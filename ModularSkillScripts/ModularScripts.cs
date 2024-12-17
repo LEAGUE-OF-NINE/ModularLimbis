@@ -380,7 +380,7 @@ namespace ModularSkillScripts
 			{
 				foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(false, thisFaction))
 				{
-					if (unit is BattleUnitModel_Abnormality || unit is BattleUnitModel) unitList.Add(unit);
+					if (unit is BattleUnitModel_Abnormality || !unit.IsAbnormalityOrPart) unitList.Add(unit);
 				}
 				return unitList;
 			}
@@ -396,7 +396,7 @@ namespace ModularSkillScripts
 			{
 				foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(false, enemyFaction))
 				{
-					if (unit is BattleUnitModel_Abnormality || unit is BattleUnitModel) unitList.Add(unit);
+					if (unit is BattleUnitModel_Abnormality || !unit.IsAbnormalityOrPart) unitList.Add(unit);
 				}
 				return unitList;
 			}
@@ -520,14 +520,19 @@ namespace ModularSkillScripts
 						if (circles[2] == "Win") _onlyClashWin = true;
 						else if (circles[2] == "Lose") _onlyClashLose = true;
 					}
-					else if (timingArg.StartsWith("WhenHit")) activationTiming = 8;
-					else if (timingArg.StartsWith("EndSkill")) activationTiming = 9;
-					else if (timingArg.StartsWith("FakePower")) activationTiming = 10;
-					else if (timingArg.StartsWith("BeforeDefense")) activationTiming = 11;
-					else if (timingArg.StartsWith("OnDie")) activationTiming = 12;
-					else if (timingArg.StartsWith("OnOtherDie")) activationTiming = 13;
-					else if (timingArg.StartsWith("DuelClash")) activationTiming = 14;
-					else if (timingArg.StartsWith("DuelClashAfter")) activationTiming = 15;
+					else if (timingArg == "WhenHit") activationTiming = 8;
+					else if (timingArg == "EndSkill") activationTiming = 9;
+					else if (timingArg == "FakePower") activationTiming = 10;
+					else if (timingArg == "BeforeDefense") activationTiming = 11;
+					else if (timingArg == "OnDie") activationTiming = 12;
+					else if (timingArg == "OnOtherDie") activationTiming = 13;
+					else if (timingArg == "DuelClash") activationTiming = 14;
+					else if (timingArg == "DuelClashAfter") activationTiming = 15;
+					else if (timingArg == "OnSucceedEvade") activationTiming = 16;
+					else if (timingArg == "OnDefeatEvade") activationTiming = 17;
+					else if (timingArg == "OnStartBehaviour") activationTiming = 18;
+					else if (timingArg == "BeforeBehaviour") activationTiming = 19;
+					else if (timingArg == "OnEndBehaviour") activationTiming = 20;
 				}
 				else if (batch.StartsWith("LOOP:")) modsa_loopString = batch.Remove(0, 5);
 				else batch_list.Add(batch);
@@ -565,7 +570,7 @@ namespace ModularSkillScripts
 					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
 					string circledSection = sectionArgs[1];
 					string[] circles = circledSection.Split(',');
-					MainClass.Logg.LogInfo("ModularLog " + circles[0] + ":" + GetNumFromParamString(circles[1]));
+					MainClass.Logg.LogInfo("ModularLog " + circles[0] + ": " + GetNumFromParamString(circles[1]));
 					continue;
 				}
 
@@ -1070,6 +1075,33 @@ namespace ModularSkillScripts
 					int amount = GetNumFromParamString(circledSection);
 					immortality = amount > 0;
 				}
+				else if (batchArgs[i].StartsWith("motion"))
+				{
+					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
+					string circledSection = sectionArgs[1];
+					string[] circles = circledSection.Split(',');
+
+					int motionIdx = motionIdx = GetNumFromParamString(circles[1]);
+
+					if (abilityMode == 0) {
+						PatchesForLethe.InjectFunnyChange(0, circles[0], modsa_skillModel.Pointer.ToInt64(), 0, motionIdx);
+					}
+					else if (abilityMode == 1) {
+						PatchesForLethe.InjectFunnyChange(0, circles[0], modsa_coinModel.Pointer.ToInt64(), modsa_skillModel.Pointer.ToInt64(), motionIdx);
+					}
+				}
+				else if (batchArgs[i].StartsWith("appearance"))
+				{
+					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
+					string circledSection = sectionArgs[1];
+					if (abilityMode == 0) {
+						PatchesForLethe.InjectFunnyChange(1, circledSection, modsa_skillModel.Pointer.ToInt64(), 0);
+					}
+					else if (abilityMode == 1) {
+						PatchesForLethe.InjectFunnyChange(1, circledSection, modsa_coinModel.Pointer.ToInt64(), modsa_skillModel.Pointer.ToInt64());
+					}
+				}
+				
 			}
 		}
 

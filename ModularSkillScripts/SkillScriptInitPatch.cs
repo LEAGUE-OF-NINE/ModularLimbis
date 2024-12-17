@@ -17,11 +17,6 @@ namespace ModularSkillScripts
 {
 	class SkillScriptInitPatch
 	{
-		public static void Setup(Harmony harmony)
-		{
-			harmony.PatchAll(typeof(SkillScriptInitPatch));
-		}
-
 		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.Init), new Type[] { })]
 		[HarmonyPostfix]
 		private static void Postfix_SkillModelInit_AddSkillScript(SkillModel __instance)
@@ -65,17 +60,13 @@ namespace ModularSkillScripts
 				}
 				if (existsAlready) continue;
 
-				MainClass.Logg.LogInfo("injecting");
 				var modsa = new ModularSA();
 				modsa.originalString = abilityScriptname;
-				MainClass.Logg.LogInfo("new modsa");
 				modsa.modsa_skillModel = __instance;
 				modsa.ptr_intlong = ptr;
-				MainClass.Logg.LogInfo("modsa init: " + ptr);
 				modsa.SetupModular(abilityScriptname.Remove(0, 8));
-				MainClass.Logg.LogInfo("setup modular");
+				MainClass.Logg.LogInfo("modSkillAbility init: " + abilityScriptname);
 				modsaglobal_list.Add(modsa);
-				MainClass.Logg.LogInfo("added to modsaglobal");
 			}
 
 			//if (injectedAbilities)
@@ -167,7 +158,7 @@ namespace ModularSkillScripts
 				modpa.passiveID = __instance.ClassInfo.ID;
 				modpa.abilityMode = 2; // 2 means passive
 				modpa.modsa_unitModel = owner;
-				MainClass.Logg.LogInfo("modpassive init: " + param);
+				MainClass.Logg.LogInfo("modPassiveAbility init: " + param);
 				modpa.SetupModular(param.Remove(0, 8));
 				modpa_list.Add(modpa);
 			}
@@ -899,6 +890,9 @@ namespace ModularSkillScripts
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
 			foreach (ModularSA modsa in modsaglobal_list)
 			{
+				// Reset clash modifiers if for some reason this skill is used again
+				if (modsa.activationTiming == 14 || modsa.activationTiming == 15) modsa.ResetAdders();
+				// normal code
 				if (skillmodel_intlong != modsa.ptr_intlong) continue;
 				MainClass.Logg.LogInfo("Found modsa - onuse");
 				modsa.modsa_selfAction = action;
@@ -1019,6 +1013,76 @@ namespace ModularSkillScripts
 				modsa.Enact(__instance, 9, timing);
 			}
 		}
+
+		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnSucceedEvade))]
+		[HarmonyPostfix]
+		private static void Postfix_SkillModel_OnSucceedEvade(BattleActionModel attackerAction, BattleActionModel evadeAction, BATTLE_EVENT_TIMING timing, SkillModel __instance)
+		{
+			long skillmodel_intlong = __instance.Pointer.ToInt64();
+			foreach (ModularSA modsa in modsaglobal_list)
+			{
+				if (skillmodel_intlong != modsa.ptr_intlong) continue;
+				modsa.modsa_selfAction = evadeAction;
+				modsa.modsa_oppoAction = attackerAction;
+				modsa.Enact(__instance, 16, timing);
+			}
+		}
+		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnFailedEvade))]
+		[HarmonyPostfix]
+		private static void Postfix_SkillModel_OnFailedEvade(BattleActionModel attackerAction, BattleActionModel evadeAction, BATTLE_EVENT_TIMING timing, SkillModel __instance)
+		{
+			long skillmodel_intlong = __instance.Pointer.ToInt64();
+			foreach (ModularSA modsa in modsaglobal_list)
+			{
+				if (skillmodel_intlong != modsa.ptr_intlong) continue;
+				modsa.modsa_selfAction = evadeAction;
+				modsa.modsa_oppoAction = attackerAction;
+				modsa.Enact(__instance, 17, timing);
+			}
+		}
+
+
+
+
+		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnStartBehaviour))]
+		[HarmonyPostfix]
+		private static void Postfix_SkillModel_OnStartBehaviour(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance)
+		{
+			long skillmodel_intlong = __instance.Pointer.ToInt64();
+			foreach (ModularSA modsa in modsaglobal_list)
+			{
+				if (skillmodel_intlong != modsa.ptr_intlong) continue;
+				modsa.modsa_selfAction = action;
+				modsa.Enact(__instance, 18, timing);
+			}
+		}
+		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.BeforeBehaviour))]
+		[HarmonyPostfix]
+		private static void Postfix_SkillModel_BeforeBehaviour(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance)
+		{
+			long skillmodel_intlong = __instance.Pointer.ToInt64();
+			foreach (ModularSA modsa in modsaglobal_list)
+			{
+				if (skillmodel_intlong != modsa.ptr_intlong) continue;
+				modsa.modsa_selfAction = action;
+				modsa.Enact(__instance, 19, timing);
+			}
+		}
+		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnEndBehaviour))]
+		[HarmonyPostfix]
+		private static void Postfix_SkillModel_OnEndBehaviour(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance)
+		{
+			long skillmodel_intlong = __instance.Pointer.ToInt64();
+			foreach (ModularSA modsa in modsaglobal_list)
+			{
+				if (skillmodel_intlong != modsa.ptr_intlong) continue;
+				modsa.modsa_selfAction = action;
+				modsa.Enact(__instance, 20, timing);
+			}
+		}
+
+
+
 
 
 		// SKILLMODEL END

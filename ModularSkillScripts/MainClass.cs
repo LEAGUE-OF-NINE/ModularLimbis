@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 
 namespace ModularSkillScripts
 {
-	[BepInPlugin("GlitchGames.ModularSkillScripts", "ModularSkillScripts", "1.5.1")]
+	[BepInPlugin("GlitchGames.ModularSkillScripts", "ModularSkillScripts", "1.6")]
 	public class MainClass : BasePlugin
 	{
 		public override void Load()
@@ -20,12 +20,14 @@ namespace ModularSkillScripts
 			Harmony harmony = new Harmony("ModularSkillScripts");
 			Logg = new ManualLogSource("ModularSkillScripts");
 			Logger.Sources.Add(Logg);
+			ClassInjector.RegisterTypeInIl2Cpp<InjectedFunnyChange>();
 			ClassInjector.RegisterTypeInIl2Cpp<DataMod>();
 			ClassInjector.RegisterTypeInIl2Cpp<ModUnitData>();
 			ClassInjector.RegisterTypeInIl2Cpp<ModularSA>();
 			//ClassInjector.RegisterTypeInIl2Cpp<MODSA_HelloWorld>();
-			SkillScriptInitPatch.Setup(harmony);
-			StagePatches.Setup(harmony);
+			//harmony.PatchAll(typeof(PatchesForLethe));
+			harmony.PatchAll(typeof(SkillScriptInitPatch));
+			harmony.PatchAll(typeof(StagePatches));
 			//OnSAGiveBuffFactionCheck.Setup(harmony);
 			//GiveBuffOnUseFactionCheck.Setup(harmony);
 			//GiveBuffOnUseFactionCheckReson.Setup(harmony);
@@ -42,7 +44,7 @@ namespace ModularSkillScripts
 
 		public const string NAME = "ModularSkillScripts";
 
-		public const string VERSION = "1.5.1";
+		public const string VERSION = "1.6";
 
 		public const string AUTHOR = "GlitchGames";
 

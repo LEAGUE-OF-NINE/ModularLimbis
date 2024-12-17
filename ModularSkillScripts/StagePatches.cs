@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using BattleUI;
 using BattleUI.Operation;
+using Lethe;
 using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
 using MainUI;
@@ -11,16 +12,13 @@ using UnityEngine;
 using static BattleUI.Abnormality.AbnormalityPartSkills;
 using static UnityEngine.GraphicsBuffer;
 using IntPtr = System.IntPtr;
+using System.Reflection;
+using System.Linq;
 
 namespace ModularSkillScripts
 {
 	internal class StagePatches
 	{
-		public static void Setup(Harmony harmony)
-		{
-			harmony.PatchAll(typeof(StagePatches));
-		}
-
 		public static int extraSlot = 0;
 		public static bool instantslot = false;
 		public static List<int> doubleslotterIDList = new List<int>();
@@ -31,6 +29,7 @@ namespace ModularSkillScripts
 		private static void Prefix_StageModel_Init(StageStaticData stageinfo, StageModel __instance)
 		{
 			SkillScriptInitPatch.ResetAllModsa();
+			PatchesForLethe.injectedFunnyChange_list.Clear();
 
 			extraSlot = 0;
 			instantslot = false;

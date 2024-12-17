@@ -261,3 +261,4 @@ D:\repos\ModularSkillScripts repos\ModularSkillScripts\obj\Release\ModularSkillS
 D:\repos\ModularSkillScripts repos\ModularSkillScripts\obj\Release\ModularS.E2C52D55.Up2Date
 D:\repos\ModularSkillScripts repos\ModularSkillScripts\obj\Release\ModularSkillScripts.dll
 D:\repos\ModularSkillScripts repos\ModularSkillScripts\obj\Release\ModularSkillScripts.pdb
+D:\repos\ModularSkillScripts repos\ModularSkillScripts\bin\Release\Lethe.dll
