@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 
 namespace ModularSkillScripts
 {
-	[BepInPlugin("GlitchGames.ModularSkillScripts", "ModularSkillScripts", "1.6")]
+	[BepInPlugin("GlitchGames.ModularSkillScripts", "ModularSkillScripts", "1.7")]
 	public class MainClass : BasePlugin
 	{
 		public override void Load()
@@ -44,7 +44,7 @@ namespace ModularSkillScripts
 
 		public const string NAME = "ModularSkillScripts";
 
-		public const string VERSION = "1.6";
+		public const string VERSION = "1.7";
 
 		public const string AUTHOR = "GlitchGames";
 

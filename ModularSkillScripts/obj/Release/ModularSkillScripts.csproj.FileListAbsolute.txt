@@ -262,3 +262,6 @@ D:\repos\ModularSkillScripts repos\ModularSkillScripts\obj\Release\ModularS.E2C5
 D:\repos\ModularSkillScripts repos\ModularSkillScripts\obj\Release\ModularSkillScripts.dll
 D:\repos\ModularSkillScripts repos\ModularSkillScripts\obj\Release\ModularSkillScripts.pdb
 D:\repos\ModularSkillScripts repos\ModularSkillScripts\bin\Release\Lethe.dll
+D:\repos\ModularSkillScripts repos\ModularSkillScripts\bin\Release\System.Memory.dll
+D:\repos\ModularSkillScripts repos\ModularSkillScripts\bin\Release\System.Buffers.dll
+D:\repos\ModularSkillScripts repos\ModularSkillScripts\bin\Release\System.Numerics.Vectors.dll

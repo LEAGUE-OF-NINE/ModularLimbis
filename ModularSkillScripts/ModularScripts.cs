@@ -126,6 +126,7 @@ namespace ModularSkillScripts
 		public int parryingResultAdder = 0;
 		public int atkDmgAdder = 0;
 		public int atkMultAdder = 0;
+		public int slotAdder = 0;
 
 		public bool wasCrit = false;
 		public bool wasClash = false;
@@ -843,10 +844,11 @@ namespace ModularSkillScripts
 					if (modelList.Count < 1) continue;
 
 					int amount = GetNumFromParamString(circles[1]);
+					bool permashield = circles.Length > 2;
 
 					foreach (BattleUnitModel targetModel in modelList)
 					{
-						targetModel.AddShield(amount, true, ABILITY_SOURCE_TYPE.SKILL, battleTiming);
+						targetModel.AddShield(amount, !permashield, ABILITY_SOURCE_TYPE.SKILL, battleTiming);
 					}
 				}
 				else if (batchArgs[i].StartsWith("explosion"))
@@ -942,6 +944,34 @@ namespace ModularSkillScripts
 					//bool randomize = false;
 
 					//pattern.PickSkillsByPattern(pickedPattern_idx, slotCount, randomize);
+				}
+				else if (batchArgs[i].StartsWith("setslotadder"))
+				{
+					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
+					string circledSection = sectionArgs[1];
+					string[] circles = circledSection.Split(',');
+
+					int amount = GetNumFromParamString(circles[1]);
+					if (amount < 0) continue;
+					bool add_max_instead = circles.Length > 2;
+					if (!add_max_instead) { slotAdder = amount; continue; }
+
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					if (modelList.Count < 1) continue;
+
+					foreach (BattleUnitModel targetModel in modelList)
+					{
+						BattleUnitModel_Abnormality abnoModel = null;
+						if (targetModel is BattleUnitModel_Abnormality) abnoModel = (BattleUnitModel_Abnormality)targetModel;
+						else if (targetModel is BattleUnitModel_Abnormality_Part)
+						{
+							BattleUnitModel_Abnormality_Part partModel = (BattleUnitModel_Abnormality_Part)targetModel;
+							abnoModel = partModel.Abnormality;
+						}
+						if (abnoModel == null) continue;
+						PatternScript_Abnormality pattern = abnoModel.PatternScript;
+						pattern._slotMax = amount;
+					}
 				}
 				else if (batchArgs[i].StartsWith("breakdmg"))
 				{
@@ -1280,6 +1310,24 @@ namespace ModularSkillScripts
 				int pattern_idx = pattern.currPatternIdx;
 				if (MainClass.logEnabled) MainClass.Logg.LogInfo("get pattern_idx: " + pattern_idx);
 				valueList[setvalue_idx] = pattern.currPatternIdx;
+			}
+			else if (methodology == "getabnoslotmax")
+			{
+				valueList[setvalue_idx] = 0;
+				BattleUnitModel targetModel = GetTargetModel(circledSection);
+				if (targetModel == null) { return; }
+
+				BattleUnitModel_Abnormality abnoModel = null;
+				if (targetModel is BattleUnitModel_Abnormality) abnoModel = (BattleUnitModel_Abnormality)targetModel;
+				else if (targetModel is BattleUnitModel_Abnormality_Part)
+				{
+					BattleUnitModel_Abnormality_Part partModel = (BattleUnitModel_Abnormality_Part)targetModel;
+					abnoModel = partModel.Abnormality;
+				}
+				if (abnoModel == null) { return; }
+
+				PatternScript_Abnormality pattern = abnoModel.PatternScript;
+				valueList[setvalue_idx] = pattern.SlotMax;
 			}
 			else if (methodology == "getdata")
 			{
