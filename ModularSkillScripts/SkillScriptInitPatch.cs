@@ -604,7 +604,7 @@ namespace ModularSkillScripts
 
 		[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnDie))]
 		[HarmonyPostfix]
-		private static void Postfix_PassiveDetail_OnDie(BattleUnitModel killer, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
+		private static void Postfix_PassiveDetail_OnDie(BattleUnitModel killer, BattleActionModel actionOrNull, DAMAGE_SOURCE_TYPE dmgSrcType, BUFF_UNIQUE_KEYWORD keyword, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 		{
 			foreach (PassiveModel passiveModel in __instance.PassiveList)
 			{
@@ -614,7 +614,7 @@ namespace ModularSkillScripts
 				{
 					if (param.StartsWith("Modular/"))
 					{
-						passiveModel.OnDie(killer, timing);
+						passiveModel.OnDie(killer, actionOrNull, dmgSrcType, keyword, timing);
 						break;
 					}
 				}
@@ -622,7 +622,7 @@ namespace ModularSkillScripts
 		}
 		[HarmonyPatch(typeof(PassiveModel), nameof(PassiveModel.OnDie))]
 		[HarmonyPostfix]
-		private static void Postfix_PassiveModel_OnDie(BattleUnitModel killer, BATTLE_EVENT_TIMING timing, PassiveModel __instance)
+		private static void Postfix_PassiveModel_OnDie(BattleUnitModel killer, BattleActionModel actionOrNull, DAMAGE_SOURCE_TYPE dmgSrcType, BUFF_UNIQUE_KEYWORD keyword, BATTLE_EVENT_TIMING timing, PassiveModel __instance)
 		{
 			long passiveModel_intlong = __instance.Pointer.ToInt64();
 			foreach (ModularSA modpa in modpa_list)

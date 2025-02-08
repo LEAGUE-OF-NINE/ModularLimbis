@@ -2,7 +2,6 @@
 using System.Runtime.InteropServices;
 using BattleUI;
 using BattleUI.Operation;
-using Lethe;
 using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
 using MainUI;

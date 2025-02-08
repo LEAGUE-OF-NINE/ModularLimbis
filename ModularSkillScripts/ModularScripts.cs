@@ -534,6 +534,7 @@ namespace ModularSkillScripts
 					else if (timingArg == "OnStartBehaviour") activationTiming = 18;
 					else if (timingArg == "BeforeBehaviour") activationTiming = 19;
 					else if (timingArg == "OnEndBehaviour") activationTiming = 20;
+					else if (timingArg == "SpecialAction") activationTiming = 999;
 				}
 				else if (batch.StartsWith("LOOP:")) modsa_loopString = batch.Remove(0, 5);
 				else batch_list.Add(batch);
@@ -697,10 +698,11 @@ namespace ModularSkillScripts
 					foreach (string circle in circles)
 					{
 						int idx = GetNumFromParamString(circle);
-						if (idx < 0) { modsa_skillModel.CopyCoin(modsa_coinModel.GetOriginCoinIndex()); continue; }
+						if (idx < 0) { modsa_skillModel.CopyCoin(modsa_selfAction, modsa_coinModel.GetOriginCoinIndex(), battleTiming); continue; }
 
 						idx = Math.Min(idx, modsa_skillModel.CoinList.Count - 1);
-						modsa_skillModel.CopyCoin(idx);
+						modsa_skillModel.CopyCoin(modsa_selfAction, idx, battleTiming);
+
 					}
 				}
 				else if (batchArgs[i].StartsWith("bonusdmg"))
