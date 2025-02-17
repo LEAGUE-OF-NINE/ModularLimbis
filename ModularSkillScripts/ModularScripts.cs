@@ -7,6 +7,7 @@ using BattleUI;
 using BattleUI.Operation;
 using Dungeon;
 using HarmonyLib;
+using Il2CppSystem.Buffers;
 using Il2CppSystem.Collections.Generic;
 using UnhollowerRuntimeLib;
 using UnityEngine;
@@ -71,7 +72,7 @@ namespace ModularSkillScripts
 			ResetAdders();
 			ResetCoinConditionals();
 
-			ptr_intlong = 0;
+            ptr_intlong = 0;
 			passiveID = 0;
 
 			modsa_selfAction = null;
@@ -97,6 +98,8 @@ namespace ModularSkillScripts
 		public BattleActionModel modsa_oppoAction = null;
 		public List<BattleUnitModel> modsa_target_list = new List<BattleUnitModel>();
 
+        public int interactionTimer = 0;
+        public bool markedForDeath = false;
 		public int abilityMode = 0;
 		public int passiveID = 0; // 0 means skill, 1 means coin, 2 means passive
 		public long ptr_intlong;
@@ -158,18 +161,20 @@ namespace ModularSkillScripts
 
 		public void Enact(SkillModel skillModel_inst, int actevent, BATTLE_EVENT_TIMING timing)
 		{
-			if (MainClass.logEnabled) MainClass.Logg.LogInfo("Enact");
-			battleTiming = timing;
-			//if (activationTiming == 0) if (actevent != 0 && actevent != 0 && actevent != 0 &&)
+            //if (MainClass.logEnabled) MainClass.Logg.LogInfo("Enact");
+            interactionTimer = 0;
+            if (activationTiming != actevent) return;
+            //if (activationTiming == 0) if (actevent != 0 && actevent != 0 && actevent != 0 &&)
 
-			if (activationTiming != actevent) return;
-			if (skillModel_inst != null) modsa_skillModel = skillModel_inst;
+            battleTiming = timing;
+            if (skillModel_inst != null) modsa_skillModel = skillModel_inst;
 			if (modsa_selfAction != null) {
 				if (modsa_skillModel == null) modsa_skillModel = modsa_selfAction.Skill;
 				if (modsa_unitModel == null) modsa_unitModel = modsa_selfAction.Model;
 			}
 			if (MainClass.logEnabled) MainClass.Logg.LogInfo("activation good");
 
+			if (activationTiming == 1) markedForDeath = true;
 			if (activationTiming == 7)
 			{
 				if (modsa_coinModel == null)
@@ -1097,7 +1102,7 @@ namespace ModularSkillScripts
 					}
 					else
 					{
-
+						
 					}
 				}
 				else if (batchArgs[i].StartsWith("setimmortal"))
@@ -1133,8 +1138,107 @@ namespace ModularSkillScripts
 						PatchesForLethe.InjectFunnyChange(1, circledSection, modsa_coinModel.Pointer.ToInt64(), modsa_skillModel.Pointer.ToInt64());
 					}
 				}
-				
-			}
+				else if (batchArgs[i].StartsWith("retreat"))
+				{
+					BattleObjectManager battleObjectManager_inst = SingletonBehavior<BattleObjectManager>.Instance;
+					if (battleObjectManager_inst == null) continue;
+
+                    string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
+                    string circledSection = sectionArgs[1];
+                    string[] circles = circledSection.Split(',');
+
+                    List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+                    //if (modelList.Count < 1) continue;
+					//bool comeback = circles.Length > 1;
+
+                    foreach (BattleUnitModel targetModel in modelList)
+					{
+						if (battleObjectManager_inst.TryReservateForRetreat(targetModel, modsa_unitModel, BUFF_UNIQUE_KEYWORD.Retreat))
+						{
+							targetModel.Retreat(modsa_unitModel, battleTiming);
+                        }
+
+                    }
+                }
+				else if (batchArgs[i].StartsWith("aggro"))
+                {
+                    string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
+                    string circledSection = sectionArgs[1];
+                    string[] circles = circledSection.Split(',');
+
+                    List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					int amount = GetNumFromParamString(circles[1]);
+                    bool nextRound = true;
+					int slot = -2;
+					if (circles.Length > 2) nextRound = circles[2] == "next";
+                    if (circles.Length > 3) slot = GetNumFromParamString(circles[3]);
+
+                    foreach (BattleUnitModel targetModel in modelList)
+                    {
+						List<SinActionModel> sinActionList = targetModel.GetSinActionList();
+						int sinActionCount = sinActionList.Count;
+                        if (sinActionCount < 1) continue;
+
+						if (targetModel == modsa_unitModel)
+						{
+							if (slot == -2 && modsa_selfAction != null)
+							{
+								if (nextRound) modsa_selfAction.SinAction.StackNextTurnAggroAdder(amount);
+								else modsa_selfAction.SinAction.StackThisTurnAggroAdder(amount);
+                            }
+                            else if (slot == -1)
+                            {
+                                int quotient = amount / sinActionCount;
+                                int remainder = amount % sinActionCount;
+
+                                foreach (SinActionModel sinAction in sinActionList)
+                                {
+                                    int finalAmount = amount;
+                                    if (remainder > 0)
+                                    {
+                                        finalAmount += 1;
+                                        remainder -= 1;
+                                    }
+                                    if (nextRound) sinAction.StackNextTurnAggroAdder(finalAmount);
+                                    else sinAction.StackThisTurnAggroAdder(finalAmount);
+                                }
+								continue;
+                            }
+							
+							int chosenSlot = Math.Min(slot, sinActionCount - 1);
+                            if (nextRound) sinActionList[chosenSlot].StackNextTurnAggroAdder(amount);
+                            else sinActionList[chosenSlot].StackThisTurnAggroAdder(amount);
+                        }
+						else
+						{
+                            int chosenSlot = Math.Min(slot, sinActionCount - 1);
+							if (chosenSlot == -2) chosenSlot = 0;
+							
+							if (chosenSlot == -1)
+							{
+								int quotient = amount / sinActionCount;
+								int remainder = amount % sinActionCount;
+
+								foreach (SinActionModel sinAction in sinActionList)
+								{
+									int finalAmount = amount;
+									if (remainder > 0)
+									{
+										finalAmount += 1;
+										remainder -= 1;
+                                    }
+									if (nextRound) sinAction.StackNextTurnAggroAdder(finalAmount);
+									else sinAction.StackThisTurnAggroAdder(finalAmount);
+                                }
+								continue;
+							}
+                            if (nextRound) sinActionList[chosenSlot].StackNextTurnAggroAdder(amount);
+                            else sinActionList[chosenSlot].StackThisTurnAggroAdder(amount);
+                        }
+                        
+                    }
+                }
+            }
 		}
 
 		private void AcquireValue(int setvalue_idx, string section)
