@@ -61,7 +61,42 @@ namespace ModularSkillScripts
 		{
 			int round = __instance.GetCurrentRound();
 			MainClass.Logg.LogInfo("Postfix_StageController_StartRound | Round: " + round);
-			SinManager sinManager_inst = Singleton<SinManager>.Instance;
+
+            int amount_before = SkillScriptInitPatch.modsaglobal_list.Count;
+            int duplicate_bad = 0;
+            int duplicate_good = 0;
+
+            List<ModularSA> goodOnes = new List<ModularSA>(amount_before);
+            foreach (ModularSA modsa in SkillScriptInitPatch.modsaglobal_list)
+            {
+                int deathTime = 5;
+				if (modsa.modsa_skillModel != null && modsa.modsa_skillModel.IsEgoSkill()) deathTime = 3;
+                if (modsa.interactionTimer < deathTime && !modsa.markedForDeath)
+				{
+					modsa.interactionTimer += 1;
+                    goodOnes.Add(modsa);
+                    if (modsa.modsa_skillModel != null)
+                    {
+                        if (modsa.modsa_skillModel._isCopiedSkill) duplicate_good += 1;
+                    }
+                }
+				else
+				{
+					if (modsa.modsa_skillModel != null)
+					{
+						if (modsa.modsa_skillModel._isCopiedSkill) duplicate_bad += 1;
+                    }
+					modsa.EraseAllData();
+				}
+            }
+            SkillScriptInitPatch.modsaglobal_list = goodOnes;
+            int amount_after = SkillScriptInitPatch.modsaglobal_list.Count;
+				
+            MainClass.Logg.LogInfo("Modsa cleanup before: " + amount_before + " - after: " + amount_after);
+            MainClass.Logg.LogInfo("Modsa cleanup duplicate_bad: " + duplicate_bad + " - duplicate_good: " + duplicate_good);
+            
+
+            SinManager sinManager_inst = Singleton<SinManager>.Instance;
 			BattleObjectManager _battleObjectManager = sinManager_inst._battleObjectManager;
 			StageModel stageModel = __instance.StageModel;
 
