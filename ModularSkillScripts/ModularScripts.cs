@@ -875,18 +875,21 @@ namespace ModularSkillScripts
 					}
 				}
 				else if (batchArgs[i].StartsWith("recoverbreak"))
+{
+				string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
+				string circledSection = sectionArgs[1];
+    string[] circles = circledSection.Split(',');
+    List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+				if (modelList.Count < 1) continue;
+
+
+    bool force = circles.Length > 1;
+    foreach (BattleUnitModel targetModel in modelList)
 				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-
-					List<BattleUnitModel> modelList = GetTargetModelList(circledSection);
-					if (modelList.Count < 1) continue;
-
-					foreach (BattleUnitModel targetModel in modelList)
-					{
-						targetModel.RecoverAllBreak(battleTiming);
-					}
+					if (!force) { targetModel.RecoverBreak(battleTiming); }
+					if (force) { targetModel.RecoverAllBreak(battleTiming); }
 				}
+}
 				else if (batchArgs[i].StartsWith("break"))
 				{
 					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
