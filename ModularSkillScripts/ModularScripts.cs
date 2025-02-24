@@ -858,6 +858,120 @@ namespace ModularSkillScripts
 						targetModel.AddShield(amount, !permashield, ABILITY_SOURCE_TYPE.SKILL, battleTiming);
 					}
 				}
+    				else if (batchArgs[i].StartsWith("addbreak"))
+				{
+					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
+					string circledSection = sectionArgs[1];
+					string[] circles = circledSection.Split(',');
+
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					if (modelList.Count < 1) continue;
+
+					int amount = GetNumFromParamString(circles[1]);
+
+					foreach (BattleUnitModel targetModel in modelList)
+					{
+						targetModel.AddBreakSectionForcely(amount);
+					}
+				}
+				else if (batchArgs[i].StartsWith("recoverbreak"))
+				{
+					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
+					string circledSection = sectionArgs[1];
+
+					List<BattleUnitModel> modelList = GetTargetModelList(circledSection);
+					if (modelList.Count < 1) continue;
+
+					foreach (BattleUnitModel targetModel in modelList)
+					{
+						targetModel.RecoverAllBreak(battleTiming);
+					}
+				}
+				else if (batchArgs[i].StartsWith("break"))
+				{
+					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
+					string circledSection = sectionArgs[1];
+					string[] circles = circledSection.Split(',');
+					bool force = false;
+					bool both = false;
+					bool damage = true;
+
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					if (modelList.Count < 1) continue;
+
+					if (circles.Length > 1)
+					{
+						int forceyesno = GetNumFromParamString(circles[1]);
+						if (forceyesno == 1)
+						{
+							force = true;
+						}
+						else if (forceyesno == 2)
+						{
+							both = true;
+							force = true;
+						}
+						else
+						{
+							force = false;
+						}
+					}
+					if (circles.Length > 2)
+					{	
+						int damageyesno = GetNumFromParamString(circles[2]);
+						if (damageyesno == 1)
+						{
+							damage = true;
+						}
+						else
+						{
+							damage = false;
+						}
+					}
+
+					foreach (BattleUnitModel targetModel in modelList)
+					{
+						if (force)
+						{
+							if (abilityMode == 2)
+							{
+								targetModel.BreakForcely(modsa_unitModel, ABILITY_SOURCE_TYPE.PASSIVE, battleTiming, false);
+								if (both)
+								{
+									targetModel.Break(modsa_unitModel, battleTiming);
+								}
+								if (damage)
+								{
+									targetModel.ChangeResistOnBreak();
+								}
+							}
+							else
+							{
+								targetModel.BreakForcely(modsa_unitModel, ABILITY_SOURCE_TYPE.SKILL, battleTiming, false);
+								if (both)
+								{
+									targetModel.Break(modsa_unitModel, battleTiming);
+								}
+								if (damage)
+								{
+									targetModel.ChangeResistOnBreak();
+								}
+							}
+						}
+						else
+						{
+						targetModel.Break(modsa_unitModel, battleTiming);
+						if (damage)
+						{
+							targetModel.ChangeResistOnBreak();
+						}
+					}
+				}
+}
+
+
+
+
 				else if (batchArgs[i].StartsWith("explosion"))
 				{
 					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
@@ -1296,6 +1410,10 @@ namespace ModularSkillScripts
 						case '?':
 							finalValue = Math.Max(finalValue, amount);
 							break;
+                                                case '$':
+				                 	finalValue %= amount;
+							break;
+
 					}
 					if (MainClass.logEnabled) MainClass.Logg.LogInfo("mathfinal " + finalValue);
 				}
