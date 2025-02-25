@@ -902,7 +902,7 @@ namespace ModularSkillScripts
                     List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
                     if (modelList.Count < 1) continue;
 
-                    string mode_string = batchArgs[i].Remove(0, 5);
+                    string mode_string = sectionArgs[0].Remove(0, 5);
 
 					if (mode_string == "")
 					{
@@ -1330,7 +1330,7 @@ namespace ModularSkillScripts
                     string circledSection = sectionArgs[1];
                     string[] circles = circledSection.Split(',');
 
-                    string mode_string = batchArgs[i].Remove(0, 5);
+                    string mode_string = sectionArgs[0].Remove(0, 5);
                     if (mode_string == "send")
                     {
                         BattleUnitModel fromUnit = GetTargetModel(circles[0]);
