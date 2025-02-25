@@ -1353,15 +1353,13 @@ namespace ModularSkillScripts
 						else int.TryParse(circle_2, out skillID);
 						if (skillID < 0) continue;
 
-						List<SinActionModel> sinActionList = toUnit.GetSinActionList();
-						int sinActionCount = sinActionList.Count;
-						if (sinActionCount < 1) continue;
-
 						SinActionModel fromSinAction_new = fromUnit.AddNewSinActionModel();
 						UnitSinModel fromSinModel_new = new UnitSinModel(skillID, fromUnit, fromSinAction_new);
 						BattleActionModel fromAction_new = new BattleActionModel(fromSinModel_new, fromUnit, fromSinAction_new);
 
 						if (toUnit != null) {
+							List<SinActionModel> sinActionList = toUnit.GetSinActionList();
+							if (sinActionList.Count < 1) continue;
 							SinActionModel targetSinAction = sinActionList[0];
 							List<SinActionModel> targetSinActionList = new List<SinActionModel>();
 							targetSinActionList.Add(targetSinAction);
