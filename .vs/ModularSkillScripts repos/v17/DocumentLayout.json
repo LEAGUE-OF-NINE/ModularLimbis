@@ -7,20 +7,20 @@
       "RelativeMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|solutionrelative:modularskillscripts\\modularscripts.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\modularskillscripts\\skillscriptinitpatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|solutionrelative:modularskillscripts\\skillscriptinitpatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\modularskillscripts\\mainclass.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|solutionrelative:modularskillscripts\\mainclass.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\modularskillscripts\\patchesforlethe.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|solutionrelative:modularskillscripts\\patchesforlethe.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\modularskillscripts\\skillscriptinitpatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|solutionrelative:modularskillscripts\\skillscriptinitpatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\modularskillscripts\\stagepatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|solutionrelative:modularskillscripts\\stagepatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\modularskillscripts\\patchesforlethe.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|solutionrelative:modularskillscripts\\patchesforlethe.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\modularskillscripts\\uniquepatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -38,7 +38,7 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "SkillScriptInitPatch.cs",
               "DocumentMoniker": "C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\ModularSkillScripts\\SkillScriptInitPatch.cs",
               "RelativeDocumentMoniker": "ModularSkillScripts\\SkillScriptInitPatch.cs",
@@ -46,11 +46,12 @@
               "RelativeToolTip": "ModularSkillScripts\\SkillScriptInitPatch.cs",
               "ViewState": "AgIAAAgBAAAAAAAAAAAmwAABAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-29T21:33:35.742Z"
+              "WhenOpened": "2024-11-29T21:33:35.742Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "PatchesForLethe.cs",
               "DocumentMoniker": "C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\ModularSkillScripts\\PatchesForLethe.cs",
               "RelativeDocumentMoniker": "ModularSkillScripts\\PatchesForLethe.cs",
@@ -62,15 +63,16 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "MainClass.cs",
               "DocumentMoniker": "C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\ModularSkillScripts\\MainClass.cs",
               "RelativeDocumentMoniker": "ModularSkillScripts\\MainClass.cs",
               "ToolTip": "C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\ModularSkillScripts\\MainClass.cs",
               "RelativeToolTip": "ModularSkillScripts\\MainClass.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAAC8AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAABoAAAAzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-29T21:33:26.057Z"
+              "WhenOpened": "2024-11-29T21:33:26.057Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -86,15 +88,16 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 3,
               "Title": "StagePatches.cs",
               "DocumentMoniker": "C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\ModularSkillScripts\\StagePatches.cs",
               "RelativeDocumentMoniker": "ModularSkillScripts\\StagePatches.cs",
               "ToolTip": "C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\ModularSkillScripts\\StagePatches.cs",
               "RelativeToolTip": "ModularSkillScripts\\StagePatches.cs",
-              "ViewState": "AgIAAMAAAAAAAAAAAAAmwOcAAAAsAAAAAAAAAA==",
+              "ViewState": "AgIAAFcAAAAAAAAAAAAowGsAAAA6AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-08T01:53:28.549Z"
+              "WhenOpened": "2024-12-08T01:53:28.549Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -104,7 +107,7 @@
               "RelativeDocumentMoniker": "ModularSkillScripts\\ModularScripts.cs",
               "ToolTip": "C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\ModularSkillScripts\\ModularScripts.cs",
               "RelativeToolTip": "ModularSkillScripts\\ModularScripts.cs",
-              "ViewState": "AgIAABMFAAAAAAAAAAAowDEFAAAGAAAAAAAAAA==",
+              "ViewState": "AgIAAIkDAAAAAAAAAAAowLMDAAAvAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-29T21:33:39.343Z",
               "EditorCaption": ""

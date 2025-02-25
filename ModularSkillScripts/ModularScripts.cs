@@ -13,6 +13,7 @@ using UnhollowerRuntimeLib;
 using UnityEngine;
 using static BattleActionModel.TargetDataDetail;
 using static BuffModel;
+using static UIComponent.Icon.GaugeTextIconUI;
 using IntPtr = System.IntPtr;
 
 namespace ModularSkillScripts
@@ -375,8 +376,23 @@ namespace ModularSkillScripts
 				}
 				return unitList;
 			}
+            else if (param.StartsWith("adj"))
+            {
+                string side_string = param.Remove(0, 3);
+                if (side_string == "Left")
+                {
+                    List<BattleUnitModel> modelList = battleObjectManager.GetPrevUnitsByPortrait(modsa_unitModel, 1);
+					if (modelList.Count > 0) unitList.Add(modelList[0]);
+                }
+                else
+                {
+                    List<BattleUnitModel> modelList = battleObjectManager.GetNextUnitsByPortrait(modsa_unitModel, 1);
+                    if (modelList.Count > 0) unitList.Add(modelList[0]);
+                }
+                return unitList;
+            }
 
-			UNIT_FACTION thisFaction = modsa_unitModel.Faction;
+            UNIT_FACTION thisFaction = modsa_unitModel.Faction;
 			UNIT_FACTION enemyFaction = thisFaction == UNIT_FACTION.PLAYER ? UNIT_FACTION.ENEMY : UNIT_FACTION.PLAYER;
 
 			if (param == "EveryAlly") return battleObjectManager.GetAliveList(false, thisFaction);
@@ -482,6 +498,25 @@ namespace ModularSkillScripts
 				}
 				return null;
 			}
+			else if (param.StartsWith("adj"))
+			{
+                BattleUnitModel foundUnit = null;
+                BattleObjectManager battleObjectManager_inst = SingletonBehavior<BattleObjectManager>.Instance;
+				if (battleObjectManager_inst == null) return foundUnit;
+				
+                string side_string = param.Remove(0, 3);
+				if (side_string == "Left")
+				{
+					List<BattleUnitModel> modelList = battleObjectManager_inst.GetPrevUnitsByPortrait(modsa_unitModel, 1);
+					if (modelList.Count > 0) foundUnit = modelList[0];
+                }
+				else
+				{
+                    List<BattleUnitModel> modelList = battleObjectManager_inst.GetNextUnitsByPortrait(modsa_unitModel, 1);
+                    if (modelList.Count > 0) foundUnit = modelList[0];
+                }
+				return foundUnit;
+            }
 
 			return modsa_unitModel;
 		}
@@ -871,60 +906,116 @@ namespace ModularSkillScripts
 						targetModel.ReuseAction(modsa_selfAction);
 					}
 				}
-    			else if (batchArgs[i].StartsWith("addbreak"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
-
-					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-					if (modelList.Count < 1) continue;
-
-					int amount = circles.Length >= 2 ? GetNumFromParamString(circles[1]) : 1;
-
-					foreach (BattleUnitModel targetModel in modelList)
-					{
-						targetModel.AddBreakSectionForcely(amount);
-					}
-				}
-				else if (batchArgs[i].StartsWith("recoverbreak"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
-					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-					if (modelList.Count < 1) continue;
-
-					bool force = circles.Length > 1;
-					foreach (BattleUnitModel targetModel in modelList)
-					{
-						if (!force) { targetModel.RecoverBreak(battleTiming); }
-						if (force) { targetModel.RecoverAllBreak(battleTiming); }
-					}
-				}
 				else if (batchArgs[i].StartsWith("break"))
 				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
-					
-					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-					if (modelList.Count < 1) continue;
+                    string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
+                    string circledSection = sectionArgs[1];
+                    string[] circles = circledSection.Split(',');
 
-					string opt2_string = circles.Length >= 2 ? circles[1] : "natural";
-                    bool force = opt2_string != "natural";
-                    bool both = opt2_string == "both";
-                    bool resistancebreak = circles.Length <= 2;
+                    List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+                    if (modelList.Count < 1) continue;
 
-                    foreach (BattleUnitModel targetModel in modelList)
+                    string mode_string = batchArgs[i].Remove(0, 5);
+
+					if (mode_string == "")
 					{
-						ABILITY_SOURCE_TYPE abilitySourceType = ABILITY_SOURCE_TYPE.SKILL;
-						if (abilityMode == 2) abilitySourceType = ABILITY_SOURCE_TYPE.PASSIVE;
+                        string opt2_string = circles.Length >= 2 ? circles[1] : "natural";
+                        bool force = opt2_string != "natural";
+                        bool both = opt2_string == "both";
+                        bool resistancebreak = circles.Length <= 2;
 
-                        if (force) targetModel.BreakForcely(modsa_unitModel, abilitySourceType, battleTiming, false, modsa_selfAction);
-						if (!force || both) targetModel.Break(modsa_unitModel, battleTiming, modsa_selfAction);
-                        if (resistancebreak) targetModel.ChangeResistOnBreak();
+                        foreach (BattleUnitModel targetModel in modelList)
+                        {
+                            ABILITY_SOURCE_TYPE abilitySourceType = ABILITY_SOURCE_TYPE.SKILL;
+                            if (abilityMode == 2) abilitySourceType = ABILITY_SOURCE_TYPE.PASSIVE;
+
+                            if (force) targetModel.BreakForcely(modsa_unitModel, abilitySourceType, battleTiming, false, modsa_selfAction);
+                            if (!force || both) targetModel.Break(modsa_unitModel, battleTiming, modsa_selfAction);
+                            if (resistancebreak) targetModel.ChangeResistOnBreak();
+                        }
                     }
+					else if (mode_string == "dmg")
+					{
+                        int amount = GetNumFromParamString(circles[1]);
+                        if (amount == 0) continue;
+                        int times = 1;
+                        if (circles.Length > 2) times = GetNumFromParamString(circles[2]);
+
+                        foreach (BattleUnitModel targetModel in modelList)
+                        {
+                            for (int times_i = 0; times_i < times; times_i++)
+                            {
+                                if (amount < 0)
+                                {
+                                    amount *= -1;
+                                    AbilityTriggeredData_BsGaugeDown triggerData = new AbilityTriggeredData_BsGaugeDown(amount, targetModel.InstanceID, battleTiming);
+                                    if (abilityMode == 2)
+                                    {
+                                        dummyPassiveAbility.FirstBsGaugeDown(modsa_unitModel, targetModel, amount, battleTiming);
+                                        targetModel.AddTriggeredData(triggerData);
+                                    }
+                                    else if (abilityMode == 1)
+                                    {
+                                        dummyCoinAbility.FirstBsGaugeDown(modsa_unitModel, targetModel, amount, battleTiming);
+                                        targetModel.AddTriggeredData(triggerData);
+                                    }
+                                    else
+                                    {
+                                        dummySkillAbility.AddTriggeredData_BsGaugeDown(amount, targetModel.InstanceID, battleTiming);
+                                        dummySkillAbility.FirstBsGaugeDown(modsa_unitModel, targetModel, amount, battleTiming);
+                                    }
+                                }
+                                else
+                                {
+                                    AbilityTriggeredData_BsGaugeUp triggerData = new AbilityTriggeredData_BsGaugeUp(amount, targetModel.InstanceID, battleTiming);
+                                    if (abilityMode == 2)
+                                    {
+                                        dummyPassiveAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, amount, battleTiming, false);
+                                        targetModel.AddTriggeredData(triggerData);
+                                    }
+                                    else if (abilityMode == 1)
+                                    {
+                                        dummyCoinAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, amount, battleTiming, false, modsa_selfAction);
+                                        targetModel.AddTriggeredData(triggerData);
+                                    }
+                                    else
+                                    {
+                                        dummySkillAbility.AddTriggeredData_BsGaugeUp(amount, targetModel.InstanceID, battleTiming, false);
+                                        dummySkillAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, amount, battleTiming, false, modsa_selfAction);
+                                    }
+                                }
+                            }
+                        }
+                    }
+					else if (mode_string == "recover")
+					{
+						bool force = circles.Length > 1;
+						foreach (BattleUnitModel targetModel in modelList)
+						{
+							if (force) targetModel.RecoverAllBreak(battleTiming);
+							else targetModel.RecoverBreak(battleTiming);
+						}
+					}
+					else if (mode_string == "addbar")
+					{
+						string circle_1 = circles[1];
+						bool scaleWithHealth = false;
+						if (circle_1.EndsWith("%"))
+						{
+							scaleWithHealth = true;
+							circle_1 = circle_1.Remove(circle_1.Length - 1, 1);
+						}
+						int healthpoint = circles.Length >= 2 ? GetNumFromParamString(circle_1) : 50;
+
+						foreach (BattleUnitModel targetModel in modelList) {
+							int finalPoint = healthpoint;
+							if (scaleWithHealth) {
+								int maxHP = targetModel.MaxHp;
+								finalPoint = maxHP * healthpoint / 100;
+							}
+							else targetModel.AddBreakSectionForcely(healthpoint);
+						}
+					}
 				}
 				else if (batchArgs[i].StartsWith("explosion"))
 				{
@@ -1047,67 +1138,6 @@ namespace ModularSkillScripts
 						PatternScript_Abnormality pattern = abnoModel.PatternScript;
 						pattern._slotMax = amount;
 					}
-				}
-				else if (batchArgs[i].StartsWith("breakdmg"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
-
-					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-					if (modelList.Count < 1) continue;
-
-					int amount = GetNumFromParamString(circles[1]);
-					if (amount == 0) continue;
-					int times = 1;
-					if (circles.Length > 2) times = GetNumFromParamString(circles[2]);
-
-					foreach (BattleUnitModel targetModel in modelList)
-					{
-						for (int times_i = 0; times_i < times; times_i++)
-						{
-							if (amount < 0)
-							{
-								amount *= -1;
-								AbilityTriggeredData_BsGaugeDown triggerData = new AbilityTriggeredData_BsGaugeDown(amount, targetModel.InstanceID, battleTiming);
-								if (abilityMode == 2)
-								{
-									dummyPassiveAbility.FirstBsGaugeDown(modsa_unitModel, targetModel, amount, battleTiming);
-									targetModel.AddTriggeredData(triggerData);
-								}
-								else if (abilityMode == 1)
-								{
-									dummyCoinAbility.FirstBsGaugeDown(modsa_unitModel, targetModel, amount, battleTiming);
-									targetModel.AddTriggeredData(triggerData);
-								}
-								else
-								{
-									dummySkillAbility.AddTriggeredData_BsGaugeDown(amount, targetModel.InstanceID, battleTiming);
-									dummySkillAbility.FirstBsGaugeDown(modsa_unitModel, targetModel, amount, battleTiming);
-								}
-							}
-							else
-							{
-								AbilityTriggeredData_BsGaugeUp triggerData = new AbilityTriggeredData_BsGaugeUp(amount, targetModel.InstanceID, battleTiming);
-								if (abilityMode == 2)
-								{
-									dummyPassiveAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, amount, battleTiming, false);
-									targetModel.AddTriggeredData(triggerData);
-								}
-								else if (abilityMode == 1)
-								{
-									dummyCoinAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, amount, battleTiming, false, modsa_selfAction);
-									targetModel.AddTriggeredData(triggerData);
-								}
-								else
-								{
-									dummySkillAbility.AddTriggeredData_BsGaugeUp(amount, targetModel.InstanceID, battleTiming, false);
-									dummySkillAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, amount, battleTiming, false, modsa_selfAction);
-								}
-							}
-						}
-					}
-
 				}
 				else if (batchArgs[i].StartsWith("setdata"))
 				{
@@ -1304,6 +1334,38 @@ namespace ModularSkillScripts
                             if (nextRound) sinActionList[chosenSlot].StackNextTurnAggroAdder(amount);
                             else sinActionList[chosenSlot].StackThisTurnAggroAdder(amount);
                         }
+                        
+                    }
+                }
+                else if (batchArgs[i].StartsWith("skill"))
+                {
+                    string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
+                    string circledSection = sectionArgs[1];
+                    string[] circles = circledSection.Split(',');
+
+                    string mode_string = batchArgs[i].Remove(0, 5);
+                    if (mode_string == "send")
+                    {
+                        BattleUnitModel fromUnit = GetTargetModel(circles[0]);
+                        BattleUnitModel toUnit = GetTargetModel(circles[1]);
+                        if (fromUnit == null || fromUnit.IsDead()) continue;
+                        if (toUnit == null) continue;
+
+                        List<SinActionModel> sinActionList = toUnit.GetSinActionList();
+                        int sinActionCount = sinActionList.Count;
+                        if (sinActionCount < 1) continue;
+
+						SinActionModel targetSinAction = sinActionList[0];
+						SinActionModel fromSinAction_new = fromUnit.AddNewSinActionModel();
+
+						UnitSinModel fromSinModel_new = new UnitSinModel(999, fromUnit, fromSinAction_new);
+						BattleActionModel fromAction_new = new BattleActionModel(fromSinModel_new, fromUnit, fromSinAction_new);
+                        List<SinActionModel> targetSinActionList = new List<SinActionModel>();
+                        targetSinActionList.Add(targetSinAction);
+                        fromAction_new.SetOriginTargetSinActions(targetSinActionList);
+                        fromAction_new._targetDataDetail.ReadyOriginTargeting(fromAction_new);
+
+                        fromUnit.CutInAction(fromAction_new);
                         
                     }
                 }
@@ -1649,19 +1711,19 @@ namespace ModularSkillScripts
 				string[] circles = circledSection.Split(',');
 				BattleUnitModel targetModel = GetTargetModel(circles[0]);
 				if (targetModel == null) {
-					valueList[setvalue_idx] = -1 // Target not found = -1
+					valueList[setvalue_idx] = -1; // Target not found = -1
 					return;
 				}
+                List<string> unitKeywordList = targetModel._unitDataModel.ClassInfo.unitKeywordList;
+                List<string> associationList = targetModel._unitDataModel.ClassInfo.associationList;
 
-				bool operator_OR = circles[1] == "OR";
+                bool operator_OR = circles[1] == "OR";
 
 				bool success = false;
 				for (int i = 2; i < circles.Length; i++)
 				{
-					UNIT_KEYWORD keyword = UNIT_KEYWORD.NONE;
-					Enum.TryParse(circles[i], true, out keyword);
-
-					success = targetModel.AssociationList.Contains(keyword) || targetModel.UnitKeywordList.Contains(keyword);
+					string keyword_string = circles[i];
+                    success = unitKeywordList.Contains(keyword_string) || associationList.Contains(keyword_string);
 
 					if (operator_OR == success) break; // [IF Statement] Simplification
 				}
