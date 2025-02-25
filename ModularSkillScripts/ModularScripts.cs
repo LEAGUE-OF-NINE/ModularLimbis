@@ -857,7 +857,19 @@ namespace ModularSkillScripts
 					{
 						targetModel.AddShield(amount, !permashield, ABILITY_SOURCE_TYPE.SKILL, battleTiming);
 					}
-				}
+				}else if (batchArgs[i].StartsWith("reuseskill"))
+{
+    string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
+    string circledSection = sectionArgs[1];
+
+    List<BattleUnitModel> modelList = GetTargetModelList(circledSection);
+    if (modelList.Count < 1) continue;
+
+    foreach (BattleUnitModel targetModel in modelList)
+    {
+					targetModel.ReuseAction(modsa_selfAction);
+    }
+}
     			else if (batchArgs[i].StartsWith("addbreak"))
 				{
 					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
