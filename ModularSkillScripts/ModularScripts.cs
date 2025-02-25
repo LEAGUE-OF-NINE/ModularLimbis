@@ -1350,6 +1350,14 @@ namespace ModularSkillScripts
 								if (skillIDList.Count > 0) skillID = skillIDList[0];
 							}
 						}
+						else if (circle_2[0] == 'D')
+						{
+							int index = 0;
+							if (int.TryParse(circle_2[1].ToString(), out index)) index -= 1;
+							List<int> skillIDList = fromUnit.GetDefenseSkillIDList();
+							index = Math.Min(index, skillIDList.Count - 1);
+							skillID = skillIDList[index];
+						}
 						else int.TryParse(circle_2, out skillID);
 						if (skillID < 0) continue;
 
