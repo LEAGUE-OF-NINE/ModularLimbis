@@ -1578,20 +1578,7 @@ namespace ModularSkillScripts
 				if (circles[1] == "og") coinCount = targetAction.Skill.CoinList.Count;
 
 				valueList[setvalue_idx] = coinCount;
-			}else if (methodology == "haskey")
-{
-    string[] circles = circledSection.Split(',');
-    BattleUnitModel targetModel = GetTargetModel(circles[0]);
-	UNIT_KEYWORD keyword = (UNIT_KEYWORD)Enum.Parse(typeof(UNIT_KEYWORD), circles[1]);
-
-    if (targetModel == null) return;
-
-    int finalValue = 0;
-
-    if (targetModel.AssociationList.Contains(keyword) || targetModel.UnitKeywordList.Contains(keyword)) { finalValue = 1; }
-
-    valueList[setvalue_idx] = finalValue;
-}
+			}
 			else if (methodology == "allcoinstate")
 			{
 				string[] circles = circledSection.Split(',');
@@ -1656,8 +1643,21 @@ namespace ModularSkillScripts
 				{
 					valueList[setvalue_idx] = res_manager.GetAttributeResonance(modsa_unitModel.Faction, sin);
 				}
+			}
+			else if (methodology == "haskey")
+			{
+				string[] circles = circledSection.Split(',');
+				BattleUnitModel targetModel = GetTargetModel(circles[0]);
+				if (targetModel == null) {
+					valueList[setvalue_idx] = -1 // Target not found = -1
+					return;
+				}
 
+				int finalValue = 0; // Default 0
 
+				UNIT_KEYWORD keyword = (UNIT_KEYWORD)Enum.Parse(typeof(UNIT_KEYWORD), circles[1]);
+				if (targetModel.AssociationList.Contains(keyword) || targetModel.UnitKeywordList.Contains(keyword)) finalValue = 1; // Found key = 1
+				valueList[setvalue_idx] = finalValue;
 			}
 		}
 	}
