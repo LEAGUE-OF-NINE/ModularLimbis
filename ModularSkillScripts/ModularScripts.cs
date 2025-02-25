@@ -1653,11 +1653,19 @@ namespace ModularSkillScripts
 					return;
 				}
 
-				int finalValue = 0; // Default 0
+				bool operator_OR = circles[1] == "OR";
 
-				UNIT_KEYWORD keyword = (UNIT_KEYWORD)Enum.Parse(typeof(UNIT_KEYWORD), circles[1]);
-				if (targetModel.AssociationList.Contains(keyword) || targetModel.UnitKeywordList.Contains(keyword)) finalValue = 1; // Found key = 1
-				valueList[setvalue_idx] = finalValue;
+				bool success = false;
+				for (int i = 2; i < circles.Length; i++)
+				{
+					UNIT_KEYWORD keyword = UNIT_KEYWORD.NONE;
+					Enum.TryParse(circles[i], true, out keyword);
+
+					success = targetModel.AssociationList.Contains(keyword) || targetModel.UnitKeywordList.Contains(keyword);
+
+					if (operator_OR == success) break; // [IF Statement] Simplification
+				}
+				valueList[setvalue_idx] = success ? 1 : 0;
 			}
 		}
 	}
