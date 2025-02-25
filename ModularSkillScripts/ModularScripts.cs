@@ -893,19 +893,6 @@ namespace ModularSkillScripts
 						targetModel.AddShield(amount, !permashield, ABILITY_SOURCE_TYPE.SKILL, battleTiming);
 					}
 				}
-				else if (batchArgs[i].StartsWith("reuseskill"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-
-					List<BattleUnitModel> modelList = GetTargetModelList(circledSection);
-					if (modelList.Count < 1) continue;
-
-					foreach (BattleUnitModel targetModel in modelList)
-					{
-						targetModel.ReuseAction(modsa_selfAction);
-					}
-				}
 				else if (batchArgs[i].StartsWith("break"))
 				{
                     string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
@@ -1351,6 +1338,21 @@ namespace ModularSkillScripts
                         if (fromUnit == null || fromUnit.IsDead()) continue;
                         if (toUnit == null) continue;
 
+						int skillID = -1;
+						string circle_2 = circles[2];
+						if (circle_2[0] == 'S')
+						{
+							int tier = 0;
+                            int.TryParse(circle_2[1].ToString(), out tier);
+							if (tier > 0)
+							{
+								List<int> skillIDList = fromUnit.GetSkillIdByTier(tier);
+								if (skillIDList.Count > 0) skillID = skillIDList[0];
+                            }
+                        }
+						else int.TryParse(circle_2, out skillID);
+                        if (skillID < 0) continue;
+
                         List<SinActionModel> sinActionList = toUnit.GetSinActionList();
                         int sinActionCount = sinActionList.Count;
                         if (sinActionCount < 1) continue;
@@ -1358,7 +1360,7 @@ namespace ModularSkillScripts
 						SinActionModel targetSinAction = sinActionList[0];
 						SinActionModel fromSinAction_new = fromUnit.AddNewSinActionModel();
 
-						UnitSinModel fromSinModel_new = new UnitSinModel(999, fromUnit, fromSinAction_new);
+						UnitSinModel fromSinModel_new = new UnitSinModel(skillID, fromUnit, fromSinAction_new);
 						BattleActionModel fromAction_new = new BattleActionModel(fromSinModel_new, fromUnit, fromSinAction_new);
                         List<SinActionModel> targetSinActionList = new List<SinActionModel>();
                         targetSinActionList.Add(targetSinAction);
@@ -1367,6 +1369,16 @@ namespace ModularSkillScripts
 
                         fromUnit.CutInAction(fromAction_new);
                         
+                    }
+					else if (mode_string == "reuse")
+					{
+                        List<BattleUnitModel> modelList = GetTargetModelList(circledSection);
+                        if (modelList.Count < 1) continue;
+
+                        foreach (BattleUnitModel targetModel in modelList)
+                        {
+                            targetModel.ReuseAction(modsa_selfAction);
+                        }
                     }
                 }
             }
