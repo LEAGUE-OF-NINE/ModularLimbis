@@ -857,19 +857,20 @@ namespace ModularSkillScripts
 					{
 						targetModel.AddShield(amount, !permashield, ABILITY_SOURCE_TYPE.SKILL, battleTiming);
 					}
-				}else if (batchArgs[i].StartsWith("reuseskill"))
-{
-    string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-    string circledSection = sectionArgs[1];
+				}
+				else if (batchArgs[i].StartsWith("reuseskill"))
+				{
+					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
+					string circledSection = sectionArgs[1];
 
-    List<BattleUnitModel> modelList = GetTargetModelList(circledSection);
-    if (modelList.Count < 1) continue;
+					List<BattleUnitModel> modelList = GetTargetModelList(circledSection);
+					if (modelList.Count < 1) continue;
 
-    foreach (BattleUnitModel targetModel in modelList)
-    {
-					targetModel.ReuseAction(modsa_selfAction);
-    }
-}
+					foreach (BattleUnitModel targetModel in modelList)
+					{
+						targetModel.ReuseAction(modsa_selfAction);
+					}
+				}
     			else if (batchArgs[i].StartsWith("addbreak"))
 				{
 					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
@@ -887,21 +888,20 @@ namespace ModularSkillScripts
 					}
 				}
 				else if (batchArgs[i].StartsWith("recoverbreak"))
-{
-				string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-				string circledSection = sectionArgs[1];
-    string[] circles = circledSection.Split(',');
-    List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-				if (modelList.Count < 1) continue;
-
-
-    bool force = circles.Length > 1;
-    foreach (BattleUnitModel targetModel in modelList)
 				{
-					if (!force) { targetModel.RecoverBreak(battleTiming); }
-					if (force) { targetModel.RecoverAllBreak(battleTiming); }
+					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
+					string circledSection = sectionArgs[1];
+					string[] circles = circledSection.Split(',');
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					if (modelList.Count < 1) continue;
+
+					bool force = circles.Length > 1;
+					foreach (BattleUnitModel targetModel in modelList)
+					{
+						if (!force) { targetModel.RecoverBreak(battleTiming); }
+						if (force) { targetModel.RecoverAllBreak(battleTiming); }
+					}
 				}
-}
 				else if (batchArgs[i].StartsWith("break"))
 				{
 					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
