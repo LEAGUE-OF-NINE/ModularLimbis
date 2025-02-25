@@ -1365,9 +1365,23 @@ namespace ModularSkillScripts
 							targetSinActionList.Add(targetSinAction);
 							fromAction_new.SetOriginTargetSinActions(targetSinActionList);
 						}
+						else
+						{
+							List<SinActionModel> targetSinActionList = new List<SinActionModel>();
+							foreach (BattleUnitModel enemy in GetTargetModelList("EveryEnemy"))
+							{
+								List<SinActionModel> sinActionList = enemy.GetSinActionList();
+								foreach (SinActionModel sinActionModel in sinActionList)
+								{
+									targetSinActionList.Add(sinActionModel);
+								}
+							}
+							fromAction_new.SetOriginTargetSinActions(targetSinActionList);
+						}
 						fromAction_new._targetDataDetail.ReadyOriginTargeting(fromAction_new);
 
-						fromUnit.CutInAction(fromAction_new);
+						if (circles.Length > 3) fromUnit.CutInDefenseActionForcely(fromAction_new, true);
+						else fromUnit.CutInAction(fromAction_new);
 					}
 					else if (mode_string == "reuse")
 					{
