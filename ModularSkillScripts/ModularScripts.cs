@@ -470,19 +470,6 @@ namespace ModularSkillScripts
 				unitList = battleObjectManager.GetAliveList(bufKeyword, 0, false, enemyFaction);
 				return unitList;
 			}
-			else if (param.StartsWith("Slowest"))
-			{
-				string sideString = param.Remove(0, 7);
-				UNIT_FACTION faction = UNIT_FACTION.NONE;
-				if (sideString.StartsWith("Ally")) faction = thisFaction;
-				else if (sideString.StartsWith("Enemy")) faction = enemyFaction;
-
-				List<BattleUnitModel> list = battleObjectManager.GetAliveList(false, faction);
-
-				Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.GetIntegerOfOriginSpeed().CompareTo(y.GetIntegerOfOriginSpeed());
-				list.Sort(value);
-				return unitList;
-			}
 			else if (param == "Self") unitList.Add(modsa_unitModel);
 			else
 			{
@@ -591,8 +578,57 @@ namespace ModularSkillScripts
 				}
 				return foundUnit;
 			}
+			else if (param == "Self") return modsa_unitModel;
+			else
+			{
+				BattleUnitModel foundUnit = null;
+				BattleObjectManager battleObjectManager_inst = SingletonBehavior<BattleObjectManager>.Instance;
+				if (battleObjectManager_inst == null) return foundUnit;
 
-			return modsa_unitModel;
+				UNIT_FACTION thisFaction = modsa_unitModel.Faction;
+				UNIT_FACTION enemyFaction = thisFaction == UNIT_FACTION.PLAYER ? UNIT_FACTION.ENEMY : UNIT_FACTION.PLAYER;
+
+				List<BattleUnitModel> list = new List<BattleUnitModel>();
+				if (param.Contains("Enemy"))
+				{
+					foreach (BattleUnitModel unit in battleObjectManager_inst.GetAliveList(false, enemyFaction)) list.Add(unit);
+				}
+				else if (param.Contains("Ally"))
+				{
+					foreach (BattleUnitModel unit in battleObjectManager_inst.GetAliveList(false, thisFaction)) list.Add(unit);
+				}
+				else if (param.Contains("Unit"))
+				{
+					foreach (BattleUnitModel unit in battleObjectManager_inst.GetAliveList(false)) list.Add(unit);
+				}
+
+				if (param.Contains("ExceptSelf")) list.Remove(modsa_unitModel);
+				if (param.Contains("ExceptTarget")) list.Remove(modsa_loopTarget);
+				if (param.Contains("Slowest"))
+				{
+					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.GetOriginSpeedForCompare().CompareTo(y.GetOriginSpeedForCompare());
+					list.Sort(value);
+				}
+				else if (param.Contains("Fastest"))
+				{
+					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.GetOriginSpeedForCompare().CompareTo(x.GetOriginSpeedForCompare());
+					list.Sort(value);
+				}
+				else if (param.Contains("HighestHP"))
+				{
+					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.Hp.CompareTo(x.Hp);
+					list.Sort(value);
+				}
+				else if (param.Contains("LowestHP"))
+				{
+					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.Hp.CompareTo(y.Hp);
+					list.Sort(value);
+				}
+				else if (param.Contains("Random")) list = MainClass.ShuffleUnits(list);
+
+				if (list.Count > 0) foundUnit = list[0];
+				return foundUnit;
+			}
 		}
 
 		public void SetupModular(string instructions)
