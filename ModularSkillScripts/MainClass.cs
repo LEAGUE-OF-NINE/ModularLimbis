@@ -5,7 +5,7 @@ using HarmonyLib;
 using UnhollowerRuntimeLib;
 using System;
 using Lethe;
-using System.Collections.Generic;
+using Il2CppSystem.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,6 +37,20 @@ namespace ModularSkillScripts
 			//GiveBuffOnUseFactionCheckPerfectReson.Setup(harmony);
 			//CustomReloadScript.Setup(harmony);
 			//AtValueSpeedBecomeUnclashable.Setup(harmony);
+		}
+
+		public static List<BattleUnitModel> ShuffleUnits(List<BattleUnitModel> list)
+		{
+			int n = list.Count;
+			while (n > 1)
+			{
+				n--;
+				int k = MainClass.rng.Next(n + 1);
+				BattleUnitModel value = list[k];
+				list[k] = list[n];
+				list[n] = value;
+			}
+			return list;
 		}
 
 		public static bool fakepowerEnabled = false;

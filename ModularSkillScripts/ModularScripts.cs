@@ -14,6 +14,7 @@ using UnityEngine;
 using static BattleActionModel.TargetDataDetail;
 using static BuffModel;
 using static UIComponent.Icon.GaugeTextIconUI;
+using static UnityEngine.GraphicsBuffer;
 using IntPtr = System.IntPtr;
 
 namespace ModularSkillScripts
@@ -396,10 +397,7 @@ namespace ModularSkillScripts
 			UNIT_FACTION thisFaction = modsa_unitModel.Faction;
 			UNIT_FACTION enemyFaction = thisFaction == UNIT_FACTION.PLAYER ? UNIT_FACTION.ENEMY : UNIT_FACTION.PLAYER;
 
-			if (param == "EveryAlly") return battleObjectManager.GetAliveList(false, thisFaction);
-			else if (param == "EveryAllyExceptSelf") return battleObjectManager.GetAliveAllyExceptSelf(modsa_unitModel);
-			else if (param == "EveryEnemy") return battleObjectManager.GetAliveList(false, enemyFaction);
-			else if (param == "EveryCoreAlly")
+			if (param == "EveryCoreAlly")
 			{
 				foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(false, thisFaction))
 				{
@@ -431,9 +429,21 @@ namespace ModularSkillScripts
 				}
 				return unitList;
 			}
+			else if (param.StartsWith("EveryUnit"))
+			{
+				string bufKeyword_string = param.Remove(0, 9);
+				if (bufKeyword_string == "") return battleObjectManager.GetAliveList(false);
+
+				BUFF_UNIQUE_KEYWORD bufKeyword = BUFF_UNIQUE_KEYWORD.Enhancement;
+				Enum.TryParse(bufKeyword_string, true, out bufKeyword);
+				unitList = battleObjectManager.GetAliveList(bufKeyword, 0, false, thisFaction);
+				return unitList;
+			}
 			else if (param.StartsWith("EveryAllyExceptSelf"))
 			{
 				string bufKeyword_string = param.Remove(0, 19);
+				if (bufKeyword_string == "") return battleObjectManager.GetAliveAllyExceptSelf(modsa_unitModel);
+
 				BUFF_UNIQUE_KEYWORD bufKeyword = BUFF_UNIQUE_KEYWORD.Enhancement;
 				Enum.TryParse(bufKeyword_string, true, out bufKeyword);
 				unitList = battleObjectManager.GetAliveList(bufKeyword, 0, false, thisFaction);
@@ -443,6 +453,8 @@ namespace ModularSkillScripts
 			else if (param.StartsWith("EveryAlly"))
 			{
 				string bufKeyword_string = param.Remove(0, 9);
+				if (bufKeyword_string == "") return battleObjectManager.GetAliveList(false, thisFaction);
+
 				BUFF_UNIQUE_KEYWORD bufKeyword = BUFF_UNIQUE_KEYWORD.Enhancement;
 				Enum.TryParse(bufKeyword_string, true, out bufKeyword);
 				unitList = battleObjectManager.GetAliveList(bufKeyword, 0, false, thisFaction);
@@ -451,13 +463,73 @@ namespace ModularSkillScripts
 			else if (param.StartsWith("EveryEnemy"))
 			{
 				string bufKeyword_string = param.Remove(0, 9);
+				if (bufKeyword_string == "") return battleObjectManager.GetAliveList(false, enemyFaction);
+
 				BUFF_UNIQUE_KEYWORD bufKeyword = BUFF_UNIQUE_KEYWORD.Enhancement;
 				Enum.TryParse(bufKeyword_string, true, out bufKeyword);
 				unitList = battleObjectManager.GetAliveList(bufKeyword, 0, false, enemyFaction);
 				return unitList;
 			}
+			else if (param.StartsWith("Slowest"))
+			{
+				string sideString = param.Remove(0, 7);
+				UNIT_FACTION faction = UNIT_FACTION.NONE;
+				if (sideString.StartsWith("Ally")) faction = thisFaction;
+				else if (sideString.StartsWith("Enemy")) faction = enemyFaction;
 
-			unitList.Add(modsa_unitModel);
+				List<BattleUnitModel> list = battleObjectManager.GetAliveList(false, faction);
+
+				Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.GetIntegerOfOriginSpeed().CompareTo(y.GetIntegerOfOriginSpeed());
+				list.Sort(value);
+				return unitList;
+			}
+			else if (param == "Self") unitList.Add(modsa_unitModel);
+			else
+			{
+				List<BattleUnitModel> list = new List<BattleUnitModel>();
+				if (param.Contains("Enemy")) {
+					foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(false, enemyFaction)) list.Add(unit);
+				}
+				else if (param.Contains("Ally")) {
+					foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(false, thisFaction)) list.Add(unit);
+				}
+				else if (param.Contains("Unit")) {
+					foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(false)) list.Add(unit);
+				}
+
+				int num = 1;
+				string text = Regex.Replace(param, "\\D", "");
+				if (text != null && text.Length > 0) num = int.Parse(text);
+
+				if (param.Contains("ExceptSelf")) list.Remove(modsa_unitModel);
+				if (param.Contains("ExceptTarget")) list.Remove(modsa_loopTarget);
+				if (param.Contains("Slowest")) {
+					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.GetIntegerOfOriginSpeed().CompareTo(y.GetIntegerOfOriginSpeed());
+					list.Sort(value);
+				}
+				else if (param.Contains("Fastest")) {
+					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.GetIntegerOfOriginSpeed().CompareTo(x.GetIntegerOfOriginSpeed());
+					list.Sort(value);
+				}
+				else if (param.Contains("HighestHP")) {
+					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.Hp.CompareTo(x.Hp);
+					list.Sort(value);
+				}
+				else if (param.Contains("LowestHP")) {
+					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.Hp.CompareTo(y.Hp);
+					list.Sort(value);
+				}
+				else if (param.Contains("Random")) list = MainClass.ShuffleUnits(list);
+
+				num = Math.Min(num, list.Count);
+				if (num > 0) {
+					for (int i = 0; i < num; i++)
+					{
+						unitList.Add(list[i]);
+					}
+				}
+			}
+
 			return unitList;
 		}
 
@@ -576,6 +648,7 @@ namespace ModularSkillScripts
 					else if (timingArg == "OnStartBehaviour") activationTiming = 18;
 					else if (timingArg == "BeforeBehaviour") activationTiming = 19;
 					else if (timingArg == "OnEndBehaviour") activationTiming = 20;
+					else if (timingArg == "EnemyKill") activationTiming = 21;
 					else if (timingArg == "SpecialAction") activationTiming = 999;
 				}
 				else if (batch.StartsWith("LOOP:")) modsa_loopString = batch.Remove(0, 5);
@@ -1366,16 +1439,16 @@ namespace ModularSkillScripts
 						UnitSinModel fromSinModel_new = new UnitSinModel(skillID, fromUnit, fromSinAction_new);
 						BattleActionModel fromAction_new = new BattleActionModel(fromSinModel_new, fromUnit, fromSinAction_new);
 
-                        List<SinActionModel> targetSinActionList = new List<SinActionModel>();
-                        foreach (BattleUnitModel targetModel in targetList)
+						List<SinActionModel> targetSinActionList = new List<SinActionModel>();
+						foreach (BattleUnitModel targetModel in targetList)
 						{
-                            List<SinActionModel> sinActionList = targetModel.GetSinActionList();
-                            foreach (SinActionModel sinActionModel in sinActionList) {
-                                targetSinActionList.Add(sinActionModel);
-                            }
+							List<SinActionModel> sinActionList = targetModel.GetSinActionList();
+							foreach (SinActionModel sinActionModel in sinActionList) {
+								targetSinActionList.Add(sinActionModel);
+							}
 						}
-                        fromAction_new.SetOriginTargetSinActions(targetSinActionList);
-                        fromAction_new._targetDataDetail.ReadyOriginTargeting(fromAction_new);
+						fromAction_new.SetOriginTargetSinActions(targetSinActionList);
+						fromAction_new._targetDataDetail.ReadyOriginTargeting(fromAction_new);
 
 						if (circles.Length > 3) fromUnit.CutInDefenseActionForcely(fromAction_new, true);
 						else fromUnit.CutInAction(fromAction_new);

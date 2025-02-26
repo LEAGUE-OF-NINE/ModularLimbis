@@ -1304,6 +1304,36 @@ namespace ModularSkillScripts
 
 		}
 
+		[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnKillTarget))]
+		[HarmonyPostfix]
+		private static void Postfix_BattleUnitModel_OnKillTarget(BattleActionModel actionOrNull, BattleUnitModel target, DAMAGE_SOURCE_TYPE dmgSrcType, BATTLE_EVENT_TIMING timing, BattleUnitModel killer, BattleUnitModel __instance)
+		{
+			if (actionOrNull == null || actionOrNull.Skill == null) return;
+			
+			SkillModel skill = actionOrNull.Skill;
+			long skillmodel_intlong = skill.Pointer.ToInt64();
+			foreach (ModularSA modsa in modsaglobal_list)
+			{
+				if (skillmodel_intlong != modsa.ptr_intlong) continue;
+				modsa.modsa_selfAction = actionOrNull;
+				modsa.Enact(skill, 21, timing);
+			}
+
+			foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList)
+			{
+				if (!passiveModel.CheckActiveCondition()) continue;
+				long passivemodel_intlong = passiveModel.Pointer.ToInt64();
+				foreach (ModularSA modpa in modpa_list)
+				{
+					if (passivemodel_intlong != modpa.ptr_intlong) continue;
+					modpa.modsa_selfAction = actionOrNull;
+					modpa.modsa_passiveModel = passiveModel;
+					modpa.modsa_unitModel = __instance;
+					modpa.Enact(skill, 21, timing);
+				}
+			}
+		}
+
 
 		// end
 	}
