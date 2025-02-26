@@ -539,6 +539,8 @@ namespace ModularSkillScripts
 					else if (timingArg == "OnStartBehaviour") activationTiming = 18;
 					else if (timingArg == "BeforeBehaviour") activationTiming = 19;
 					else if (timingArg == "OnEndBehaviour") activationTiming = 20;
+                                        else if (timingArg == "OnBreak") activationTiming = 22;
+                                        else if (timingArg == "OnOtherBreak") activationTiming = 23;
 					else if (timingArg == "SpecialAction") activationTiming = 999;
 				}
 				else if (batch.StartsWith("LOOP:")) modsa_loopString = batch.Remove(0, 5);
