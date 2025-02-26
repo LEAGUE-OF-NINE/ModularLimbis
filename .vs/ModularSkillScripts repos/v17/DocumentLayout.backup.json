@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|c:\\users\\glitch\\desktop\\modularskillscripts repos\\modularskillscripts\\modularscripts.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|solutionrelative:modularskillscripts\\modularscripts.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\modularskillscripts\\mainclass.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|solutionrelative:modularskillscripts\\mainclass.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|c:\\users\\glitch\\desktop\\modularskillscripts repos\\modularskillscripts\\modularscripts.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|solutionrelative:modularskillscripts\\modularscripts.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\modularskillscripts\\skillscriptinitpatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -34,7 +34,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
@@ -51,13 +51,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "MainClass.cs",
               "DocumentMoniker": "C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\ModularSkillScripts\\MainClass.cs",
               "RelativeDocumentMoniker": "ModularSkillScripts\\MainClass.cs",
               "ToolTip": "C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\ModularSkillScripts\\MainClass.cs",
               "RelativeToolTip": "ModularSkillScripts\\MainClass.cs",
-              "ViewState": "AgIAABIAAAAAAAAAAAA4wCoAAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAA9AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-29T21:33:26.057Z",
               "EditorCaption": ""
@@ -96,20 +96,20 @@
               "RelativeDocumentMoniker": "ModularSkillScripts\\SkillScriptInitPatch.cs",
               "ToolTip": "C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\ModularSkillScripts\\SkillScriptInitPatch.cs",
               "RelativeToolTip": "ModularSkillScripts\\SkillScriptInitPatch.cs",
-              "ViewState": "AgIAAAoFAAAAAAAAAAAmwCUFAAAqAAAAAAAAAA==",
+              "ViewState": "AgIAABkFAAAAAAAAAAAmwCMFAAAEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-29T21:33:35.742Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "ModularScripts.cs",
               "DocumentMoniker": "C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\ModularSkillScripts\\ModularScripts.cs",
               "RelativeDocumentMoniker": "ModularSkillScripts\\ModularScripts.cs",
               "ToolTip": "C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\ModularSkillScripts\\ModularScripts.cs",
               "RelativeToolTip": "ModularSkillScripts\\ModularScripts.cs",
-              "ViewState": "AgIAAMoBAAAAAAAAAAAowPABAABeAAAAAAAAAA==",
+              "ViewState": "AgIAAN8BAAAAAAAAAAAowP8BAAAWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-29T21:33:39.343Z",
               "EditorCaption": ""

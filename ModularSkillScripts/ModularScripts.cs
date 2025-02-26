@@ -504,11 +504,11 @@ namespace ModularSkillScripts
 				if (param.Contains("ExceptSelf")) list.Remove(modsa_unitModel);
 				if (param.Contains("ExceptTarget")) list.Remove(modsa_loopTarget);
 				if (param.Contains("Slowest")) {
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.GetIntegerOfOriginSpeed().CompareTo(y.GetIntegerOfOriginSpeed());
+					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.GetOriginSpeedForCompare().CompareTo(y.GetOriginSpeedForCompare());
 					list.Sort(value);
 				}
 				else if (param.Contains("Fastest")) {
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.GetIntegerOfOriginSpeed().CompareTo(x.GetIntegerOfOriginSpeed());
+					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.GetOriginSpeedForCompare().CompareTo(x.GetOriginSpeedForCompare());
 					list.Sort(value);
 				}
 				else if (param.Contains("HighestHP")) {
