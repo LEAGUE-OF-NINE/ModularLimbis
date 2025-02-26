@@ -30,6 +30,7 @@ namespace ModularSkillScripts
 			harmony.PatchAll(typeof(SkillScriptInitPatch));
 			harmony.PatchAll(typeof(StagePatches));
 			harmony.PatchAll(typeof(UniquePatches));
+			if (fakepowerEnabled) harmony.PatchAll(typeof(FakePowerPatches));
 			//OnSAGiveBuffFactionCheck.Setup(harmony);
 			//GiveBuffOnUseFactionCheck.Setup(harmony);
 			//GiveBuffOnUseFactionCheckReson.Setup(harmony);
@@ -37,6 +38,8 @@ namespace ModularSkillScripts
 			//CustomReloadScript.Setup(harmony);
 			//AtValueSpeedBecomeUnclashable.Setup(harmony);
 		}
+
+		public static bool fakepowerEnabled = false;
 
 		public static Random rng = new Random();
 

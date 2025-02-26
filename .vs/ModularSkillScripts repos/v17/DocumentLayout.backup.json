@@ -34,21 +34,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 4,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "SkillScriptInitPatch.cs",
-              "DocumentMoniker": "C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\ModularSkillScripts\\SkillScriptInitPatch.cs",
-              "RelativeDocumentMoniker": "ModularSkillScripts\\SkillScriptInitPatch.cs",
-              "ToolTip": "C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\ModularSkillScripts\\SkillScriptInitPatch.cs",
-              "RelativeToolTip": "ModularSkillScripts\\SkillScriptInitPatch.cs",
-              "ViewState": "AgIAAAgBAAAAAAAAAAAmwAABAAAmAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-29T21:33:35.742Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Document",
               "DocumentIndex": 4,
@@ -71,8 +58,7 @@
               "RelativeToolTip": "ModularSkillScripts\\MainClass.cs",
               "ViewState": "AgIAAAYAAAAAAAAAAAAAAB0AAAAyAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-29T21:33:26.057Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-29T21:33:26.057Z"
             },
             {
               "$type": "Document",
@@ -96,8 +82,7 @@
               "RelativeToolTip": "ModularSkillScripts\\StagePatches.cs",
               "ViewState": "AgIAAFcAAAAAAAAAAAAowGsAAAA6AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-08T01:53:28.549Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-12-08T01:53:28.549Z"
             },
             {
               "$type": "Document",
@@ -111,6 +96,18 @@
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-29T21:33:39.343Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "SkillScriptInitPatch.cs",
+              "DocumentMoniker": "C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\ModularSkillScripts\\SkillScriptInitPatch.cs",
+              "RelativeDocumentMoniker": "ModularSkillScripts\\SkillScriptInitPatch.cs",
+              "ToolTip": "C:\\Users\\Glitch\\Desktop\\ModularSkillScripts repos\\ModularSkillScripts\\SkillScriptInitPatch.cs",
+              "RelativeToolTip": "ModularSkillScripts\\SkillScriptInitPatch.cs",
+              "ViewState": "AgIAAAgBAAAAAAAAAAAmwAABAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-29T21:33:35.742Z"
             }
           ]
         }
