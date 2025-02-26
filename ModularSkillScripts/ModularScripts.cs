@@ -317,7 +317,8 @@ namespace ModularSkillScripts
 		public List<BattleUnitModel> GetTargetModelList(string param)
 		{
 			List<BattleUnitModel> unitList = new List<BattleUnitModel>();
-			if (param == "Target")
+			if (param == "Null") return unitList;
+			else if (param == "Target")
 			{
 				if (modsa_loopTarget != null) unitList.Add(modsa_loopTarget);
 				return unitList;
@@ -1335,7 +1336,7 @@ namespace ModularSkillScripts
 					if (mode_string == "send")
 					{
 						BattleUnitModel fromUnit = GetTargetModel(circles[0]);
-						BattleUnitModel toUnit = GetTargetModel(circles[1]);
+						List<BattleUnitModel> targetList = GetTargetModelList(circles[1]);
 						if (fromUnit == null || fromUnit.IsDead()) continue;
 
 						int skillID = -1;
@@ -1365,28 +1366,16 @@ namespace ModularSkillScripts
 						UnitSinModel fromSinModel_new = new UnitSinModel(skillID, fromUnit, fromSinAction_new);
 						BattleActionModel fromAction_new = new BattleActionModel(fromSinModel_new, fromUnit, fromSinAction_new);
 
-						if (toUnit != null) {
-							List<SinActionModel> sinActionList = toUnit.GetSinActionList();
-							if (sinActionList.Count < 1) continue;
-							SinActionModel targetSinAction = sinActionList[0];
-							List<SinActionModel> targetSinActionList = new List<SinActionModel>();
-							targetSinActionList.Add(targetSinAction);
-							fromAction_new.SetOriginTargetSinActions(targetSinActionList);
-						}
-						else
+                        List<SinActionModel> targetSinActionList = new List<SinActionModel>();
+                        foreach (BattleUnitModel targetModel in targetList)
 						{
-							List<SinActionModel> targetSinActionList = new List<SinActionModel>();
-							foreach (BattleUnitModel enemy in GetTargetModelList("EveryEnemy"))
-							{
-								List<SinActionModel> sinActionList = enemy.GetSinActionList();
-								foreach (SinActionModel sinActionModel in sinActionList)
-								{
-									targetSinActionList.Add(sinActionModel);
-								}
-							}
-							fromAction_new.SetOriginTargetSinActions(targetSinActionList);
+                            List<SinActionModel> sinActionList = targetModel.GetSinActionList();
+                            foreach (SinActionModel sinActionModel in sinActionList) {
+                                targetSinActionList.Add(sinActionModel);
+                            }
 						}
-						fromAction_new._targetDataDetail.ReadyOriginTargeting(fromAction_new);
+                        fromAction_new.SetOriginTargetSinActions(targetSinActionList);
+                        fromAction_new._targetDataDetail.ReadyOriginTargeting(fromAction_new);
 
 						if (circles.Length > 3) fromUnit.CutInDefenseActionForcely(fromAction_new, true);
 						else fromUnit.CutInAction(fromAction_new);
