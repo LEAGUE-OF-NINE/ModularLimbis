@@ -643,8 +643,8 @@ namespace ModularSkillScripts
 				if (batch.StartsWith("TIMING:"))
 				{
 					string timingArg = batch.Remove(0, 7);
-					if (timingArg == "RoundStart")
-					{
+					if (timingArg == "RoundStartWeird") activationTiming = -2;
+					else if (timingArg == "RoundStart") {
 						activationTiming = -1;
 						if (abilityMode == 0) { SkillScriptInitPatch.skillPtrsRoundStart.Add(modsa_skillModel.Pointer.ToInt64()); }
 					}

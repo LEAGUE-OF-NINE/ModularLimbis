@@ -50,6 +50,7 @@ namespace ModularSkillScripts
 					MainClass.Logg.LogInfo("Batches loop: " + batch);
 					if (batch.StartsWith("extraslot:")) int.TryParse(batch.Remove(0, 10), out extraSlot);
 					else if (batch == "instantslot") instantslot = true;
+					else if (batch == "forceslotgain") forceSlotGain = true;
 				}
 			}
 
@@ -124,10 +125,11 @@ namespace ModularSkillScripts
 				unitModel.AddSinAction(sinActionModel_Player);
 			}
 
-			if (stageModel.StageType == STAGE_TYPE.RAILWAY_DUNGEON || forceSlotGain)
+			bool isRailway = stageModel.StageType == STAGE_TYPE.RAILWAY_DUNGEON;
+			if (isRailway || forceSlotGain)
 			{
 				MainClass.Logg.LogInfo("forceSlotGain");
-				if (stageModel.StageType == STAGE_TYPE.RAILWAY_DUNGEON) MainClass.Logg.LogInfo("IS RAILWAY_DUNGEON");
+				if (isRailway) MainClass.Logg.LogInfo("IS RAILWAY_DUNGEON");
 
 				//List<SinActionModel> sinAction_list = sinManager_inst.GetActionListByFaction(UNIT_FACTION.PLAYER);
 				int sinAction_count = 0;
@@ -138,16 +140,15 @@ namespace ModularSkillScripts
 				int multislot_max = (int)Math.Ceiling((double)slot_max / stageModel.ClassInfo.ParticipantInfo.Max);
 
 				int highestSlotter = 2;
-				while (sinAction_count < slot_max)
+				while (sinAction_count < slot_max && highestSlotter <= multislot_max)
 				{
 					//int slot_max_loop = slot_max;
 					//int multislot_max_loop = multislot_max;
-					if (highestSlotter > multislot_max) break;
 
 					foreach (BattleUnitModel unitModel in playerUnit_list)
 					{
 						int thisUnitSlotCount = unitModel._actionSlotDetail.GetSinActionList().Count;
-						if (doubleslotterIDList.Contains(unitModel.GetID())) thisUnitSlotCount -= 1;
+						if (doubleslotterIDList.Contains(unitModel.GetUnitID())) thisUnitSlotCount -= 1;
 
 						if (thisUnitSlotCount < highestSlotter) {
 							sinManager_inst.AddSinActionModelOnRoundStart(UNIT_FACTION.PLAYER, unitModel.InstanceID);

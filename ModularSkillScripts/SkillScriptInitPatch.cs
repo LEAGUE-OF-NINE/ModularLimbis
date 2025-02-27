@@ -264,6 +264,34 @@ namespace ModularSkillScripts
 		//	}
 		//}
 
+		[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnRoundStart))]
+		[HarmonyPostfix]
+		private static void Postfix_PassiveDetail_OnRoundStart(PassiveDetail __instance)
+		{
+			foreach (ModularSA modpa in modpa_list) { modpa.ResetAdders(); }
+
+			foreach (PassiveModel passiveModel in __instance.PassiveList)
+			{
+				if (!passiveModel.CheckActiveCondition()) continue;
+				List<string> requireIDList = passiveModel.ClassInfo.requireIDList;
+				foreach (string param in requireIDList)
+				{
+					if (!param.StartsWith("Modular/")) continue;
+					
+					long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+					foreach (ModularSA modpa in modpa_list)
+					{
+						if (modpa.passiveID != passiveModel.ClassInfo.ID) continue;
+						if (passiveModel_intlong != modpa.ptr_intlong) continue;
+						modpa.modsa_passiveModel = passiveModel;
+						modpa.modsa_unitModel = __instance._owner;
+						modpa.Enact(null, -2, BATTLE_EVENT_TIMING.ON_START_ROUND);
+					}
+					break;
+				}
+			}
+		}
+
 		[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnRoundStart_After_Event))]
 		[HarmonyPostfix]
 		private static void Postfix_PassiveDetail_OnRoundStart_After_Event(BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
