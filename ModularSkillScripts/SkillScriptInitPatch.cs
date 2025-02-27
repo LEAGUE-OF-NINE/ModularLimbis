@@ -286,9 +286,9 @@ namespace ModularSkillScripts
 
 			foreach (SinActionModel sinAction in __instance._owner.GetSinActionList())
 			{
-                foreach (UnitSinModel sinModel in sinAction.currentSinList)
+				foreach (UnitSinModel sinModel in sinAction.currentSinList)
 				{
-                    SkillModel skillModel = sinModel.GetSkill();
+					SkillModel skillModel = sinModel.GetSkill();
 					if (skillModel == null) continue;
 					long skillmodel_intlong = skillModel.Pointer.ToInt64();
 
@@ -390,42 +390,42 @@ namespace ModularSkillScripts
 			}
 		}
 
-		[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.IsAbnormalityImmortal))]
-		[HarmonyPostfix]
-		private static void Postfix_PassiveDetail_IsImmortal(BATTLE_EVENT_TIMING timing, int newHp, bool isInstantDeath, ref bool __result, PassiveDetail __instance)
-		{
-			PassiveDetail pasdet = new PassiveDetail(null, null);
+		//[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.IsAbnormalityImmortal))]
+		//[HarmonyPostfix]
+		//private static void Postfix_PassiveDetail_IsImmortal(BATTLE_EVENT_TIMING timing, int newHp, bool isInstantDeath, ref bool __result, PassiveDetail __instance)
+		//{
+		//	PassiveDetail pasdet = new PassiveDetail(null, null);
 
-			if (isInstantDeath) return;
-			foreach (PassiveModel passiveModel in __instance.PassiveList)
-			{
-				if (!passiveModel.CheckActiveCondition()) continue;
-				List<string> requireIDList = passiveModel.ClassInfo.requireIDList;
-				foreach (string param in requireIDList)
-				{
-					if (param.StartsWith("Modular/"))
-					{
-						if (passiveModel.IsAbnormalityImmortal(timing, newHp, isInstantDeath)) __result = true;
-						break;
-					}
-				}
-			}
-		}
+		//	if (isInstantDeath) return;
+		//	foreach (PassiveModel passiveModel in __instance.PassiveList)
+		//	{
+		//		if (!passiveModel.CheckActiveCondition()) continue;
+		//		List<string> requireIDList = passiveModel.ClassInfo.requireIDList;
+		//		foreach (string param in requireIDList)
+		//		{
+		//			if (param.StartsWith("Modular/"))
+		//			{
+		//				if (passiveModel.IsAbnormalityImmortal(timing, newHp, isInstantDeath)) __result = true;
+		//				break;
+		//			}
+		//		}
+		//	}
+		//}
 
-		[HarmonyPatch(typeof(PassiveModel), nameof(PassiveModel.IsAbnormalityImmortal))]
-		[HarmonyPostfix]
-		private static void Postfix_PassiveModel_IsImmortal(BATTLE_EVENT_TIMING timing, int newHp, bool isInstantDeath, ref bool __result, PassiveModel __instance)
-		{
-			//MainClass.Logg.LogInfo("postfix passive combat start");
-			long passiveModel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modpa in modpa_list)
-			{
-				if (modpa.passiveID != __instance.ClassInfo.ID) continue;
-				if (passiveModel_intlong != modpa.ptr_intlong) continue;
-				MainClass.Logg.LogInfo("Found modpassive - immortal: " + modpa.passiveID);
-				if (modpa.IsImmortal()) __result = true;
-			}
-		}
+		//[HarmonyPatch(typeof(PassiveModel), nameof(PassiveModel.IsAbnormalityImmortal))]
+		//[HarmonyPostfix]
+		//private static void Postfix_PassiveModel_IsImmortal(BATTLE_EVENT_TIMING timing, int newHp, bool isInstantDeath, ref bool __result, PassiveModel __instance)
+		//{
+		//	//MainClass.Logg.LogInfo("postfix passive combat start");
+		//	long passiveModel_intlong = __instance.Pointer.ToInt64();
+		//	foreach (ModularSA modpa in modpa_list)
+		//	{
+		//		if (modpa.passiveID != __instance.ClassInfo.ID) continue;
+		//		if (passiveModel_intlong != modpa.ptr_intlong) continue;
+		//		MainClass.Logg.LogInfo("Found modpassive - immortal: " + modpa.passiveID);
+		//		if (modpa.IsImmortal()) __result = true;
+		//	}
+		//}
 
 
 
