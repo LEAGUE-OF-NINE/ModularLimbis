@@ -140,12 +140,16 @@ namespace ModularSkillScripts
 				int highestSlotter = 2;
 				while (sinAction_count < slot_max)
 				{
+					//int slot_max_loop = slot_max;
+					//int multislot_max_loop = multislot_max;
 					if (highestSlotter > multislot_max) break;
 
 					foreach (BattleUnitModel unitModel in playerUnit_list)
 					{
-						if (unitModel._actionSlotDetail.GetSinActionList().Count < highestSlotter)
-						{
+						int thisUnitSlotCount = unitModel._actionSlotDetail.GetSinActionList().Count;
+						if (doubleslotterIDList.Contains(unitModel.GetID())) thisUnitSlotCount -= 1;
+
+						if (thisUnitSlotCount < highestSlotter) {
 							sinManager_inst.AddSinActionModelOnRoundStart(UNIT_FACTION.PLAYER, unitModel.InstanceID);
 							sinAction_count += 1;
 						}
