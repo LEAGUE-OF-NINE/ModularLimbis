@@ -286,9 +286,9 @@ namespace ModularSkillScripts
 
 			foreach (SinActionModel sinAction in __instance._owner.GetSinActionList())
 			{
-				foreach (UnitSinModel sinModel in sinAction.currentSinList)
+                foreach (UnitSinModel sinModel in sinAction.currentSinList)
 				{
-					SkillModel skillModel = sinModel.GetSkill();
+                    SkillModel skillModel = sinModel.GetSkill();
 					if (skillModel == null) continue;
 					long skillmodel_intlong = skillModel.Pointer.ToInt64();
 

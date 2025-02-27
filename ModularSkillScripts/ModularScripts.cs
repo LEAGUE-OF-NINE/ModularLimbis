@@ -1499,6 +1499,25 @@ namespace ModularSkillScripts
 							targetModel.ReuseAction(modsa_selfAction);
 						}
 					}
+					else if (mode_string == "slotreplace")
+					{
+						if (modsa_unitModel == null) {
+							MainClass.Logg.LogInfo("skillslotreplace Self == null");
+							continue;
+						}
+
+						int slot = GetNumFromParamString(circles[0]);
+
+						List<SinActionModel> sinActionList = modsa_unitModel.GetSinActionList();
+						if (slot >= sinActionList.Count || slot < 0) {
+							MainClass.Logg.LogInfo("skillslotreplace invalid slot");
+							continue;
+						}
+
+						int skillID_1 = GetNumFromParamString(circles[1]);
+						int skillID_2 = GetNumFromParamString(circles[2]);
+						sinActionList[slot].ReplaceSkillAtoB(skillID_1, skillID_2);
+					}
 				}
 			}
 		}
