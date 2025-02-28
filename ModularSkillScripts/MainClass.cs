@@ -4,16 +4,12 @@ using BepInEx.Logging;
 using HarmonyLib;
 using UnhollowerRuntimeLib;
 using System;
-using Lethe;
 using Il2CppSystem.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 
 namespace ModularSkillScripts
 {
-	[BepInPlugin("GlitchGames.ModularSkillScripts", "ModularSkillScripts", "2.0.7")]
+	[BepInPlugin("GlitchGames.ModularSkillScripts", "ModularSkillScripts", "2.1.0")]
 	public class MainClass : BasePlugin
 	{
 		public override void Load()
@@ -31,12 +27,6 @@ namespace ModularSkillScripts
 			harmony.PatchAll(typeof(StagePatches));
 			harmony.PatchAll(typeof(UniquePatches));
 			if (fakepowerEnabled) harmony.PatchAll(typeof(FakePowerPatches));
-			//OnSAGiveBuffFactionCheck.Setup(harmony);
-			//GiveBuffOnUseFactionCheck.Setup(harmony);
-			//GiveBuffOnUseFactionCheckReson.Setup(harmony);
-			//GiveBuffOnUseFactionCheckPerfectReson.Setup(harmony);
-			//CustomReloadScript.Setup(harmony);
-			//AtValueSpeedBecomeUnclashable.Setup(harmony);
 		}
 
 		public static List<BattleUnitModel> ShuffleUnits(List<BattleUnitModel> list)
@@ -63,7 +53,7 @@ namespace ModularSkillScripts
 
 		public const string NAME = "ModularSkillScripts";
 
-		public const string VERSION = "2.0.7";
+		public const string VERSION = "2.1.0";
 
 		public const string AUTHOR = "GlitchGames";
 
