@@ -139,7 +139,7 @@ namespace ModularSkillScripts
 				int slot_max = stageModel.GetStageMaxParticipantCount();
 				int multislot_max = (int)Math.Ceiling((double)slot_max / stageModel.ClassInfo.ParticipantInfo.Max);
 
-				int highestSlotter = 2;
+				int highestSlotter = 1;
 				while (sinAction_count < slot_max && highestSlotter <= multislot_max)
 				{
 					//int slot_max_loop = slot_max;
