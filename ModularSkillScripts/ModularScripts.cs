@@ -1157,28 +1157,34 @@ namespace ModularSkillScripts
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
 					if (modelList.Count < 1) continue;
 
-					int amount = GetNumFromParamString(circles[1]);
+					string circle_1 = circles[1];
+					bool percentageheal = circle_1.Last() == '%';
+					if (percentageheal) circle_1 = circle_1.Remove(circle_1.Length - 1);
+					int amount = GetNumFromParamString(circle_1);
 					if (amount < 1) continue;
 
 					foreach (BattleUnitModel targetModel in modelList)
 					{
+						int finalAmount = amount;
+						if (percentageheal) finalAmount = targetModel.MaxHp * finalAmount / 100;
+
 						if (abilityMode == 2)
 						{
-							dummyPassiveAbility.AddTriggeredData_HpHeal(amount, targetModel.InstanceID, battleTiming);
-							//dummyPassiveAbility.HealTargetHp(modsa_unitModel, modsa_selfAction, targetModel, amount, battleTiming, amount);
-							targetModel.TryRecoverHp(modsa_unitModel, null, amount, ABILITY_SOURCE_TYPE.PASSIVE, battleTiming, amount);
+							dummyPassiveAbility.AddTriggeredData_HpHeal(finalAmount, targetModel.InstanceID, battleTiming);
+							//dummyPassiveAbility.HealTargetHp(modsa_unitModel, modsa_selfAction, targetModel, finalAmount, battleTiming, finalAmount);
+							targetModel.TryRecoverHp(modsa_unitModel, null, finalAmount, ABILITY_SOURCE_TYPE.PASSIVE, battleTiming, finalAmount);
 						}
 						else if (abilityMode == 1)
 						{
-							dummyCoinAbility.AddTriggeredData_HpHeal(amount, targetModel.InstanceID, battleTiming);
-							//dummyCoinAbility.HealTargetHp(modsa_unitModel, modsa_selfAction, targetModel, amount, battleTiming, amount);
-							targetModel.TryRecoverHp(modsa_unitModel, null, amount, ABILITY_SOURCE_TYPE.SKILL, battleTiming, amount);
+							dummyCoinAbility.AddTriggeredData_HpHeal(finalAmount, targetModel.InstanceID, battleTiming);
+							//dummyCoinAbility.HealTargetHp(modsa_unitModel, modsa_selfAction, targetModel, finalAmount, battleTiming, finalAmount);
+							targetModel.TryRecoverHp(modsa_unitModel, null, finalAmount, ABILITY_SOURCE_TYPE.SKILL, battleTiming, finalAmount);
 						}
 						else
 						{
-							dummySkillAbility.AddTriggeredData_HpHeal(amount, targetModel.InstanceID, battleTiming);
-							//dummySkillAbility.HealTargetHp(modsa_unitModel, modsa_selfAction, targetModel, amount, battleTiming, amount);
-							targetModel.TryRecoverHp(modsa_unitModel, null, amount, ABILITY_SOURCE_TYPE.SKILL, battleTiming, amount);
+							dummySkillAbility.AddTriggeredData_HpHeal(finalAmount, targetModel.InstanceID, battleTiming);
+							//dummySkillAbility.HealTargetHp(modsa_unitModel, modsa_selfAction, targetModel, finalAmount, battleTiming, finalAmount);
+							targetModel.TryRecoverHp(modsa_unitModel, null, finalAmount, ABILITY_SOURCE_TYPE.SKILL, battleTiming, finalAmount);
 						}
 					}
 
