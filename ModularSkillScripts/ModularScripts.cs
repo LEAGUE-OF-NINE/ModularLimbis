@@ -720,19 +720,16 @@ namespace ModularSkillScripts
 					else if (timingArg == "EndBattle") activationTiming = 6;
 					else if (timingArg.StartsWith("OnSucceedAttack"))
 					{
-						activationTiming = 7;
-						string[] sectionArgs = batch.Split(parenthesisSeparator);
-						string circledSection = sectionArgs[1];
-						string[] circles = circledSection.Split(',');
+					activationTiming = 7;
 
-						if (circles[0] == "Head") _onlyHeads = true;
-						else if (circles[0] == "Tail") _onlyTails = true;
+   					 if (timingArg.Contains("Head"))  _onlyHeads = true;
+    					 else if (timingArg.Contains("Tail")) _onlyTails = true;
 
-						if (circles[1] == "Crit") _onlyCrit = true;
-						else if (circles[1] == "NoCrit") _onlyNonCrit = true;
+    					if (timingArg.Contains("NoCrit")) _onlyNonCrit = true;
+   					else if (timingArg.Contains("Crit")) _onlyCrit = true;
 
-						if (circles[2] == "Win") _onlyClashWin = true;
-						else if (circles[2] == "Lose") _onlyClashLose = true;
+    					if (timingArg.Contains("Win")) _onlyClashWin = true;
+    					else if (timingArg.Contains("Lose")) _onlyClashLose = true;						
 					}
 					else if (timingArg == "WhenHit") activationTiming = 8;
 					else if (timingArg == "EndSkill") activationTiming = 9;
