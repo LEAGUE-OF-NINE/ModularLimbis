@@ -1022,16 +1022,12 @@ namespace ModularSkillScripts
 					{
 						if (stack < 0)
 						{
-							if (abilityMode == 2) targetModel.UseBuffStack(buf_keyword, stack * -1, battleTiming);
-							else if (abilityMode == 1) dummyCoinAbility.UseBuffStack(targetModel, modsa_selfAction, buf_keyword, battleTiming, stack * -1);
-							else dummySkillAbility.UseBuffStack(targetModel, modsa_selfAction, buf_keyword, battleTiming, stack * -1);
+							targetModel.LoseBuffStack(buf_keyword, stack * -1, battleTiming);
 							stack = 0;
 						}
 						if (turn < 0)
 						{
-							if (abilityMode == 2) targetModel.UseBuffTurn(buf_keyword, turn * -1, battleTiming);
-							else if (abilityMode == 1) dummyCoinAbility.UseBuffTurn(targetModel, modsa_selfAction, buf_keyword, battleTiming, turn * -1);
-							else dummySkillAbility.UseBuffTurn(targetModel, modsa_selfAction, buf_keyword, battleTiming, turn * -1);
+							targetModel.LoseBuffTurn(buf_keyword, turn * -1, battleTiming);
 							turn = 0;
 						}
 						if (stack > 0 || turn > 0)
