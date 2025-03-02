@@ -92,7 +92,7 @@ namespace ModularSkillScripts
 			//	MainClass.Logg.LogInfo("calced all datas");
 			//	//MainClass.Logg.LogInfo("skillabilityCount: " + __instance._skillAbilityList.Count);
 			//	//foreach (SkillAbility skillab in __instance._skillAbilityList) MainClass.Logg.LogInfo("index: " + skillab._index);
-				
+
 			//}
 		}
 

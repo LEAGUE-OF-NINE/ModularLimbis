@@ -148,7 +148,7 @@ namespace ModularSkillScripts
 					foreach (BattleUnitModel unitModel in playerUnit_list)
 					{
 						int thisUnitSlotCount = unitModel._actionSlotDetail.GetSinActionList().Count;
-						if (doubleslotterIDList.Contains(unitModel.GetUnitID())) thisUnitSlotCount -= 1;
+						if (doubleslotterIDList.Contains(unitModel.InstanceID)) thisUnitSlotCount -= 1;
 
 						if (thisUnitSlotCount < highestSlotter) {
 							sinManager_inst.AddSinActionModelOnRoundStart(UNIT_FACTION.PLAYER, unitModel.InstanceID);
