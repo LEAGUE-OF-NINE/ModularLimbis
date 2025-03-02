@@ -93,6 +93,7 @@ namespace ModularSkillScripts
 		}
 
 		public int activationTiming = 0;
+		public bool resetWhenUse = false;
 
 		private List<string> batch_list = new List<string>();
 
@@ -750,6 +751,7 @@ namespace ModularSkillScripts
 					else if (timingArg == "SpecialAction") activationTiming = 999;
 				}
 				else if (batch.StartsWith("LOOP:")) modsa_loopString = batch.Remove(0, 5);
+				else if (batch.StartsWith("RESETWHENUSE")) resetWhenUse = true;
 				else batch_list.Add(batch);
 			}
 		}

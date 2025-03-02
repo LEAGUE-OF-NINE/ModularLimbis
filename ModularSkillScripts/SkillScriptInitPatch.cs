@@ -461,12 +461,6 @@ namespace ModularSkillScripts
 		[HarmonyPostfix]
 		private static void Postfix_PassiveDetail_OnStartTurn_BeforeLog(BattleActionModel action, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 		{
-			foreach (ModularSA modpa in modpa_list) // Resets passive adders for modpa timings that suck
-			{
-				if (modpa.activationTiming != 2 && modpa.activationTiming != 20) continue;
-				modpa.ResetAdders();
-			}
-
 			foreach (PassiveModel passiveModel in __instance.PassiveList)
 			{
 				if (!passiveModel.CheckActiveCondition()) continue;
@@ -490,6 +484,7 @@ namespace ModularSkillScripts
 			{
 				if (modpa.passiveID != __instance.ClassInfo.ID) continue;
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
+				if (modpa.resetWhenUse) modpa.ResetAdders(); // on-demand power adder reset (used for passives)
 				MainClass.Logg.LogInfo("Found modpassive - OnStartTurn_BeforeLog: " + modpa.passiveID);
 				modpa.modsa_passiveModel = __instance;
 				modpa.modsa_unitModel = __instance.Owner;
