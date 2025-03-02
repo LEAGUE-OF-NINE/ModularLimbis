@@ -268,7 +268,7 @@ namespace ModularSkillScripts
 		[HarmonyPostfix]
 		private static void Postfix_PassiveDetail_OnRoundStart(PassiveDetail __instance)
 		{
-			foreach (ModularSA modpa in modpa_list) { modpa.ResetAdders(); }
+			MainClass.Logg.LogInfo("passivedetail roundstart");
 
 			foreach (PassiveModel passiveModel in __instance.PassiveList)
 			{
@@ -296,6 +296,7 @@ namespace ModularSkillScripts
 		[HarmonyPostfix]
 		private static void Postfix_PassiveDetail_OnRoundStart_After_Event(BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 		{
+			MainClass.Logg.LogInfo("passivedetail roundstart_afterevent");
 			foreach (ModularSA modpa in modpa_list) { modpa.ResetAdders(); }
 
 			foreach (PassiveModel passiveModel in __instance.PassiveList)
@@ -1150,6 +1151,21 @@ namespace ModularSkillScripts
 				modsa.modsa_oppoAction = oppoAction;
 				modsa.Enact(__instance, 14, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
+
+			foreach (PassiveModel passiveModel in ownerAction.Model._passiveDetail.PassiveList)
+			{
+				if (!passiveModel.CheckActiveCondition()) continue;
+				long passivemodel_intlong = passiveModel.Pointer.ToInt64();
+				foreach (ModularSA modpa in modpa_list)
+				{
+					if (passivemodel_intlong != modpa.ptr_intlong) continue;
+					modpa.modsa_selfAction = ownerAction;
+					modpa.modsa_passiveModel = passiveModel;
+					modpa.modsa_unitModel = ownerAction.Model;
+					modpa.modsa_oppoAction = oppoAction;
+					modpa.Enact(__instance, 14, BATTLE_EVENT_TIMING.ALL_TIMING);
+				}
+			}
 		}
 
 		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnBeforeParryingOnce_AfterLog))]
@@ -1350,7 +1366,6 @@ namespace ModularSkillScripts
 			foreach (ModularSA modca in modca_list)
 			{
 				if (coinmodel_intlong != modca.ptr_intlong) continue;
-				MainClass.Logg.LogInfo("Found modca (in coin, OnAttackConfirmed)");
 				//modca.lastFinalDmg = finalDmg;
 				modca.wasCrit = isCritical;
 				//modca.wasClash = isWinDuel.HasValue;
