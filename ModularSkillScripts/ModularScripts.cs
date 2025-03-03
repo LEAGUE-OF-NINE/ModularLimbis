@@ -1584,6 +1584,7 @@ namespace ModularSkillScripts
 						int skillID_2 = GetNumFromParamString(circles[2]);
 						sinActionList[slot].ReplaceSkillAtoB(skillID_1, skillID_2);
 					}
+
 				}
 			}
 		}
