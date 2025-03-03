@@ -1405,6 +1405,8 @@ namespace ModularSkillScripts
 					modpa.wasCrit = isCritical;
 					modpa.modsa_selfAction = __instance;
 					modpa.modsa_coinModel = coin;
+					modpa.modsa_passiveModel = passiveModel;
+					modpa.modsa_unitModel = __instance;
 					modpa.Enact(__instance.Skill, 8, timing);
 				}
 			}
