@@ -486,7 +486,6 @@ namespace ModularSkillScripts
 				if (modpa.passiveID != __instance.ClassInfo.ID) continue;
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
 				if (modpa.resetWhenUse) modpa.ResetAdders(); // on-demand power adder reset (used for passives)
-				MainClass.Logg.LogInfo("Found modpassive - OnStartTurn_BeforeLog: " + modpa.passiveID);
 				modpa.modsa_passiveModel = __instance;
 				modpa.modsa_unitModel = __instance.Owner;
 				modpa.modsa_selfAction = action;
