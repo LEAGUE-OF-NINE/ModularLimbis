@@ -49,10 +49,6 @@
     <Reference Include="Il2Cppmscorlib">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Limbus Company\BepInEx\unhollowed\Il2Cppmscorlib.dll</HintPath>
     </Reference>
-    <Reference Include="Lethe, Version=1.0.8.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Limbus Company\BepInEx\plugins\Lethe.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -75,7 +71,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FakePowerPatches.cs" />
-    <Compile Include="PatchesForLethe.cs" />
     <Compile Include="MainClass.cs" />
     <Compile Include="ModularScripts.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,18 +1,6 @@
 ﻿using System;
-using System.Runtime.InteropServices;
-using BattleUI;
-using BattleUI.Operation;
 using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
-using MainUI;
-using UnhollowerBaseLib;
-using UnhollowerRuntimeLib;
-using UnityEngine;
-using static BattleUI.Abnormality.AbnormalityPartSkills;
-using static UnityEngine.GraphicsBuffer;
-using IntPtr = System.IntPtr;
-using System.Reflection;
-using System.Linq;
 
 namespace ModularSkillScripts
 {
@@ -28,7 +16,6 @@ namespace ModularSkillScripts
 		private static void Prefix_StageModel_Init(StageStaticData stageinfo, StageModel __instance)
 		{
 			SkillScriptInitPatch.ResetAllModsa();
-			PatchesForLethe.injectedFunnyChange_list.Clear();
 
 			extraSlot = 0;
 			instantslot = false;

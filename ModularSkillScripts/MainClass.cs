@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace ModularSkillScripts
 {
-	[BepInPlugin("GlitchGames.ModularSkillScripts", "ModularSkillScripts", "2.1.3")]
+	[BepInPlugin("GlitchGames.ModularSkillScripts", "ModularSkillScripts", "2.1.4")]
 	public class MainClass : BasePlugin
 	{
 		public override void Load()
@@ -17,7 +17,6 @@ namespace ModularSkillScripts
 			Harmony harmony = new Harmony("ModularSkillScripts");
 			Logg = new ManualLogSource("ModularSkillScripts");
 			BepInEx.Logging.Logger.Sources.Add(Logg);
-			ClassInjector.RegisterTypeInIl2Cpp<InjectedFunnyChange>();
 			ClassInjector.RegisterTypeInIl2Cpp<DataMod>();
 			ClassInjector.RegisterTypeInIl2Cpp<ModUnitData>();
 			ClassInjector.RegisterTypeInIl2Cpp<ModularSA>();
@@ -53,7 +52,7 @@ namespace ModularSkillScripts
 
 		public const string NAME = "ModularSkillScripts";
 
-		public const string VERSION = "2.1.3";
+		public const string VERSION = "2.1.4";
 
 		public const string AUTHOR = "GlitchGames";
 

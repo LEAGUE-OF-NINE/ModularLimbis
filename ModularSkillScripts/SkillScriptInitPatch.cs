@@ -1,18 +1,7 @@
 ﻿using System;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using BattleUI;
-using BattleUI.Operation;
 using BepInEx.IL2CPP.UnityEngine;
-using Dungeon;
 using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
-using UnhollowerBaseLib;
-using UnhollowerRuntimeLib;
-using UnityEngine;
-using static BattleUI.Abnormality.AbnormalityPartSkills;
-using static UnityEngine.GraphicsBuffer;
-using IntPtr = System.IntPtr;
 
 namespace ModularSkillScripts
 {
@@ -1406,7 +1395,7 @@ namespace ModularSkillScripts
 					modpa.modsa_selfAction = __instance;
 					modpa.modsa_coinModel = coin;
 					modpa.modsa_passiveModel = passiveModel;
-					modpa.modsa_unitModel = __instance;
+					modpa.modsa_unitModel = __instance.Model;
 					modpa.Enact(__instance.Skill, 8, timing);
 				}
 			}

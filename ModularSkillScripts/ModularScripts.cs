@@ -1,20 +1,10 @@
 ﻿using System;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using System.Text.RegularExpressions;
-using BattleUI;
-using BattleUI.Operation;
-using Dungeon;
-using HarmonyLib;
-using Il2CppSystem.Buffers;
 using Il2CppSystem.Collections.Generic;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 using static BattleActionModel.TargetDataDetail;
-using static BuffModel;
-using static UIComponent.Icon.GaugeTextIconUI;
-using static UnityEngine.GraphicsBuffer;
 using IntPtr = System.IntPtr;
 
 namespace ModularSkillScripts
@@ -1373,32 +1363,6 @@ namespace ModularSkillScripts
 					string circledSection = sectionArgs[1];
 					int amount = GetNumFromParamString(circledSection);
 					immortality = amount > 0;
-				}
-				else if (batchArgs[i].StartsWith("motion"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
-
-					int motionIdx = motionIdx = GetNumFromParamString(circles[1]);
-
-					if (abilityMode == 0) {
-						PatchesForLethe.InjectFunnyChange(0, circles[0], modsa_skillModel.Pointer.ToInt64(), 0, motionIdx);
-					}
-					else if (abilityMode == 1) {
-						PatchesForLethe.InjectFunnyChange(0, circles[0], modsa_coinModel.Pointer.ToInt64(), modsa_skillModel.Pointer.ToInt64(), motionIdx);
-					}
-				}
-				else if (batchArgs[i].StartsWith("appearance"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					if (abilityMode == 0) {
-						PatchesForLethe.InjectFunnyChange(1, circledSection, modsa_skillModel.Pointer.ToInt64(), 0);
-					}
-					else if (abilityMode == 1) {
-						PatchesForLethe.InjectFunnyChange(1, circledSection, modsa_coinModel.Pointer.ToInt64(), modsa_skillModel.Pointer.ToInt64());
-					}
 				}
 				else if (batchArgs[i].StartsWith("retreat"))
 				{
