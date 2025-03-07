@@ -1012,7 +1012,7 @@ namespace ModularSkillScripts
 					{
 						if (stack < 0)
 						{
-							targetModel.LoseBuffStack(buf_keyword, stack * -1, battleTiming);
+							targetModel.LoseBuffStack(buf_keyword, stack * -1, battleTiming, activeRound);
 							stack = 0;
 						}
 						if (turn < 0)
@@ -1536,17 +1536,28 @@ namespace ModularSkillScripts
 							continue;
 						}
 
-						int slot = GetNumFromParamString(circles[0]);
-
-						List<SinActionModel> sinActionList = modsa_unitModel.GetSinActionList();
-						if (slot >= sinActionList.Count || slot < 0) {
-							MainClass.Logg.LogInfo("skillslotreplace invalid slot");
-							continue;
+    						List<SinActionModel> sinActionList = modsa_unitModel.GetSinActionList();
+    						int skillID_1 = GetNumFromParamString(circles[1]);
+    						int skillID_2 = GetNumFromParamString(circles[2]);
+						if (circles[0] == "All")
+						{
+							foreach (SinActionModel sinslot in sinActionList)
+							{
+								sinslot.ReplaceSkillAtoB(skillID_1, skillID_2);
+							}
 						}
+						else
+						{
+							int slot = GetNumFromParamString(circles[0]);
 
-						int skillID_1 = GetNumFromParamString(circles[1]);
-						int skillID_2 = GetNumFromParamString(circles[2]);
-						sinActionList[slot].ReplaceSkillAtoB(skillID_1, skillID_2);
+							if (slot >= sinActionList.Count || slot < 0)
+							{
+								MainClass.Logg.LogInfo("skillslotreplace invalid slot");
+								continue;
+							}
+
+							sinActionList[slot].ReplaceSkillAtoB(skillID_1, skillID_2);
+						}
 					}
 
 				}
