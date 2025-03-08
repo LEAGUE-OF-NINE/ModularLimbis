@@ -1495,22 +1495,17 @@ namespace ModularSkillScripts
 							continue;
 						}
 
-    						List<SinActionModel> sinActionList = modsa_unitModel.GetSinActionList();
-    						int skillID_1 = GetNumFromParamString(circles[1]);
-    						int skillID_2 = GetNumFromParamString(circles[2]);
-						if (circles[0] == "All")
-						{
-							foreach (SinActionModel sinslot in sinActionList)
-							{
-								sinslot.ReplaceSkillAtoB(skillID_1, skillID_2);
-							}
+								List<SinActionModel> sinActionList = modsa_unitModel.GetSinActionList();
+								int skillID_1 = GetNumFromParamString(circles[1]);
+								int skillID_2 = GetNumFromParamString(circles[2]);
+						if (circles[0] == "All") {
+							foreach (SinActionModel sinslot in sinActionList) sinslot.ReplaceSkillAtoB(skillID_1, skillID_2);
 						}
 						else
 						{
 							int slot = GetNumFromParamString(circles[0]);
 
-							if (slot >= sinActionList.Count || slot < 0)
-							{
+							if (slot >= sinActionList.Count || slot < 0) {
 								MainClass.Logg.LogInfo("skillslotreplace invalid slot");
 								continue;
 							}
@@ -1518,25 +1513,27 @@ namespace ModularSkillScripts
 							sinActionList[slot].ReplaceSkillAtoB(skillID_1, skillID_2);
 						}
 					}
-
 				}
-    				else if (batchArgs[i].StartsWith("addstock"))
+				else if (batchArgs[i].StartsWith("resource"))
 				{
-    					SinManager sinmanager_inst = Singleton<SinManager>.Instance;
-    					SinManager.EgoStockManager stock_manager = sinmanager_inst._egoStockMangaer;
+					SinManager sinmanager_inst = Singleton<SinManager>.Instance;
+					SinManager.EgoStockManager stock_manager = sinmanager_inst._egoStockMangaer;
 
-   					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-    					string circledSection = sectionArgs[1];
-    					string[] circles = circledSection.Split(',');
-   					ATTRIBUTE_TYPE sin = ATTRIBUTE_TYPE.NONE;
-    					UNIT_FACTION faction = UNIT_FACTION.NONE;
-    					Enum.TryParse(circles[0], true, out sin);
-    					Enum.TryParse(circles[1], true, out faction);
-    					int amount = GetNumFromParamString(circles[2]);
+					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
+					string circledSection = sectionArgs[1];
+					string[] circles = circledSection.Split(',');
+
+					ATTRIBUTE_TYPE sin = ATTRIBUTE_TYPE.NONE;
+					Enum.TryParse(circles[0], true, out sin);
+
+					int amount = GetNumFromParamString(circles[1]);
+
+					UNIT_FACTION faction = modsa_unitModel.Faction;
+					UNIT_FACTION enemyFaction = faction == UNIT_FACTION.PLAYER ? UNIT_FACTION.ENEMY : UNIT_FACTION.PLAYER;
+					if (circles.Length >= 3) faction = enemyFaction;
 
 					if (amount >= 0) stock_manager.AddSinStock(faction, sin, amount, 0);
 					else amount *= -1; stock_manager.RemoveSinStock(faction, sin, amount);
-				
 				}
 			}
 		}
@@ -1875,6 +1872,21 @@ namespace ModularSkillScripts
 					valueList[setvalue_idx] = res_manager.GetAttributeResonance(modsa_unitModel.Faction, sin);
 				}
 			}
+			else if (methodology == "resource") {
+				string[] circles = circledSection.Split(',');
+				valueList[setvalue_idx] = 0;
+
+				SinManager sinmanager_inst = Singleton<SinManager>.Instance;
+				SinManager.EgoStockManager stock_manager = sinmanager_inst._egoStockMangaer;
+
+				ATTRIBUTE_TYPE sin = ATTRIBUTE_TYPE.NONE;
+				UNIT_FACTION faction = modsa_unitModel.Faction;
+				UNIT_FACTION enemyFaction = faction == UNIT_FACTION.PLAYER ? UNIT_FACTION.ENEMY : UNIT_FACTION.PLAYER;
+				Enum.TryParse(circles[0], true, out sin);
+				if (circles.Length >= 2) faction = enemyFaction;
+
+				valueList[setvalue_idx] = stock_manager.GetAttributeStockNumberByAttributeType(faction, sin);
+			}
 			else if (methodology == "haskey")
 			{
 				string[] circles = circledSection.Split(',');
@@ -1897,139 +1909,52 @@ namespace ModularSkillScripts
 					if (operator_OR == success) break; // [IF Statement] Simplification
 				}
 				valueList[setvalue_idx] = success ? 1 : 0;
-			}else if (methodology == "getbase")
-{
-    BattleActionModel targetAction = modsa_selfAction;
-    if (circledSection == "Target") targetAction = modsa_oppoAction;
-	if (targetAction == null)
-	{
-		valueList[setvalue_idx] = -1;
-		return;
-	}
+			}
+			else if (methodology.StartsWith("skill"))
+			{
+				string[] circles = circledSection.Split(',');
+				valueList[setvalue_idx] = -1;
 
-    valueList[setvalue_idx] = targetAction.Skill.GetSkillDefaultPower();
-}
-else if (methodology == "gettargetnum")
-{
-    BattleActionModel targetAction = modsa_selfAction;
-    if (circledSection == "Target") targetAction = modsa_oppoAction;
-    if (targetAction == null)
-    {
-        valueList[setvalue_idx] = -1;
-        return;
-    }
-    valueList[setvalue_idx] = targetAction.Skill.GetAttackWeight(targetAction);
-}
-else if (methodology == "getcoinscale")
-{
-    string[] circles = circledSection.Split(',');
-	int coinindex = GetNumFromParamString(circles[0]);
-    BattleActionModel targetAction = modsa_selfAction;
-    if (circles[1] == "Target") targetAction = modsa_oppoAction;
-    if (targetAction == null)
-    {
-        valueList[setvalue_idx] = -1;
-        return;
-    }
-    valueList[setvalue_idx] = targetAction.Skill.CoinList[coinindex]._scale;
-}
-else if (methodology == "getskilltype")
-{
-    BattleActionModel targetAction = modsa_selfAction;
-    if (circledSection == "Target") targetAction = modsa_oppoAction;
-    if (targetAction == null)
-    {
-        valueList[setvalue_idx] = -1;
-        return;
-    }
-    int type = -1;
-    switch (targetAction.Skill.GetAttackType())
-    {
-        case ATK_BEHAVIOUR.SLASH:
-            type = 0;
-            break;
-        case ATK_BEHAVIOUR.PENETRATE:
-            type = 1;
-            break;
-        case ATK_BEHAVIOUR.HIT:
-            type = 2;
-            break;
-        default:
-            type = -1;
-            break;
-    }
+				string mode_string = sectionArgs[0].Remove(0, 5);
+				if (mode_string == "base") {
+					BattleActionModel action = modsa_selfAction;
+					if (circledSection == "Target") action = modsa_oppoAction;
+					if (action == null) return;
+					valueList[setvalue_idx] = action.Skill.GetSkillDefaultPower();
+				}
+				else if (mode_string == "atkweight") {
+					BattleActionModel action = modsa_selfAction;
+					if (circledSection == "Target") action = modsa_oppoAction;
+					if (action == null) return;
+					valueList[setvalue_idx] = action.Skill.GetAttackWeight(action);
+				}
+				else if (mode_string == "onescale") {
+					BattleActionModel action = modsa_selfAction;
+					if (circles[0] == "Target") action = modsa_oppoAction;
+					if (action == null) return;
 
-    valueList[setvalue_idx] = type;
-}
-else if (methodology == "getskillsin")
-{
-    BattleActionModel targetAction = modsa_selfAction;
-    if (circledSection == "Target") targetAction = modsa_oppoAction;
-    if (targetAction == null)
-    {
-        valueList[setvalue_idx] = -1;
-        return;
-    }
-    int sin = -1;
-    switch (targetAction.Skill.GetAttributeType())
-    {
-        case ATTRIBUTE_TYPE.CRIMSON:
-            sin = 0;
-            break;
-        case ATTRIBUTE_TYPE.SCARLET:
-            sin = 1;
-            break;
-        case ATTRIBUTE_TYPE.AMBER:
-            sin = 2;
-            break;
-        case ATTRIBUTE_TYPE.SHAMROCK:
-            sin = 3;
-            break;
-        case ATTRIBUTE_TYPE.AZURE:
-            sin = 4;
-            break;
-        case ATTRIBUTE_TYPE.INDIGO:
-            sin = 5;
-            break;
-        case ATTRIBUTE_TYPE.VIOLET:
-            sin = 6;
-            break;
-        default:
-            sin = -1;
-            break;
-    }
+					int coin_idx = GetNumFromParamString(circles[1]);
+					int coinAmount = action.Skill.CoinList.Count;
+					if (coinAmount < 1) return;
+					if (coin_idx >= coinAmount) coin_idx = coinAmount - 1;
 
-    valueList[setvalue_idx] = sin;
-}
-else if (methodology == "getstock")
-{
-    valueList[setvalue_idx] = 0;
-    SinManager sinmanager_inst = Singleton<SinManager>.Instance;
-    SinManager.EgoStockManager stock_manager = sinmanager_inst._egoStockMangaer;
+					valueList[setvalue_idx] = action.Skill.CoinList[coin_idx]._scale;
+				}
+				else if (mode_string == "atk") {
+					BattleActionModel action = modsa_selfAction;
+					if (circles[0] == "Target") action = modsa_oppoAction;
+					if (action == null) return;
 
-    string[] circles = circledSection.Split(',');
-    ATTRIBUTE_TYPE sin = ATTRIBUTE_TYPE.NONE;
-	UNIT_FACTION faction = UNIT_FACTION.NONE;
-    Enum.TryParse(circles[0], true, out sin);
-    Enum.TryParse(circles[1], true, out faction);
+					valueList[setvalue_idx] = (int)action.Skill.GetAttackType();
+				}
+				else if (mode_string == "attribute") {
+					BattleActionModel action = modsa_selfAction;
+					if (circles[0] == "Target") action = modsa_oppoAction;
+					if (action == null) return;
 
-    valueList[setvalue_idx] = stock_manager.GetAttributeStockNumberByAttributeType(faction, sin);
-
-}
+					valueList[setvalue_idx] = (int)action.Skill.GetAttributeType();
+				}
+			}
 		}
 	}
-
-
-	//SinManager sinmanager_inst = Singleton<SinManager>.Instance;
-	//SinManager.ResonanceManager res_manager = sinmanager_inst._resManager;
-	//int gloom_res = res_manager.GetAttributeResonance(faction, ATTRIBUTE_TYPE.AZURE);
-	//return gloom_res >= 3;
-
-
-	//SinManager sinmanager_inst = Singleton<SinManager>.Instance;
-	//SinManager.ResonanceManager res_manager = sinmanager_inst._resManager;
-	//int gloom_perfectres = res_manager.GetMaxPerfectResonance(faction, ATTRIBUTE_TYPE.AZURE);
-	//return gloom_perfectres >= 5;
-
-
 }
