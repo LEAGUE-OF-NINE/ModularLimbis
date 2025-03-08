@@ -420,47 +420,6 @@ namespace ModularSkillScripts
 				}
 				return unitList;
 			}
-			else if (param.StartsWith("EveryUnit"))
-			{
-				string bufKeyword_string = param.Remove(0, 9);
-				if (bufKeyword_string == "") return battleObjectManager.GetAliveList(false);
-
-				BUFF_UNIQUE_KEYWORD bufKeyword = BUFF_UNIQUE_KEYWORD.Enhancement;
-				Enum.TryParse(bufKeyword_string, true, out bufKeyword);
-				unitList = battleObjectManager.GetAliveList(bufKeyword, 0, false, thisFaction);
-				return unitList;
-			}
-			else if (param.StartsWith("EveryAllyExceptSelf"))
-			{
-				string bufKeyword_string = param.Remove(0, 19);
-				if (bufKeyword_string == "") return battleObjectManager.GetAliveAllyExceptSelf(modsa_unitModel);
-
-				BUFF_UNIQUE_KEYWORD bufKeyword = BUFF_UNIQUE_KEYWORD.Enhancement;
-				Enum.TryParse(bufKeyword_string, true, out bufKeyword);
-				unitList = battleObjectManager.GetAliveList(bufKeyword, 0, false, thisFaction);
-				unitList.Remove(modsa_unitModel);
-				return unitList;
-			}
-			else if (param.StartsWith("EveryAlly"))
-			{
-				string bufKeyword_string = param.Remove(0, 9);
-				if (bufKeyword_string == "") return battleObjectManager.GetAliveList(false, thisFaction);
-
-				BUFF_UNIQUE_KEYWORD bufKeyword = BUFF_UNIQUE_KEYWORD.Enhancement;
-				Enum.TryParse(bufKeyword_string, true, out bufKeyword);
-				unitList = battleObjectManager.GetAliveList(bufKeyword, 0, false, thisFaction);
-				return unitList;
-			}
-			else if (param.StartsWith("EveryEnemy"))
-			{
-				string bufKeyword_string = param.Remove(0, 9);
-				if (bufKeyword_string == "") return battleObjectManager.GetAliveList(false, enemyFaction);
-
-				BUFF_UNIQUE_KEYWORD bufKeyword = BUFF_UNIQUE_KEYWORD.Enhancement;
-				Enum.TryParse(bufKeyword_string, true, out bufKeyword);
-				unitList = battleObjectManager.GetAliveList(bufKeyword, 0, false, enemyFaction);
-				return unitList;
-			}
 			else if (param == "Self") unitList.Add(modsa_unitModel);
 			else
 			{
