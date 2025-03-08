@@ -11,24 +11,7 @@ namespace ModularSkillScripts
 		[HarmonyPostfix]
 		private static void Postfix_SkillModelInit_AddSkillScript(SkillModel __instance)
 		{
-			//List<ModularSA> modsa_list_goodones = new List<ModularSA>();
-			//foreach (ModularSA modsa in modsaglobal_list)
-			//{
-			//	//GCHandle skillModel_gchandle = (GCHandle)modsa.skillModel_ptr;
-			//	if (modsa.skillModel != null)
-			//	{
-			//		modsa_list_goodones.Add(modsa);
-			//		//MainClass.Logg.LogInfo("found ptr");
-			//	}
-			//	else
-			//	{
-			//		//MainClass.Logg.LogInfo("null ptr");
-			//	}
-			//}
-			//modsaglobal_list = modsa_list_goodones;
-
 			long ptr = __instance.Pointer.ToInt64();
-			//int skillID = __instance.GetID();
 
 			List<AbilityData> abilityData_list = __instance.GetSkillAbilityScript();
 			for (int i = 0; i < abilityData_list.Count; i++)
@@ -39,17 +22,6 @@ namespace ModularSkillScripts
 				if (!MainClass.fakepowerEnabled && abilityScriptname.Contains("FakePower")) continue;
 
 				bool existsAlready = false;
-				//foreach (ModularSA existingModsa in modsaglobal_list)
-				//{
-				//	if (existingModsa.skillID == skillID && existingModsa.abilityIdx == i)
-				//	{
-				//		existsAlready = true;
-				//		existingModsa.ResetValueList();
-				//		existingModsa.ResetAdders();
-				//		existingModsa.modsa_skillModel = __instance;
-				//		break;
-				//	}
-				//}
 				foreach (ModularSA existingModsa in modsaglobal_list)
 				{
 					if (existingModsa.ptr_intlong == ptr && existingModsa.originalString == abilityScriptname)
@@ -73,50 +45,15 @@ namespace ModularSkillScripts
 				if (Input.GetKeyInt(BepInEx.IL2CPP.UnityEngine.KeyCode.LeftControl)) MainClass.Logg.LogInfo("modSkillAbility init: " + abilityScriptname);
 				modsaglobal_list.Add(modsa);
 			}
-
-			//if (injectedAbilities)
-			//{
-			//	MainClass.Logg.LogInfo("about to calc all datas");
-			//	__instance.CalculateAllPossibleDatas(0, null);
-			//	MainClass.Logg.LogInfo("calced all datas");
-			//	//MainClass.Logg.LogInfo("skillabilityCount: " + __instance._skillAbilityList.Count);
-			//	//foreach (SkillAbility skillab in __instance._skillAbilityList) MainClass.Logg.LogInfo("index: " + skillab._index);
-
-			//}
 		}
 
-		private static void InjectSkillAbility(SkillModel skillModel_inst, int ability_idx, AbilityData abilityData, string abilityScriptname)
-		{
-			//ModularSA modsa = Activator.CreateInstance(typeof(ModularSA)) as ModularSA;
-			//ModularSA modsa = new ModularSA();
-			MainClass.Logg.LogInfo("injecting");
-			var modsa = new ModularSA();
-			MainClass.Logg.LogInfo("new modsa");
-			//MODSA_HelloWorld modsa = Activator.CreateInstance(typeof(MODSA_HelloWorld)) as MODSA_HelloWorld;
-			//ModularScripts.modsa_list.Add(modsa);
-			//modsa.skillmodel_ref = skillModel_inst;
-
-			//modsa.Init(skillModel_inst, abilityScriptname, ability_idx, abilityData.BuffData);
-			modsa.modsa_skillModel = skillModel_inst;
-			//GCHandle handle = GCHandle.Alloc(skillModel_inst);
-			//IntPtr pointer = (IntPtr)handle;
-			modsa.ptr_intlong = skillModel_inst.Pointer.ToInt64();
-			MainClass.Logg.LogInfo("modsa init: " + modsa.ptr_intlong.ToString());
-			//skillModel_inst._skillAbilityList.Add(modsa);
-			//MainClass.Logg.LogInfo("addtolist");
-			//modsa.skillModel = skillModel_inst;
-			modsa.SetupModular(abilityScriptname.Remove(0, 8));
-			MainClass.Logg.LogInfo("setup modular");
-			modsaglobal_list.Add(modsa);
-			MainClass.Logg.LogInfo("added to modsaglobal");
-		}
 
 		[HarmonyPatch(typeof(PassiveModel), nameof(PassiveModel.Init))]
 		[HarmonyPrefix]
 		private static void Prefix_PassiveModel_Init(BattleUnitModel owner, PassiveModel __instance)
 		{
 			if (__instance._script != null) return;
-			
+
 			bool isModular = false;
 			List<string> requireIDList = __instance.ClassInfo.requireIDList;
 			for (int i = 0; i < requireIDList.Count; i++) {
@@ -237,55 +174,14 @@ namespace ModularSkillScripts
 		public static List<ModUnitData> unitMod_list = new List<ModUnitData>();
 		public static List<long> skillPtrsRoundStart = new List<long>();
 
-		//[HarmonyPatch(typeof(PassiveModel), nameof(PassiveModel.IsActive))]
-		//[HarmonyPostfix]
-		//private static void Postfix_PassiveModel_IsActive(PassiveModel __instance, ref bool __result)
-		//{
-		//	List<string> requireIDList = __instance.ClassInfo.requireIDList;
-		//	for (int i = 0; i < requireIDList.Count; i++)
-		//	{
-		//		string param = requireIDList[i];
-		//		if (param.StartsWith("Modular/"))
-		//		{
-		//			__result = true;
-		//			break;
-		//		}
-		//	}
-		//}
 
-		[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnRoundStart))]
-		[HarmonyPostfix]
-		private static void Postfix_PassiveDetail_OnRoundStart(PassiveDetail __instance)
-		{
-			MainClass.Logg.LogInfo("passivedetail roundstart");
+		// REAL PATCHES START HERE
 
-			foreach (PassiveModel passiveModel in __instance.PassiveList)
-			{
-				if (!passiveModel.CheckActiveCondition()) continue;
-				List<string> requireIDList = passiveModel.ClassInfo.requireIDList;
-				foreach (string param in requireIDList)
-				{
-					if (!param.StartsWith("Modular/")) continue;
-					
-					long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-					foreach (ModularSA modpa in modpa_list)
-					{
-						if (modpa.passiveID != passiveModel.ClassInfo.ID) continue;
-						if (passiveModel_intlong != modpa.ptr_intlong) continue;
-						modpa.modsa_passiveModel = passiveModel;
-						modpa.modsa_unitModel = __instance._owner;
-						modpa.Enact(null, -2, BATTLE_EVENT_TIMING.ON_START_ROUND);
-					}
-					break;
-				}
-			}
-		}
 
 		[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnRoundStart_After_Event))]
 		[HarmonyPostfix]
 		private static void Postfix_PassiveDetail_OnRoundStart_After_Event(BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 		{
-			MainClass.Logg.LogInfo("passivedetail roundstart_afterevent");
 			foreach (ModularSA modpa in modpa_list) { modpa.ResetAdders(); }
 
 			foreach (PassiveModel passiveModel in __instance.PassiveList)
@@ -407,43 +303,6 @@ namespace ModularSkillScripts
 				modpa.Enact(null, 6, timing);
 			}
 		}
-
-		//[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.IsAbnormalityImmortal))]
-		//[HarmonyPostfix]
-		//private static void Postfix_PassiveDetail_IsImmortal(BATTLE_EVENT_TIMING timing, int newHp, bool isInstantDeath, ref bool __result, PassiveDetail __instance)
-		//{
-		//	PassiveDetail pasdet = new PassiveDetail(null, null);
-
-		//	if (isInstantDeath) return;
-		//	foreach (PassiveModel passiveModel in __instance.PassiveList)
-		//	{
-		//		if (!passiveModel.CheckActiveCondition()) continue;
-		//		List<string> requireIDList = passiveModel.ClassInfo.requireIDList;
-		//		foreach (string param in requireIDList)
-		//		{
-		//			if (param.StartsWith("Modular/"))
-		//			{
-		//				if (passiveModel.IsAbnormalityImmortal(timing, newHp, isInstantDeath)) __result = true;
-		//				break;
-		//			}
-		//		}
-		//	}
-		//}
-
-		//[HarmonyPatch(typeof(PassiveModel), nameof(PassiveModel.IsAbnormalityImmortal))]
-		//[HarmonyPostfix]
-		//private static void Postfix_PassiveModel_IsImmortal(BATTLE_EVENT_TIMING timing, int newHp, bool isInstantDeath, ref bool __result, PassiveModel __instance)
-		//{
-		//	//MainClass.Logg.LogInfo("postfix passive combat start");
-		//	long passiveModel_intlong = __instance.Pointer.ToInt64();
-		//	foreach (ModularSA modpa in modpa_list)
-		//	{
-		//		if (modpa.passiveID != __instance.ClassInfo.ID) continue;
-		//		if (passiveModel_intlong != modpa.ptr_intlong) continue;
-		//		MainClass.Logg.LogInfo("Found modpassive - immortal: " + modpa.passiveID);
-		//		if (modpa.IsImmortal()) __result = true;
-		//	}
-		//}
 
 
 
@@ -1174,22 +1033,9 @@ namespace ModularSkillScripts
 		[HarmonyPostfix]
 		private static void Postfix_SkillModel_OnWinDuel(BattleActionModel selfAction, BattleActionModel oppoAction, BATTLE_EVENT_TIMING timing, int parryingCount, SkillModel __instance)
 		{
-			//MainClass.Logg.LogInfo("Won Duel");
-			//foreach (var skillab in __instance.SkillAbilityList)
-			//{
-			//	MainClass.Logg.LogInfo("skillab search: "+ skillab._index);
-			//	ModularSA modsa = skillab as ModularSA;
-			//	if (modsa == null) continue;
-			//	MainClass.Logg.LogInfo("Found modsa");
-			//	modsa.selfAction = selfAction;
-			//	modsa.oppoAction = oppoAction;
-			//	modsa.Enact(__instance, 4);
-			//}
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			//MainClass.Logg.LogInfo("instance ptr: " + skillmodel_intlong);
 			foreach (ModularSA modsa in modsaglobal_list)
 			{
-				//MainClass.Logg.LogInfo("iterating modsaglobal_list: " + modsa.skillModel_ptr_intlong.ToString());
 				if (skillmodel_intlong != modsa.ptr_intlong) continue;
 				MainClass.Logg.LogInfo("Found modsa (but from globallist)");
 				modsa.modsa_selfAction = selfAction;
@@ -1306,45 +1152,10 @@ namespace ModularSkillScripts
 			}
 		}
 
+		// SKILLMODEL UP TO HERE
+		// SKILLMODEL UP TO HERE
+		// SKILLMODEL UP TO HERE
 
-
-
-
-		// SKILLMODEL END
-
-		//[HarmonyPatch(typeof(BattleActionModel), nameof(BattleActionModel.OnAttackConfirmed))]
-		//[HarmonyPrefix]
-		//private static void Prefix_BattleActionModel_OnAttackConfirmed(CoinModel coin, BattleUnitModel target, BATTLE_EVENT_TIMING timing, bool isCritical, BattleActionModel __instance)
-		//{
-		//	long coinmodel_intlong = coin.Pointer.ToInt64();
-		//	MainClass.Logg.LogInfo("OnAttackConfirmed timing: " + timing.ToString());
-		//	foreach (ModularSA modca in modca_list)
-		//	{
-		//		if (coinmodel_intlong != modca.ptr_intlong) continue;
-		//		MainClass.Logg.LogInfo("Found modca (in coin, succeed attack)");
-		//		//modca.lastFinalDmg = finalDmg;
-		//		modca.wasCrit = isCritical;
-		//		//modca.wasClash = isWinDuel.HasValue;
-		//		//if (modca.wasClash) modca.wasWin = isWinDuel.Value;
-		//		modca.modsa_selfAction = __instance;
-		//		modca.modsa_coinModel = coin;
-		//		modca.Enact(__instance.Skill, 7, timing);
-		//	}
-
-		//	foreach (PassiveModel passiveModel in __instance.Model._passiveDetail.PassiveList)
-		//	{
-		//		long passivemodel_intlong = passiveModel.Pointer.ToInt64();
-		//		foreach (ModularSA modpa in modpa_list)
-		//		{
-		//			if (passivemodel_intlong != modpa.ptr_intlong) continue;
-		//			MainClass.Logg.LogInfo("Found modpa (in coin, succeed attack)");
-		//			modpa.wasCrit = isCritical;
-		//			modpa.modsa_selfAction = __instance;
-		//			modpa.modsa_coinModel = coin;
-		//			modpa.Enact(__instance.Skill, 7, timing);
-		//		}
-		//	}
-		//}
 
 		[HarmonyPatch(typeof(BattleActionModel), nameof(BattleActionModel.OnAttackConfirmed))]
 		[HarmonyPostfix]
