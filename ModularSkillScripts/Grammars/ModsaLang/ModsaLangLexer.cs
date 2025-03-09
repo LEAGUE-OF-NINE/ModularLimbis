@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from /media/glitch/ExtraWorld/repos/ModularSkillScripts repos/ModularSkillScripts/Grammars/ModsaLanguage.g4 by ANTLR 4.13.2
+// Generated from /media/glitch/ExtraWorld/repos/ModularSkillScripts repos/ModularSkillScripts/Grammars/ModsaLang.g4 by ANTLR 4.13.2
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -30,7 +30,7 @@ using DFA = Antlr4.Runtime.Dfa.DFA;
 
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.13.2")]
 [System.CLSCompliant(false)]
-public partial class ModsaLanguageLexer : Lexer {
+public partial class ModsaLangLexer : Lexer {
 	protected static DFA[] decisionToDFA;
 	protected static PredictionContextCache sharedContextCache = new PredictionContextCache();
 	public const int
@@ -48,10 +48,10 @@ public partial class ModsaLanguageLexer : Lexer {
 	};
 
 
-	public ModsaLanguageLexer(ICharStream input)
+	public ModsaLangLexer(ICharStream input)
 	: this(input, Console.Out, Console.Error) { }
 
-	public ModsaLanguageLexer(ICharStream input, TextWriter output, TextWriter errorOutput)
+	public ModsaLangLexer(ICharStream input, TextWriter output, TextWriter errorOutput)
 	: base(input, output, errorOutput)
 	{
 		Interpreter = new LexerATNSimulator(this, _ATN, decisionToDFA, sharedContextCache);
@@ -74,7 +74,7 @@ public partial class ModsaLanguageLexer : Lexer {
 		}
 	}
 
-	public override string GrammarFileName { get { return "ModsaLanguage.g4"; } }
+	public override string GrammarFileName { get { return "ModsaLang.g4"; } }
 
 	public override string[] RuleNames { get { return ruleNames; } }
 
@@ -84,7 +84,7 @@ public partial class ModsaLanguageLexer : Lexer {
 
 	public override int[] SerializedAtn { get { return _serializedATN; } }
 
-	static ModsaLanguageLexer() {
+	static ModsaLangLexer() {
 		decisionToDFA = new DFA[_ATN.NumberOfDecisions];
 		for (int i = 0; i < _ATN.NumberOfDecisions; i++) {
 			decisionToDFA[i] = new DFA(_ATN.GetDecisionState(i), i);

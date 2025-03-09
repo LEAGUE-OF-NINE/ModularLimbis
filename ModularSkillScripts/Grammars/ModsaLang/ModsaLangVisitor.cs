@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from /media/glitch/ExtraWorld/repos/ModularSkillScripts repos/ModularSkillScripts/Grammars/ModsaLanguage.g4 by ANTLR 4.13.2
+// Generated from /media/glitch/ExtraWorld/repos/ModularSkillScripts repos/ModularSkillScripts/Grammars/ModsaLang.g4 by ANTLR 4.13.2
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -26,59 +26,59 @@ using IToken = Antlr4.Runtime.IToken;
 
 /// <summary>
 /// This interface defines a complete generic visitor for a parse tree produced
-/// by <see cref="ModsaLanguageParser"/>.
+/// by <see cref="ModsaLangParser"/>.
 /// </summary>
 /// <typeparam name="Result">The return type of the visit operation.</typeparam>
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.13.2")]
 [System.CLSCompliant(false)]
-public interface IModsaLanguageVisitor<Result> : IParseTreeVisitor<Result> {
+public interface IModsaLangVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="ModsaLanguageParser.program"/>.
+	/// Visit a parse tree produced by <see cref="ModsaLangParser.program"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitProgram([NotNull] ModsaLanguageParser.ProgramContext context);
+	Result VisitProgram([NotNull] ModsaLangParser.ProgramContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>AddSubExpression</c>
-	/// labeled alternative in <see cref="ModsaLanguageParser.expression"/>.
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitAddSubExpression([NotNull] ModsaLanguageParser.AddSubExpressionContext context);
+	Result VisitAddSubExpression([NotNull] ModsaLangParser.AddSubExpressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>FunctionExpression</c>
-	/// labeled alternative in <see cref="ModsaLanguageParser.expression"/>.
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitFunctionExpression([NotNull] ModsaLanguageParser.FunctionExpressionContext context);
+	Result VisitFunctionExpression([NotNull] ModsaLangParser.FunctionExpressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>ParenExpression</c>
-	/// labeled alternative in <see cref="ModsaLanguageParser.expression"/>.
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitParenExpression([NotNull] ModsaLanguageParser.ParenExpressionContext context);
+	Result VisitParenExpression([NotNull] ModsaLangParser.ParenExpressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>NumberExpression</c>
-	/// labeled alternative in <see cref="ModsaLanguageParser.expression"/>.
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitNumberExpression([NotNull] ModsaLanguageParser.NumberExpressionContext context);
+	Result VisitNumberExpression([NotNull] ModsaLangParser.NumberExpressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>VariableExpression</c>
-	/// labeled alternative in <see cref="ModsaLanguageParser.expression"/>.
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitVariableExpression([NotNull] ModsaLanguageParser.VariableExpressionContext context);
+	Result VisitVariableExpression([NotNull] ModsaLangParser.VariableExpressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>MulDivExpression</c>
-	/// labeled alternative in <see cref="ModsaLanguageParser.expression"/>.
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitMulDivExpression([NotNull] ModsaLanguageParser.MulDivExpressionContext context);
+	Result VisitMulDivExpression([NotNull] ModsaLangParser.MulDivExpressionContext context);
 }
 } // namespace ModsaLang

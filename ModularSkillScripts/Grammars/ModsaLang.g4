@@ -1,4 +1,4 @@
-grammar ModsaLanguage;
+grammar ModsaLang;
 
 // Parser rules
 program : expression EOF ; // A program is a single expression

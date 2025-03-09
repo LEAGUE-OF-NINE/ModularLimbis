@@ -8,6 +8,7 @@ using static BattleActionModel.TargetDataDetail;
 using IntPtr = System.IntPtr;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using ModsaLang;
 
 namespace ModularSkillScripts
 {
@@ -1964,7 +1965,7 @@ namespace ModularSkillScripts
 		
 	}
 	
-	class MathEvaluator : ModsaLanguageBaseVisitor<double>
+	class MathEvaluator : ModsaLangBaseVisitor<double>
 	{
 		public override double VisitParenExpression(MathParser.ParenExpressionContext context)
 		{

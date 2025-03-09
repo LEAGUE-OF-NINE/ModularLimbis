@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from /media/glitch/ExtraWorld/repos/ModularSkillScripts repos/ModularSkillScripts/Grammars/ModsaLanguage.g4 by ANTLR 4.13.2
+// Generated from /media/glitch/ExtraWorld/repos/ModularSkillScripts repos/ModularSkillScripts/Grammars/ModsaLang.g4 by ANTLR 4.13.2
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -28,110 +28,110 @@ using IToken = Antlr4.Runtime.IToken;
 using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 
 /// <summary>
-/// This class provides an empty implementation of <see cref="IModsaLanguageListener"/>,
+/// This class provides an empty implementation of <see cref="IModsaLangListener"/>,
 /// which can be extended to create a listener which only needs to handle a subset
 /// of the available methods.
 /// </summary>
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.13.2")]
 [System.Diagnostics.DebuggerNonUserCode]
 [System.CLSCompliant(false)]
-public partial class ModsaLanguageBaseListener : IModsaLanguageListener {
+public partial class ModsaLangBaseListener : IModsaLangListener {
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="ModsaLanguageParser.program"/>.
+	/// Enter a parse tree produced by <see cref="ModsaLangParser.program"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterProgram([NotNull] ModsaLanguageParser.ProgramContext context) { }
+	public virtual void EnterProgram([NotNull] ModsaLangParser.ProgramContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="ModsaLanguageParser.program"/>.
+	/// Exit a parse tree produced by <see cref="ModsaLangParser.program"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitProgram([NotNull] ModsaLanguageParser.ProgramContext context) { }
+	public virtual void ExitProgram([NotNull] ModsaLangParser.ProgramContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>AddSubExpression</c>
-	/// labeled alternative in <see cref="ModsaLanguageParser.expression"/>.
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterAddSubExpression([NotNull] ModsaLanguageParser.AddSubExpressionContext context) { }
+	public virtual void EnterAddSubExpression([NotNull] ModsaLangParser.AddSubExpressionContext context) { }
 	/// <summary>
 	/// Exit a parse tree produced by the <c>AddSubExpression</c>
-	/// labeled alternative in <see cref="ModsaLanguageParser.expression"/>.
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitAddSubExpression([NotNull] ModsaLanguageParser.AddSubExpressionContext context) { }
+	public virtual void ExitAddSubExpression([NotNull] ModsaLangParser.AddSubExpressionContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>FunctionExpression</c>
-	/// labeled alternative in <see cref="ModsaLanguageParser.expression"/>.
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterFunctionExpression([NotNull] ModsaLanguageParser.FunctionExpressionContext context) { }
+	public virtual void EnterFunctionExpression([NotNull] ModsaLangParser.FunctionExpressionContext context) { }
 	/// <summary>
 	/// Exit a parse tree produced by the <c>FunctionExpression</c>
-	/// labeled alternative in <see cref="ModsaLanguageParser.expression"/>.
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitFunctionExpression([NotNull] ModsaLanguageParser.FunctionExpressionContext context) { }
+	public virtual void ExitFunctionExpression([NotNull] ModsaLangParser.FunctionExpressionContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>ParenExpression</c>
-	/// labeled alternative in <see cref="ModsaLanguageParser.expression"/>.
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterParenExpression([NotNull] ModsaLanguageParser.ParenExpressionContext context) { }
+	public virtual void EnterParenExpression([NotNull] ModsaLangParser.ParenExpressionContext context) { }
 	/// <summary>
 	/// Exit a parse tree produced by the <c>ParenExpression</c>
-	/// labeled alternative in <see cref="ModsaLanguageParser.expression"/>.
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitParenExpression([NotNull] ModsaLanguageParser.ParenExpressionContext context) { }
+	public virtual void ExitParenExpression([NotNull] ModsaLangParser.ParenExpressionContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>NumberExpression</c>
-	/// labeled alternative in <see cref="ModsaLanguageParser.expression"/>.
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterNumberExpression([NotNull] ModsaLanguageParser.NumberExpressionContext context) { }
+	public virtual void EnterNumberExpression([NotNull] ModsaLangParser.NumberExpressionContext context) { }
 	/// <summary>
 	/// Exit a parse tree produced by the <c>NumberExpression</c>
-	/// labeled alternative in <see cref="ModsaLanguageParser.expression"/>.
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitNumberExpression([NotNull] ModsaLanguageParser.NumberExpressionContext context) { }
+	public virtual void ExitNumberExpression([NotNull] ModsaLangParser.NumberExpressionContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>VariableExpression</c>
-	/// labeled alternative in <see cref="ModsaLanguageParser.expression"/>.
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterVariableExpression([NotNull] ModsaLanguageParser.VariableExpressionContext context) { }
+	public virtual void EnterVariableExpression([NotNull] ModsaLangParser.VariableExpressionContext context) { }
 	/// <summary>
 	/// Exit a parse tree produced by the <c>VariableExpression</c>
-	/// labeled alternative in <see cref="ModsaLanguageParser.expression"/>.
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitVariableExpression([NotNull] ModsaLanguageParser.VariableExpressionContext context) { }
+	public virtual void ExitVariableExpression([NotNull] ModsaLangParser.VariableExpressionContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>MulDivExpression</c>
-	/// labeled alternative in <see cref="ModsaLanguageParser.expression"/>.
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterMulDivExpression([NotNull] ModsaLanguageParser.MulDivExpressionContext context) { }
+	public virtual void EnterMulDivExpression([NotNull] ModsaLangParser.MulDivExpressionContext context) { }
 	/// <summary>
 	/// Exit a parse tree produced by the <c>MulDivExpression</c>
-	/// labeled alternative in <see cref="ModsaLanguageParser.expression"/>.
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitMulDivExpression([NotNull] ModsaLanguageParser.MulDivExpressionContext context) { }
+	public virtual void ExitMulDivExpression([NotNull] ModsaLangParser.MulDivExpressionContext context) { }
 
 	/// <inheritdoc/>
 	/// <remarks>The default implementation does nothing.</remarks>
