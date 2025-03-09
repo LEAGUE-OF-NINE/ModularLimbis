@@ -16,7 +16,7 @@ namespace ModularSkillScripts
 			List<AbilityData> abilityData_list = __instance.GetSkillAbilityScript();
 			for (int i = 0; i < abilityData_list.Count; i++)
 			{
-				AbilityData abilityData = abilityData_list[i];
+				AbilityData abilityData = abilityData_list.ToArray()[i];
 				string abilityScriptname = abilityData.ScriptName;
 				if (!abilityScriptname.StartsWith("Modular/")) continue;
 				if (!MainClass.fakepowerEnabled && abilityScriptname.Contains("FakePower")) continue;
@@ -57,7 +57,7 @@ namespace ModularSkillScripts
 			bool isModular = false;
 			List<string> requireIDList = __instance.ClassInfo.requireIDList;
 			for (int i = 0; i < requireIDList.Count; i++) {
-				string param = requireIDList[i];
+				string param = requireIDList.ToArray()[i];
 				if (param.StartsWith("Modular/")) { isModular = true; break; }
 			}
 
@@ -76,7 +76,7 @@ namespace ModularSkillScripts
 			List<string> requireIDList = __instance.ClassInfo.requireIDList;
 			for (int i = 0; i < requireIDList.Count; i++)
 			{
-				string param = requireIDList[i];
+				string param = requireIDList.ToArray()[i];
 				if (!param.StartsWith("Modular/")) continue;
 
 				long ptr = __instance.Pointer.ToInt64();
@@ -116,7 +116,7 @@ namespace ModularSkillScripts
 				List<ModularSA> goodones = new List<ModularSA>(500);
 				for (int i = 0; i < 500; i++)
 				{
-					goodones[i] = modca_list[modca_list.Count - 500 + i];
+					goodones.ToArray()[i] = modca_list.ToArray()[modca_list.Count - 500 + i];
 				}
 				modca_list.Clear();
 				modca_list = goodones;
@@ -126,7 +126,7 @@ namespace ModularSkillScripts
 			List<AbilityData> abilityData_list = __instance.ClassInfo.abilityScriptList;
 			for (int i = 0; i < abilityData_list.Count; i++)
 			{
-				AbilityData abilityData = abilityData_list[i];
+				AbilityData abilityData = abilityData_list.ToArray()[i];
 				string abilityScriptname = abilityData.ScriptName;
 				if (!abilityScriptname.StartsWith("Modular/")) continue;
 

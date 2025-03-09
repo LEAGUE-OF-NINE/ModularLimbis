@@ -35,9 +35,9 @@ namespace ModularSkillScripts
 			{
 				n--;
 				int k = MainClass.rng.Next(n + 1);
-				BattleUnitModel value = list[k];
-				list[k] = list[n];
-				list[n] = value;
+				BattleUnitModel value = list.ToArray()[k];
+				list.ToArray()[k] = list.ToArray()[n];
+				list.ToArray()[n] = value;
 			}
 			return list;
 		}

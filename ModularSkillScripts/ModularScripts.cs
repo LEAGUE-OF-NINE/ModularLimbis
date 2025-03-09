@@ -154,10 +154,8 @@ namespace ModularSkillScripts
 
 		public void Enact(SkillModel skillModel_inst, int actevent, BATTLE_EVENT_TIMING timing)
 		{
-			//if (MainClass.logEnabled) MainClass.Logg.LogInfo("Enact");
 			interactionTimer = 0;
 			if (activationTiming != actevent) return;
-			//if (activationTiming == 0) if (actevent != 0 && actevent != 0 && actevent != 0 &&)
 
 			battleTiming = timing;
 			if (skillModel_inst != null) modsa_skillModel = skillModel_inst;
@@ -210,7 +208,7 @@ namespace ModularSkillScripts
 			}
 			else
 			{
-				if (modsa_skillModel.SkillAbilityList.Count > 0) dummySkillAbility = modsa_skillModel.SkillAbilityList[0];
+				if (modsa_skillModel.SkillAbilityList.Count > 0) dummySkillAbility = modsa_skillModel.SkillAbilityList.ToArray()[0];
 				if (dummySkillAbility == null)
 				{
 					if (MainClass.logEnabled) MainClass.Logg.LogInfo("creating dummy skillability");
@@ -223,7 +221,7 @@ namespace ModularSkillScripts
 
 			if (abilityMode == 1)
 			{
-				if (modsa_coinModel.CoinAbilityList.Count > 0) dummyCoinAbility = modsa_coinModel.CoinAbilityList[0];
+				if (modsa_coinModel.CoinAbilityList.Count > 0) dummyCoinAbility = modsa_coinModel.CoinAbilityList.ToArray()[0];
 				if (dummyCoinAbility == null)
 				{
 					if (MainClass.logEnabled) MainClass.Logg.LogInfo("creating dummy coinability");
@@ -247,7 +245,7 @@ namespace ModularSkillScripts
 				for (int i = 0; i < batch_list.Count; i++)
 				{
 					if (_fullStop) break;
-					string batch = batch_list[i];
+					string batch = batch_list.ToArray()[i];
 					if (MainClass.logEnabled) MainClass.Logg.LogInfo("batch " + i.ToString() + ": " + batch);
 					ProcessBatch(batch);
 				}
@@ -375,12 +373,12 @@ namespace ModularSkillScripts
 				if (side_string == "Left")
 				{
 					List<BattleUnitModel> modelList = battleObjectManager.GetPrevUnitsByPortrait(modsa_unitModel, 1);
-					if (modelList.Count > 0) unitList.Add(modelList[0]);
+					if (modelList.Count > 0) unitList.Add(modelList.ToArray()[0]);
 				}
 				else
 				{
 					List<BattleUnitModel> modelList = battleObjectManager.GetNextUnitsByPortrait(modsa_unitModel, 1);
-					if (modelList.Count > 0) unitList.Add(modelList[0]);
+					if (modelList.Count > 0) unitList.Add(modelList.ToArray()[0]);
 				}
 				return unitList;
 			}
@@ -495,7 +493,7 @@ namespace ModularSkillScripts
 				if (num > 0) {
 					for (int i = 0; i < num; i++)
 					{
-						unitList.Add(list[i]);
+						unitList.Add(list.ToArray()[i]);
 					}
 				}
 			}
@@ -552,12 +550,12 @@ namespace ModularSkillScripts
 				if (side_string == "Left")
 				{
 					List<BattleUnitModel> modelList = battleObjectManager_inst.GetPrevUnitsByPortrait(modsa_unitModel, 1);
-					if (modelList.Count > 0) foundUnit = modelList[0];
+					if (modelList.Count > 0) foundUnit = modelList.ToArray()[0];
 				}
 				else
 				{
 					List<BattleUnitModel> modelList = battleObjectManager_inst.GetNextUnitsByPortrait(modsa_unitModel, 1);
-					if (modelList.Count > 0) foundUnit = modelList[0];
+					if (modelList.Count > 0) foundUnit = modelList.ToArray()[0];
 				}
 				return foundUnit;
 			}
@@ -639,7 +637,7 @@ namespace ModularSkillScripts
 				}
 				else if (param.StartsWith("Random")) list = MainClass.ShuffleUnits(list);
 
-				if (list.Count > 0) foundUnit = list[0];
+				if (list.Count > 0) foundUnit = list.ToArray()[0];
 				return foundUnit;
 			}
 		}
@@ -850,8 +848,8 @@ namespace ModularSkillScripts
 					else power = GetNumFromParamString(firstCircle);
 
 					coin_idx = Math.Min(modsa_skillModel.CoinList.Count - 1, coin_idx);
-					modsa_skillModel.CoinList[coin_idx]._scale += power;
-					if (coinOp != OPERATOR_TYPE.NONE) modsa_skillModel.CoinList[coin_idx]._operatorType = coinOp;
+					modsa_skillModel.CoinList.ToArray()[coin_idx]._scale += power;
+					if (coinOp != OPERATOR_TYPE.NONE) modsa_skillModel.CoinList.ToArray()[coin_idx]._operatorType = coinOp;
 					
 				}
 				else if (batchArgs[i].StartsWith("reusecoin"))
@@ -1391,8 +1389,8 @@ namespace ModularSkillScripts
 							}
 							
 							int chosenSlot = Math.Min(slot, sinActionCount - 1);
-							if (nextRound) sinActionList[chosenSlot].StackNextTurnAggroAdder(amount);
-							else sinActionList[chosenSlot].StackThisTurnAggroAdder(amount);
+							if (nextRound) sinActionList.ToArray()[chosenSlot].StackNextTurnAggroAdder(amount);
+							else sinActionList.ToArray()[chosenSlot].StackThisTurnAggroAdder(amount);
 						}
 						else
 						{
@@ -1418,8 +1416,8 @@ namespace ModularSkillScripts
 								}
 								continue;
 							}
-							if (nextRound) sinActionList[chosenSlot].StackNextTurnAggroAdder(amount);
-							else sinActionList[chosenSlot].StackThisTurnAggroAdder(amount);
+							if (nextRound) sinActionList.ToArray()[chosenSlot].StackNextTurnAggroAdder(amount);
+							else sinActionList.ToArray()[chosenSlot].StackThisTurnAggroAdder(amount);
 						}
 						
 					}
@@ -1446,7 +1444,7 @@ namespace ModularSkillScripts
 							if (tier > 0)
 							{
 								List<int> skillIDList = fromUnit.GetSkillIdByTier(tier);
-								if (skillIDList.Count > 0) skillID = skillIDList[0];
+								if (skillIDList.Count > 0) skillID = skillIDList.ToArray()[0];
 							}
 						}
 						else if (circle_2[0] == 'D')
@@ -1455,7 +1453,7 @@ namespace ModularSkillScripts
 							if (int.TryParse(circle_2[1].ToString(), out index)) index -= 1;
 							List<int> skillIDList = fromUnit.GetDefenseSkillIDList();
 							index = Math.Min(index, skillIDList.Count - 1);
-							skillID = skillIDList[index];
+							skillID = skillIDList.ToArray()[index];
 						}
 						else int.TryParse(circle_2, out skillID);
 						if (skillID < 0) continue;
@@ -1510,7 +1508,7 @@ namespace ModularSkillScripts
 								continue;
 							}
 
-							sinActionList[slot].ReplaceSkillAtoB(skillID_1, skillID_2);
+							sinActionList.ToArray()[slot].ReplaceSkillAtoB(skillID_1, skillID_2);
 						}
 					}
 				}
@@ -1938,7 +1936,7 @@ namespace ModularSkillScripts
 					if (coinAmount < 1) return;
 					if (coin_idx >= coinAmount) coin_idx = coinAmount - 1;
 
-					valueList[setvalue_idx] = action.Skill.CoinList[coin_idx]._scale;
+					valueList[setvalue_idx] = action.Skill.CoinList.ToArray()[coin_idx]._scale;
 				}
 				else if (mode_string == "atk") {
 					BattleActionModel action = modsa_selfAction;
