@@ -1967,31 +1967,31 @@ namespace ModularSkillScripts
 	
 	class MathEvaluator : ModsaLangBaseVisitor<double>
 	{
-		public override double VisitParenExpression(MathParser.ParenExpressionContext context)
+		public override double VisitParenExpression(ModsaLangParser.ParenExpressionContext context)
 		{
 			// Evaluate the expression inside the parentheses
 			return Visit(context.expression());
 		}
 
-		public override double VisitMulDivExpression(MathParser.MulDivExpressionContext context)
+		public override double VisitMulDivExpression(ModsaLangParser.MulDivExpressionContext context)
 		{
 			double left = Visit(context.expression(0)); // Evaluate the left expression
 			double right = Visit(context.expression(1)); // Evaluate the right expression
 
 			// Perform multiplication or division
-			return context.op.Type == MathParser.MUL ? left * right : left / right;
+			return context.op.Type == ModsaLangParser.MUL ? left * right : left / right;
 		}
 
-		public override double VisitAddSubExpression(MathParser.AddSubExpressionContext context)
+		public override double VisitAddSubExpression(ModsaLangParser.AddSubExpressionContext context)
 		{
 			double left = Visit(context.expression(0)); // Evaluate the left expression
 			double right = Visit(context.expression(1)); // Evaluate the right expression
 
 			// Perform addition or subtraction
-			return context.op.Type == MathParser.ADD ? left + right : left - right;
+			return context.op.Type == ModsaLangParser.ADD ? left + right : left - right;
 		}
 
-		public override double VisitFunctionExpression(MathParser.FunctionExpressionContext context)
+		public override double VisitFunctionExpression(ModsaLangParser.FunctionExpressionContext context)
 		{
 			string funcName = context.ID().GetText(); // Get the function name
 			double arg = Visit(context.expression()); // Evaluate the argument
@@ -2006,13 +2006,13 @@ namespace ModularSkillScripts
 			};
 		}
 
-		public override double VisitNumberExpression(MathParser.NumberExpressionContext context)
+		public override double VisitNumberExpression(ModsaLangParser.NumberExpressionContext context)
 		{
 			// Parse the number
 			return double.Parse(context.NUMBER().GetText());
 		}
 
-		public override double VisitVariableExpression(MathParser.VariableExpressionContext context)
+		public override double VisitVariableExpression(ModsaLangParser.VariableExpressionContext context)
 		{
 			// For now, assume variables are 0 (you can extend this to support variables)
 			return 0;
