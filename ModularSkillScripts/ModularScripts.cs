@@ -6,6 +6,8 @@ using UnhollowerRuntimeLib;
 using UnityEngine;
 using static BattleActionModel.TargetDataDetail;
 using IntPtr = System.IntPtr;
+using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 
 namespace ModularSkillScripts
 {
@@ -1954,5 +1956,66 @@ namespace ModularSkillScripts
 				}
 			}
 		}
+
+		static void Main(string[] args)
+		{
+			
+		}
+		
 	}
+	
+	class MathEvaluator : ModsaLanguageBaseVisitor<double>
+	{
+		public override double VisitParenExpression(MathParser.ParenExpressionContext context)
+		{
+			// Evaluate the expression inside the parentheses
+			return Visit(context.expression());
+		}
+
+		public override double VisitMulDivExpression(MathParser.MulDivExpressionContext context)
+		{
+			double left = Visit(context.expression(0)); // Evaluate the left expression
+			double right = Visit(context.expression(1)); // Evaluate the right expression
+
+			// Perform multiplication or division
+			return context.op.Type == MathParser.MUL ? left * right : left / right;
+		}
+
+		public override double VisitAddSubExpression(MathParser.AddSubExpressionContext context)
+		{
+			double left = Visit(context.expression(0)); // Evaluate the left expression
+			double right = Visit(context.expression(1)); // Evaluate the right expression
+
+			// Perform addition or subtraction
+			return context.op.Type == MathParser.ADD ? left + right : left - right;
+		}
+
+		public override double VisitFunctionExpression(MathParser.FunctionExpressionContext context)
+		{
+			string funcName = context.ID().GetText(); // Get the function name
+			double arg = Visit(context.expression()); // Evaluate the argument
+
+			// Perform the function
+			return funcName switch
+			{
+				"sin" => Math.Sin(arg),
+				"cos" => Math.Cos(arg),
+				"tan" => Math.Tan(arg),
+				_ => throw new Exception($"Unknown function: {funcName}")
+			};
+		}
+
+		public override double VisitNumberExpression(MathParser.NumberExpressionContext context)
+		{
+			// Parse the number
+			return double.Parse(context.NUMBER().GetText());
+		}
+
+		public override double VisitVariableExpression(MathParser.VariableExpressionContext context)
+		{
+			// For now, assume variables are 0 (you can extend this to support variables)
+			return 0;
+		}
+	}
+	
 }
