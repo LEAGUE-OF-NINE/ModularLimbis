@@ -22,10 +22,9 @@ namespace ModularSkillScripts
 				if (!MainClass.fakepowerEnabled && abilityScriptname.Contains("FakePower")) continue;
 
 				bool existsAlready = false;
-				foreach (ModularSA existingModsa in modsaglobal_list)
-				{
-					if (existingModsa.ptr_intlong == ptr && existingModsa.originalString == abilityScriptname)
-					{
+				if (modsaDict.ContainsKey(ptr)) {
+					foreach (ModularSA existingModsa in modsaDict[ptr]) {
+						if (existingModsa.originalString != abilityScriptname) continue;
 						existsAlready = true;
 						MainClass.Logg.LogInfo(ptr + ": exists already " + abilityScriptname);
 						existingModsa.ResetValueList();
@@ -44,9 +43,14 @@ namespace ModularSkillScripts
 				modsa.SetupModular(abilityScriptname.Remove(0, 8));
 				if (Input.GetKeyInt(BepInEx.IL2CPP.UnityEngine.KeyCode.LeftControl)) MainClass.Logg.LogInfo("modSkillAbility init: " + abilityScriptname);
 				modsaglobal_list.Add(modsa);
+				if (modsaDict.ContainsKey(ptr)) modsaDict[ptr].Add(modsa);
+				else {
+					modsaDict.Add(ptr, new List<ModularSA>());
+					modsaDict[ptr].Add(modsa);
+				}
 			}
 		}
-
+		
 
 		[HarmonyPatch(typeof(PassiveModel), nameof(PassiveModel.Init))]
 		[HarmonyPrefix]
@@ -157,7 +161,12 @@ namespace ModularSkillScripts
 
 		public static void ResetAllModsa()
 		{
-			foreach (ModularSA modular in modsaglobal_list) { modular.EraseAllData(); }
+			foreach (List<ModularSA> value in modsaDict._values) {
+				foreach (ModularSA modular in value) modular.EraseAllData();
+				value.Clear();
+			}
+			modsaDict.Clear();
+			
 			foreach (ModularSA modular in modpa_list) { modular.EraseAllData(); }
 			foreach (ModularSA modular in modca_list) { modular.EraseAllData(); }
 
@@ -168,6 +177,7 @@ namespace ModularSkillScripts
 			skillPtrsRoundStart.Clear();
 		}
 
+		public static Dictionary<long, List<ModularSA>> modsaDict = new();
 		public static List<ModularSA> modsaglobal_list = new List<ModularSA>();
 		public static List<ModularSA> modpa_list = new List<ModularSA>();
 		public static List<ModularSA> modca_list = new List<ModularSA>();
