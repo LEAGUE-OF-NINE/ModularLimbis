@@ -164,7 +164,7 @@ namespace ModularSkillScripts
 			if (skillModel_inst != null) modsa_skillModel = skillModel_inst;
 			if (modsa_selfAction != null) {
 				if (modsa_skillModel == null) modsa_skillModel = modsa_selfAction.Skill;
-				if (modsa_unitModel == null) modsa_unitModel = modsa_selfAction.Model;
+				modsa_unitModel = modsa_selfAction.Model;
 			}
 			if (MainClass.logEnabled) MainClass.Logg.LogInfo("activation good");
 
@@ -464,11 +464,23 @@ namespace ModularSkillScripts
 				if (param.Contains("ExceptSelf")) list.Remove(modsa_unitModel);
 				if (param.Contains("ExceptTarget")) list.Remove(modsa_loopTarget);
 
-				if (param.StartsWith("Slowest")) {
+				if (param.Contains("Random")) list = MainClass.ShuffleUnits(list);
+				else if (param.Contains("Deploy")) {
+					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.PARTICIPATE_ORDER.CompareTo(y.PARTICIPATE_ORDER);
+					list.Sort(value);
+				}
+				else if (param.Contains("Reversedeploy")) {
+					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.PARTICIPATE_ORDER.CompareTo(x.PARTICIPATE_ORDER);
+					list.Sort(value);
+				}
+				
+				if (param.StartsWith("Slowest"))
+				{
 					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.GetOriginSpeedForCompare().CompareTo(y.GetOriginSpeedForCompare());
 					list.Sort(value);
 				}
-				else if (param.StartsWith("Fastest")) {
+				else if (param.StartsWith("Fastest"))
+				{
 					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.GetOriginSpeedForCompare().CompareTo(x.GetOriginSpeedForCompare());
 					list.Sort(value);
 				}
@@ -482,15 +494,26 @@ namespace ModularSkillScripts
 					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.GetHpRatio().CompareTo(y.GetHpRatio());
 					list.Sort(value);
 				}
-				else if (param.StartsWith("HighestHP")) {
+				else if (param.StartsWith("HighestHP"))
+				{
 					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.Hp.CompareTo(x.Hp);
 					list.Sort(value);
 				}
-				else if (param.StartsWith("LowestHP")) {
+				else if (param.StartsWith("LowestHP"))
+				{
 					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.Hp.CompareTo(y.Hp);
 					list.Sort(value);
 				}
-				else if (param.StartsWith("Random")) list = MainClass.ShuffleUnits(list);
+				else if (param.StartsWith("HighestMP"))
+				{
+					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.Mp.CompareTo(x.Mp);
+					list.Sort(value);
+				}
+				else if (param.StartsWith("LowestMP"))
+				{
+					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.Mp.CompareTo(y.Mp);
+					list.Sort(value);
+				}
 
 				num = Math.Min(num, list.Count);
 				if (num > 0) {
@@ -607,38 +630,49 @@ namespace ModularSkillScripts
 
 				if (param.Contains("ExceptSelf")) list.Remove(modsa_unitModel);
 				if (param.Contains("ExceptTarget")) list.Remove(modsa_loopTarget);
-
-				if (param.StartsWith("Slowest"))
-				{
+				
+				if (param.Contains("Random")) list = MainClass.ShuffleUnits(list);
+				else if (param.Contains("Deploy")) {
+					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.PARTICIPATE_ORDER.CompareTo(y.PARTICIPATE_ORDER);
+					list.Sort(value);
+				}
+				else if (param.Contains("Reversedeploy")) {
+					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.PARTICIPATE_ORDER.CompareTo(x.PARTICIPATE_ORDER);
+					list.Sort(value);
+				}
+				
+				if (param.StartsWith("Slowest")) {
 					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.GetOriginSpeedForCompare().CompareTo(y.GetOriginSpeedForCompare());
 					list.Sort(value);
 				}
-				else if (param.StartsWith("Fastest"))
-				{
+				else if (param.StartsWith("Fastest")) {
 					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.GetOriginSpeedForCompare().CompareTo(x.GetOriginSpeedForCompare());
 					list.Sort(value);
 				}
-				else if (param.StartsWith("HighestHPRatio"))
-				{
+				else if (param.StartsWith("HighestHPRatio")) {
 					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.GetHpRatio().CompareTo(x.GetHpRatio());
 					list.Sort(value);
 				}
-				else if (param.StartsWith("LowestHPRatio"))
-				{
+				else if (param.StartsWith("LowestHPRatio")) {
 					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.GetHpRatio().CompareTo(y.GetHpRatio());
 					list.Sort(value);
 				}
-				else if (param.StartsWith("HighestHP"))
-				{
+				else if (param.StartsWith("HighestHP")) {
 					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.Hp.CompareTo(x.Hp);
 					list.Sort(value);
 				}
-				else if (param.StartsWith("LowestHP"))
-				{
+				else if (param.StartsWith("LowestHP")) {
 					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.Hp.CompareTo(y.Hp);
 					list.Sort(value);
 				}
-				else if (param.StartsWith("Random")) list = MainClass.ShuffleUnits(list);
+				else if (param.StartsWith("HighestMP")) {
+					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.Mp.CompareTo(x.Mp);
+					list.Sort(value);
+				}
+				else if (param.StartsWith("LowestMP")) {
+					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.Mp.CompareTo(y.Mp);
+					list.Sort(value);
+				}
 
 				if (list.Count > 0) foundUnit = list.ToArray()[0];
 				return foundUnit;
@@ -647,75 +681,47 @@ namespace ModularSkillScripts
 
 		public void SetupModular(string instructions)
 		{
+			/*AntlrInputStream inputStream = new AntlrInputStream(instructions);
+			ModsaLangLexer lexer = new ModsaLangLexer(inputStream);
+			CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+			ModsaLangParser parser = new ModsaLangParser(tokenStream);
+			ModsaLangParser.ProgramContext tree = parser.program();*/
+			
 			instructions = MainClass.sWhitespace.Replace(instructions, "");
 			string[] batches = instructions.Split('/');
 
-			for (int i = 0; i < batches.Length; i++)
-			{
+			for (int i = 0; i < batches.Length; i++) {
 				string batch = batches[i];
 				if (MainClass.logEnabled) MainClass.Logg.LogInfo("batch " + i.ToString() + ": " + batch);
-				if (batch.StartsWith("TIMING:"))
-				{
+				if (batch.StartsWith("TIMING:")) {
 					string timingArg = batch.Remove(0, 7);
-					if (timingArg == "RoundStartWeird") activationTiming = -2;
-					else if (timingArg == "RoundStart") {
-						activationTiming = -1;
-						if (abilityMode == 0) { SkillScriptInitPatch.skillPtrsRoundStart.Add(modsa_skillModel.Pointer.ToInt64()); }
+					if (MainClass.timingDict.ContainsKey(timingArg)) activationTiming = MainClass.timingDict[timingArg];
+					
+					if (activationTiming == 7) {
+						string[] circles = timingArg.Split(parenthesisSeparator);
+						string hitArgs = circles[1];
+						if (hitArgs.Contains("Head"))  _onlyHeads = true;
+						else if (hitArgs.Contains("Tail")) _onlyTails = true;
+
+						if (hitArgs.Contains("NoCrit")) _onlyNonCrit = true;
+						else if (hitArgs.Contains("Crit")) _onlyCrit = true;
+
+						if (hitArgs.Contains("Win")) _onlyClashWin = true;
+						else if (hitArgs.Contains("Lose")) _onlyClashLose = true;						
 					}
-					else if (timingArg == "StartBattle") activationTiming = 0;
-					else if (timingArg == "WhenUse") activationTiming = 1;
-					else if (timingArg == "BeforeAttack") activationTiming = 2;
-					else if (timingArg == "StartDuel") activationTiming = 3;
-					else if (timingArg == "WinDuel") activationTiming = 4;
-					else if (timingArg == "DefeatDuel") activationTiming = 5;
-					else if (timingArg == "EndBattle") activationTiming = 6;
-					else if (timingArg.StartsWith("OnSucceedAttack"))
-					{
-						activationTiming = 7;
-
-						if (timingArg.Contains("Head"))  _onlyHeads = true;
-						else if (timingArg.Contains("Tail")) _onlyTails = true;
-
-						if (timingArg.Contains("NoCrit")) _onlyNonCrit = true;
-						else if (timingArg.Contains("Crit")) _onlyCrit = true;
-
-						if (timingArg.Contains("Win")) _onlyClashWin = true;
-						else if (timingArg.Contains("Lose")) _onlyClashLose = true;						
-					}
-					else if (timingArg == "WhenHit") activationTiming = 8;
-					else if (timingArg == "EndSkill") activationTiming = 9;
-					else if (timingArg == "FakePower") activationTiming = 10;
-					else if (timingArg == "BeforeDefense") activationTiming = 11;
-					else if (timingArg == "OnDie") activationTiming = 12;
-					else if (timingArg == "OnOtherDie") activationTiming = 13;
-					else if (timingArg == "DuelClash") activationTiming = 14;
-					else if (timingArg == "DuelClashAfter") activationTiming = 15;
-					else if (timingArg == "OnSucceedEvade") activationTiming = 16;
-					else if (timingArg == "OnDefeatEvade") activationTiming = 17;
-					else if (timingArg == "OnStartBehaviour") activationTiming = 18;
-					else if (timingArg == "BeforeBehaviour") activationTiming = 19;
-					else if (timingArg == "OnEndBehaviour") activationTiming = 20;
-					else if (timingArg == "EnemyKill") activationTiming = 21;
-					else if (timingArg == "OnBreak") activationTiming = 22;
-					else if (timingArg == "OnOtherBreak") activationTiming = 23;
-					else if (timingArg == "SpecialAction") activationTiming = 999;
 				}
 				else if (batch.StartsWith("LOOP:")) modsa_loopString = batch.Remove(0, 5);
-				else if (batch.StartsWith("RESETWHENUSE")) resetWhenUse = true;
+				else if (batch == "RESETWHENUSE") resetWhenUse = true;
 				else batch_list.Add(batch);
 			}
 		}
-
-		private void ProcessBatch(string batch)
-		{
+		
+		private void ProcessBatch(string batch) {
 			string[] batchArgs = batch.Split(':');
-			for (int i = 0; i < batchArgs.Length; i++)
-			{
+			for (int i = 0; i < batchArgs.Length; i++) {
 				if (MainClass.logEnabled) MainClass.Logg.LogInfo("batchArgs " + i.ToString() + ": " + batchArgs[i]);
-				if (batchArgs[i].StartsWith("STOPIF"))
-				{
-					if (!CheckIF(batchArgs[i]))
-					{
+				if (batchArgs[i].StartsWith("STOPIF")) {
+					if (!CheckIF(batchArgs[i])) {
 						_fullStop = true;
 						return;
 					}
@@ -723,33 +729,36 @@ namespace ModularSkillScripts
 				}
 				else if (batchArgs[i].StartsWith("IFNOT")) { if (CheckIF(batchArgs[i])) break; else continue; }
 				else if (batchArgs[i].StartsWith("IF")) { if (!CheckIF(batchArgs[i])) break; else continue; }
-				else if (batchArgs[i].StartsWith("VALUE_"))
-				{
+				else if (batchArgs[i].StartsWith("VALUE_")) {
 					string numChar = batchArgs[i][6].ToString();
 					int num = 0;
 					int.TryParse(numChar, out num);
-					AcquireValue(num, batchArgs[i + 1]);
+					AcquireValue(num, batchArgs[i + 1]); // GETTERS
 					i += 1;
 					continue;
 				}
 
-				if (batchArgs[i].StartsWith("log")) {
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
-					MainClass.Logg.LogInfo("ModularLog " + circles[0] + ": " + GetNumFromParamString(circles[1]));
-					continue;
-				}
+				Consequence(batchArgs[i]); // CONSEQUENCES
+			}
+		}
 
-				if (batchArgs[i].StartsWith("base")) { skillPowerAdder = GetNumFromParamString(batchArgs[i].Remove(0, 5)); continue; }
-				else if (batchArgs[i].StartsWith("final")) { skillPowerResultAdder = GetNumFromParamString(batchArgs[i].Remove(0, 6)); continue; }
-				else if (batchArgs[i].StartsWith("clash")) { parryingResultAdder = GetNumFromParamString(batchArgs[i].Remove(0, 6)); continue; }
-				else if (batchArgs[i].StartsWith("scale"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
+		private void Consequence(string section) {
+			string[] sectionArgs = section.Split(parenthesisSeparator);
+			string mEth = sectionArgs[0];
+			string circledSection = sectionArgs[1];
+			string[] circles = circledSection.Split(',');
 
+			switch (mEth)
+			{
+				case "log": MainClass.Logg.LogInfo("ModularLog " + circles[0] + ": " + GetNumFromParamString(circles[1]));
+					break;
+				case "base": skillPowerAdder = GetNumFromParamString(circledSection);
+					break;
+				case "final": skillPowerResultAdder = GetNumFromParamString(circledSection);
+					break;
+				case "clash": parryingResultAdder = GetNumFromParamString(circledSection);
+					break;
+				case "scale":{
 					if (circles.Length == 1)
 					{
 						int power = 0;
@@ -763,31 +772,38 @@ namespace ModularSkillScripts
 							if (coinOp != OPERATOR_TYPE.NONE) foreach (CoinModel coin in modsa_skillModel.CoinList) coin._operatorType = coinOp;
 							else coinScaleAdder = power;
 						}
-						else
-						{
-							power = GetNumFromParamString(circledSection);
-							coinScaleAdder = power;
-						}
-						continue;
+						else coinScaleAdder = GetNumFromParamString(circledSection);
+					}
+					else
+					{
+						int coin_idx = -999;
+						coin_idx = GetNumFromParamString(circles[1]);
+						if (coin_idx == -999) return;
+
+						string firstCircle = circles[0];
+
+						int power = 0;
+						OPERATOR_TYPE coinOp = OPERATOR_TYPE.NONE;
+						if (firstCircle == "ADD") coinOp = OPERATOR_TYPE.ADD;
+						else if (firstCircle == "SUB") coinOp = OPERATOR_TYPE.SUB;
+						else if (firstCircle == "MUL") coinOp = OPERATOR_TYPE.MUL;
+						else power = GetNumFromParamString(firstCircle);
+
+						coin_idx = Math.Min(modsa_skillModel.CoinList.Count - 1, coin_idx);
+						modsa_skillModel.CoinList.ToArray()[coin_idx]._scale += power;
+						if (coinOp != OPERATOR_TYPE.NONE) modsa_skillModel.CoinList.ToArray()[coin_idx]._operatorType = coinOp;
 					}
 				}
-				else if (batchArgs[i].StartsWith("dmgadd")) { atkDmgAdder = GetNumFromParamString(batchArgs[i].Remove(0, 7)); continue; }
-				else if (batchArgs[i].StartsWith("dmgmult")) { atkMultAdder = GetNumFromParamString(batchArgs[i].Remove(0, 8)); continue; }
-
-				if (activationTiming == 10) continue;
-				if (batchArgs[i].StartsWith("mpdmg"))
-				{
-					if (MainClass.logEnabled) MainClass.Logg.LogInfo("mpdmg");
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
+					break;
+				case "dmgadd": atkDmgAdder = GetNumFromParamString(circledSection); 
+					break;
+				case "dmgmult": atkMultAdder = GetNumFromParamString(circledSection);
+					break;
+				case "mpdmg":{
 					int mpAmount = GetNumFromParamString(circles[1]);
-					if (MainClass.logEnabled) MainClass.Logg.LogInfo("mpAmount: " + mpAmount.ToString());
-
-					if (mpAmount == 0) continue;
+					if (mpAmount == 0) return;
 
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-					if (modelList.Count < 1) continue;
 
 					foreach (BattleUnitModel targetModel in modelList)
 					{
@@ -828,38 +844,9 @@ namespace ModularSkillScripts
 							}
 						}
 					}
-					if (MainClass.logEnabled) MainClass.Logg.LogInfo("after mpdmg");
 				}
-				else if (batchArgs[i].StartsWith("scale"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
-					if (circles.Length != 2) continue;
-
-					int coin_idx = -999;
-					coin_idx = GetNumFromParamString(circles[1]);
-					if (coin_idx == -999) continue;
-
-					string firstCircle = circles[0];
-
-					int power = 0;
-					OPERATOR_TYPE coinOp = OPERATOR_TYPE.NONE;
-					if (firstCircle == "ADD") coinOp = OPERATOR_TYPE.ADD;
-					else if (firstCircle == "SUB") coinOp = OPERATOR_TYPE.SUB;
-					else if (firstCircle == "MUL") coinOp = OPERATOR_TYPE.MUL;
-					else power = GetNumFromParamString(firstCircle);
-
-					coin_idx = Math.Min(modsa_skillModel.CoinList.Count - 1, coin_idx);
-					modsa_skillModel.CoinList.ToArray()[coin_idx]._scale += power;
-					if (coinOp != OPERATOR_TYPE.NONE) modsa_skillModel.CoinList.ToArray()[coin_idx]._operatorType = coinOp;
-					
-				}
-				else if (batchArgs[i].StartsWith("reusecoin"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
+					break;
+				case "reusecoin":{
 					foreach (string circle in circles)
 					{
 						int idx = GetNumFromParamString(circle);
@@ -867,17 +854,12 @@ namespace ModularSkillScripts
 
 						idx = Math.Min(idx, modsa_skillModel.CoinList.Count - 1);
 						modsa_skillModel.CopyCoin(modsa_selfAction, idx, battleTiming);
-
 					}
 				}
-				else if (batchArgs[i].StartsWith("bonusdmg"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
-
+					break;
+				case "bonusdmg":{
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-					if (modelList.Count < 1) continue;
+					if (modelList.Count < 1) return;
 
 					int amount = GetNumFromParamString(circles[1]);
 
@@ -953,14 +935,10 @@ namespace ModularSkillScripts
 						}
 					}
 				}
-				else if (batchArgs[i].StartsWith("buf"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
-
+					break;
+				case "buf":{
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-					if (modelList.Count < 1) continue;
+					if (modelList.Count < 1) return;
 
 					BUFF_UNIQUE_KEYWORD buf_keyword = BUFF_UNIQUE_KEYWORD.Enhancement;
 					Enum.TryParse(circles[1], true, out buf_keyword);
@@ -997,143 +975,126 @@ namespace ModularSkillScripts
 						}
 					}
 				}
-				else if (batchArgs[i].StartsWith("shield"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
-
+					break;
+				case "shield":{
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-					if (modelList.Count < 1) continue;
-
 					int amount = GetNumFromParamString(circles[1]);
 					bool permashield = circles.Length > 2;
+					foreach (BattleUnitModel targetModel in modelList)
+					{
+						if (amount >= 0) targetModel.AddShield(amount, !permashield, ABILITY_SOURCE_TYPE.SKILL, battleTiming);
+						else targetModel.ReduceShield(battleTiming, amount *= -1, modsa_unitModel);
+					}
+				}
+					break;
+				case "break":{
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					if (modelList.Count < 1) return;
+					string opt2_string = circles.Length >= 2 ? circles[1] : "natural";
+					bool force = opt2_string != "natural";
+					bool both = opt2_string == "both";
+					bool resistancebreak = circles.Length <= 2;
 
 					foreach (BattleUnitModel targetModel in modelList)
 					{
-						targetModel.AddShield(amount, !permashield, ABILITY_SOURCE_TYPE.SKILL, battleTiming);
+						ABILITY_SOURCE_TYPE abilitySourceType = ABILITY_SOURCE_TYPE.SKILL;
+						if (abilityMode == 2) abilitySourceType = ABILITY_SOURCE_TYPE.PASSIVE;
+
+						if (force) targetModel.BreakForcely(modsa_unitModel, abilitySourceType, battleTiming, false, modsa_selfAction);
+						if (!force || both) targetModel.Break(modsa_unitModel, battleTiming, modsa_selfAction);
+						if (resistancebreak) targetModel.ChangeResistOnBreak();
 					}
 				}
-				else if (batchArgs[i].StartsWith("break"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
-
+					break;
+				case "breakdmg":{
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-					if (modelList.Count < 1) continue;
+					if (modelList.Count < 1) return;
+					int amount = GetNumFromParamString(circles[1]);
+					if (amount == 0) return;
+					int times = 1;
+					if (circles.Length > 2) times = GetNumFromParamString(circles[2]);
 
-					string mode_string = sectionArgs[0].Remove(0, 5);
-
-					if (mode_string == "")
+					foreach (BattleUnitModel targetModel in modelList)
 					{
-						string opt2_string = circles.Length >= 2 ? circles[1] : "natural";
-						bool force = opt2_string != "natural";
-						bool both = opt2_string == "both";
-						bool resistancebreak = circles.Length <= 2;
-
-						foreach (BattleUnitModel targetModel in modelList)
+						for (int times_i = 0; times_i < times; times_i++)
 						{
-							ABILITY_SOURCE_TYPE abilitySourceType = ABILITY_SOURCE_TYPE.SKILL;
-							if (abilityMode == 2) abilitySourceType = ABILITY_SOURCE_TYPE.PASSIVE;
-
-							if (force) targetModel.BreakForcely(modsa_unitModel, abilitySourceType, battleTiming, false, modsa_selfAction);
-							if (!force || both) targetModel.Break(modsa_unitModel, battleTiming, modsa_selfAction);
-							if (resistancebreak) targetModel.ChangeResistOnBreak();
-						}
-					}
-					else if (mode_string == "dmg")
-					{
-						int amount = GetNumFromParamString(circles[1]);
-						if (amount == 0) continue;
-						int times = 1;
-						if (circles.Length > 2) times = GetNumFromParamString(circles[2]);
-
-						foreach (BattleUnitModel targetModel in modelList)
-						{
-							for (int times_i = 0; times_i < times; times_i++)
+							if (amount < 0)
 							{
-								if (amount < 0)
+								amount *= -1;
+								AbilityTriggeredData_BsGaugeDown triggerData = new AbilityTriggeredData_BsGaugeDown(amount, targetModel.InstanceID, battleTiming);
+								if (abilityMode == 2)
 								{
-									amount *= -1;
-									AbilityTriggeredData_BsGaugeDown triggerData = new AbilityTriggeredData_BsGaugeDown(amount, targetModel.InstanceID, battleTiming);
-									if (abilityMode == 2)
-									{
-										dummyPassiveAbility.FirstBsGaugeDown(modsa_unitModel, targetModel, amount, battleTiming);
-										targetModel.AddTriggeredData(triggerData);
-									}
-									else if (abilityMode == 1)
-									{
-										dummyCoinAbility.FirstBsGaugeDown(modsa_unitModel, targetModel, amount, battleTiming);
-										targetModel.AddTriggeredData(triggerData);
-									}
-									else
-									{
-										dummySkillAbility.AddTriggeredData_BsGaugeDown(amount, targetModel.InstanceID, battleTiming);
-										dummySkillAbility.FirstBsGaugeDown(modsa_unitModel, targetModel, amount, battleTiming);
-									}
+									dummyPassiveAbility.FirstBsGaugeDown(modsa_unitModel, targetModel, amount, battleTiming);
+									targetModel.AddTriggeredData(triggerData);
+								}
+								else if (abilityMode == 1)
+								{
+									dummyCoinAbility.FirstBsGaugeDown(modsa_unitModel, targetModel, amount, battleTiming);
+									targetModel.AddTriggeredData(triggerData);
 								}
 								else
 								{
-									AbilityTriggeredData_BsGaugeUp triggerData = new AbilityTriggeredData_BsGaugeUp(amount, targetModel.InstanceID, battleTiming);
-									if (abilityMode == 2)
-									{
-										dummyPassiveAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, amount, battleTiming, false);
-										targetModel.AddTriggeredData(triggerData);
-									}
-									else if (abilityMode == 1)
-									{
-										dummyCoinAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, amount, battleTiming, false, modsa_selfAction);
-										targetModel.AddTriggeredData(triggerData);
-									}
-									else
-									{
-										dummySkillAbility.AddTriggeredData_BsGaugeUp(amount, targetModel.InstanceID, battleTiming, false);
-										dummySkillAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, amount, battleTiming, false, modsa_selfAction);
-									}
+									dummySkillAbility.AddTriggeredData_BsGaugeDown(amount, targetModel.InstanceID, battleTiming);
+									dummySkillAbility.FirstBsGaugeDown(modsa_unitModel, targetModel, amount, battleTiming);
+								}
+							}
+							else
+							{
+								AbilityTriggeredData_BsGaugeUp triggerData = new AbilityTriggeredData_BsGaugeUp(amount, targetModel.InstanceID, battleTiming);
+								if (abilityMode == 2)
+								{
+									dummyPassiveAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, amount, battleTiming, false);
+									targetModel.AddTriggeredData(triggerData);
+								}
+								else if (abilityMode == 1)
+								{
+									dummyCoinAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, amount, battleTiming, false, modsa_selfAction);
+									targetModel.AddTriggeredData(triggerData);
+								}
+								else
+								{
+									dummySkillAbility.AddTriggeredData_BsGaugeUp(amount, targetModel.InstanceID, battleTiming, false);
+									dummySkillAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, amount, battleTiming, false, modsa_selfAction);
 								}
 							}
 						}
 					}
-					else if (mode_string == "recover")
+				}
+					break;
+				case "breakrecover":{
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					bool force = circles.Length > 1;
+					foreach (BattleUnitModel targetModel in modelList)
 					{
-						bool force = circles.Length > 1;
-						foreach (BattleUnitModel targetModel in modelList)
-						{
-							if (force) targetModel.RecoverAllBreak(battleTiming);
-							else targetModel.RecoverBreak(battleTiming);
-						}
-					}
-					else if (mode_string == "addbar")
-					{
-						string circle_1 = circles[1];
-						bool scaleWithHealth = false;
-						if (circle_1.EndsWith("%"))
-						{
-							scaleWithHealth = true;
-							circle_1 = circle_1.Remove(circle_1.Length - 1, 1);
-						}
-						int healthpoint = circles.Length >= 2 ? GetNumFromParamString(circle_1) : 50;
-
-						foreach (BattleUnitModel targetModel in modelList) {
-							int finalPoint = healthpoint;
-							if (scaleWithHealth) {
-								int maxHP = targetModel.MaxHp;
-								finalPoint = maxHP * healthpoint / 100;
-							}
-							else targetModel.AddBreakSectionForcely(healthpoint);
-						}
+						if (force) targetModel.RecoverAllBreak(battleTiming);
+						else targetModel.RecoverBreak(battleTiming);
 					}
 				}
-				else if (batchArgs[i].StartsWith("explosion"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
-
+					break;
+				case "breakaddbar":{
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-					if (modelList.Count < 1) continue;
+					if (modelList.Count < 1) return;
+					string circle_1 = circles[1];
+					bool scaleWithHealth = false;
+					if (circle_1.EndsWith("%"))
+					{
+						scaleWithHealth = true;
+						circle_1 = circle_1.Remove(circle_1.Length - 1, 1);
+					}
+					int healthpoint = circles.Length >= 2 ? GetNumFromParamString(circle_1) : 50;
 
+					foreach (BattleUnitModel targetModel in modelList) {
+						int finalPoint = healthpoint;
+						if (scaleWithHealth) {
+							int maxHP = targetModel.MaxHp;
+							finalPoint = maxHP * healthpoint / 100;
+						}
+						else targetModel.AddBreakSectionForcely(healthpoint);
+					}
+				}
+					break;
+				case "explosion":{
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
 					int times = GetNumFromParamString(circles[1]);
 
 					foreach (BattleUnitModel targetModel in modelList)
@@ -1156,20 +1117,16 @@ namespace ModularSkillScripts
 						}
 					}
 				}
-				else if (batchArgs[i].StartsWith("healhp"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
-
+					break;
+				case "healhp":{
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-					if (modelList.Count < 1) continue;
+					if (modelList.Count < 1) return;
 
 					string circle_1 = circles[1];
 					bool percentageheal = circle_1.Last() == '%';
 					if (percentageheal) circle_1 = circle_1.Remove(circle_1.Length - 1);
 					int amount = GetNumFromParamString(circle_1);
-					if (amount < 1) continue;
+					if (amount < 1) return;
 
 					foreach (BattleUnitModel targetModel in modelList)
 					{
@@ -1197,9 +1154,8 @@ namespace ModularSkillScripts
 					}
 
 				}
-				else if (batchArgs[i].StartsWith("pattern"))
-				{
-					if (MainClass.logEnabled) MainClass.Logg.LogInfo("pattern() -> " + batchArgs[i]);
+					break;
+				case "pattern":{
 					BattleUnitModel_Abnormality abnoModel = null;
 					if (modsa_unitModel is BattleUnitModel_Abnormality) abnoModel = (BattleUnitModel_Abnormality)modsa_unitModel;
 					else if (modsa_unitModel is BattleUnitModel_Abnormality_Part)
@@ -1207,11 +1163,8 @@ namespace ModularSkillScripts
 						BattleUnitModel_Abnormality_Part partModel = (BattleUnitModel_Abnormality_Part)modsa_unitModel;
 						abnoModel = partModel.Abnormality;
 					}
-					if (abnoModel == null) continue;
+					if (abnoModel == null) return;
 					if (MainClass.logEnabled) MainClass.Logg.LogInfo("abnoModel not null");
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
 
 					PatternScript_Abnormality pattern = abnoModel.PatternScript;
 
@@ -1225,20 +1178,14 @@ namespace ModularSkillScripts
 
 					//pattern.PickSkillsByPattern(pickedPattern_idx, slotCount, randomize);
 				}
-				else if (batchArgs[i].StartsWith("setslotadder"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
-
+					break;
+				case "setslotadder":{
 					int amount = GetNumFromParamString(circles[1]);
-					if (amount < 0) continue;
+					if (amount < 0) return;
 					bool add_max_instead = circles.Length > 2;
-					if (!add_max_instead) { slotAdder = amount; continue; }
+					if (!add_max_instead) { slotAdder = amount; return; }
 
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-					if (modelList.Count < 1) continue;
-
 					foreach (BattleUnitModel targetModel in modelList)
 					{
 						BattleUnitModel_Abnormality abnoModel = null;
@@ -1253,14 +1200,10 @@ namespace ModularSkillScripts
 						pattern._slotMax = amount;
 					}
 				}
-				else if (batchArgs[i].StartsWith("setdata"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
-
+					break;
+				case "setdata":{
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-					if (modelList.Count < 1) continue;
+					if (modelList.Count < 1) return;
 
 					int dataID = GetNumFromParamString(circles[1]);
 					int dataValue = GetNumFromParamString(circles[2]);
@@ -1301,37 +1244,19 @@ namespace ModularSkillScripts
 							dataMod.dataValue = dataValue;
 							unitMod.data_list.Add(dataMod);
 						}
-
 					}
 				}
-				else if (batchArgs[i].StartsWith("changeskill"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					if (modsa_selfAction != null)
-					{
-						modsa_selfAction.TryChangeSkill(GetNumFromParamString(circledSection));
-					}
-					else
-					{
-						
-					}
-				}
-				else if (batchArgs[i].StartsWith("setimmortal"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
+					break;
+				case "changeskill": if (modsa_selfAction != null) modsa_selfAction.TryChangeSkill(GetNumFromParamString(circledSection));
+					break;
+				case "setimmortal":{
 					int amount = GetNumFromParamString(circledSection);
 					immortality = amount > 0;
 				}
-				else if (batchArgs[i].StartsWith("retreat"))
-				{
+					break;
+				case "retreat":{
 					BattleObjectManager battleObjectManager_inst = SingletonBehavior<BattleObjectManager>.Instance;
-					if (battleObjectManager_inst == null) continue;
-
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
+					if (battleObjectManager_inst == null) return;
 
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
 					//if (modelList.Count < 1) continue;
@@ -1343,15 +1268,10 @@ namespace ModularSkillScripts
 						{
 							targetModel.Retreat(modsa_unitModel, battleTiming);
 						}
-
 					}
 				}
-				else if (batchArgs[i].StartsWith("aggro"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
-
+					break;
+				case "aggro":{
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
 					int amount = GetNumFromParamString(circles[1]);
 					bool nextRound = true;
@@ -1425,104 +1345,81 @@ namespace ModularSkillScripts
 						
 					}
 				}
-				else if (batchArgs[i].StartsWith("skill"))
-				{
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
+					break;
+				case "skillsend":{
+					BattleUnitModel fromUnit = GetTargetModel(circles[0]);
+					List<BattleUnitModel> targetList = GetTargetModelList(circles[1]);
+					if (fromUnit == null || fromUnit.IsDead()) return;
 
-					string mode_string = sectionArgs[0].Remove(0, 5);
-					if (mode_string == "send")
+					int skillID = -1;
+					string circle_2 = circles[2];
+					if (circle_2[0] == 'S')
 					{
-						BattleUnitModel fromUnit = GetTargetModel(circles[0]);
-						List<BattleUnitModel> targetList = GetTargetModelList(circles[1]);
-						if (fromUnit == null || fromUnit.IsDead()) continue;
-
-						int skillID = -1;
-						string circle_2 = circles[2];
-						if (circle_2[0] == 'S')
+						int tier = 0;
+						int.TryParse(circle_2[1].ToString(), out tier);
+						if (tier > 0)
 						{
-							int tier = 0;
-							int.TryParse(circle_2[1].ToString(), out tier);
-							if (tier > 0)
-							{
-								List<int> skillIDList = fromUnit.GetSkillIdByTier(tier);
-								if (skillIDList.Count > 0) skillID = skillIDList.ToArray()[0];
-							}
-						}
-						else if (circle_2[0] == 'D')
-						{
-							int index = 0;
-							if (int.TryParse(circle_2[1].ToString(), out index)) index -= 1;
-							List<int> skillIDList = fromUnit.GetDefenseSkillIDList();
-							index = Math.Min(index, skillIDList.Count - 1);
-							skillID = skillIDList.ToArray()[index];
-						}
-						else int.TryParse(circle_2, out skillID);
-						if (skillID < 0) continue;
-
-						SinActionModel fromSinAction_new = fromUnit.AddNewSinActionModel();
-						UnitSinModel fromSinModel_new = new UnitSinModel(skillID, fromUnit, fromSinAction_new);
-						BattleActionModel fromAction_new = new BattleActionModel(fromSinModel_new, fromUnit, fromSinAction_new);
-
-						List<SinActionModel> targetSinActionList = new List<SinActionModel>();
-						foreach (BattleUnitModel targetModel in targetList)
-						{
-							List<SinActionModel> sinActionList = targetModel.GetSinActionList();
-							foreach (SinActionModel sinActionModel in sinActionList) {
-								targetSinActionList.Add(sinActionModel);
-							}
-						}
-						fromAction_new.SetOriginTargetSinActions(targetSinActionList);
-						fromAction_new._targetDataDetail.ReadyOriginTargeting(fromAction_new);
-
-						if (circles.Length > 3) fromUnit.CutInDefenseActionForcely(fromAction_new, true);
-						else fromUnit.CutInAction(fromAction_new);
-					}
-					else if (mode_string == "reuse")
-					{
-						List<BattleUnitModel> modelList = GetTargetModelList(circledSection);
-						if (modelList.Count < 1) continue;
-
-						foreach (BattleUnitModel targetModel in modelList)
-						{
-							targetModel.ReuseAction(modsa_selfAction);
+							List<int> skillIDList = fromUnit.GetSkillIdByTier(tier);
+							if (skillIDList.Count > 0) skillID = skillIDList.ToArray()[0];
 						}
 					}
-					else if (mode_string == "slotreplace")
+					else if (circle_2[0] == 'D')
 					{
-						if (modsa_unitModel == null) {
-							MainClass.Logg.LogInfo("skillslotreplace Self == null");
-							continue;
-						}
+						int index = 0;
+						if (int.TryParse(circle_2[1].ToString(), out index)) index -= 1;
+						List<int> skillIDList = fromUnit.GetDefenseSkillIDList();
+						index = Math.Min(index, skillIDList.Count - 1);
+						skillID = skillIDList.ToArray()[index];
+					}
+					else int.TryParse(circle_2, out skillID);
+					if (skillID < 0) return;
 
-								List<SinActionModel> sinActionList = modsa_unitModel.GetSinActionList();
-								int skillID_1 = GetNumFromParamString(circles[1]);
-								int skillID_2 = GetNumFromParamString(circles[2]);
-						if (circles[0] == "All") {
-							foreach (SinActionModel sinslot in sinActionList) sinslot.ReplaceSkillAtoB(skillID_1, skillID_2);
-						}
-						else
-						{
-							int slot = GetNumFromParamString(circles[0]);
+					SinActionModel fromSinAction_new = fromUnit.AddNewSinActionModel();
+					UnitSinModel fromSinModel_new = new UnitSinModel(skillID, fromUnit, fromSinAction_new);
+					BattleActionModel fromAction_new = new BattleActionModel(fromSinModel_new, fromUnit, fromSinAction_new);
 
-							if (slot >= sinActionList.Count || slot < 0) {
-								MainClass.Logg.LogInfo("skillslotreplace invalid slot");
-								continue;
-							}
+					//List<SinActionModel> targetSinActionList = new List<SinActionModel>();
+					foreach (BattleUnitModel targetModel in targetList)
+					{
+						List<SinActionModel> sinActionList = targetModel.GetSinActionList();
+						if (sinActionList.Count > 0) fromAction_new.AddTarget(sinActionList.ToArray()[0]); //targetSinActionList.Add(sinActionList.ToArray()[0]);
+					}
+					
+					//fromAction_new.SetOriginTargetSinActions(targetSinActionList);
+					//fromAction_new._targetDataDetail.ReadyOriginTargeting(fromAction_new);
 
-							sinActionList.ToArray()[slot].ReplaceSkillAtoB(skillID_1, skillID_2);
+					if (circles.Length > 3) fromUnit.CutInDefenseActionForcely(fromAction_new, true);
+					else fromUnit.CutInAction(fromAction_new);
+				}
+					break;
+				case "skillreuse": foreach (BattleUnitModel targetModel in GetTargetModelList(circledSection)) targetModel.ReuseAction(modsa_selfAction);
+					break;
+				case "skillslotreplace":{
+					if (modsa_unitModel == null) {
+						MainClass.Logg.LogInfo("skillslotreplace Self == null");
+						return;
+					}
+
+					List<SinActionModel> sinActionList = modsa_unitModel.GetSinActionList();
+					int skillID_1 = GetNumFromParamString(circles[1]);
+					int skillID_2 = GetNumFromParamString(circles[2]);
+					if (circles[0] == "All") {
+						foreach (SinActionModel sinslot in sinActionList) sinslot.ReplaceSkillAtoB(skillID_1, skillID_2);
+					}
+					else
+					{
+						int slot = GetNumFromParamString(circles[0]);
+						if (slot >= sinActionList.Count || slot < 0) {
+							MainClass.Logg.LogInfo("skillslotreplace invalid slot");
+							return;
 						}
+						sinActionList.ToArray()[slot].ReplaceSkillAtoB(skillID_1, skillID_2);
 					}
 				}
-				else if (batchArgs[i].StartsWith("resource"))
-				{
+					break;
+				case "resource":{
 					SinManager sinmanager_inst = Singleton<SinManager>.Instance;
 					SinManager.EgoStockManager stock_manager = sinmanager_inst._egoStockMangaer;
-
-					string[] sectionArgs = batchArgs[i].Split(parenthesisSeparator);
-					string circledSection = sectionArgs[1];
-					string[] circles = circledSection.Split(',');
 
 					ATTRIBUTE_TYPE sin = ATTRIBUTE_TYPE.NONE;
 					Enum.TryParse(circles[0], true, out sin);
@@ -1536,9 +1433,41 @@ namespace ModularSkillScripts
 					if (amount >= 0) stock_manager.AddSinStock(faction, sin, amount, 0);
 					else amount *= -1; stock_manager.RemoveSinStock(faction, sin, amount);
 				}
+					break;
+				case "discard":{
+					if (modsa_selfAction == null) return;
+					int funnywhilenumber = 1;
+					int amount = GetNumFromParamString(circles[1]);
+	
+					SORT_SKILL_BY_INDEX sorting = SORT_SKILL_BY_INDEX.NONE;
+					Enum.TryParse(circles[0], true, out sorting);
+					
+					while (funnywhilenumber <= amount)
+					{
+						modsa_unitModel.DiscardSkill(battleTiming, sorting, modsa_selfAction);
+						funnywhilenumber++;
+					}
+				}
+					break;
+				case "passiveadd":{
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					int id = GetNumFromParamString(circles[1]);
+					foreach (BattleUnitModel targetModel in modelList) targetModel.AddPassive(id);
+				}
+					break;
+				case "passiveremove":{
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					int id = GetNumFromParamString(circles[1]);
+					foreach (BattleUnitModel targetModel in modelList) {
+						foreach (PassiveModel passive in targetModel.GetPassiveList()) {
+							if (passive.GetID() == id) targetModel.GetPassiveList().Remove(passive);
+						}
+					}
+				}
+					break;
 			}
 		}
-
+		
 		private void AcquireValue(int setvalue_idx, string section)
 		{
 			if (MainClass.logEnabled) MainClass.Logg.LogInfo("AcquireValue " + section);
@@ -1553,14 +1482,15 @@ namespace ModularSkillScripts
 			string methodology = sectionArgs[0];
 			string circledSection = "";
 			if (sectionArgs.Length > 1) circledSection = sectionArgs[1];
-			if (MainClass.logEnabled) MainClass.Logg.LogInfo("AcquireValuecircledSection: " + circledSection);
+			string[] circles = circledSection.Split(',');
+			
 			if (methodology == "math")
 			{
 				MatchCollection symbols = Regex.Matches(circledSection, "(-|\\+|\\*|%|!|¡|\\?)", RegexOptions.IgnoreCase);
 				char[] mathSeparator = new char[] { '-', '+', '*', '%', '!', '¡', '?' };
 				string[] parameters = circledSection.Split(mathSeparator);
 				string firstParam = parameters[0];
-				int finalValue = GetNumFromParamString(firstParam);
+				double finalValue = (double)GetNumFromParamString(firstParam);
 
 				for (int i = 0; i < symbols.Count; i++)
 				{
@@ -1594,342 +1524,329 @@ namespace ModularSkillScripts
 							finalValue %= amount;
 							break;
 					}
-					if (MainClass.logEnabled) MainClass.Logg.LogInfo("mathfinal " + finalValue);
 				}
 
-				valueList[setvalue_idx] = finalValue;
+				valueList[setvalue_idx] = (int)finalValue;
+				return; // End acquisition here
 			}
-			else if (methodology == "mpcheck")
+			
+			valueList[setvalue_idx] = -1; // Default -1
+			
+			switch (methodology)
 			{
-				BattleUnitModel targetModel = GetTargetModel(circledSection);
-				if (targetModel == null) return;
-				valueList[setvalue_idx] = targetModel.Mp;
-			}
-			else if (methodology == "hpcheck")
-			{
-				string[] circles = circledSection.Split(',');
-				BattleUnitModel targetModel = GetTargetModel(circles[0]);
-				if (targetModel == null) return;
-
-				int hp = targetModel.Hp;
-				int hp_max = targetModel.MaxHp;
-				float hp_ptg = (float)hp / hp_max;
-				int hp_ptg_floor = (int)Math.Floor(hp_ptg * 100.0);
-
-				int finalValue = hp;
-				if (circles[1] == "%") finalValue = hp_ptg_floor;
-				else if (circles[1] == "max") finalValue = hp_max;
-
-				valueList[setvalue_idx] = finalValue;
-			}
-			else if (methodology == "bufcheck")
-			{
-				string[] circles = circledSection.Split(',');
-
-				BattleUnitModel targetModel = GetTargetModel(circles[0]);
-				if (targetModel == null) return;
-
-				BUFF_UNIQUE_KEYWORD buf_keyword = BUFF_UNIQUE_KEYWORD.Enhancement;
-				Enum.TryParse(circles[1], true, out buf_keyword);
-
-				BuffDetail bufDetail = targetModel._buffDetail;
-				//BuffModel buf = bufDetail.FindActivatedBuff(buf_keyword, false);
-				int stack = bufDetail.GetActivatedBuffStack(buf_keyword, false);
-				int turn = bufDetail.GetActivatedBuffTurn(buf_keyword, false);
-
-				int finalValue = stack;
-				if (circles[2] == "turn") finalValue = turn;
-				else if (circles[2] == "+") finalValue = stack + turn;
-				else if (circles[2] == "*") finalValue = stack * turn;
-				valueList[setvalue_idx] = finalValue;
-			}
-			else if (methodology == "getdmg") valueList[setvalue_idx] = lastFinalDmg;
-			else if (methodology == "round")
-			{
-				StageController stageController_inst = Singleton<StageController>.Instance;
-				valueList[setvalue_idx] = stageController_inst.GetCurrentRound();
-			}
-			else if (methodology == "wave")
-			{
-				StageController stageController_inst = Singleton<StageController>.Instance;
-				valueList[setvalue_idx] = stageController_inst.GetCurrentWave();
-			}
-			else if (methodology == "activations") valueList[setvalue_idx] = activationCounter;
-			else if (methodology == "unitstate")
-			{
-				BattleUnitModel targetModel = GetTargetModel(circledSection);
-				if (targetModel == null)
-				{
-					if (MainClass.logEnabled) MainClass.Logg.LogInfo("unitstate() unit not found");
-					valueList[setvalue_idx] = -1;
-					return;
-				}
-				if (targetModel.IsDead())
-				{
-					valueList[setvalue_idx] = 0;
-					return;
-				}
-				valueList[setvalue_idx] = 1;
-				if (targetModel.IsBreak()) valueList[setvalue_idx] = 2;
-
-				if (targetModel is BattleUnitModel_Abnormality_Part)
-				{
-					BattleUnitModel_Abnormality_Part partModel = (BattleUnitModel_Abnormality_Part)targetModel;
-					if (!partModel.IsActionable()) valueList[setvalue_idx] = 2;
-				}
-			}
-			else if (methodology == "getid")
-			{
-				BattleUnitModel targetModel = GetTargetModel(circledSection);
-				if (targetModel != null) valueList[setvalue_idx] = targetModel.GetUnitID();
-			}
-			else if (methodology == "instid")
-			{
-				BattleUnitModel targetModel = GetTargetModel(circledSection);
-				if (targetModel != null) valueList[setvalue_idx] = targetModel.InstanceID;
-			}
-			else if (methodology == "speedcheck")
-			{
-				BattleUnitModel targetModel = GetTargetModel(circledSection);
-				if (targetModel == null) valueList[setvalue_idx] = 0;
-				else valueList[setvalue_idx] = targetModel.GetIntegerOfOriginSpeed();
-			}
-			else if (methodology == "getpattern")
-			{
-				BattleUnitModel targetModel = GetTargetModel(circledSection);
-				if (targetModel == null) { valueList[setvalue_idx] = 0; return; }
-
-				BattleUnitModel_Abnormality abnoModel = null;
-				if (targetModel is BattleUnitModel_Abnormality) abnoModel = (BattleUnitModel_Abnormality)targetModel;
-				else if (targetModel is BattleUnitModel_Abnormality_Part)
-				{
-					BattleUnitModel_Abnormality_Part partModel = (BattleUnitModel_Abnormality_Part)targetModel;
-					abnoModel = partModel.Abnormality;
-				}
-				if (abnoModel == null) { valueList[setvalue_idx] = 0; return; }
-				if (MainClass.logEnabled) MainClass.Logg.LogInfo("getpattern: abnoModel exists");
-
-				PatternScript_Abnormality pattern = abnoModel.PatternScript;
-
-				int pattern_idx = pattern.currPatternIdx;
-				if (MainClass.logEnabled) MainClass.Logg.LogInfo("get pattern_idx: " + pattern_idx);
-				valueList[setvalue_idx] = pattern.currPatternIdx;
-			}
-			else if (methodology == "getabnoslotmax")
-			{
-				valueList[setvalue_idx] = 0;
-				BattleUnitModel targetModel = GetTargetModel(circledSection);
-				if (targetModel == null) { return; }
-
-				BattleUnitModel_Abnormality abnoModel = null;
-				if (targetModel is BattleUnitModel_Abnormality) abnoModel = (BattleUnitModel_Abnormality)targetModel;
-				else if (targetModel is BattleUnitModel_Abnormality_Part)
-				{
-					BattleUnitModel_Abnormality_Part partModel = (BattleUnitModel_Abnormality_Part)targetModel;
-					abnoModel = partModel.Abnormality;
-				}
-				if (abnoModel == null) { return; }
-
-				PatternScript_Abnormality pattern = abnoModel.PatternScript;
-				valueList[setvalue_idx] = pattern.SlotMax;
-			}
-			else if (methodology == "getdata")
-			{
-				string[] circles = circledSection.Split(',');
-
-				BattleUnitModel targetModel = GetTargetModel(circles[0]);
-				if (targetModel == null) { valueList[setvalue_idx] = 0; return; }
-
-				int finalValue = 0;
-				int dataID = GetNumFromParamString(circles[1]);
-
-				long targetPtr_intlong = targetModel.Pointer.ToInt64();
-				foreach (ModUnitData unitMod in SkillScriptInitPatch.unitMod_list)
-				{
-					if (unitMod.unitPtr_intlong != targetPtr_intlong) continue;
-					foreach (DataMod dataMod in unitMod.data_list) {
-						if (dataMod.dataID != dataID) continue;
-						finalValue = dataMod.dataValue;
-						break;
-					}
+				case "mpcheck":{
+					BattleUnitModel targetModel = GetTargetModel(circledSection);
+					if (targetModel == null) return;
+					valueList[setvalue_idx] = targetModel.Mp;
 					break;
 				}
-				valueList[setvalue_idx] = finalValue;
-			}
-			else if (methodology == "deadallies")
-			{
-				BattleUnitModel targetModel = GetTargetModel(circledSection);
-				if (targetModel == null) { valueList[setvalue_idx] = 0; return; }
-				valueList[setvalue_idx] = targetModel.deadAllyCount;
-			}
-			else if (methodology == "trieddeath") valueList[setvalue_idx] = immortality_attempted ? 1 : 0;
-			else if (methodology == "random")
-			{
-				string[] circles = circledSection.Split(',');
-				int minroll = GetNumFromParamString(circles[0]);
-				int maxroll = GetNumFromParamString(circles[1]);
-				valueList[setvalue_idx] = MainClass.rng.Next(minroll, maxroll + 1);
-			}
-			else if (methodology == "areallied")
-			{
-				string[] circles = circledSection.Split(',');
-				BattleUnitModel targetModel1 = GetTargetModel(circles[0]);
-				BattleUnitModel targetModel2 = GetTargetModel(circles[1]);
-				if (targetModel1 == null || targetModel2 == null) { valueList[setvalue_idx] = -1; return; }
+				case "hpcheck":{
+					BattleUnitModel targetModel = GetTargetModel(circles[0]);
+					if (targetModel == null) return;
 
-				valueList[setvalue_idx] = targetModel1.Faction == targetModel2.Faction ? 1 : 0;
-			}
-			else if (methodology == "getshield")
-			{
-				string[] circles = circledSection.Split(',');
-				BattleUnitModel targetModel = GetTargetModel(circles[0]);
-				if (targetModel == null) { valueList[setvalue_idx] = 0; return; }
-				valueList[setvalue_idx] = targetModel.GetShield();
-			}
-			else if (methodology == "getskillid")
-			{
-				valueList[setvalue_idx] = 0;
-				if (modsa_skillModel != null) valueList[setvalue_idx] = modsa_skillModel.GetID();
-				else if (modsa_selfAction != null) valueList[setvalue_idx] = modsa_selfAction.Skill.GetID();
-			}
-			else if (methodology == "getcoincount")
-			{
-				string[] circles = circledSection.Split(',');
-				BattleActionModel targetAction = modsa_selfAction;
-				if (circles[0] == "Target") targetAction = modsa_oppoAction;
-				if (targetAction == null)
-				{
-					valueList[setvalue_idx] = -1;
-					return;
+					int hp = targetModel.Hp;
+					int hp_max = targetModel.MaxHp;
+					float hp_ptg = (float)hp / hp_max;
+					int hp_ptg_floor = (int)Math.Floor(hp_ptg * 100.0);
+
+					int finalValue = hp;
+					if (circles[1] == "%") finalValue = hp_ptg_floor;
+					else if (circles[1] == "max") finalValue = hp_max;
+
+					valueList[setvalue_idx] = finalValue;
 				}
-				
-				int coinCount = targetAction.Skill.GetAliveCoins().Count;
-				if (circles[1] == "og") coinCount = targetAction.Skill.CoinList.Count;
+					break;
+				case "bufcheck":{
+					BattleUnitModel targetModel = GetTargetModel(circles[0]);
+					if (targetModel == null) return;
 
-				valueList[setvalue_idx] = coinCount;
-			}
-			else if (methodology == "allcoinstate")
-			{
-				string[] circles = circledSection.Split(',');
-				BattleActionModel targetAction = modsa_selfAction;
-				if (circles[0] == "Target") targetAction = modsa_oppoAction;
-				if (targetAction == null)
-				{
-					valueList[setvalue_idx] = -1;
-					return;
+					BUFF_UNIQUE_KEYWORD buf_keyword = BUFF_UNIQUE_KEYWORD.Enhancement;
+					Enum.TryParse(circles[1], true, out buf_keyword);
+
+					BuffDetail bufDetail = targetModel._buffDetail;
+					//BuffModel buf = bufDetail.FindActivatedBuff(buf_keyword, false);
+					int stack = bufDetail.GetActivatedBuffStack(buf_keyword, false);
+					int turn = bufDetail.GetActivatedBuffTurn(buf_keyword, false);
+
+					int finalValue = stack;
+					if (circles[2] == "turn") finalValue = turn;
+					else if (circles[2] == "+") finalValue = stack + turn;
+					else if (circles[2] == "*") finalValue = stack * turn;
+					valueList[setvalue_idx] = finalValue;
 				}
-
-				string way = circles[1];
-
-				int coinCount = targetAction.Skill.GetAliveCoins().Count;
-				int headCount = targetAction.GetHeadCoinNum();
-				int tailCount = targetAction.GetTailCoinNum();
-				int result = 0;
-				if (way == "full")
-				{
-					if (coinCount == headCount) result = 1;
-					else if (coinCount == tailCount) result = 2;
+					break;
+				case "getdmg": valueList[setvalue_idx] = lastFinalDmg;
+					break;
+				case "round":{
+					StageController stageController_inst = Singleton<StageController>.Instance;
+					valueList[setvalue_idx] = stageController_inst.GetCurrentRound();
 				}
-				else if (way == "headcount") result = headCount;
-				else if (way == "tailcount") result = tailCount;
-
-				valueList[setvalue_idx] = result;
-			}
-			else if (methodology == "resonance")
-			{
-				valueList[setvalue_idx] = 0;
-				SinManager sinmanager_inst = Singleton<SinManager>.Instance;
-				SinManager.ResonanceManager res_manager = sinmanager_inst._resManager;
-
-				ATTRIBUTE_TYPE sin = ATTRIBUTE_TYPE.NONE;
-				
-				if (circledSection == "highres")
-				{
-					List<ATTRIBUTE_TYPE> sinList = new List<ATTRIBUTE_TYPE>();
-					for (int i = 0; i<7; i++)
+					break;
+				case "wave":{
+					StageController stageController_inst = Singleton<StageController>.Instance;
+					valueList[setvalue_idx] = stageController_inst.GetCurrentWave();
+				}
+					break;
+				case "activations":valueList[setvalue_idx] = activationCounter;
+					break;
+				case "unitstate":{
+					BattleUnitModel targetModel = GetTargetModel(circledSection);
+					if (targetModel == null) return;
+					if (targetModel.IsDead())
 					{
-						sinList.Add((ATTRIBUTE_TYPE)i);
+						valueList[setvalue_idx] = 0;
+						return;
 					}
-					valueList[setvalue_idx] = res_manager.GetMaxAttributeResonanceOfAll(modsa_unitModel.Faction, sinList);
-				}
-				else if (circledSection == "highperfect")
-				{
-					List<ATTRIBUTE_TYPE> sinList = new List<ATTRIBUTE_TYPE>();
-					int highest = 0;
-					for (int i = 0; i < 7; i++)
+					valueList[setvalue_idx] = 1;
+					if (targetModel.IsBreak()) valueList[setvalue_idx] = 2;
+
+					if (targetModel is BattleUnitModel_Abnormality_Part)
 					{
-						int current = res_manager.GetMaxPerfectResonance(modsa_unitModel.Faction, (ATTRIBUTE_TYPE)i);
-						if (current > highest) highest = current;
+						BattleUnitModel_Abnormality_Part partModel = (BattleUnitModel_Abnormality_Part)targetModel;
+						if (!partModel.IsActionable()) valueList[setvalue_idx] = 2;
 					}
-					valueList[setvalue_idx] = highest;
 				}
-				else if (circledSection.StartsWith("perfect"))
-				{
-					Enum.TryParse(circledSection.Remove(0,7), true, out sin);
-					valueList[setvalue_idx] = res_manager.GetAttributeResonance(modsa_unitModel.Faction, sin);
+					break;
+				case "getid":{
+					BattleUnitModel targetModel = GetTargetModel(circledSection);
+					if (targetModel != null) valueList[setvalue_idx] = targetModel.GetUnitID();
 				}
-				else if (Enum.TryParse(circledSection, true, out sin))
-				{
-					valueList[setvalue_idx] = res_manager.GetAttributeResonance(modsa_unitModel.Faction, sin);
+					break;
+				case "instid":{
+					BattleUnitModel targetModel = GetTargetModel(circledSection);
+					if (targetModel != null) valueList[setvalue_idx] = targetModel.InstanceID;
 				}
-			}
-			else if (methodology == "resource") {
-				string[] circles = circledSection.Split(',');
-				valueList[setvalue_idx] = 0;
-
-				SinManager sinmanager_inst = Singleton<SinManager>.Instance;
-				SinManager.EgoStockManager stock_manager = sinmanager_inst._egoStockMangaer;
-
-				ATTRIBUTE_TYPE sin = ATTRIBUTE_TYPE.NONE;
-				UNIT_FACTION faction = modsa_unitModel.Faction;
-				UNIT_FACTION enemyFaction = faction == UNIT_FACTION.PLAYER ? UNIT_FACTION.ENEMY : UNIT_FACTION.PLAYER;
-				Enum.TryParse(circles[0], true, out sin);
-				if (circles.Length >= 2) faction = enemyFaction;
-
-				valueList[setvalue_idx] = stock_manager.GetAttributeStockNumberByAttributeType(faction, sin);
-			}
-			else if (methodology == "haskey")
-			{
-				string[] circles = circledSection.Split(',');
-				BattleUnitModel targetModel = GetTargetModel(circles[0]);
-				if (targetModel == null) {
-					valueList[setvalue_idx] = -1; // Target not found = -1
-					return;
+					break;
+				case "speedcheck":{
+					BattleUnitModel targetModel = GetTargetModel(circledSection);
+					if (targetModel == null) valueList[setvalue_idx] = 0;
+					else valueList[setvalue_idx] = targetModel.GetIntegerOfOriginSpeed();
 				}
-				List<string> unitKeywordList = targetModel._unitDataModel.ClassInfo.unitKeywordList;
-				List<string> associationList = targetModel._unitDataModel.ClassInfo.associationList;
+					break;
+				case "getpattern":{
+					BattleUnitModel targetModel = GetTargetModel(circledSection);
+					if (targetModel == null) { valueList[setvalue_idx] = 0; return; }
 
-				bool operator_OR = circles[1] == "OR";
+					BattleUnitModel_Abnormality abnoModel = null;
+					if (targetModel is BattleUnitModel_Abnormality) abnoModel = (BattleUnitModel_Abnormality)targetModel;
+					else if (targetModel is BattleUnitModel_Abnormality_Part)
+					{
+						BattleUnitModel_Abnormality_Part partModel = (BattleUnitModel_Abnormality_Part)targetModel;
+						abnoModel = partModel.Abnormality;
+					}
+					if (abnoModel == null) { valueList[setvalue_idx] = 0; return; }
+					if (MainClass.logEnabled) MainClass.Logg.LogInfo("getpattern: abnoModel exists");
 
-				bool success = false;
-				for (int i = 2; i < circles.Length; i++)
-				{
-					string keyword_string = circles[i];
-					success = unitKeywordList.Contains(keyword_string) || associationList.Contains(keyword_string);
+					PatternScript_Abnormality pattern = abnoModel.PatternScript;
 
-					if (operator_OR == success) break; // [IF Statement] Simplification
+					int pattern_idx = pattern.currPatternIdx;
+					if (MainClass.logEnabled) MainClass.Logg.LogInfo("get pattern_idx: " + pattern_idx);
+					valueList[setvalue_idx] = pattern.currPatternIdx;
 				}
-				valueList[setvalue_idx] = success ? 1 : 0;
-			}
-			else if (methodology.StartsWith("skill"))
-			{
-				string[] circles = circledSection.Split(',');
-				valueList[setvalue_idx] = -1;
+					break;
+				case "getabnoslotmax":{
+					valueList[setvalue_idx] = 0;
+					BattleUnitModel targetModel = GetTargetModel(circledSection);
+					if (targetModel == null) { return; }
 
-				string mode_string = sectionArgs[0].Remove(0, 5);
-				if (mode_string == "base") {
+					BattleUnitModel_Abnormality abnoModel = null;
+					if (targetModel is BattleUnitModel_Abnormality) abnoModel = (BattleUnitModel_Abnormality)targetModel;
+					else if (targetModel is BattleUnitModel_Abnormality_Part)
+					{
+						BattleUnitModel_Abnormality_Part partModel = (BattleUnitModel_Abnormality_Part)targetModel;
+						abnoModel = partModel.Abnormality;
+					}
+					if (abnoModel == null) { return; }
+
+					PatternScript_Abnormality pattern = abnoModel.PatternScript;
+					valueList[setvalue_idx] = pattern.SlotMax;
+				}
+					break;
+				case "getdata":{
+					BattleUnitModel targetModel = GetTargetModel(circles[0]);
+					if (targetModel == null) { valueList[setvalue_idx] = 0; return; }
+
+					int finalValue = 0;
+					int dataID = GetNumFromParamString(circles[1]);
+
+					long targetPtr_intlong = targetModel.Pointer.ToInt64();
+					foreach (ModUnitData unitMod in SkillScriptInitPatch.unitMod_list)
+					{
+						if (unitMod.unitPtr_intlong != targetPtr_intlong) continue;
+						foreach (DataMod dataMod in unitMod.data_list) {
+							if (dataMod.dataID != dataID) continue;
+							finalValue = dataMod.dataValue;
+							break;
+						}
+						break;
+					}
+					valueList[setvalue_idx] = finalValue;
+				}
+					break;
+				case "deadallies":{
+					BattleUnitModel targetModel = GetTargetModel(circledSection);
+					if (targetModel == null) { valueList[setvalue_idx] = 0; return; }
+					valueList[setvalue_idx] = targetModel.deadAllyCount;
+				}
+					break;
+				case "trieddeath": valueList[setvalue_idx] = immortality_attempted ? 1 : 0;
+					break;
+				case "random":{
+					int minroll = GetNumFromParamString(circles[0]);
+					int maxroll = GetNumFromParamString(circles[1]);
+					valueList[setvalue_idx] = MainClass.rng.Next(minroll, maxroll + 1);
+				}
+					break;
+				case "areallied":{
+					BattleUnitModel targetModel1 = GetTargetModel(circles[0]);
+					BattleUnitModel targetModel2 = GetTargetModel(circles[1]);
+					if (targetModel1 == null || targetModel2 == null) { valueList[setvalue_idx] = -1; return; }
+
+					valueList[setvalue_idx] = targetModel1.Faction == targetModel2.Faction ? 1 : 0;
+				}
+					break;
+				case "getshield":{
+					BattleUnitModel targetModel = GetTargetModel(circles[0]);
+					if (targetModel != null) valueList[setvalue_idx] = targetModel.GetShield();
+				}
+					break;
+				case "getskillid":{
+					valueList[setvalue_idx] = 0;
+					if (modsa_skillModel != null) valueList[setvalue_idx] = modsa_skillModel.GetID();
+					else if (modsa_selfAction != null) valueList[setvalue_idx] = modsa_selfAction.Skill.GetID();
+				}
+					break;
+				case "getcoincount":{
+					BattleActionModel targetAction = modsa_selfAction;
+					if (circles[0] == "Target") targetAction = modsa_oppoAction;
+					if (targetAction == null)
+					{
+						valueList[setvalue_idx] = -1;
+						return;
+					}
+				
+					int coinCount = targetAction.Skill.GetAliveCoins().Count;
+					if (circles[1] == "og") coinCount = targetAction.Skill.CoinList.Count;
+
+					valueList[setvalue_idx] = coinCount;
+				}
+					break;
+				case "allcoinstate":{
+					BattleActionModel targetAction = modsa_selfAction;
+					if (circles[0] == "Target") targetAction = modsa_oppoAction;
+					if (targetAction == null)
+					{
+						valueList[setvalue_idx] = -1;
+						return;
+					}
+
+					string way = circles[1];
+
+					int coinCount = targetAction.Skill.GetAliveCoins().Count;
+					int headCount = targetAction.GetHeadCoinNum();
+					int tailCount = targetAction.GetTailCoinNum();
+					int result = 0;
+					if (way == "full")
+					{
+						if (coinCount == headCount) result = 1;
+						else if (coinCount == tailCount) result = 2;
+					}
+					else if (way == "headcount") result = headCount;
+					else if (way == "tailcount") result = tailCount;
+
+					valueList[setvalue_idx] = result;
+				}
+					break;
+				case "resonance":{
+					valueList[setvalue_idx] = 0;
+					SinManager sinmanager_inst = Singleton<SinManager>.Instance;
+					SinManager.ResonanceManager res_manager = sinmanager_inst._resManager;
+
+					ATTRIBUTE_TYPE sin = ATTRIBUTE_TYPE.NONE;
+				
+					if (circledSection == "highres")
+					{
+						List<ATTRIBUTE_TYPE> sinList = new List<ATTRIBUTE_TYPE>();
+						for (int i = 0; i<7; i++)
+						{
+							sinList.Add((ATTRIBUTE_TYPE)i);
+						}
+						valueList[setvalue_idx] = res_manager.GetMaxAttributeResonanceOfAll(modsa_unitModel.Faction, sinList);
+					}
+					else if (circledSection == "highperfect")
+					{
+						List<ATTRIBUTE_TYPE> sinList = new List<ATTRIBUTE_TYPE>();
+						int highest = 0;
+						for (int i = 0; i < 7; i++)
+						{
+							int current = res_manager.GetMaxPerfectResonance(modsa_unitModel.Faction, (ATTRIBUTE_TYPE)i);
+							if (current > highest) highest = current;
+						}
+						valueList[setvalue_idx] = highest;
+					}
+					else if (circledSection.StartsWith("perfect"))
+					{
+						Enum.TryParse(circledSection.Remove(0,7), true, out sin);
+						valueList[setvalue_idx] = res_manager.GetAttributeResonance(modsa_unitModel.Faction, sin);
+					}
+					else if (Enum.TryParse(circledSection, true, out sin))
+					{
+						valueList[setvalue_idx] = res_manager.GetAttributeResonance(modsa_unitModel.Faction, sin);
+					}
+				}
+					break;
+				case "resource":{
+					valueList[setvalue_idx] = 0;
+
+					SinManager sinmanager_inst = Singleton<SinManager>.Instance;
+					SinManager.EgoStockManager stock_manager = sinmanager_inst._egoStockMangaer;
+
+					ATTRIBUTE_TYPE sin = ATTRIBUTE_TYPE.NONE;
+					UNIT_FACTION faction = modsa_unitModel.Faction;
+					UNIT_FACTION enemyFaction = faction == UNIT_FACTION.PLAYER ? UNIT_FACTION.ENEMY : UNIT_FACTION.PLAYER;
+					Enum.TryParse(circles[0], true, out sin);
+					if (circles.Length >= 2) faction = enemyFaction;
+
+					valueList[setvalue_idx] = stock_manager.GetAttributeStockNumberByAttributeType(faction, sin);
+				}
+					break;
+				case "haskey":{
+					BattleUnitModel targetModel = GetTargetModel(circles[0]);
+					if (targetModel == null) {
+						valueList[setvalue_idx] = -1; // Target not found = -1
+						return;
+					}
+					List<string> unitKeywordList = targetModel._unitDataModel.ClassInfo.unitKeywordList;
+					List<string> associationList = targetModel._unitDataModel.ClassInfo.associationList;
+
+					bool operator_OR = circles[1] == "OR";
+
+					bool success = false;
+					for (int i = 2; i < circles.Length; i++)
+					{
+						string keyword_string = circles[i];
+						success = unitKeywordList.Contains(keyword_string) || associationList.Contains(keyword_string);
+
+						if (operator_OR == success) break; // [IF Statement] Simplification
+					}
+					valueList[setvalue_idx] = success ? 1 : 0;
+				}
+					break;
+				case "skillbase":{
 					BattleActionModel action = modsa_selfAction;
 					if (circledSection == "Target") action = modsa_oppoAction;
 					if (action == null) return;
 					valueList[setvalue_idx] = action.Skill.GetSkillDefaultPower();
 				}
-				else if (mode_string == "atkweight") {
+					break;
+				case "skillatkweight":{
 					BattleActionModel action = modsa_selfAction;
 					if (circledSection == "Target") action = modsa_oppoAction;
 					if (action == null) return;
 					valueList[setvalue_idx] = action.Skill.GetAttackWeight(action);
 				}
-				else if (mode_string == "onescale") {
+					break;
+				case "onescale":{
 					BattleActionModel action = modsa_selfAction;
 					if (circles[0] == "Target") action = modsa_oppoAction;
 					if (action == null) return;
@@ -1941,82 +1858,49 @@ namespace ModularSkillScripts
 
 					valueList[setvalue_idx] = action.Skill.CoinList.ToArray()[coin_idx]._scale;
 				}
-				else if (mode_string == "atk") {
+					break;
+				case "skillatk":{
 					BattleActionModel action = modsa_selfAction;
 					if (circles[0] == "Target") action = modsa_oppoAction;
 					if (action == null) return;
 
 					valueList[setvalue_idx] = (int)action.Skill.GetAttackType();
 				}
-				else if (mode_string == "attribute") {
+					break;
+				case "skillattribute":{
 					BattleActionModel action = modsa_selfAction;
 					if (circles[0] == "Target") action = modsa_oppoAction;
 					if (action == null) return;
 
 					valueList[setvalue_idx] = (int)action.Skill.GetAttributeType();
 				}
-			}
-		}
+					break;
+				case "getstat":{
+					BattleUnitModel targetModel = GetTargetModel(circles[0]);
+					if (targetModel == null) return;
+					int value = -1;
 
-		static void Main(string[] args)
-		{
-			
+					string circle_1 = circles[1];
+					if (circle_1 == "deployment") value = targetModel.PARTICIPATE_ORDER;
+					else if (circle_1 == "deadAllyCount") value = targetModel.deadAllyCount;
+					else if (circle_1.StartsWith("res"))
+					{
+						string word = circle_1.Remove(0, 3);
+						ATK_BEHAVIOUR atk = ATK_BEHAVIOUR.NONE;
+						Enum.TryParse(word, true, out atk);
+						if (atk != ATK_BEHAVIOUR.NONE) {
+							valueList[setvalue_idx] = (int)(targetModel.GetAtkResistMultiplier(atk) * 100.0f);
+							return;
+						}
+						
+						ATTRIBUTE_TYPE sin = ATTRIBUTE_TYPE.NONE;
+						Enum.TryParse(word, true, out sin);
+						if (sin != ATTRIBUTE_TYPE.NONE) valueList[setvalue_idx] = (int)(targetModel.GetAttributeResistMultiplier(sin) * 100.0f);
+					}
+				}
+					break;
+			}
 		}
 		
 	}
-	
-	class MathEvaluator : ModsaLangBaseVisitor<double>
-	{
-		public override double VisitParenExpression(ModsaLangParser.ParenExpressionContext context)
-		{
-			// Evaluate the expression inside the parentheses
-			return Visit(context.expression());
-		}
-
-		public override double VisitMulDivExpression(ModsaLangParser.MulDivExpressionContext context)
-		{
-			double left = Visit(context.expression(0)); // Evaluate the left expression
-			double right = Visit(context.expression(1)); // Evaluate the right expression
-
-			// Perform multiplication or division
-			return context.op.Type == ModsaLangParser.MUL ? left * right : left / right;
-		}
-
-		public override double VisitAddSubExpression(ModsaLangParser.AddSubExpressionContext context)
-		{
-			double left = Visit(context.expression(0)); // Evaluate the left expression
-			double right = Visit(context.expression(1)); // Evaluate the right expression
-
-			// Perform addition or subtraction
-			return context.op.Type == ModsaLangParser.ADD ? left + right : left - right;
-		}
-
-		public override double VisitFunctionExpression(ModsaLangParser.FunctionExpressionContext context)
-		{
-			string funcName = context.ID().GetText(); // Get the function name
-			double arg = Visit(context.expression()); // Evaluate the argument
-
-			// Perform the function
-			return funcName switch
-			{
-				"sin" => Math.Sin(arg),
-				"cos" => Math.Cos(arg),
-				"tan" => Math.Tan(arg),
-				_ => throw new Exception($"Unknown function: {funcName}")
-			};
-		}
-
-		public override double VisitNumberExpression(ModsaLangParser.NumberExpressionContext context)
-		{
-			// Parse the number
-			return double.Parse(context.NUMBER().GetText());
-		}
-
-		public override double VisitVariableExpression(ModsaLangParser.VariableExpressionContext context)
-		{
-			// For now, assume variables are 0 (you can extend this to support variables)
-			return 0;
-		}
-	}
-	
 }

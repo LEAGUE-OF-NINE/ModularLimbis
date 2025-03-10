@@ -39,46 +39,53 @@ public interface IModsaLangVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitProgram([NotNull] ModsaLangParser.ProgramContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>AddSubExpression</c>
+	/// Visit a parse tree produced by the <c>VariableEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitAddSubExpression([NotNull] ModsaLangParser.AddSubExpressionContext context);
+	Result VisitVariableEx([NotNull] ModsaLangParser.VariableExContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>FunctionExpression</c>
+	/// Visit a parse tree produced by the <c>SetModvalEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitFunctionExpression([NotNull] ModsaLangParser.FunctionExpressionContext context);
+	Result VisitSetModvalEx([NotNull] ModsaLangParser.SetModvalExContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>ParenExpression</c>
+	/// Visit a parse tree produced by the <c>NumberEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitParenExpression([NotNull] ModsaLangParser.ParenExpressionContext context);
+	Result VisitNumberEx([NotNull] ModsaLangParser.NumberExContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>NumberExpression</c>
+	/// Visit a parse tree produced by the <c>CircleEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitNumberExpression([NotNull] ModsaLangParser.NumberExpressionContext context);
+	Result VisitCircleEx([NotNull] ModsaLangParser.CircleExContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>VariableExpression</c>
+	/// Visit a parse tree produced by the <c>FunctionEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitVariableExpression([NotNull] ModsaLangParser.VariableExpressionContext context);
+	Result VisitFunctionEx([NotNull] ModsaLangParser.FunctionExContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>MulDivExpression</c>
+	/// Visit a parse tree produced by the <c>MathEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitMulDivExpression([NotNull] ModsaLangParser.MulDivExpressionContext context);
+	Result VisitMathEx([NotNull] ModsaLangParser.MathExContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>ModvalEx</c>
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitModvalEx([NotNull] ModsaLangParser.ModvalExContext context);
 }
 } // namespace ModsaLang

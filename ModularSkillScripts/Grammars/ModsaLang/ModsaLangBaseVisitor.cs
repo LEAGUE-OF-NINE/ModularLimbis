@@ -46,7 +46,7 @@ public partial class ModsaLangBaseVisitor<Result> : AbstractParseTreeVisitor<Res
 	/// <return>The visitor result.</return>
 	public virtual Result VisitProgram([NotNull] ModsaLangParser.ProgramContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by the <c>AddSubExpression</c>
+	/// Visit a parse tree produced by the <c>VariableEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
@@ -55,9 +55,9 @@ public partial class ModsaLangBaseVisitor<Result> : AbstractParseTreeVisitor<Res
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitAddSubExpression([NotNull] ModsaLangParser.AddSubExpressionContext context) { return VisitChildren(context); }
+	public virtual Result VisitVariableEx([NotNull] ModsaLangParser.VariableExContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by the <c>FunctionExpression</c>
+	/// Visit a parse tree produced by the <c>SetModvalEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
@@ -66,9 +66,9 @@ public partial class ModsaLangBaseVisitor<Result> : AbstractParseTreeVisitor<Res
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitFunctionExpression([NotNull] ModsaLangParser.FunctionExpressionContext context) { return VisitChildren(context); }
+	public virtual Result VisitSetModvalEx([NotNull] ModsaLangParser.SetModvalExContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by the <c>ParenExpression</c>
+	/// Visit a parse tree produced by the <c>NumberEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
@@ -77,9 +77,9 @@ public partial class ModsaLangBaseVisitor<Result> : AbstractParseTreeVisitor<Res
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitParenExpression([NotNull] ModsaLangParser.ParenExpressionContext context) { return VisitChildren(context); }
+	public virtual Result VisitNumberEx([NotNull] ModsaLangParser.NumberExContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by the <c>NumberExpression</c>
+	/// Visit a parse tree produced by the <c>CircleEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
@@ -88,9 +88,9 @@ public partial class ModsaLangBaseVisitor<Result> : AbstractParseTreeVisitor<Res
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitNumberExpression([NotNull] ModsaLangParser.NumberExpressionContext context) { return VisitChildren(context); }
+	public virtual Result VisitCircleEx([NotNull] ModsaLangParser.CircleExContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by the <c>VariableExpression</c>
+	/// Visit a parse tree produced by the <c>FunctionEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
@@ -99,9 +99,9 @@ public partial class ModsaLangBaseVisitor<Result> : AbstractParseTreeVisitor<Res
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitVariableExpression([NotNull] ModsaLangParser.VariableExpressionContext context) { return VisitChildren(context); }
+	public virtual Result VisitFunctionEx([NotNull] ModsaLangParser.FunctionExContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by the <c>MulDivExpression</c>
+	/// Visit a parse tree produced by the <c>MathEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
@@ -110,6 +110,17 @@ public partial class ModsaLangBaseVisitor<Result> : AbstractParseTreeVisitor<Res
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitMulDivExpression([NotNull] ModsaLangParser.MulDivExpressionContext context) { return VisitChildren(context); }
+	public virtual Result VisitMathEx([NotNull] ModsaLangParser.MathExContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by the <c>ModvalEx</c>
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitModvalEx([NotNull] ModsaLangParser.ModvalExContext context) { return VisitChildren(context); }
 }
 } // namespace ModsaLang

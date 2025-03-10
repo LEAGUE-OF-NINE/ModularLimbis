@@ -37,7 +37,8 @@ public partial class ModsaLangParser : Parser {
 	protected static DFA[] decisionToDFA;
 	protected static PredictionContextCache sharedContextCache = new PredictionContextCache();
 	public const int
-		T__0=1, T__1=2, ID=3, NUMBER=4, WS=5, MUL=6, DIV=7, ADD=8, SUB=9;
+		T__0=1, T__1=2, MODVAL=3, ID=4, NUMBER=5, WS=6, ADD=7, SUB=8, MUL=9, DIV=10, 
+		MAX=11, MIN=12;
 	public const int
 		RULE_program = 0, RULE_expression = 1;
 	public static readonly string[] ruleNames = {
@@ -45,10 +46,12 @@ public partial class ModsaLangParser : Parser {
 	};
 
 	private static readonly string[] _LiteralNames = {
-		null, "'('", "')'", null, null, null, "'*'", "'/'", "'+'", "'-'"
+		null, "'('", "')'", null, null, null, null, "'+'", "'-'", "'*'", "'/'", 
+		"'\\u00A1'", "'!'"
 	};
 	private static readonly string[] _SymbolicNames = {
-		null, null, null, "ID", "NUMBER", "WS", "MUL", "DIV", "ADD", "SUB"
+		null, null, null, "MODVAL", "ID", "NUMBER", "WS", "ADD", "SUB", "MUL", 
+		"DIV", "MAX", "MIN"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -146,7 +149,115 @@ public partial class ModsaLangParser : Parser {
 			base.CopyFrom(context);
 		}
 	}
-	public partial class AddSubExpressionContext : ExpressionContext {
+	public partial class VariableExContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode ID() { return GetToken(ModsaLangParser.ID, 0); }
+		public VariableExContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			IModsaLangListener typedListener = listener as IModsaLangListener;
+			if (typedListener != null) typedListener.EnterVariableEx(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			IModsaLangListener typedListener = listener as IModsaLangListener;
+			if (typedListener != null) typedListener.ExitVariableEx(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IModsaLangVisitor<TResult> typedVisitor = visitor as IModsaLangVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitVariableEx(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class SetModvalExContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode MODVAL() { return GetToken(ModsaLangParser.MODVAL, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
+			return GetRuleContext<ExpressionContext>(0);
+		}
+		public SetModvalExContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			IModsaLangListener typedListener = listener as IModsaLangListener;
+			if (typedListener != null) typedListener.EnterSetModvalEx(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			IModsaLangListener typedListener = listener as IModsaLangListener;
+			if (typedListener != null) typedListener.ExitSetModvalEx(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IModsaLangVisitor<TResult> typedVisitor = visitor as IModsaLangVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitSetModvalEx(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class NumberExContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode NUMBER() { return GetToken(ModsaLangParser.NUMBER, 0); }
+		public NumberExContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			IModsaLangListener typedListener = listener as IModsaLangListener;
+			if (typedListener != null) typedListener.EnterNumberEx(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			IModsaLangListener typedListener = listener as IModsaLangListener;
+			if (typedListener != null) typedListener.ExitNumberEx(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IModsaLangVisitor<TResult> typedVisitor = visitor as IModsaLangVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitNumberEx(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class CircleExContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
+			return GetRuleContext<ExpressionContext>(0);
+		}
+		public CircleExContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			IModsaLangListener typedListener = listener as IModsaLangListener;
+			if (typedListener != null) typedListener.EnterCircleEx(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			IModsaLangListener typedListener = listener as IModsaLangListener;
+			if (typedListener != null) typedListener.ExitCircleEx(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IModsaLangVisitor<TResult> typedVisitor = visitor as IModsaLangVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitCircleEx(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class FunctionExContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode ID() { return GetToken(ModsaLangParser.ID, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
+			return GetRuleContext<ExpressionContext>(0);
+		}
+		public FunctionExContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			IModsaLangListener typedListener = listener as IModsaLangListener;
+			if (typedListener != null) typedListener.EnterFunctionEx(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			IModsaLangListener typedListener = listener as IModsaLangListener;
+			if (typedListener != null) typedListener.ExitFunctionEx(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IModsaLangVisitor<TResult> typedVisitor = visitor as IModsaLangVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitFunctionEx(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class MathExContext : ExpressionContext {
 		public IToken op;
 		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
 			return GetRuleContexts<ExpressionContext>();
@@ -156,134 +267,45 @@ public partial class ModsaLangParser : Parser {
 		}
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode ADD() { return GetToken(ModsaLangParser.ADD, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode SUB() { return GetToken(ModsaLangParser.SUB, 0); }
-		public AddSubExpressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			IModsaLangListener typedListener = listener as IModsaLangListener;
-			if (typedListener != null) typedListener.EnterAddSubExpression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			IModsaLangListener typedListener = listener as IModsaLangListener;
-			if (typedListener != null) typedListener.ExitAddSubExpression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IModsaLangVisitor<TResult> typedVisitor = visitor as IModsaLangVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitAddSubExpression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class FunctionExpressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode ID() { return GetToken(ModsaLangParser.ID, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
-			return GetRuleContext<ExpressionContext>(0);
-		}
-		public FunctionExpressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			IModsaLangListener typedListener = listener as IModsaLangListener;
-			if (typedListener != null) typedListener.EnterFunctionExpression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			IModsaLangListener typedListener = listener as IModsaLangListener;
-			if (typedListener != null) typedListener.ExitFunctionExpression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IModsaLangVisitor<TResult> typedVisitor = visitor as IModsaLangVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitFunctionExpression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class ParenExpressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
-			return GetRuleContext<ExpressionContext>(0);
-		}
-		public ParenExpressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			IModsaLangListener typedListener = listener as IModsaLangListener;
-			if (typedListener != null) typedListener.EnterParenExpression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			IModsaLangListener typedListener = listener as IModsaLangListener;
-			if (typedListener != null) typedListener.ExitParenExpression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IModsaLangVisitor<TResult> typedVisitor = visitor as IModsaLangVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitParenExpression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class NumberExpressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode NUMBER() { return GetToken(ModsaLangParser.NUMBER, 0); }
-		public NumberExpressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			IModsaLangListener typedListener = listener as IModsaLangListener;
-			if (typedListener != null) typedListener.EnterNumberExpression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			IModsaLangListener typedListener = listener as IModsaLangListener;
-			if (typedListener != null) typedListener.ExitNumberExpression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IModsaLangVisitor<TResult> typedVisitor = visitor as IModsaLangVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitNumberExpression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class VariableExpressionContext : ExpressionContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode ID() { return GetToken(ModsaLangParser.ID, 0); }
-		public VariableExpressionContext(ExpressionContext context) { CopyFrom(context); }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			IModsaLangListener typedListener = listener as IModsaLangListener;
-			if (typedListener != null) typedListener.EnterVariableExpression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			IModsaLangListener typedListener = listener as IModsaLangListener;
-			if (typedListener != null) typedListener.ExitVariableExpression(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
-			IModsaLangVisitor<TResult> typedVisitor = visitor as IModsaLangVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitVariableExpression(this);
-			else return visitor.VisitChildren(this);
-		}
-	}
-	public partial class MulDivExpressionContext : ExpressionContext {
-		public IToken op;
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext[] expression() {
-			return GetRuleContexts<ExpressionContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression(int i) {
-			return GetRuleContext<ExpressionContext>(i);
-		}
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode MUL() { return GetToken(ModsaLangParser.MUL, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode DIV() { return GetToken(ModsaLangParser.DIV, 0); }
-		public MulDivExpressionContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode MAX() { return GetToken(ModsaLangParser.MAX, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode MIN() { return GetToken(ModsaLangParser.MIN, 0); }
+		public MathExContext(ExpressionContext context) { CopyFrom(context); }
 		[System.Diagnostics.DebuggerNonUserCode]
 		public override void EnterRule(IParseTreeListener listener) {
 			IModsaLangListener typedListener = listener as IModsaLangListener;
-			if (typedListener != null) typedListener.EnterMulDivExpression(this);
+			if (typedListener != null) typedListener.EnterMathEx(this);
 		}
 		[System.Diagnostics.DebuggerNonUserCode]
 		public override void ExitRule(IParseTreeListener listener) {
 			IModsaLangListener typedListener = listener as IModsaLangListener;
-			if (typedListener != null) typedListener.ExitMulDivExpression(this);
+			if (typedListener != null) typedListener.ExitMathEx(this);
 		}
 		[System.Diagnostics.DebuggerNonUserCode]
 		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
 			IModsaLangVisitor<TResult> typedVisitor = visitor as IModsaLangVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitMulDivExpression(this);
+			if (typedVisitor != null) return typedVisitor.VisitMathEx(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class ModvalExContext : ExpressionContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode MODVAL() { return GetToken(ModsaLangParser.MODVAL, 0); }
+		public ModvalExContext(ExpressionContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			IModsaLangListener typedListener = listener as IModsaLangListener;
+			if (typedListener != null) typedListener.EnterModvalEx(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			IModsaLangListener typedListener = listener as IModsaLangListener;
+			if (typedListener != null) typedListener.ExitModvalEx(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IModsaLangVisitor<TResult> typedVisitor = visitor as IModsaLangVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitModvalEx(this);
 			else return visitor.VisitChildren(this);
 		}
 	}
@@ -305,12 +327,12 @@ public partial class ModsaLangParser : Parser {
 			int _alt;
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 19;
+			State = 25;
 			ErrorHandler.Sync(this);
 			switch ( Interpreter.AdaptivePredict(TokenStream,0,Context) ) {
 			case 1:
 				{
-				_localctx = new ParenExpressionContext(_localctx);
+				_localctx = new CircleExContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
 
@@ -324,11 +346,11 @@ public partial class ModsaLangParser : Parser {
 				break;
 			case 2:
 				{
-				_localctx = new FunctionExpressionContext(_localctx);
+				_localctx = new SetModvalExContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
 				State = 12;
-				Match(ID);
+				Match(MODVAL);
 				State = 13;
 				Match(T__0);
 				State = 14;
@@ -339,82 +361,80 @@ public partial class ModsaLangParser : Parser {
 				break;
 			case 3:
 				{
-				_localctx = new NumberExpressionContext(_localctx);
+				_localctx = new FunctionExContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
 				State = 17;
-				Match(NUMBER);
+				Match(ID);
+				State = 18;
+				Match(T__0);
+				State = 19;
+				expression(0);
+				State = 20;
+				Match(T__1);
 				}
 				break;
 			case 4:
 				{
-				_localctx = new VariableExpressionContext(_localctx);
+				_localctx = new NumberExContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 18;
+				State = 22;
+				Match(NUMBER);
+				}
+				break;
+			case 5:
+				{
+				_localctx = new ModvalExContext(_localctx);
+				Context = _localctx;
+				_prevctx = _localctx;
+				State = 23;
+				Match(MODVAL);
+				}
+				break;
+			case 6:
+				{
+				_localctx = new VariableExContext(_localctx);
+				Context = _localctx;
+				_prevctx = _localctx;
+				State = 24;
 				Match(ID);
 				}
 				break;
 			}
 			Context.Stop = TokenStream.LT(-1);
-			State = 29;
+			State = 32;
 			ErrorHandler.Sync(this);
-			_alt = Interpreter.AdaptivePredict(TokenStream,2,Context);
+			_alt = Interpreter.AdaptivePredict(TokenStream,1,Context);
 			while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( ParseListeners!=null )
 						TriggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
+					{
+					_localctx = new MathExContext(new ExpressionContext(_parentctx, _parentState));
+					PushNewRecursionContext(_localctx, _startState, RULE_expression);
 					State = 27;
-					ErrorHandler.Sync(this);
-					switch ( Interpreter.AdaptivePredict(TokenStream,1,Context) ) {
-					case 1:
-						{
-						_localctx = new MulDivExpressionContext(new ExpressionContext(_parentctx, _parentState));
-						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 21;
-						if (!(Precpred(Context, 5))) throw new FailedPredicateException(this, "Precpred(Context, 5)");
-						State = 22;
-						((MulDivExpressionContext)_localctx).op = TokenStream.LT(1);
-						_la = TokenStream.LA(1);
-						if ( !(_la==MUL || _la==DIV) ) {
-							((MulDivExpressionContext)_localctx).op = ErrorHandler.RecoverInline(this);
-						}
-						else {
-							ErrorHandler.ReportMatch(this);
-						    Consume();
-						}
-						State = 23;
-						expression(6);
-						}
-						break;
-					case 2:
-						{
-						_localctx = new AddSubExpressionContext(new ExpressionContext(_parentctx, _parentState));
-						PushNewRecursionContext(_localctx, _startState, RULE_expression);
-						State = 24;
-						if (!(Precpred(Context, 4))) throw new FailedPredicateException(this, "Precpred(Context, 4)");
-						State = 25;
-						((AddSubExpressionContext)_localctx).op = TokenStream.LT(1);
-						_la = TokenStream.LA(1);
-						if ( !(_la==ADD || _la==SUB) ) {
-							((AddSubExpressionContext)_localctx).op = ErrorHandler.RecoverInline(this);
-						}
-						else {
-							ErrorHandler.ReportMatch(this);
-						    Consume();
-						}
-						State = 26;
-						expression(5);
-						}
-						break;
+					if (!(Precpred(Context, 6))) throw new FailedPredicateException(this, "Precpred(Context, 6)");
+					State = 28;
+					((MathExContext)_localctx).op = TokenStream.LT(1);
+					_la = TokenStream.LA(1);
+					if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 8064L) != 0)) ) {
+						((MathExContext)_localctx).op = ErrorHandler.RecoverInline(this);
+					}
+					else {
+						ErrorHandler.ReportMatch(this);
+					    Consume();
+					}
+					State = 29;
+					expression(7);
 					}
 					} 
 				}
-				State = 31;
+				State = 34;
 				ErrorHandler.Sync(this);
-				_alt = Interpreter.AdaptivePredict(TokenStream,2,Context);
+				_alt = Interpreter.AdaptivePredict(TokenStream,1,Context);
 			}
 			}
 		}
@@ -437,23 +457,23 @@ public partial class ModsaLangParser : Parser {
 	}
 	private bool expression_sempred(ExpressionContext _localctx, int predIndex) {
 		switch (predIndex) {
-		case 0: return Precpred(Context, 5);
-		case 1: return Precpred(Context, 4);
+		case 0: return Precpred(Context, 6);
 		}
 		return true;
 	}
 
 	private static int[] _serializedATN = {
-		4,1,9,33,2,0,7,0,2,1,7,1,1,0,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-		1,1,1,1,1,1,1,3,1,20,8,1,1,1,1,1,1,1,1,1,1,1,1,1,5,1,28,8,1,10,1,12,1,
-		31,9,1,1,1,0,1,2,2,0,2,0,2,1,0,6,7,1,0,8,9,35,0,4,1,0,0,0,2,19,1,0,0,0,
-		4,5,3,2,1,0,5,6,5,0,0,1,6,1,1,0,0,0,7,8,6,1,-1,0,8,9,5,1,0,0,9,10,3,2,
-		1,0,10,11,5,2,0,0,11,20,1,0,0,0,12,13,5,3,0,0,13,14,5,1,0,0,14,15,3,2,
-		1,0,15,16,5,2,0,0,16,20,1,0,0,0,17,20,5,4,0,0,18,20,5,3,0,0,19,7,1,0,0,
-		0,19,12,1,0,0,0,19,17,1,0,0,0,19,18,1,0,0,0,20,29,1,0,0,0,21,22,10,5,0,
-		0,22,23,7,0,0,0,23,28,3,2,1,6,24,25,10,4,0,0,25,26,7,1,0,0,26,28,3,2,1,
-		5,27,21,1,0,0,0,27,24,1,0,0,0,28,31,1,0,0,0,29,27,1,0,0,0,29,30,1,0,0,
-		0,30,3,1,0,0,0,31,29,1,0,0,0,3,19,27,29
+		4,1,12,36,2,0,7,0,2,1,7,1,1,0,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+		1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,26,8,1,1,1,1,1,1,1,5,1,31,
+		8,1,10,1,12,1,34,9,1,1,1,0,1,2,2,0,2,0,1,1,0,7,12,39,0,4,1,0,0,0,2,25,
+		1,0,0,0,4,5,3,2,1,0,5,6,5,0,0,1,6,1,1,0,0,0,7,8,6,1,-1,0,8,9,5,1,0,0,9,
+		10,3,2,1,0,10,11,5,2,0,0,11,26,1,0,0,0,12,13,5,3,0,0,13,14,5,1,0,0,14,
+		15,3,2,1,0,15,16,5,2,0,0,16,26,1,0,0,0,17,18,5,4,0,0,18,19,5,1,0,0,19,
+		20,3,2,1,0,20,21,5,2,0,0,21,26,1,0,0,0,22,26,5,5,0,0,23,26,5,3,0,0,24,
+		26,5,4,0,0,25,7,1,0,0,0,25,12,1,0,0,0,25,17,1,0,0,0,25,22,1,0,0,0,25,23,
+		1,0,0,0,25,24,1,0,0,0,26,32,1,0,0,0,27,28,10,6,0,0,28,29,7,0,0,0,29,31,
+		3,2,1,7,30,27,1,0,0,0,31,34,1,0,0,0,32,30,1,0,0,0,32,33,1,0,0,0,33,3,1,
+		0,0,0,34,32,1,0,0,0,2,25,32
 	};
 
 	public static readonly ATN _ATN =

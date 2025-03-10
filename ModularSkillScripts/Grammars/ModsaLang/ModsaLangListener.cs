@@ -42,76 +42,88 @@ public interface IModsaLangListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitProgram([NotNull] ModsaLangParser.ProgramContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>AddSubExpression</c>
+	/// Enter a parse tree produced by the <c>VariableEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterAddSubExpression([NotNull] ModsaLangParser.AddSubExpressionContext context);
+	void EnterVariableEx([NotNull] ModsaLangParser.VariableExContext context);
 	/// <summary>
-	/// Exit a parse tree produced by the <c>AddSubExpression</c>
+	/// Exit a parse tree produced by the <c>VariableEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitAddSubExpression([NotNull] ModsaLangParser.AddSubExpressionContext context);
+	void ExitVariableEx([NotNull] ModsaLangParser.VariableExContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>FunctionExpression</c>
+	/// Enter a parse tree produced by the <c>SetModvalEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterFunctionExpression([NotNull] ModsaLangParser.FunctionExpressionContext context);
+	void EnterSetModvalEx([NotNull] ModsaLangParser.SetModvalExContext context);
 	/// <summary>
-	/// Exit a parse tree produced by the <c>FunctionExpression</c>
+	/// Exit a parse tree produced by the <c>SetModvalEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitFunctionExpression([NotNull] ModsaLangParser.FunctionExpressionContext context);
+	void ExitSetModvalEx([NotNull] ModsaLangParser.SetModvalExContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>ParenExpression</c>
+	/// Enter a parse tree produced by the <c>NumberEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterParenExpression([NotNull] ModsaLangParser.ParenExpressionContext context);
+	void EnterNumberEx([NotNull] ModsaLangParser.NumberExContext context);
 	/// <summary>
-	/// Exit a parse tree produced by the <c>ParenExpression</c>
+	/// Exit a parse tree produced by the <c>NumberEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitParenExpression([NotNull] ModsaLangParser.ParenExpressionContext context);
+	void ExitNumberEx([NotNull] ModsaLangParser.NumberExContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>NumberExpression</c>
+	/// Enter a parse tree produced by the <c>CircleEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterNumberExpression([NotNull] ModsaLangParser.NumberExpressionContext context);
+	void EnterCircleEx([NotNull] ModsaLangParser.CircleExContext context);
 	/// <summary>
-	/// Exit a parse tree produced by the <c>NumberExpression</c>
+	/// Exit a parse tree produced by the <c>CircleEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitNumberExpression([NotNull] ModsaLangParser.NumberExpressionContext context);
+	void ExitCircleEx([NotNull] ModsaLangParser.CircleExContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>VariableExpression</c>
+	/// Enter a parse tree produced by the <c>FunctionEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterVariableExpression([NotNull] ModsaLangParser.VariableExpressionContext context);
+	void EnterFunctionEx([NotNull] ModsaLangParser.FunctionExContext context);
 	/// <summary>
-	/// Exit a parse tree produced by the <c>VariableExpression</c>
+	/// Exit a parse tree produced by the <c>FunctionEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitVariableExpression([NotNull] ModsaLangParser.VariableExpressionContext context);
+	void ExitFunctionEx([NotNull] ModsaLangParser.FunctionExContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>MulDivExpression</c>
+	/// Enter a parse tree produced by the <c>MathEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterMulDivExpression([NotNull] ModsaLangParser.MulDivExpressionContext context);
+	void EnterMathEx([NotNull] ModsaLangParser.MathExContext context);
 	/// <summary>
-	/// Exit a parse tree produced by the <c>MulDivExpression</c>
+	/// Exit a parse tree produced by the <c>MathEx</c>
 	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitMulDivExpression([NotNull] ModsaLangParser.MulDivExpressionContext context);
+	void ExitMathEx([NotNull] ModsaLangParser.MathExContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>ModvalEx</c>
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterModvalEx([NotNull] ModsaLangParser.ModvalExContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>ModvalEx</c>
+	/// labeled alternative in <see cref="ModsaLangParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitModvalEx([NotNull] ModsaLangParser.ModvalExContext context);
 }
 } // namespace ModsaLang

@@ -1151,6 +1151,17 @@ namespace ModularSkillScripts
 				modsa.Enact(__instance, 20, timing);
 			}
 		}
+		
+		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnDiscarded))]
+		[HarmonyPostfix]
+		private static void Postfix_SkillModel_OnDiscarded(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance) {
+			long skillmodel_intlong = __instance.Pointer.ToInt64();
+			foreach (ModularSA modsa in modsaglobal_list) {
+				if (skillmodel_intlong != modsa.ptr_intlong) continue;
+				modsa.modsa_selfAction = action;
+				modsa.Enact(__instance, 24, timing);
+			}
+		}
 
 		// SKILLMODEL UP TO HERE
 		// SKILLMODEL UP TO HERE
