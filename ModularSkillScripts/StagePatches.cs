@@ -50,35 +50,35 @@ namespace ModularSkillScripts
 			int round = __instance.GetCurrentRound();
 			MainClass.Logg.LogInfo("Postfix_StageController_StartRound | Round: " + round);
 
-			int amount_before = SkillScriptInitPatch.modsaglobal_list.Count;
+			int amount_before = SkillScriptInitPatch.modsaDict.Count;
 			int duplicate_bad = 0;
 			int duplicate_good = 0;
-
-			List<ModularSA> goodOnes = new List<ModularSA>(amount_before);
-			foreach (ModularSA modsa in SkillScriptInitPatch.modsaglobal_list)
-			{
-				int deathTime = 5;
-				if (modsa.modsa_skillModel != null && modsa.modsa_skillModel.IsEgoSkill()) deathTime = 2;
-				if (modsa.interactionTimer < deathTime && !modsa.markedForDeath)
+			
+			List<long> badones = new List<long>();
+			
+			foreach (long key in SkillScriptInitPatch.modsaDict.Keys) {
+				List<ModularSA> value = SkillScriptInitPatch.modsaDict[key];
+				foreach (ModularSA modsa in value)
 				{
-					modsa.interactionTimer += 1;
-					goodOnes.Add(modsa);
-					if (modsa.modsa_skillModel != null)
-					{
-						if (modsa.modsa_skillModel.IsEgoSkill()) duplicate_good += 1;
+					int deathTime = 5;
+					if (modsa.modsa_skillModel != null && modsa.modsa_skillModel.IsEgoSkill()) deathTime = 2;
+					if (modsa.interactionTimer < deathTime && !modsa.markedForDeath) {
+						modsa.interactionTimer += 1;
+						if (deathTime == 2) duplicate_good += 1;
 					}
-				}
-				else
-				{
-					if (modsa.modsa_skillModel != null)
-					{
-						if (modsa.modsa_skillModel.IsEgoSkill()) duplicate_bad += 1;
+					else {
+						if (deathTime == 2) duplicate_bad += 1;
+						if (!badones.Contains(key)) badones.Add(key);
 					}
-					modsa.EraseAllData();
 				}
 			}
-			SkillScriptInitPatch.modsaglobal_list = goodOnes;
-			int amount_after = SkillScriptInitPatch.modsaglobal_list.Count;
+
+			foreach (long ptr in badones) {
+				foreach (ModularSA modsa in SkillScriptInitPatch.modsaDict[ptr]) modsa.EraseAllData();
+				SkillScriptInitPatch.modsaDict[ptr].Clear();
+				SkillScriptInitPatch.modsaDict.Remove(ptr);
+			}
+			int amount_after = SkillScriptInitPatch.modsaDict.Count;
 				
 			MainClass.Logg.LogInfo("Modsa cleanup before: " + amount_before + " - after: " + amount_after);
 			MainClass.Logg.LogInfo("Modsa EGO removed: " + duplicate_bad + " - EGO kept: " + duplicate_good);

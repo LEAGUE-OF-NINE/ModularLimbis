@@ -79,7 +79,7 @@ namespace ModularSkillScripts
 		//public static ModsaEvaluator modsaEval = null;
 		public static Dictionary<string, int> timingDict = new();
 		
-		public static bool fakepowerEnabled = false;
+		public static bool fakepowerEnabled = true;
 
 		public static Random rng = new Random();
 
@@ -89,7 +89,7 @@ namespace ModularSkillScripts
 
 		public const string NAME = "ModularSkillScripts";
 
-		public const string VERSION = "2.3.0";
+		public const string VERSION = "2.3.2";
 
 		public const string AUTHOR = "GlitchGames";
 

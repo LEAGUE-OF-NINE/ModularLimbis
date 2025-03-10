@@ -7,7 +7,6 @@ namespace ModularSkillScripts
 {
 	internal class UniquePatches
 	{
-
 		[HarmonyPatch(typeof(NewOperationController), nameof(NewOperationController.EquipDefense))]
 		[HarmonyPrefix]
 		private static bool Postfix_NewOperationController_EquipDefense(bool equiped, SinActionModel sinAction)
@@ -61,8 +60,8 @@ namespace ModularSkillScripts
 			{
 				unitView.RefreshAppearanceRenderer(true);
 			}
-			
-			
+
+
 			return false;
 		}
 	}

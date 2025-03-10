@@ -41,13 +41,8 @@ namespace ModularSkillScripts
 				modsa.ptr_intlong = ptr;
 
 				modsa.SetupModular(abilityScriptname.Remove(0, 8));
-				if (Input.GetKeyInt(BepInEx.IL2CPP.UnityEngine.KeyCode.LeftControl)) MainClass.Logg.LogInfo("modSkillAbility init: " + abilityScriptname);
-				modsaglobal_list.Add(modsa);
-				if (modsaDict.ContainsKey(ptr)) modsaDict[ptr].Add(modsa);
-				else {
-					modsaDict.Add(ptr, new List<ModularSA>());
-					modsaDict[ptr].Add(modsa);
-				}
+				if (!modsaDict.ContainsKey(ptr)) modsaDict.Add(ptr, new List<ModularSA>());
+				modsaDict[ptr].Add(modsa);
 			}
 		}
 		
@@ -159,9 +154,9 @@ namespace ModularSkillScripts
 			}
 		}
 
-		public static void ResetAllModsa()
-		{
-			foreach (List<ModularSA> value in modsaDict._values) {
+		public static void ResetAllModsa() {
+			foreach (long key in modsaDict.Keys) {
+				List<ModularSA> value = modsaDict[key];
 				foreach (ModularSA modular in value) modular.EraseAllData();
 				value.Clear();
 			}
@@ -170,7 +165,6 @@ namespace ModularSkillScripts
 			foreach (ModularSA modular in modpa_list) { modular.EraseAllData(); }
 			foreach (ModularSA modular in modca_list) { modular.EraseAllData(); }
 
-			modsaglobal_list.Clear();
 			modpa_list.Clear();
 			modca_list.Clear();
 			unitMod_list.Clear();
@@ -178,11 +172,10 @@ namespace ModularSkillScripts
 		}
 
 		public static Dictionary<long, List<ModularSA>> modsaDict = new();
-		public static List<ModularSA> modsaglobal_list = new List<ModularSA>();
-		public static List<ModularSA> modpa_list = new List<ModularSA>();
-		public static List<ModularSA> modca_list = new List<ModularSA>();
-		public static List<ModUnitData> unitMod_list = new List<ModUnitData>();
-		public static List<long> skillPtrsRoundStart = new List<long>();
+		public static List<ModularSA> modpa_list = new ();
+		public static List<ModularSA> modca_list = new ();
+		public static List<ModUnitData> unitMod_list = new ();
+		public static List<long> skillPtrsRoundStart = new ();
 
 
 		// REAL PATCHES START HERE
@@ -216,10 +209,8 @@ namespace ModularSkillScripts
 					if (skillModel == null) continue;
 					long skillmodel_intlong = skillModel.Pointer.ToInt64();
 
-					//if (!skillPtrsRoundStart.Contains(skillmodel_intlong)) continue;
-					foreach (ModularSA modsa in modsaglobal_list)
-					{
-						if (skillmodel_intlong != modsa.ptr_intlong) continue;
+					if (!modsaDict.ContainsKey(skillmodel_intlong)) continue;
+					foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 						//MainClass.Logg.LogInfo("Found modsa - RoundStart");
 						modsa.modsa_unitModel = __instance._owner;
 						modsa.Enact(skillModel, -1, timing);
@@ -767,16 +758,17 @@ namespace ModularSkillScripts
 		private static void Postfix_SkillModel_GetCoinScaleAdder(BattleActionModel action, ref int __result, SkillModel __instance)
 		{
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (modsa.activationTiming == 10) continue;
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
-				int power = modsa.coinScaleAdder;
-				if (Input.GetKeyInt(BepInEx.IL2CPP.UnityEngine.KeyCode.LeftControl)) MainClass.Logg.LogInfo("Found modsa - coin scale adder: " + power);
-				__result += power;
+			if (modsaDict.ContainsKey(skillmodel_intlong)) {
+				foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+					if (modsa.activationTiming == 10) continue;
+					int power = modsa.coinScaleAdder;
+					if (Input.GetKeyInt(BepInEx.IL2CPP.UnityEngine.KeyCode.LeftControl))
+						MainClass.Logg.LogInfo("Found modsa - coin scale adder: " + power);
+					__result += power;
+				}
 			}
-			foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList)
-			{
+			
+			foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList) {
 				long passivemodel_intlong = passiveModel.Pointer.ToInt64();
 				foreach (ModularSA modpa in modpa_list)
 				{
@@ -790,22 +782,20 @@ namespace ModularSkillScripts
 		}
 		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetSkillPowerAdder))]
 		[HarmonyPostfix]
-		private static void Postfix_SkillModel_GetSkillPowerAdder(BattleActionModel action, ref int __result, SkillModel __instance)
-		{
+		private static void Postfix_SkillModel_GetSkillPowerAdder(BattleActionModel action, ref int __result, SkillModel __instance) {
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (modsa.activationTiming == 10) continue;
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
-				int power = modsa.skillPowerAdder;
-				if (power != 0) MainClass.Logg.LogInfo("Found modsa - base power adder: " + power);
-				__result += power;
+			if (modsaDict.ContainsKey(skillmodel_intlong)) {
+				foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+					if (modsa.activationTiming == 10) continue;
+					int power = modsa.skillPowerAdder;
+					if (power != 0) MainClass.Logg.LogInfo("Found modsa - base power adder: " + power);
+					__result += power;
+				}
 			}
-			foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList)
-			{
+			
+			foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList) {
 				long passivemodel_intlong = passiveModel.Pointer.ToInt64();
-				foreach (ModularSA modpa in modpa_list)
-				{
+				foreach (ModularSA modpa in modpa_list) {
 					if (modpa.activationTiming == 10) continue;
 					if (passivemodel_intlong != modpa.ptr_intlong) continue;
 					int power = modpa.skillPowerAdder;
@@ -819,19 +809,18 @@ namespace ModularSkillScripts
 		private static void Postfix_SkillModel_GetSkillPowerResultAdder(BattleActionModel action, ref int __result, SkillModel __instance)
 		{
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (modsa.activationTiming == 10) continue;
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
-				int power = modsa.skillPowerResultAdder;
-				if (power != 0) MainClass.Logg.LogInfo("Found modsa - final power adder: " + power);
-				__result += power;
+			if (modsaDict.ContainsKey(skillmodel_intlong)) {
+				foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+					if (modsa.activationTiming == 10) continue;
+					int power = modsa.skillPowerResultAdder;
+					if (power != 0) MainClass.Logg.LogInfo("Found modsa - final power adder: " + power);
+					__result += power;
+				}
 			}
-			foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList)
-			{
+
+			foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList) {
 				long passivemodel_intlong = passiveModel.Pointer.ToInt64();
-				foreach (ModularSA modpa in modpa_list)
-				{
+				foreach (ModularSA modpa in modpa_list) {
 					if (modpa.activationTiming == 10) continue;
 					if (passivemodel_intlong != modpa.ptr_intlong) continue;
 					int power = modpa.skillPowerResultAdder;
@@ -845,19 +834,18 @@ namespace ModularSkillScripts
 		private static void Postfix_SkillModel_GetParryingResultAdder(BattleActionModel actorAction, ref int __result, SkillModel __instance)
 		{
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (modsa.activationTiming == 10) continue;
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
-				int power = modsa.parryingResultAdder;
-				if (power != 0) MainClass.Logg.LogInfo("Found modsa - clash power adder: " + power);
-				__result += power;
+			if (modsaDict.ContainsKey(skillmodel_intlong)) {
+				foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+					if (modsa.activationTiming == 10) continue;
+					int power = modsa.parryingResultAdder;
+					if (power != 0) MainClass.Logg.LogInfo("Found modsa - clash power adder: " + power);
+					__result += power;
+				}
 			}
-			foreach (PassiveModel passiveModel in actorAction.Model._passiveDetail.PassiveList)
-			{
+			
+			foreach (PassiveModel passiveModel in actorAction.Model._passiveDetail.PassiveList) {
 				long passivemodel_intlong = passiveModel.Pointer.ToInt64();
-				foreach (ModularSA modpa in modpa_list)
-				{
+				foreach (ModularSA modpa in modpa_list) {
 					if (modpa.activationTiming == 10) continue;
 					if (passivemodel_intlong != modpa.ptr_intlong) continue;
 					int power = modpa.parryingResultAdder;
@@ -871,8 +859,7 @@ namespace ModularSkillScripts
 		private static void Postfix_SkillModel_GetAttackDmgAdder(BattleActionModel action, CoinModel coin, ref int __result, SkillModel __instance)
 		{
 			long coinmodel_intlong = coin.Pointer.ToInt64();
-			foreach (ModularSA modca in modca_list)
-			{
+			foreach (ModularSA modca in modca_list) {
 				if (modca.activationTiming == 10) continue;
 				if (coinmodel_intlong != modca.ptr_intlong) continue;
 				int power = modca.atkDmgAdder;
@@ -881,17 +868,16 @@ namespace ModularSkillScripts
 					__result += power;
 				}
 			}
+			
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (modsa.activationTiming == 10) continue;
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
-				int power = modsa.atkDmgAdder;
-				if (power != 0)
-				{
-					__result += power;
+			if (modsaDict.ContainsKey(skillmodel_intlong)) {
+				foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+					if (modsa.activationTiming == 10) continue;
+					int power = modsa.atkDmgAdder;
+					if (power != 0) __result += power;
 				}
 			}
+
 			foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList)
 			{
 				long passivemodel_intlong = passiveModel.Pointer.ToInt64();
@@ -922,17 +908,16 @@ namespace ModularSkillScripts
 					__result += (float)power * 0.01f;
 				}
 			}
+			
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (modsa.activationTiming == 10) continue;
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
-				int power = modsa.atkMultAdder;
-				if (power != 0)
-				{
-					__result += (float)power * 0.01f;
+			if (modsaDict.ContainsKey(skillmodel_intlong)) {
+				foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+					if (modsa.activationTiming == 10) continue;
+					int power = modsa.atkMultAdder;
+					if (power != 0) __result += (float)power * 0.01f;
 				}
 			}
+
 			foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList)
 			{
 				long passivemodel_intlong = passiveModel.Pointer.ToInt64();
@@ -955,10 +940,8 @@ namespace ModularSkillScripts
 		private static void Postfix_SkillModel_OnBattleStart(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance)
 		{
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
-				MainClass.Logg.LogInfo("Found modsa - battlestart");
+			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				modsa.modsa_selfAction = action;
 				modsa.Enact(__instance, 0, timing);
 			}
@@ -969,13 +952,11 @@ namespace ModularSkillScripts
 		private static void Postfix_SkillModel_OnStartTurnBeforeLog(BattleActionModel action, List<BattleUnitModel> targets, BATTLE_EVENT_TIMING timing, SkillModel __instance)
 		{
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
+			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				// Reset clash modifiers if for some reason this skill is used again
 				if (modsa.activationTiming == 14 || modsa.activationTiming == 15) modsa.ResetAdders();
 				// normal code
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
-				if (Input.GetKeyInt(BepInEx.IL2CPP.UnityEngine.KeyCode.LeftControl)) MainClass.Logg.LogInfo("Found modsa - onuse");
 				modsa.modsa_selfAction = action;
 				modsa.modsa_target_list = targets;
 				modsa.Enact(__instance, 1, timing);
@@ -987,9 +968,8 @@ namespace ModularSkillScripts
 		private static void Postfix_SkillModel_BeforeAttack(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance)
 		{
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
+			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				if (Input.GetKeyInt(BepInEx.IL2CPP.UnityEngine.KeyCode.LeftControl)) MainClass.Logg.LogInfo("Found modsa (but from globallist)");
 				modsa.modsa_selfAction = action;
 				modsa.Enact(__instance, 2, timing);
@@ -1001,12 +981,12 @@ namespace ModularSkillScripts
 		private static void Postfix_SkillModel_OnBeforeParryingOnce(BattleActionModel ownerAction, BattleActionModel oppoAction, SkillModel __instance)
 		{
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
-				modsa.modsa_selfAction = ownerAction;
-				modsa.modsa_oppoAction = oppoAction;
-				modsa.Enact(__instance, 14, BATTLE_EVENT_TIMING.ALL_TIMING);
+			if (modsaDict.ContainsKey(skillmodel_intlong)) {
+				foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+					modsa.modsa_selfAction = ownerAction;
+					modsa.modsa_oppoAction = oppoAction;
+					modsa.Enact(__instance, 14, BATTLE_EVENT_TIMING.ALL_TIMING);
+				}
 			}
 
 			foreach (PassiveModel passiveModel in ownerAction.Model._passiveDetail.PassiveList)
@@ -1030,9 +1010,8 @@ namespace ModularSkillScripts
 		private static void Postfix_SkillModel_OnBeforeParryingOnce_AfterLog(BattleActionModel ownerAction, BattleActionModel oppoAction, SkillModel __instance)
 		{
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
+			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				modsa.modsa_selfAction = ownerAction;
 				modsa.modsa_oppoAction = oppoAction;
 				modsa.Enact(__instance, 15, BATTLE_EVENT_TIMING.ALL_TIMING);
@@ -1044,10 +1023,8 @@ namespace ModularSkillScripts
 		private static void Postfix_SkillModel_OnWinDuel(BattleActionModel selfAction, BattleActionModel oppoAction, BATTLE_EVENT_TIMING timing, int parryingCount, SkillModel __instance)
 		{
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
-				MainClass.Logg.LogInfo("Found modsa (but from globallist)");
+			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				modsa.modsa_selfAction = selfAction;
 				modsa.modsa_oppoAction = oppoAction;
 				modsa.Enact(__instance, 4, timing);
@@ -1058,10 +1035,8 @@ namespace ModularSkillScripts
 		private static void Postfix_SkillModel_OnLoseDuel(BattleActionModel selfAction, BattleActionModel oppoAction, BATTLE_EVENT_TIMING timing, SkillModel __instance)
 		{
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
-				MainClass.Logg.LogInfo("Found modsa (but from globallist)");
+			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				modsa.modsa_selfAction = selfAction;
 				modsa.modsa_oppoAction = oppoAction;
 				modsa.Enact(__instance, 5, timing);
@@ -1070,26 +1045,21 @@ namespace ModularSkillScripts
 
 		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnRoundEnd))]
 		[HarmonyPostfix]
-		private static void Postfix_SkillModel_OnRoundEnd(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance)
-		{
+		private static void Postfix_SkillModel_OnRoundEnd(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance) {
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
+			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				modsa.modsa_selfAction = action;
 				modsa.Enact(__instance, 6, timing);
 			}
-			
 		}
 
 		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnEndTurn))]
 		[HarmonyPostfix]
-		private static void Postfix_SkillModel_OnEndTurn(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance)
-		{
+		private static void Postfix_SkillModel_OnEndTurn(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance) {
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
+			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				modsa.modsa_selfAction = action;
 				modsa.Enact(__instance, 9, timing);
 			}
@@ -1097,12 +1067,10 @@ namespace ModularSkillScripts
 
 		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnSucceedEvade))]
 		[HarmonyPostfix]
-		private static void Postfix_SkillModel_OnSucceedEvade(BattleActionModel attackerAction, BattleActionModel evadeAction, BATTLE_EVENT_TIMING timing, SkillModel __instance)
-		{
+		private static void Postfix_SkillModel_OnSucceedEvade(BattleActionModel attackerAction, BattleActionModel evadeAction, BATTLE_EVENT_TIMING timing, SkillModel __instance) {
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
+			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				modsa.modsa_selfAction = evadeAction;
 				modsa.modsa_oppoAction = attackerAction;
 				modsa.Enact(__instance, 16, timing);
@@ -1110,53 +1078,43 @@ namespace ModularSkillScripts
 		}
 		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnFailedEvade))]
 		[HarmonyPostfix]
-		private static void Postfix_SkillModel_OnFailedEvade(BattleActionModel attackerAction, BattleActionModel evadeAction, BATTLE_EVENT_TIMING timing, SkillModel __instance)
-		{
+		private static void Postfix_SkillModel_OnFailedEvade(BattleActionModel attackerAction, BattleActionModel evadeAction, BATTLE_EVENT_TIMING timing, SkillModel __instance) {
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
+			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				modsa.modsa_selfAction = evadeAction;
 				modsa.modsa_oppoAction = attackerAction;
 				modsa.Enact(__instance, 17, timing);
 			}
 		}
-
-
-
+		
 
 		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnStartBehaviour))]
 		[HarmonyPostfix]
-		private static void Postfix_SkillModel_OnStartBehaviour(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance)
-		{
+		private static void Postfix_SkillModel_OnStartBehaviour(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance) {
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
+			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				modsa.modsa_selfAction = action;
 				modsa.Enact(__instance, 18, timing);
 			}
 		}
 		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.BeforeBehaviour))]
 		[HarmonyPostfix]
-		private static void Postfix_SkillModel_BeforeBehaviour(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance)
-		{
+		private static void Postfix_SkillModel_BeforeBehaviour(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance) {
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
+			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				modsa.modsa_selfAction = action;
 				modsa.Enact(__instance, 19, timing);
 			}
 		}
 		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnEndBehaviour))]
 		[HarmonyPostfix]
-		private static void Postfix_SkillModel_OnEndBehaviour(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance)
-		{
+		private static void Postfix_SkillModel_OnEndBehaviour(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance) {
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
+			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				modsa.modsa_selfAction = action;
 				modsa.Enact(__instance, 20, timing);
 			}
@@ -1166,8 +1124,8 @@ namespace ModularSkillScripts
 		[HarmonyPostfix]
 		private static void Postfix_SkillModel_OnDiscarded(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance) {
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list) {
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
+			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				modsa.modsa_selfAction = action;
 				modsa.Enact(__instance, 24, timing);
 			}
@@ -1196,11 +1154,11 @@ namespace ModularSkillScripts
 			}
 
 			long skillmodel_intlong = __instance.Skill.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
+			if (modsaDict.ContainsKey(skillmodel_intlong)) {
+				foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				modsa.modsa_selfAction = __instance;
 				modsa.Enact(__instance.Skill, 7, timing);
+				}
 			}
 
 			foreach (PassiveModel passiveModel in __instance.Model._passiveDetail.PassiveList)
@@ -1242,11 +1200,11 @@ namespace ModularSkillScripts
 			
 			SkillModel skill = actionOrNull.Skill;
 			long skillmodel_intlong = skill.Pointer.ToInt64();
-			foreach (ModularSA modsa in modsaglobal_list)
-			{
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
-				modsa.modsa_selfAction = actionOrNull;
-				modsa.Enact(skill, 21, timing);
+			if (modsaDict.ContainsKey(skillmodel_intlong)) {
+				foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+					modsa.modsa_selfAction = actionOrNull;
+					modsa.Enact(skill, 21, timing);
+				}
 			}
 
 			foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList)

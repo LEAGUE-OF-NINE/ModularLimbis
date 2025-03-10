@@ -774,7 +774,7 @@ namespace ModularSkillScripts
 						}
 						else coinScaleAdder = GetNumFromParamString(circledSection);
 					}
-					else
+					else if (activationTiming != 10)
 					{
 						int coin_idx = -999;
 						coin_idx = GetNumFromParamString(circles[1]);
