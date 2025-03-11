@@ -8,17 +8,13 @@ namespace ModularSkillScripts
 		[HarmonyPrefix]
 		private static void Postfix_SkillModelManager_GetExpectedWinRate(BattleActionModel selfAction)
 		{
-			foreach (ModularSA modpa in SkillScriptInitPatch.modpa_list)
-			{
-				modpa.ResetAdders();
-			}
+			foreach (ModularSA modpa in SkillScriptInitPatch.modpa_list) modpa.ResetAdders();
 
 			long skillmodel_intlong = selfAction.Skill.Pointer.ToInt64();
 			if (SkillScriptInitPatch.modsaDict.ContainsKey(skillmodel_intlong)) {
 				foreach (ModularSA modsa in SkillScriptInitPatch.modsaDict[skillmodel_intlong]) {
 					if (skillmodel_intlong != modsa.ptr_intlong) continue;
-					modsa.modsa_selfAction = selfAction;
-					modsa.Enact(selfAction.Skill, 10, BATTLE_EVENT_TIMING.NONE);
+					modsa.Enact(selfAction.Model, selfAction.Skill, selfAction, null, 10, BATTLE_EVENT_TIMING.NONE);
 				}
 			}
 
@@ -29,8 +25,7 @@ namespace ModularSkillScripts
 				foreach (ModularSA modpa in SkillScriptInitPatch.modpa_list)
 				{
 					if (passivemodel_intlong != modpa.ptr_intlong) continue;
-					modpa.modsa_selfAction = selfAction;
-					modpa.Enact(selfAction.Skill, 10, BATTLE_EVENT_TIMING.NONE);
+					modpa.Enact(selfAction.Model, selfAction.Skill, selfAction, null, 10, BATTLE_EVENT_TIMING.NONE);
 				}
 			}
 		}

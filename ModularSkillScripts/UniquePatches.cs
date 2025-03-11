@@ -31,8 +31,7 @@ namespace ModularSkillScripts
 							if (passiveModel_intlong != modpa.ptr_intlong) continue;
 							MainClass.Logg.LogInfo("Found modpassive - SPECIAL: " + modpa.passiveID);
 							modpa.modsa_passiveModel = passiveModel;
-							modpa.modsa_unitModel = unit;
-							modpa.Enact(null, 999, BATTLE_EVENT_TIMING.ALL_TIMING);
+							modpa.Enact(passiveModel.Owner, null, null, null, 999, BATTLE_EVENT_TIMING.ALL_TIMING);
 						}
 
 						break;

@@ -156,16 +156,20 @@ namespace ModularSkillScripts
 		private bool _fullStop = false;
 		BATTLE_EVENT_TIMING battleTiming = BATTLE_EVENT_TIMING.NONE;
 
-		public void Enact(SkillModel skillModel_inst, int actevent, BATTLE_EVENT_TIMING timing)
+		public void Enact(BattleUnitModel unitModel, SkillModel skillModel_inst, BattleActionModel selfAction, BattleActionModel oppoAction, int actevent, BATTLE_EVENT_TIMING timing)
 		{
 			interactionTimer = 0;
 			if (activationTiming != actevent) return;
 
+			modsa_unitModel = unitModel;
+			modsa_skillModel = skillModel_inst;
+			modsa_selfAction = selfAction;
+			modsa_oppoAction = oppoAction;
 			battleTiming = timing;
-			if (skillModel_inst != null) modsa_skillModel = skillModel_inst;
+			
 			if (modsa_selfAction != null) {
 				if (modsa_skillModel == null) modsa_skillModel = modsa_selfAction.Skill;
-				modsa_unitModel = modsa_selfAction.Model;
+				if (modsa_unitModel == null) modsa_unitModel = modsa_selfAction.Model;
 			}
 			if (MainClass.logEnabled) MainClass.Logg.LogInfo("activation good");
 

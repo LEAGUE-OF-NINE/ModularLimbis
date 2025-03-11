@@ -187,14 +187,11 @@ namespace ModularSkillScripts
 		{
 			foreach (ModularSA modpa in modpa_list) { modpa.ResetAdders(); }
 
-			foreach (PassiveModel passiveModel in __instance.PassiveList)
-			{
+			foreach (PassiveModel passiveModel in __instance.PassiveList) {
 				if (!passiveModel.CheckActiveCondition()) continue;
 				List<string> requireIDList = passiveModel.ClassInfo.requireIDList;
-				foreach (string param in requireIDList)
-				{
-					if (param.StartsWith("Modular/"))
-					{
+				foreach (string param in requireIDList) {
+					if (param.StartsWith("Modular/")) {
 						passiveModel.OnRoundStart_After_Event(timing);
 						break;
 					}
@@ -212,8 +209,7 @@ namespace ModularSkillScripts
 					if (!modsaDict.ContainsKey(skillmodel_intlong)) continue;
 					foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 						//MainClass.Logg.LogInfo("Found modsa - RoundStart");
-						modsa.modsa_unitModel = __instance._owner;
-						modsa.Enact(skillModel, -1, timing);
+						modsa.Enact(__instance._owner, skillModel, null, null, -1, timing);
 					}
 				}
 			}
@@ -224,16 +220,12 @@ namespace ModularSkillScripts
 		{
 			if (__instance.Owner == null) MainClass.Logg.LogInfo("THE FUCKING PASSIVE OWNER IS NULLLLL");
 			long passiveModel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modpa in modpa_list)
-			{
+			foreach (ModularSA modpa in modpa_list) {
 				if (modpa.passiveID != __instance.ClassInfo.ID) continue;
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
 				modpa.modsa_passiveModel = __instance;
-				modpa.modsa_unitModel = __instance.Owner;
-				modpa.Enact(null, -1, timing);
+				modpa.Enact(__instance.Owner, null, null, null, -1, timing);
 			}
-
-			
 		}
 
 		[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnBattleStart))]
@@ -265,8 +257,7 @@ namespace ModularSkillScripts
 				if (modpa.passiveID != __instance.ClassInfo.ID) continue;
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
 				modpa.modsa_passiveModel = __instance;
-				modpa.modsa_unitModel = __instance.Owner;
-				modpa.Enact(null, 0, timing);
+				modpa.Enact(__instance.Owner, null, null, null, 0, timing);
 			}
 		}
 
@@ -300,8 +291,7 @@ namespace ModularSkillScripts
 				if (modpa.passiveID != __instance.ClassInfo.ID) continue;
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
 				modpa.modsa_passiveModel = __instance;
-				modpa.modsa_unitModel = __instance.Owner;
-				modpa.Enact(null, 6, timing);
+				modpa.Enact(__instance.Owner, null, null, null, 6, timing);
 			}
 		}
 
@@ -336,9 +326,7 @@ namespace ModularSkillScripts
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
 				if (modpa.resetWhenUse) modpa.ResetAdders(); // on-demand power adder reset (used for passives)
 				modpa.modsa_passiveModel = __instance;
-				modpa.modsa_unitModel = __instance.Owner;
-				modpa.modsa_selfAction = action;
-				modpa.Enact(action.Skill, 1, timing);
+				modpa.Enact(__instance.Owner, action.Skill, action, null, 1, timing);
 			}
 		}
 
@@ -371,9 +359,7 @@ namespace ModularSkillScripts
 				if (modpa.passiveID != __instance.ClassInfo.ID) continue;
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
 				modpa.modsa_passiveModel = __instance;
-				modpa.modsa_unitModel = __instance.Owner;
-				modpa.modsa_selfAction = ownerAction;
-				modpa.Enact(ownerAction.Skill, 3, BATTLE_EVENT_TIMING.ON_START_DUEL);
+				modpa.Enact(__instance.Owner, ownerAction.Skill, ownerAction, opponentAction, 3, BATTLE_EVENT_TIMING.ON_START_DUEL);
 			}
 		}
 		[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnWinDuel))]
@@ -404,9 +390,7 @@ namespace ModularSkillScripts
 				if (modpa.passiveID != __instance.ClassInfo.ID) continue;
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
 				modpa.modsa_passiveModel = __instance;
-				modpa.modsa_unitModel = __instance.Owner;
-				modpa.modsa_selfAction = selfAction;
-				modpa.Enact(selfAction.Skill, 4, timing);
+				modpa.Enact(__instance.Owner, selfAction.Skill, selfAction, oppoAction, 4, timing);
 			}
 		}
 		[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnLoseDuel))]
@@ -437,9 +421,7 @@ namespace ModularSkillScripts
 				if (modpa.passiveID != __instance.ClassInfo.ID) continue;
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
 				modpa.modsa_passiveModel = __instance;
-				modpa.modsa_unitModel = __instance.Owner;
-				modpa.modsa_selfAction = selfAction;
-				modpa.Enact(selfAction.Skill, 5, timing);
+				modpa.Enact(__instance.Owner, selfAction.Skill, selfAction, oppoAction, 5, timing);
 			}
 		}
 
@@ -469,9 +451,7 @@ namespace ModularSkillScripts
 				if (modpa.passiveID != __instance.ClassInfo.ID) continue;
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
 				modpa.modsa_passiveModel = __instance;
-				modpa.modsa_unitModel = __instance.Owner;
-				modpa.modsa_selfAction = action;
-				modpa.Enact(action.Skill, 2, timing);
+				modpa.Enact(__instance.Owner, action.Skill, action, null, 2, timing);
 			}
 		}
 
@@ -499,18 +479,14 @@ namespace ModularSkillScripts
 		private static void Postfix_PassiveModel_OnEndTurn(BattleActionModel action, BATTLE_EVENT_TIMING timing, PassiveModel __instance)
 		{
 			long passiveModel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modpa in modpa_list)
-			{
+			foreach (ModularSA modpa in modpa_list) {
 				if (modpa.passiveID != __instance.ClassInfo.ID) continue;
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
-				if (Input.GetKeyInt(BepInEx.IL2CPP.UnityEngine.KeyCode.LeftControl)) MainClass.Logg.LogInfo("Found modpassive - OnEndTurn: " + modpa.passiveID);
+				if (Input.GetKeyInt(KeyCode.LeftControl)) MainClass.Logg.LogInfo("Found modpassive - OnEndTurn: " + modpa.passiveID);
 				modpa.modsa_passiveModel = __instance;
-				modpa.modsa_unitModel = __instance.Owner;
-				modpa.modsa_selfAction = action;
-				modpa.Enact(action.Skill, 9, timing);
+				modpa.Enact(__instance.Owner, action.Skill, action, null, 9, timing);
 			}
 		}
-
 
 
 		[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnEndBehaviour))]
@@ -538,12 +514,9 @@ namespace ModularSkillScripts
 				if (modpa.passiveID != __instance.ClassInfo.ID) continue;
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
 				modpa.modsa_passiveModel = __instance;
-				modpa.modsa_unitModel = __instance.Owner;
-				modpa.modsa_selfAction = action;
-				modpa.Enact(action.Skill, 20, timing);
+				modpa.Enact(__instance.Owner, action.Skill, action, null, 20, timing);
 			}
 		}
-
 
 
 
@@ -574,11 +547,9 @@ namespace ModularSkillScripts
 			{
 				if (modpa.passiveID != __instance.ClassInfo.ID) continue;
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
-				if (Input.GetKeyInt(BepInEx.IL2CPP.UnityEngine.KeyCode.LeftControl)) MainClass.Logg.LogInfo("Found modpassive - OnBeforeDefense: " + modpa.passiveID);
+				if (Input.GetKeyInt(KeyCode.LeftControl)) MainClass.Logg.LogInfo("Found modpassive - OnBeforeDefense: " + modpa.passiveID);
 				modpa.modsa_passiveModel = __instance;
-				modpa.modsa_unitModel = __instance.Owner;
-				modpa.modsa_selfAction = action;
-				modpa.Enact(action.Skill, 11, BATTLE_EVENT_TIMING.NONE);
+				modpa.Enact(action.Model, action.Skill, action, null, 11, BATTLE_EVENT_TIMING.NONE);
 			}
 		}
 
@@ -612,9 +583,8 @@ namespace ModularSkillScripts
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
 				MainClass.Logg.LogInfo("Found modpassive - OnDie: " + modpa.passiveID);
 				modpa.modsa_passiveModel = __instance;
-				modpa.modsa_unitModel = __instance.Owner;
 				modpa.modsa_target_list.Add(killer);
-				modpa.Enact(null, 12, timing);
+				modpa.Enact(__instance.Owner, null, null, null, 12, timing);
 			}
 		}
 
@@ -647,9 +617,8 @@ namespace ModularSkillScripts
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
 				if (Input.GetKeyInt(BepInEx.IL2CPP.UnityEngine.KeyCode.LeftControl)) MainClass.Logg.LogInfo("Found modpassive - OnDieOtherUnit: " + modpa.passiveID);
 				modpa.modsa_passiveModel = __instance;
-				modpa.modsa_unitModel = __instance.Owner;
 				modpa.modsa_target_list.Add(dead);
-				modpa.Enact(null, 13, timing);
+				modpa.Enact(__instance.Owner, null, null, null, 13, timing);
 			}
 		}
 
@@ -707,11 +676,9 @@ namespace ModularSkillScripts
 			{
 				if (modpa.passiveID != __instance.ClassInfo.ID) continue;
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
-				MainClass.Logg.LogInfo("Found modpassive - OnBreak " + modpa.passiveID);
 				modpa.modsa_passiveModel = __instance;
 				modpa.modsa_unitModel = __instance.Owner;
-				modpa.modsa_target_list.Add(__instance.Owner);
-				modpa.Enact(null, 22, timing);
+				modpa.Enact(__instance.Owner, null, null, null, 22, timing);
 			}
 		}
 
@@ -738,15 +705,12 @@ namespace ModularSkillScripts
 		private static void Postfix_PassiveModel_OnBreakOtherUnit(BattleUnitModel breakedUnit, BATTLE_EVENT_TIMING timing, PassiveModel __instance)
 		{
 			long passiveModel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modpa in modpa_list)
-			{
+			foreach (ModularSA modpa in modpa_list) {
 				if (modpa.passiveID != __instance.ClassInfo.ID) continue;
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
-				if (Input.GetKeyInt(BepInEx.IL2CPP.UnityEngine.KeyCode.LeftControl)) MainClass.Logg.LogInfo("Found modpassive - OnBreakOtherUnit: " + modpa.passiveID);
 				modpa.modsa_passiveModel = __instance;
-				modpa.modsa_unitModel = __instance.Owner;
 				modpa.modsa_target_list.Add(breakedUnit);
-				modpa.Enact(null, 23, timing);
+				modpa.Enact(__instance.Owner, null, null, null, 23, timing);
 			}
 		}
 
@@ -942,8 +906,7 @@ namespace ModularSkillScripts
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
 			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				modsa.modsa_selfAction = action;
-				modsa.Enact(__instance, 0, timing);
+				modsa.Enact(action.Model, __instance, action, null, 0, timing);
 			}
 		}
 
@@ -957,9 +920,8 @@ namespace ModularSkillScripts
 				// Reset clash modifiers if for some reason this skill is used again
 				if (modsa.activationTiming == 14 || modsa.activationTiming == 15) modsa.ResetAdders();
 				// normal code
-				modsa.modsa_selfAction = action;
 				modsa.modsa_target_list = targets;
-				modsa.Enact(__instance, 1, timing);
+				modsa.Enact(action.Model, __instance, action, null, 1, timing);
 			}
 		}
 
@@ -970,9 +932,7 @@ namespace ModularSkillScripts
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
 			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				if (Input.GetKeyInt(BepInEx.IL2CPP.UnityEngine.KeyCode.LeftControl)) MainClass.Logg.LogInfo("Found modsa (but from globallist)");
-				modsa.modsa_selfAction = action;
-				modsa.Enact(__instance, 2, timing);
+				modsa.Enact(action.Model, __instance, action, null, 2, timing);
 			}
 		}
 
@@ -983,9 +943,7 @@ namespace ModularSkillScripts
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
 			if (modsaDict.ContainsKey(skillmodel_intlong)) {
 				foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-					modsa.modsa_selfAction = ownerAction;
-					modsa.modsa_oppoAction = oppoAction;
-					modsa.Enact(__instance, 14, BATTLE_EVENT_TIMING.ALL_TIMING);
+					modsa.Enact(ownerAction.Model, __instance, ownerAction, oppoAction, 14, BATTLE_EVENT_TIMING.ALL_TIMING);
 				}
 			}
 
@@ -993,14 +951,10 @@ namespace ModularSkillScripts
 			{
 				if (!passiveModel.CheckActiveCondition()) continue;
 				long passivemodel_intlong = passiveModel.Pointer.ToInt64();
-				foreach (ModularSA modpa in modpa_list)
-				{
+				foreach (ModularSA modpa in modpa_list) {
 					if (passivemodel_intlong != modpa.ptr_intlong) continue;
-					modpa.modsa_selfAction = ownerAction;
 					modpa.modsa_passiveModel = passiveModel;
-					modpa.modsa_unitModel = ownerAction.Model;
-					modpa.modsa_oppoAction = oppoAction;
-					modpa.Enact(__instance, 14, BATTLE_EVENT_TIMING.ALL_TIMING);
+					modpa.Enact(ownerAction.Model, __instance, ownerAction, oppoAction, 14, BATTLE_EVENT_TIMING.ALL_TIMING);
 				}
 			}
 		}
@@ -1012,9 +966,7 @@ namespace ModularSkillScripts
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
 			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				modsa.modsa_selfAction = ownerAction;
-				modsa.modsa_oppoAction = oppoAction;
-				modsa.Enact(__instance, 15, BATTLE_EVENT_TIMING.ALL_TIMING);
+				modsa.Enact(ownerAction.Model, __instance, ownerAction, oppoAction, 15, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 
@@ -1025,9 +977,7 @@ namespace ModularSkillScripts
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
 			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				modsa.modsa_selfAction = selfAction;
-				modsa.modsa_oppoAction = oppoAction;
-				modsa.Enact(__instance, 4, timing);
+				modsa.Enact(selfAction.Model, __instance, selfAction, oppoAction, 4, timing);
 			}
 		}
 		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnLoseDuel))]
@@ -1037,9 +987,7 @@ namespace ModularSkillScripts
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
 			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				modsa.modsa_selfAction = selfAction;
-				modsa.modsa_oppoAction = oppoAction;
-				modsa.Enact(__instance, 5, timing);
+				modsa.Enact(selfAction.Model, __instance, selfAction, oppoAction, 5, timing);
 			}
 		}
 
@@ -1049,8 +997,7 @@ namespace ModularSkillScripts
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
 			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				modsa.modsa_selfAction = action;
-				modsa.Enact(__instance, 6, timing);
+				modsa.Enact(action.Model, __instance, action, null, 6, timing);
 			}
 		}
 
@@ -1060,8 +1007,7 @@ namespace ModularSkillScripts
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
 			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				modsa.modsa_selfAction = action;
-				modsa.Enact(__instance, 9, timing);
+				modsa.Enact(action.Model, __instance, action, null, 9, timing);
 			}
 		}
 
@@ -1071,9 +1017,7 @@ namespace ModularSkillScripts
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
 			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				modsa.modsa_selfAction = evadeAction;
-				modsa.modsa_oppoAction = attackerAction;
-				modsa.Enact(__instance, 16, timing);
+				modsa.Enact(evadeAction.Model, __instance, evadeAction, attackerAction, 16, timing);
 			}
 		}
 		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnFailedEvade))]
@@ -1082,9 +1026,7 @@ namespace ModularSkillScripts
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
 			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				modsa.modsa_selfAction = evadeAction;
-				modsa.modsa_oppoAction = attackerAction;
-				modsa.Enact(__instance, 17, timing);
+				modsa.Enact(evadeAction.Model, __instance, evadeAction, attackerAction, 17, timing);
 			}
 		}
 		
@@ -1095,8 +1037,7 @@ namespace ModularSkillScripts
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
 			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				modsa.modsa_selfAction = action;
-				modsa.Enact(__instance, 18, timing);
+				modsa.Enact(action.Model, __instance, action, null, 18, timing);
 			}
 		}
 		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.BeforeBehaviour))]
@@ -1105,8 +1046,7 @@ namespace ModularSkillScripts
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
 			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				modsa.modsa_selfAction = action;
-				modsa.Enact(__instance, 19, timing);
+				modsa.Enact(action.Model, __instance, action, null, 19, timing);
 			}
 		}
 		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnEndBehaviour))]
@@ -1115,8 +1055,7 @@ namespace ModularSkillScripts
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
 			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				modsa.modsa_selfAction = action;
-				modsa.Enact(__instance, 20, timing);
+				modsa.Enact(action.Model, __instance, action, null, 20, timing);
 			}
 		}
 		
@@ -1126,8 +1065,7 @@ namespace ModularSkillScripts
 			long skillmodel_intlong = __instance.Pointer.ToInt64();
 			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				modsa.modsa_selfAction = action;
-				modsa.Enact(__instance, 24, timing);
+				modsa.Enact(action.Model, __instance, action, null, 24, timing);
 			}
 		}
 
@@ -1148,16 +1086,15 @@ namespace ModularSkillScripts
 				modca.wasCrit = isCritical;
 				//modca.wasClash = isWinDuel.HasValue;
 				//if (modca.wasClash) modca.wasWin = isWinDuel.Value;
-				modca.modsa_selfAction = __instance;
 				modca.modsa_coinModel = coin;
-				modca.Enact(__instance.Skill, 7, timing);
+				modca.Enact(__instance.Model, __instance.Skill, __instance, null, 7, timing);
 			}
 
 			long skillmodel_intlong = __instance.Skill.Pointer.ToInt64();
 			if (modsaDict.ContainsKey(skillmodel_intlong)) {
 				foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				modsa.modsa_selfAction = __instance;
-				modsa.Enact(__instance.Skill, 7, timing);
+					modsa.wasCrit = isCritical;
+					modsa.Enact(__instance.Model, __instance.Skill, __instance, null, 7, timing);
 				}
 			}
 
@@ -1165,28 +1102,24 @@ namespace ModularSkillScripts
 			{
 				if (!passiveModel.CheckActiveCondition()) continue;
 				long passivemodel_intlong = passiveModel.Pointer.ToInt64();
-				foreach (ModularSA modpa in modpa_list)
-				{
+				foreach (ModularSA modpa in modpa_list) {
 					if (passivemodel_intlong != modpa.ptr_intlong) continue;
 					modpa.wasCrit = isCritical;
-					modpa.modsa_selfAction = __instance;
 					modpa.modsa_coinModel = coin;
-					modpa.Enact(__instance.Skill, 7, timing);
+					modpa.modsa_passiveModel = passiveModel;
+					modpa.Enact(__instance.Model, __instance.Skill, __instance, null, 7, timing);
 				}
 			}
 			foreach (PassiveModel passiveModel in target._passiveDetail.PassiveList)
 			{
 				if (!passiveModel.CheckActiveCondition()) continue;
 				long passivemodel_intlong = passiveModel.Pointer.ToInt64();
-				foreach (ModularSA modpa in modpa_list)
-				{
+				foreach (ModularSA modpa in modpa_list) {
 					if (passivemodel_intlong != modpa.ptr_intlong) continue;
 					modpa.wasCrit = isCritical;
-					modpa.modsa_selfAction = __instance;
 					modpa.modsa_coinModel = coin;
 					modpa.modsa_passiveModel = passiveModel;
-					modpa.modsa_unitModel = __instance.Model;
-					modpa.Enact(__instance.Skill, 8, timing);
+					modpa.Enact(__instance.Model, __instance.Skill, __instance, null, 8, timing);
 				}
 			}
 		}
@@ -1202,8 +1135,7 @@ namespace ModularSkillScripts
 			long skillmodel_intlong = skill.Pointer.ToInt64();
 			if (modsaDict.ContainsKey(skillmodel_intlong)) {
 				foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-					modsa.modsa_selfAction = actionOrNull;
-					modsa.Enact(skill, 21, timing);
+					modsa.Enact(__instance, skill, actionOrNull, null, 21, timing);
 				}
 			}
 
@@ -1214,10 +1146,8 @@ namespace ModularSkillScripts
 				foreach (ModularSA modpa in modpa_list)
 				{
 					if (passivemodel_intlong != modpa.ptr_intlong) continue;
-					modpa.modsa_selfAction = actionOrNull;
 					modpa.modsa_passiveModel = passiveModel;
-					modpa.modsa_unitModel = __instance;
-					modpa.Enact(skill, 21, timing);
+					modpa.Enact(__instance, skill, actionOrNull, null, 21, timing);
 				}
 			}
 		}
