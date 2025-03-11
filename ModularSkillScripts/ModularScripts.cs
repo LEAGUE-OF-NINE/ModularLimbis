@@ -1440,18 +1440,10 @@ namespace ModularSkillScripts
 				}
 					break;
 				case "discard":{
-					if (modsa_selfAction == null) return;
-					int funnywhilenumber = 1;
-					int amount = GetNumFromParamString(circles[1]);
-	
-					SORT_SKILL_BY_INDEX sorting = SORT_SKILL_BY_INDEX.NONE;
+					SORT_SKILL_BY_INDEX sorting;
 					Enum.TryParse(circles[0], true, out sorting);
-					
-					while (funnywhilenumber <= amount)
-					{
-						modsa_unitModel.DiscardSkill(battleTiming, sorting, modsa_selfAction);
-						funnywhilenumber++;
-					}
+					int times = GetNumFromParamString(circles[1]);
+					for (int i = 0; i < times; i++) modsa_unitModel.DiscardSkill(battleTiming, sorting, modsa_selfAction);
 				}
 					break;
 				case "passiveadd":{
@@ -1460,31 +1452,18 @@ namespace ModularSkillScripts
 					foreach (BattleUnitModel targetModel in modelList) targetModel.AddPassive(id);
 				}
 					break;
-				case "passiveremove":
-					{
-						List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-						int id = GetNumFromParamString(circles[1]);
-						foreach (BattleUnitModel targetModel in modelList)
-						{
-							foreach (PassiveModel passive in targetModel.GetPassiveList())
-							{
-								if (passive.GetID() == id) targetModel.GetPassiveList().Remove(passive);
-							}
+				case "passiveremove":{
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					int id = GetNumFromParamString(circles[1]);
+					foreach (BattleUnitModel targetModel in modelList) {
+						foreach (PassiveModel passive in targetModel.GetPassiveList()) {
+							if (passive.GetID() == id) targetModel.GetPassiveList().Remove(passive);
 						}
 					}
+				}
 					break;
-				case "endstage":
-					{
-						StageController stageController_inst = Singleton<StageController>.Instance;
-						stageController_inst.EndStage();
-                    }
-					break;
-				case "endbattle":
-					{
-						StageController stageController_inst = Singleton<StageController>.Instance;
-                        stageController_inst.EndBattlePhaseForcely(true);
-                    }
-					break;
+				case "endstage": Singleton<StageController>.Instance.EndStage(); break;
+				case "endbattle": Singleton<StageController>.Instance.EndBattlePhaseForcely(true); break;
 			}
 		}
 		
