@@ -312,8 +312,11 @@ namespace ModularSkillScripts
 		{
 			List<BattleUnitModel> unitList = new List<BattleUnitModel>();
 			if (param == "Null") return unitList;
-			else if (param == "Target")
-			{
+			else if (param == "Self") {
+				unitList.Add(modsa_unitModel);
+				return unitList;
+			}
+			else if (param == "Target") {
 				if (modsa_loopTarget != null) unitList.Add(modsa_loopTarget);
 				return unitList;
 			}
@@ -422,7 +425,6 @@ namespace ModularSkillScripts
 				}
 				return unitList;
 			}
-			else if (param == "Self") unitList.Add(modsa_unitModel);
 			else
 			{
 				List<BattleUnitModel> list = new List<BattleUnitModel>();
@@ -460,7 +462,7 @@ namespace ModularSkillScripts
 
 				int num = 1;
 				string text = Regex.Replace(param, "\\D", "");
-				if (text != null && text.Length > 0) num = int.Parse(text);
+				if (text.Length > 0) num = int.Parse(text);
 
 				if (param.Contains("ExceptSelf")) list.Remove(modsa_unitModel);
 				if (param.Contains("ExceptTarget")) list.Remove(modsa_loopTarget);
@@ -531,6 +533,7 @@ namespace ModularSkillScripts
 		public BattleUnitModel GetTargetModel(string param)
 		{
 			if (param == "Null") return null;
+			else if (param == "Self") return modsa_unitModel;
 			else if (param == "Target") return modsa_loopTarget;
 			else if (param == "MainTarget")
 			{
@@ -586,7 +589,6 @@ namespace ModularSkillScripts
 				}
 				return foundUnit;
 			}
-			else if (param == "Self") return modsa_unitModel;
 			else
 			{
 				BattleUnitModel foundUnit = null;
