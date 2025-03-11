@@ -360,10 +360,10 @@ namespace ModularSkillScripts
 			{
 				string id_string = param.Remove(0, 2);
 				int id = GetNumFromParamString(id_string);
-
-				foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(false))
-				{
-					if (unit.GetUnitID() == id) unitList.Add(unit);
+				BattleUnitModel hardfind = battleObjectManager.GetModelByUnitID(id);
+				if (hardfind != null) unitList.Add(hardfind);
+				foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(false)) {
+					if (unit != hardfind && unit.GetUnitID() == id) unitList.Add(unit);
 				}
 				return unitList;
 			}
@@ -371,9 +371,7 @@ namespace ModularSkillScripts
 			{
 				string id_string = param.Remove(0, 4);
 				int id = GetNumFromParamString(id_string);
-
-				foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(false))
-				{
+				foreach (BattleUnitModel unit in battleObjectManager.GetModelList()) {
 					if (unit.InstanceID == id) unitList.Add(unit);
 				}
 				return unitList;
@@ -1359,7 +1357,6 @@ namespace ModularSkillScripts
 					break;
 				case "skillsend":{
 					BattleUnitModel fromUnit = GetTargetModel(circles[0]);
-					List<BattleUnitModel> targetList = GetTargetModelList(circles[1]);
 					if (fromUnit == null || fromUnit.IsDead()) return;
 
 					int skillID = -1;
@@ -1388,16 +1385,19 @@ namespace ModularSkillScripts
 					SinActionModel fromSinAction_new = fromUnit.AddNewSinActionModel();
 					UnitSinModel fromSinModel_new = new UnitSinModel(skillID, fromUnit, fromSinAction_new);
 					BattleActionModel fromAction_new = new BattleActionModel(fromSinModel_new, fromUnit, fromSinAction_new);
-
-					//List<SinActionModel> targetSinActionList = new List<SinActionModel>();
-					foreach (BattleUnitModel targetModel in targetList)
-					{
-						List<SinActionModel> sinActionList = targetModel.GetSinActionList();
-						if (sinActionList.Count > 0) fromAction_new.AddTarget(sinActionList.ToArray()[0]); //targetSinActionList.Add(sinActionList.ToArray()[0]);
-					}
+					fromAction_new._targetDataDetail.ClearAllTargetData(fromAction_new);
 					
+					List<SinActionModel> targetSinActionList = new List<SinActionModel>();
+					List<BattleUnitModel> targetList = GetTargetModelList(circles[1]);
+					foreach (BattleUnitModel targetModel in targetList) {
+						List<SinActionModel> sinActionList = targetModel.GetSinActionList();
+						if (sinActionList.Count < 1) continue;
+						targetSinActionList.Add(sinActionList.ToArray()[0]);
+						//fromAction_new._targetDataDetail.AddTargetSinAction(sinActionList.ToArray()[0]);
+					}
+					fromAction_new._targetDataDetail.SetOriginTargetSinAction(fromAction_new, targetSinActionList);
 					//fromAction_new.SetOriginTargetSinActions(targetSinActionList);
-					//fromAction_new._targetDataDetail.ReadyOriginTargeting(fromAction_new);
+					fromAction_new._targetDataDetail.ReadyOriginTargeting(fromAction_new);
 
 					if (circles.Length > 3) fromUnit.CutInDefenseActionForcely(fromAction_new, true);
 					else fromUnit.CutInAction(fromAction_new);
@@ -1470,6 +1470,14 @@ namespace ModularSkillScripts
 					break;
 				case "endstage": Singleton<StageController>.Instance.EndStage(); break;
 				case "endbattle": Singleton<StageController>.Instance.EndBattlePhaseForcely(true); break;
+				case "skillslotgive":{
+					SinManager sinManager_inst = Singleton<SinManager>.Instance;
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					foreach (BattleUnitModel targetModel in modelList) {
+						sinManager_inst.AddSinActionModelOnRoundStart(UNIT_FACTION.PLAYER, targetModel.InstanceID);
+					}
+				}
+					break;
 			}
 		}
 		
@@ -1896,24 +1904,25 @@ namespace ModularSkillScripts
 					int value = -1;
 
 					string circle_1 = circles[1];
-						if (circle_1 == "deployment") value = targetModel.PARTICIPATE_ORDER;
-						else if (circle_1 == "deadAllyCount") value = targetModel.deadAllyCount;
-						else if (circle_1 == "panicType") value = Convert.ToInt32(targetModel._defaultPanicType);
-						else if (circle_1.StartsWith("res"))
+					if (circle_1 == "deployment") value = targetModel.PARTICIPATE_ORDER;
+					else if (circle_1 == "deadAllyCount") value = targetModel.deadAllyCount;
+					else if (circle_1 == "panicType") value = Convert.ToInt32(targetModel._defaultPanicType);
+					else if (circle_1 == "isRetreated") value = targetModel.IsRetreated() ? 1 : 0;
+					else if (circle_1.StartsWith("res"))
+					{
+						string word = circle_1.Remove(0, 3);
+						ATK_BEHAVIOUR atk = ATK_BEHAVIOUR.NONE;
+						Enum.TryParse(word, true, out atk);
+						if (atk != ATK_BEHAVIOUR.NONE)
 						{
-							string word = circle_1.Remove(0, 3);
-							ATK_BEHAVIOUR atk = ATK_BEHAVIOUR.NONE;
-							Enum.TryParse(word, true, out atk);
-							if (atk != ATK_BEHAVIOUR.NONE)
-							{
-								value = (int)(targetModel.GetAtkResistMultiplier(atk) * 100.0f);
-								return;
-							}
-
-							ATTRIBUTE_TYPE sin = ATTRIBUTE_TYPE.NONE;
-							Enum.TryParse(word, true, out sin);
-							if (sin != ATTRIBUTE_TYPE.NONE) value = (int)(targetModel.GetAttributeResistMultiplier(sin) * 100.0f);
+							value = (int)(targetModel.GetAtkResistMultiplier(atk) * 100.0f);
+							return;
 						}
+
+						ATTRIBUTE_TYPE sin = ATTRIBUTE_TYPE.NONE;
+						Enum.TryParse(word, true, out sin);
+						if (sin != ATTRIBUTE_TYPE.NONE) value = (int)(targetModel.GetAttributeResistMultiplier(sin) * 100.0f);
+					}
 					valueList[setvalue_idx] = value;
 				}
 				break;
