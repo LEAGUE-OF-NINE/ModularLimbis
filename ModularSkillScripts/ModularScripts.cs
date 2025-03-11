@@ -695,10 +695,11 @@ namespace ModularSkillScripts
 				if (MainClass.logEnabled) MainClass.Logg.LogInfo("batch " + i.ToString() + ": " + batch);
 				if (batch.StartsWith("TIMING:")) {
 					string timingArg = batch.Remove(0, 7);
-					if (MainClass.timingDict.ContainsKey(timingArg)) activationTiming = MainClass.timingDict[timingArg];
+					string[] circles = timingArg.Split(parenthesisSeparator);
+					string circle_0 = circles[0];
+					if (MainClass.timingDict.ContainsKey(circle_0)) activationTiming = MainClass.timingDict[circle_0];
 					
 					if (activationTiming == 7) {
-						string[] circles = timingArg.Split(parenthesisSeparator);
 						string hitArgs = circles[1];
 						if (hitArgs.Contains("Head"))  _onlyHeads = true;
 						else if (hitArgs.Contains("Tail")) _onlyTails = true;
