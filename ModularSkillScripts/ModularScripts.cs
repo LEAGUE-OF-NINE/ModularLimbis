@@ -356,8 +356,7 @@ namespace ModularSkillScripts
 			SinManager sinManager_inst = Singleton<SinManager>.Instance;
 			BattleObjectManager battleObjectManager = sinManager_inst._battleObjectManager;
 
-			if (param.StartsWith("id"))
-			{
+			if (param.StartsWith("id")) {
 				string id_string = param.Remove(0, 2);
 				int id = GetNumFromParamString(id_string);
 				BattleUnitModel hardfind = battleObjectManager.GetModelByUnitID(id);
@@ -367,8 +366,7 @@ namespace ModularSkillScripts
 				}
 				return unitList;
 			}
-			else if (param.StartsWith("inst"))
-			{
+			else if (param.StartsWith("inst")) {
 				string id_string = param.Remove(0, 4);
 				int id = GetNumFromParamString(id_string);
 				foreach (BattleUnitModel unit in battleObjectManager.GetModelList()) {
@@ -544,19 +542,12 @@ namespace ModularSkillScripts
 				return targetDataSet.GetMainTarget();
 			}
 
-			if (param.StartsWith("id"))
-			{
+			if (param.StartsWith("id")) {
 				SinManager sinManager_inst = Singleton<SinManager>.Instance;
 				BattleObjectManager battleObjectManager = sinManager_inst._battleObjectManager;
-
 				string id_string = param.Remove(0, 2);
 				int id = GetNumFromParamString(id_string);
-
-				foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(false))
-				{
-					if (unit.GetUnitID() == id) return unit;
-				}
-				return null;
+				return battleObjectManager.GetModelByUnitID(id);
 			}
 			else if (param.StartsWith("inst"))
 			{
@@ -566,8 +557,7 @@ namespace ModularSkillScripts
 				string id_string = param.Remove(0, 4);
 				int id = GetNumFromParamString(id_string);
 
-				foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(false))
-				{
+				foreach (BattleUnitModel unit in battleObjectManager.GetModelList()) {
 					if (unit.InstanceID == id) return unit;
 				}
 				return null;
@@ -1387,15 +1377,15 @@ namespace ModularSkillScripts
 					BattleActionModel fromAction_new = new BattleActionModel(fromSinModel_new, fromUnit, fromSinAction_new);
 					fromAction_new._targetDataDetail.ClearAllTargetData(fromAction_new);
 					
-					List<SinActionModel> targetSinActionList = new List<SinActionModel>();
+					//List<SinActionModel> targetSinActionList = new List<SinActionModel>();
 					List<BattleUnitModel> targetList = GetTargetModelList(circles[1]);
 					foreach (BattleUnitModel targetModel in targetList) {
 						List<SinActionModel> sinActionList = targetModel.GetSinActionList();
 						if (sinActionList.Count < 1) continue;
-						targetSinActionList.Add(sinActionList.ToArray()[0]);
-						//fromAction_new._targetDataDetail.AddTargetSinAction(sinActionList.ToArray()[0]);
+						//targetSinActionList.Add(sinActionList.ToArray()[0]);
+						fromAction_new._targetDataDetail.AddTargetSinAction(sinActionList.ToArray()[0]);
 					}
-					fromAction_new._targetDataDetail.SetOriginTargetSinAction(fromAction_new, targetSinActionList);
+					//fromAction_new._targetDataDetail.SetOriginTargetSinAction(fromAction_new, targetSinActionList);
 					//fromAction_new.SetOriginTargetSinActions(targetSinActionList);
 					fromAction_new._targetDataDetail.ReadyOriginTargeting(fromAction_new);
 
