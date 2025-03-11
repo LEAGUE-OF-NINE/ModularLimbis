@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Il2CppSystem.Collections.Generic;
@@ -9,6 +9,7 @@ using IntPtr = System.IntPtr;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using ModsaLang;
+using Il2CppSystem.Collections;
 
 namespace ModularSkillScripts
 {
@@ -699,7 +700,7 @@ namespace ModularSkillScripts
 					string circle_0 = circles[0];
 					if (MainClass.timingDict.ContainsKey(circle_0)) activationTiming = MainClass.timingDict[circle_0];
 					
-					if (activationTiming == 7) {
+					if (activationTiming == 7 && circles.Length > 1) {
 						string hitArgs = circles[1];
 						if (hitArgs.Contains("Head"))  _onlyHeads = true;
 						else if (hitArgs.Contains("Tail")) _onlyTails = true;
@@ -721,8 +722,10 @@ namespace ModularSkillScripts
 			string[] batchArgs = batch.Split(':');
 			for (int i = 0; i < batchArgs.Length; i++) {
 				if (MainClass.logEnabled) MainClass.Logg.LogInfo("batchArgs " + i.ToString() + ": " + batchArgs[i]);
-				if (batchArgs[i].StartsWith("STOPIF")) {
-					if (!CheckIF(batchArgs[i])) {
+				if (batchArgs[i].StartsWith("STOPIF") || batchArgs[i].StartsWith("CONTINUEIF"))
+				{
+					if (!CheckIF(batchArgs[i]))
+					{
 						_fullStop = true;
 						return;
 					}
@@ -977,16 +980,17 @@ namespace ModularSkillScripts
 					}
 				}
 					break;
-				case "shield":{
-					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-					int amount = GetNumFromParamString(circles[1]);
-					bool permashield = circles.Length > 2;
-					foreach (BattleUnitModel targetModel in modelList)
+				case "shield":
 					{
-						if (amount >= 0) targetModel.AddShield(amount, !permashield, ABILITY_SOURCE_TYPE.SKILL, battleTiming);
-						else targetModel.ReduceShield(battleTiming, amount *= -1, modsa_unitModel);
+						List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+						int amount = GetNumFromParamString(circles[1]);
+						bool permashield = circles.Length > 2;
+						foreach (BattleUnitModel targetModel in modelList)
+						{
+							if (amount >= 0) targetModel.AddShield(amount, !permashield, ABILITY_SOURCE_TYPE.SKILL, battleTiming);
+							else targetModel.ReduceShield(battleTiming, amount *= -1, modsa_unitModel);
+						}
 					}
-				}
 					break;
 				case "break":{
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
@@ -1456,15 +1460,30 @@ namespace ModularSkillScripts
 					foreach (BattleUnitModel targetModel in modelList) targetModel.AddPassive(id);
 				}
 					break;
-				case "passiveremove":{
-					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-					int id = GetNumFromParamString(circles[1]);
-					foreach (BattleUnitModel targetModel in modelList) {
-						foreach (PassiveModel passive in targetModel.GetPassiveList()) {
-							if (passive.GetID() == id) targetModel.GetPassiveList().Remove(passive);
+				case "passiveremove":
+					{
+						List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+						int id = GetNumFromParamString(circles[1]);
+						foreach (BattleUnitModel targetModel in modelList)
+						{
+							foreach (PassiveModel passive in targetModel.GetPassiveList())
+							{
+								if (passive.GetID() == id) targetModel.GetPassiveList().Remove(passive);
+							}
 						}
 					}
-				}
+					break;
+				case "endstage":
+					{
+						StageController stageController_inst = Singleton<StageController>.Instance;
+						stageController_inst.EndStage();
+                    }
+					break;
+				case "endbattle":
+					{
+						StageController stageController_inst = Singleton<StageController>.Instance;
+                        stageController_inst.EndBattlePhaseForcely(true);
+                    }
 					break;
 			}
 		}
@@ -1535,12 +1554,13 @@ namespace ModularSkillScripts
 			
 			switch (methodology)
 			{
-				case "mpcheck":{
-					BattleUnitModel targetModel = GetTargetModel(circledSection);
-					if (targetModel == null) return;
-					valueList[setvalue_idx] = targetModel.Mp;
-					break;
-				}
+				case "mpcheck":
+					{
+						BattleUnitModel targetModel = GetTargetModel(circledSection);
+						if (targetModel == null) return;
+						valueList[setvalue_idx] = targetModel.Mp;
+						break;
+					}
 				case "hpcheck":{
 					BattleUnitModel targetModel = GetTargetModel(circles[0]);
 					if (targetModel == null) return;
@@ -1583,10 +1603,11 @@ namespace ModularSkillScripts
 					valueList[setvalue_idx] = stageController_inst.GetCurrentRound();
 				}
 					break;
-				case "wave":{
-					StageController stageController_inst = Singleton<StageController>.Instance;
-					valueList[setvalue_idx] = stageController_inst.GetCurrentWave();
-				}
+				case "wave":
+					{
+						StageController stageController_inst = Singleton<StageController>.Instance;
+						valueList[setvalue_idx] = stageController_inst.GetCurrentWave();
+					}
 					break;
 				case "activations":valueList[setvalue_idx] = activationCounter;
 					break;
@@ -1882,24 +1903,27 @@ namespace ModularSkillScripts
 					int value = -1;
 
 					string circle_1 = circles[1];
-					if (circle_1 == "deployment") value = targetModel.PARTICIPATE_ORDER;
-					else if (circle_1 == "deadAllyCount") value = targetModel.deadAllyCount;
-					else if (circle_1.StartsWith("res"))
-					{
-						string word = circle_1.Remove(0, 3);
-						ATK_BEHAVIOUR atk = ATK_BEHAVIOUR.NONE;
-						Enum.TryParse(word, true, out atk);
-						if (atk != ATK_BEHAVIOUR.NONE) {
-							valueList[setvalue_idx] = (int)(targetModel.GetAtkResistMultiplier(atk) * 100.0f);
-							return;
+						if (circle_1 == "deployment") value = targetModel.PARTICIPATE_ORDER;
+						else if (circle_1 == "deadAllyCount") value = targetModel.deadAllyCount;
+						else if (circle_1 == "panicType") value = Convert.ToInt32(targetModel._defaultPanicType);
+						else if (circle_1.StartsWith("res"))
+						{
+							string word = circle_1.Remove(0, 3);
+							ATK_BEHAVIOUR atk = ATK_BEHAVIOUR.NONE;
+							Enum.TryParse(word, true, out atk);
+							if (atk != ATK_BEHAVIOUR.NONE)
+							{
+								value = (int)(targetModel.GetAtkResistMultiplier(atk) * 100.0f);
+								return;
+							}
+
+							ATTRIBUTE_TYPE sin = ATTRIBUTE_TYPE.NONE;
+							Enum.TryParse(word, true, out sin);
+							if (sin != ATTRIBUTE_TYPE.NONE) value = (int)(targetModel.GetAttributeResistMultiplier(sin) * 100.0f);
 						}
-						
-						ATTRIBUTE_TYPE sin = ATTRIBUTE_TYPE.NONE;
-						Enum.TryParse(word, true, out sin);
-						if (sin != ATTRIBUTE_TYPE.NONE) valueList[setvalue_idx] = (int)(targetModel.GetAttributeResistMultiplier(sin) * 100.0f);
-					}
+					valueList[setvalue_idx] = value;
 				}
-					break;
+				break;
 			}
 		}
 		
