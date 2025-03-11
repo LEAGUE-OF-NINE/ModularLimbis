@@ -1897,6 +1897,14 @@ namespace ModularSkillScripts
 					valueList[setvalue_idx] = (int)action.Skill.GetAttributeType();
 				}
 					break;
+				case "amountattacks":
+				{
+					SinManager sinManager_inst = Singleton<SinManager>.Instance;
+					BattleUnitModel targetModel = GetTargetModel(circles[0]);
+					if (targetModel == null || sinManager_inst == null) return;
+					valueList[setvalue_idx] = sinManager_inst.GetActionListTargetingUnit(targetModel).Count;
+				}
+					break;
 				case "getstat":{
 					BattleUnitModel targetModel = GetTargetModel(circles[0]);
 					if (targetModel == null) return;
