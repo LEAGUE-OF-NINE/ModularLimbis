@@ -1460,12 +1460,14 @@ namespace ModularSkillScripts
 					break;
 				case "endstage": Singleton<StageController>.Instance.EndStage(); break;
 				case "endbattle": Singleton<StageController>.Instance.EndBattlePhaseForcely(true); break;
+    				case "teamkill": modsa_skillModel._skillData.canTeamKill = (circledSection == "True"); break;
 				case "skillslotgive":{
 					SinManager sinManager_inst = Singleton<SinManager>.Instance;
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
 					foreach (BattleUnitModel targetModel in modelList) {
 						sinManager_inst.AddSinActionModelOnRoundStart(UNIT_FACTION.PLAYER, targetModel.InstanceID);
 					}
+     				
 				}
 					break;
 			}
