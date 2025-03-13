@@ -89,7 +89,7 @@ namespace ModularSkillScripts
 
 		public const string NAME = "ModularSkillScripts";
 
-		public const string VERSION = "2.3.5";
+		public const string VERSION = "2.3.6";
 
 		public const string AUTHOR = "GlitchGames";
 

@@ -360,10 +360,8 @@ namespace ModularSkillScripts
 			if (param.StartsWith("id")) {
 				string id_string = param.Remove(0, 2);
 				int id = GetNumFromParamString(id_string);
-				BattleUnitModel hardfind = battleObjectManager.GetModelByUnitID(id);
-				if (hardfind != null) unitList.Add(hardfind);
-				foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(false)) {
-					if (unit != hardfind && unit.GetUnitID() == id) unitList.Add(unit);
+				foreach (BattleUnitModel unit in battleObjectManager.GetModelList()) {
+					if (unit.GetUnitID() == id) unitList.Add(unit);
 				}
 				return unitList;
 			}
