@@ -1311,18 +1311,28 @@ namespace ModularSkillScripts
 					BattleActionModel fromAction_new = new BattleActionModel(fromSinModel_new, fromUnit, fromSinAction_new);
 					fromAction_new._targetDataDetail.ClearAllTargetData(fromAction_new);
 					
-					//List<SinActionModel> targetSinActionList = new List<SinActionModel>();
+					List<SinActionModel> targetSinActionList = new List<SinActionModel>();
 					List<BattleUnitModel> targetList = GetTargetModelList(circles[1]);
 					foreach (BattleUnitModel targetModel in targetList) {
 						List<SinActionModel> sinActionList = targetModel.GetSinActionList();
 						if (sinActionList.Count < 1) continue;
-						//targetSinActionList.Add(sinActionList.ToArray()[0]);
+						targetSinActionList.Add(sinActionList.ToArray()[0]);
 						fromAction_new._targetDataDetail.AddTargetSinAction(sinActionList.ToArray()[0]);
 					}
 					//fromAction_new._targetDataDetail.SetOriginTargetSinAction(fromAction_new, targetSinActionList);
 					//fromAction_new.SetOriginTargetSinActions(targetSinActionList);
 					fromAction_new._targetDataDetail.ReadyOriginTargeting(fromAction_new);
-
+					
+					TargetDataSet targetDataSet = fromAction_new._targetDataDetail.GetCurrentTargetSet();
+					if (!targetSinActionList.Contains(targetDataSet._mainTarget.GetTargetSinAction())) {
+						if (targetSinActionList.Count > 0) targetDataSet.SetMainTargetSinAction(targetSinActionList.ToArray()[0]);
+					}
+					List<TargetSinActionData> goodones = new List<TargetSinActionData>();
+					foreach (TargetSinActionData targetSinActionData in targetDataSet._subTargetList) {
+						if (targetSinActionList.Contains(targetSinActionData.GetTargetSinAction())) goodones.Add(targetSinActionData);
+					}
+					targetDataSet._subTargetList = goodones;
+					
 					if (circles.Length > 3) fromUnit.CutInDefenseActionForcely(fromAction_new, true);
 					else fromUnit.CutInAction(fromAction_new);
 				}

@@ -1089,7 +1089,7 @@ namespace ModularSkillScripts
 				modca.modsa_coinModel = coin;
 				modca.Enact(__instance.Model, __instance.Skill, __instance, null, 7, timing);
 			}
-
+			
 			long skillmodel_intlong = __instance.Skill.Pointer.ToInt64();
 			if (modsaDict.ContainsKey(skillmodel_intlong)) {
 				foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
