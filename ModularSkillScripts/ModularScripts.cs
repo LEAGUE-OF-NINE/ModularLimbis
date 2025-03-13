@@ -677,7 +677,8 @@ namespace ModularSkillScripts
 		private void Consequence(string section) {
 			string[] sectionArgs = section.Split(parenthesisSeparator);
 			string mEth = sectionArgs[0];
-			string circledSection = sectionArgs[1];
+			string circledSection = "";
+			if (sectionArgs.Length >= 2) circledSection = sectionArgs[1];
 			string[] circles = circledSection.Split(',');
 
 			switch (mEth)
@@ -1414,6 +1415,16 @@ namespace ModularSkillScripts
      				
 				}
 					break;
+				case "passivereveal":{
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					int pasID = GetNumFromParamString(circles[1]);
+					UnlockInformationManager unlockInfo_inst = Singleton<UnlockInformationManager>.Instance;
+					foreach (BattleUnitModel targetModel in modelList) {
+						unlockInfo_inst.UnlockPassiveStatus(targetModel.GetOriginUnitID(), pasID);
+					}
+					
+				}
+					break;
 			}
 		}
 		
@@ -1422,8 +1433,7 @@ namespace ModularSkillScripts
 			if (MainClass.logEnabled) MainClass.Logg.LogInfo("AcquireValue " + section);
 			string[] sectionArgs = section.Split(parenthesisSeparator);
 
-			if (char.IsNumber(section.Last()))
-			{
+			if (char.IsNumber(section.Last())) {
 				valueList[setvalue_idx] = GetNumFromParamString(sectionArgs[0]);
 				return;
 			}
