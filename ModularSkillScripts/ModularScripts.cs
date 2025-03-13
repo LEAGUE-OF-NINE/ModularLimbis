@@ -8,6 +8,7 @@ using static BattleActionModel.TargetDataDetail;
 using IntPtr = System.IntPtr;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using CodeStage.AntiCheat.ObscuredTypes;
 using ModsaLang;
 using Il2CppSystem.Collections;
 
@@ -1459,8 +1460,8 @@ namespace ModularSkillScripts
 				}
 					break;
 				case "endstage": Singleton<StageController>.Instance.EndStage(); break;
-				case "endbattle": Singleton<StageController>.Instance.EndBattlePhaseForcely(true); break;
-    				case "teamkill": modsa_skillModel._skillData.canTeamKill = (circledSection == "True"); break;
+				case "endbattle": Singleton<StageController>.Instance.EndBattlePhaseForcely(true); break; 
+				case "teamkill": modsa_skillModel._skillData.canTeamKill = circledSection == "True"; break;
 				case "skillslotgive":{
 					SinManager sinManager_inst = Singleton<SinManager>.Instance;
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);

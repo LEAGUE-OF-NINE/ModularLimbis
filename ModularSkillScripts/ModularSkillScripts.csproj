@@ -38,6 +38,9 @@
     <Reference Include="0Harmony">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Limbus Company\BepInEx\core\0Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="ACTk.Runtime">
+      <HintPath>..\..\..\..\..\..\home\glitch\.local\share\Steam\steamapps\common\Limbus Company\BepInEx\unhollowed\ACTk.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="Antlr4.Runtime.Standard, Version=4.13.1.0, Culture=neutral, PublicKeyToken=e78b2c5abd1fcb3f, processorArchitecture=MSIL">
       <HintPath>..\packages\Antlr4.Runtime.Standard.4.13.1\lib\net45\Antlr4.Runtime.Standard.dll</HintPath>
     </Reference>
