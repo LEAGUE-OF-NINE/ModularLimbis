@@ -426,97 +426,12 @@ namespace ModularSkillScripts
 			}
 			else
 			{
-				List<BattleUnitModel> list = new List<BattleUnitModel>();
-				if (param.Contains("$"))
-				{
-					string[] circles = param.Split('$');
-					param = circles[0];
-
-					string bufKeyword_string = circles[1];
-					BUFF_UNIQUE_KEYWORD bufKeyword = BUFF_UNIQUE_KEYWORD.Enhancement;
-					Enum.TryParse(bufKeyword_string, true, out bufKeyword);
-
-					if (param.Contains("Enemy")) {
-						foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(bufKeyword, 0, false, enemyFaction)) list.Add(unit);
-					}
-					else if (param.Contains("Ally")) {
-						foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(bufKeyword, 0, false, thisFaction)) list.Add(unit);
-					}
-					else {
-						foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(bufKeyword, 0, false)) list.Add(unit);
-					}
-				}
-				else
-				{
-					if (param.Contains("Enemy")) {
-						foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(false, enemyFaction)) list.Add(unit);
-					}
-					else if (param.Contains("Ally")) {
-						foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(false, thisFaction)) list.Add(unit);
-					}
-					else {
-						foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(false)) list.Add(unit);
-					}
-				}
-
+				List<BattleUnitModel> list = GetCustomTargetingList(battleObjectManager, param, thisFaction, enemyFaction);
+				
 				int num = 1;
 				string text = Regex.Replace(param, "\\D", "");
 				if (text.Length > 0) num = int.Parse(text);
-
-				if (param.Contains("ExceptSelf")) list.Remove(modsa_unitModel);
-				if (param.Contains("ExceptTarget")) list.Remove(modsa_loopTarget);
-
-				if (param.Contains("Random")) list = MainClass.ShuffleUnits(list);
-				else if (param.Contains("Deploy")) {
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.PARTICIPATE_ORDER.CompareTo(y.PARTICIPATE_ORDER);
-					list.Sort(value);
-				}
-				else if (param.Contains("Reversedeploy")) {
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.PARTICIPATE_ORDER.CompareTo(x.PARTICIPATE_ORDER);
-					list.Sort(value);
-				}
 				
-				if (param.StartsWith("Slowest"))
-				{
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.GetOriginSpeedForCompare().CompareTo(y.GetOriginSpeedForCompare());
-					list.Sort(value);
-				}
-				else if (param.StartsWith("Fastest"))
-				{
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.GetOriginSpeedForCompare().CompareTo(x.GetOriginSpeedForCompare());
-					list.Sort(value);
-				}
-				else if (param.StartsWith("HighestHPRatio"))
-				{
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.GetHpRatio().CompareTo(x.GetHpRatio());
-					list.Sort(value);
-				}
-				else if (param.StartsWith("LowestHPRatio"))
-				{
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.GetHpRatio().CompareTo(y.GetHpRatio());
-					list.Sort(value);
-				}
-				else if (param.StartsWith("HighestHP"))
-				{
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.Hp.CompareTo(x.Hp);
-					list.Sort(value);
-				}
-				else if (param.StartsWith("LowestHP"))
-				{
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.Hp.CompareTo(y.Hp);
-					list.Sort(value);
-				}
-				else if (param.StartsWith("HighestMP"))
-				{
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.Mp.CompareTo(x.Mp);
-					list.Sort(value);
-				}
-				else if (param.StartsWith("LowestMP"))
-				{
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.Mp.CompareTo(y.Mp);
-					list.Sort(value);
-				}
-
 				num = Math.Min(num, list.Count);
 				if (num > 0) {
 					for (int i = 0; i < num; i++)
@@ -529,6 +444,106 @@ namespace ModularSkillScripts
 			return unitList;
 		}
 
+		private List<BattleUnitModel> GetCustomTargetingList(BattleObjectManager battleObjectManager, string param, UNIT_FACTION thisFaction, UNIT_FACTION enemyFaction) {
+			List<BattleUnitModel> list = new List<BattleUnitModel>();
+			UNIT_FACTION filterFaction = UNIT_FACTION.NONE;
+			bool filterKeyword = param.Contains("$");
+			
+			bool noCores = param.Contains("NoCores");
+			bool noParts = param.Contains("NoParts");
+
+			if (param.Contains("Enemy")) filterFaction = enemyFaction;
+			else if (param.Contains("Ally")) filterFaction = thisFaction;
+			
+			if (filterKeyword) {
+				string[] circles = param.Split('$');
+				param = circles[0];
+				string bufKeyword_string = circles[1];
+				BUFF_UNIQUE_KEYWORD bufKeyword = BUFF_UNIQUE_KEYWORD.Enhancement;
+				Enum.TryParse(bufKeyword_string, true, out bufKeyword);
+				
+				foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(bufKeyword, 0, false, filterFaction)) list.Add(unit);
+			}
+			else {
+				if (noCores) foreach (BattleUnitModel unit in battleObjectManager.GetAliveListExceptAbnormalitySelf(filterFaction, false)) list.Add(unit);
+				else if (noParts) foreach (BattleUnitModel unit in battleObjectManager.GetAliveListExceptAbnormalityPart(filterFaction, false)) list.Add(unit);
+				else foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(false, filterFaction)) list.Add(unit);
+			}
+			
+			if (param.Contains("AbnoOnly")) {
+				List<BattleUnitModel> goodones = new List<BattleUnitModel>();
+				foreach (BattleUnitModel unit in list) {
+					if (unit.IsAbnormalityOrPart) goodones.Add(unit);
+				}
+			}
+			else if (param.Contains("NoAbnos")) {
+				List<BattleUnitModel> goodones = new List<BattleUnitModel>();
+				foreach (BattleUnitModel unit in list) {
+					if (!unit.IsAbnormalityOrPart) goodones.Add(unit);
+				}
+			}
+
+			if (param.Contains("ExceptSelf")) list.Remove(modsa_unitModel);
+			if (param.Contains("ExceptTarget")) list.Remove(modsa_loopTarget);
+			
+			if (param.Contains("Random")) list = MainClass.ShuffleUnits(list);
+			else if (param.Contains("Deploy")) {
+				Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.PARTICIPATE_ORDER.CompareTo(y.PARTICIPATE_ORDER);
+				list.Sort(value);
+			}
+			else if (param.Contains("Reversedeploy")) {
+				Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.PARTICIPATE_ORDER.CompareTo(x.PARTICIPATE_ORDER);
+				list.Sort(value);
+			}
+			
+			if (param.StartsWith("Slowest"))
+			{
+				Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.GetOriginSpeedForCompare().CompareTo(y.GetOriginSpeedForCompare());
+				list.Sort(value);
+			}
+			else if (param.StartsWith("Fastest"))
+			{
+				Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.GetOriginSpeedForCompare().CompareTo(x.GetOriginSpeedForCompare());
+				list.Sort(value);
+			}
+			else if (param.StartsWith("HighestHPRatio"))
+			{
+				Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.GetHpRatio().CompareTo(x.GetHpRatio());
+				list.Sort(value);
+			}
+			else if (param.StartsWith("LowestHPRatio"))
+			{
+				Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.GetHpRatio().CompareTo(y.GetHpRatio());
+				list.Sort(value);
+			}
+			else if (param.StartsWith("HighestHP")) {
+				Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.Hp.CompareTo(x.Hp);
+				list.Sort(value);
+			}
+			else if (param.StartsWith("LowestHP")) {
+				Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.Hp.CompareTo(y.Hp);
+				list.Sort(value);
+			}
+			else if (param.StartsWith("HighestMaxHP")) {
+				Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.MaxHp.CompareTo(x.MaxHp);
+				list.Sort(value);
+			}
+			else if (param.StartsWith("LowestMaxHP")) {
+				Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.MaxHp.CompareTo(y.MaxHp);
+				list.Sort(value);
+			}
+			else if (param.StartsWith("HighestMP")) {
+				Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.Mp.CompareTo(x.Mp);
+				list.Sort(value);
+			}
+			else if (param.StartsWith("LowestMP")) {
+				Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.Mp.CompareTo(y.Mp);
+				list.Sort(value);
+			}
+
+			return list;
+		}
+		
 		public BattleUnitModel GetTargetModel(string param)
 		{
 			if (param == "Null") return null;
@@ -561,11 +576,10 @@ namespace ModularSkillScripts
 				}
 				return null;
 			}
-			else if (param.StartsWith("adj"))
-			{
-				BattleUnitModel foundUnit = null;
+			else if (param.StartsWith("adj")) {
 				BattleObjectManager battleObjectManager_inst = SingletonBehavior<BattleObjectManager>.Instance;
-				if (battleObjectManager_inst == null) return foundUnit;
+				if (battleObjectManager_inst == null) return null;
+				BattleUnitModel foundUnit = null;
 				
 				string side_string = param.Remove(0, 3);
 				if (side_string == "Left")
@@ -580,94 +594,15 @@ namespace ModularSkillScripts
 				}
 				return foundUnit;
 			}
-			else
-			{
-				BattleUnitModel foundUnit = null;
+			else {
 				BattleObjectManager battleObjectManager_inst = SingletonBehavior<BattleObjectManager>.Instance;
-				if (battleObjectManager_inst == null) return foundUnit;
-
+				if (battleObjectManager_inst == null) return null;
+				BattleUnitModel foundUnit = null;
+				
 				UNIT_FACTION thisFaction = modsa_unitModel.Faction;
 				UNIT_FACTION enemyFaction = thisFaction == UNIT_FACTION.PLAYER ? UNIT_FACTION.ENEMY : UNIT_FACTION.PLAYER;
 
-				List<BattleUnitModel> list = new List<BattleUnitModel>();
-				if (param.Contains("$"))
-				{
-					string[] circles = param.Split('$');
-					param = circles[0];
-
-					string bufKeyword_string = circles[1];
-					BUFF_UNIQUE_KEYWORD bufKeyword = BUFF_UNIQUE_KEYWORD.Enhancement;
-					Enum.TryParse(bufKeyword_string, true, out bufKeyword);
-
-					if (param.Contains("Enemy")) {
-						foreach (BattleUnitModel unit in battleObjectManager_inst.GetAliveList(bufKeyword, 0, false, enemyFaction)) list.Add(unit);
-					}
-					else if (param.Contains("Ally")) {
-						foreach (BattleUnitModel unit in battleObjectManager_inst.GetAliveList(bufKeyword, 0, false, thisFaction)) list.Add(unit);
-					}
-					else {
-						foreach (BattleUnitModel unit in battleObjectManager_inst.GetAliveList(bufKeyword, 0, false)) list.Add(unit);
-					}
-				}
-				else
-				{
-					if (param.Contains("Enemy")) {
-						foreach (BattleUnitModel unit in battleObjectManager_inst.GetAliveList(false, enemyFaction)) list.Add(unit);
-					}
-					else if (param.Contains("Ally")) {
-						foreach (BattleUnitModel unit in battleObjectManager_inst.GetAliveList(false, thisFaction)) list.Add(unit);
-					}
-					else {
-						foreach (BattleUnitModel unit in battleObjectManager_inst.GetAliveList(false)) list.Add(unit);
-					}
-				}
-
-				if (param.Contains("ExceptSelf")) list.Remove(modsa_unitModel);
-				if (param.Contains("ExceptTarget")) list.Remove(modsa_loopTarget);
-				
-				if (param.Contains("Random")) list = MainClass.ShuffleUnits(list);
-				else if (param.Contains("Deploy")) {
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.PARTICIPATE_ORDER.CompareTo(y.PARTICIPATE_ORDER);
-					list.Sort(value);
-				}
-				else if (param.Contains("Reversedeploy")) {
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.PARTICIPATE_ORDER.CompareTo(x.PARTICIPATE_ORDER);
-					list.Sort(value);
-				}
-				
-				if (param.StartsWith("Slowest")) {
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.GetOriginSpeedForCompare().CompareTo(y.GetOriginSpeedForCompare());
-					list.Sort(value);
-				}
-				else if (param.StartsWith("Fastest")) {
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.GetOriginSpeedForCompare().CompareTo(x.GetOriginSpeedForCompare());
-					list.Sort(value);
-				}
-				else if (param.StartsWith("HighestHPRatio")) {
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.GetHpRatio().CompareTo(x.GetHpRatio());
-					list.Sort(value);
-				}
-				else if (param.StartsWith("LowestHPRatio")) {
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.GetHpRatio().CompareTo(y.GetHpRatio());
-					list.Sort(value);
-				}
-				else if (param.StartsWith("HighestHP")) {
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.Hp.CompareTo(x.Hp);
-					list.Sort(value);
-				}
-				else if (param.StartsWith("LowestHP")) {
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.Hp.CompareTo(y.Hp);
-					list.Sort(value);
-				}
-				else if (param.StartsWith("HighestMP")) {
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => y.Mp.CompareTo(x.Mp);
-					list.Sort(value);
-				}
-				else if (param.StartsWith("LowestMP")) {
-					Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.Mp.CompareTo(y.Mp);
-					list.Sort(value);
-				}
-
+				List<BattleUnitModel> list = GetCustomTargetingList(battleObjectManager_inst, param, thisFaction, enemyFaction);
 				if (list.Count > 0) foundUnit = list.ToArray()[0];
 				return foundUnit;
 			}
