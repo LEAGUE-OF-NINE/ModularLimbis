@@ -1310,7 +1310,7 @@ namespace ModularSkillScripts
 					SinActionModel fromSinAction_new = fromUnit.AddNewSinActionModel();
 					UnitSinModel fromSinModel_new = new UnitSinModel(skillID, fromUnit, fromSinAction_new);
 					BattleActionModel fromAction_new = new BattleActionModel(fromSinModel_new, fromUnit, fromSinAction_new);
-					fromAction_new._targetDataDetail.ClearAllTargetData(fromAction_new);
+					//fromAction_new._targetDataDetail.ClearAllTargetData(fromAction_new);
 					
 					List<SinActionModel> targetSinActionList = new List<SinActionModel>();
 					List<BattleUnitModel> targetList = GetTargetModelList(circles[1]);
@@ -1318,13 +1318,12 @@ namespace ModularSkillScripts
 						List<SinActionModel> sinActionList = targetModel.GetSinActionList();
 						if (sinActionList.Count < 1) continue;
 						targetSinActionList.Add(sinActionList.ToArray()[0]);
-						fromAction_new._targetDataDetail.AddTargetSinAction(sinActionList.ToArray()[0]);
+						//fromAction_new._targetDataDetail.AddTargetSinAction(sinActionList.ToArray()[0]);
 					}
 					//fromAction_new._targetDataDetail.SetOriginTargetSinAction(fromAction_new, targetSinActionList);
 					//fromAction_new.SetOriginTargetSinActions(targetSinActionList);
-					fromAction_new._targetDataDetail.ReadyOriginTargeting(fromAction_new);
 					
-					TargetDataSet targetDataSet = fromAction_new._targetDataDetail.GetCurrentTargetSet();
+					/*TargetDataSet targetDataSet = fromAction_new._targetDataDetail.GetCurrentTargetSet();
 					if (!targetSinActionList.Contains(targetDataSet._mainTarget.GetTargetSinAction())) {
 						if (targetSinActionList.Count > 0) targetDataSet.SetMainTargetSinAction(targetSinActionList.ToArray()[0]);
 					}
@@ -1332,10 +1331,16 @@ namespace ModularSkillScripts
 					foreach (TargetSinActionData targetSinActionData in targetDataSet._subTargetList) {
 						if (targetSinActionList.Contains(targetSinActionData.GetTargetSinAction())) goodones.Add(targetSinActionData);
 					}
-					targetDataSet._subTargetList = goodones;
+					targetDataSet._subTargetList = goodones;*/
 					
+					fromAction_new._targetDataDetail.ReadyOriginTargeting(fromAction_new);
 					if (circles.Length > 3) fromUnit.CutInDefenseActionForcely(fromAction_new, true);
-					else fromUnit.CutInAction(fromAction_new);
+					else {
+						fromUnit.CutInAction(fromAction_new);
+						if (targetSinActionList.Count > 0) {
+							fromAction_new.ChangeMainTargetSinAction(targetSinActionList.ToArray()[0], null, true);
+						}
+					}
 				}
 					break;
 				case "skillreuse": foreach (BattleUnitModel targetModel in GetTargetModelList(circledSection)) targetModel.ReuseAction(modsa_selfAction);
