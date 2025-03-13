@@ -1406,6 +1406,9 @@ namespace ModularSkillScripts
 				case "endstage": Singleton<StageController>.Instance.EndStage(); break;
 				case "endbattle": Singleton<StageController>.Instance.EndBattlePhaseForcely(true); break; 
 				case "skillteamkill": modsa_skillModel._skillData.canTeamKill = circledSection == "True"; break;
+		                case "skillcanduel": modsa_skillModel._skillData.canDuel = circledSection == "True"; break;
+		                case "skillchangetarget": modsa_skillModel._skillData.canBeChangedTarget = circledSection == "True"; break;
+		                case "skilltargetnum": int targetnum = GetNumFromParamString(circledSection); modsa_skillModel._skillData.targetNum = targetnum; break;
 				case "skillslotgive":{
 					SinManager sinManager_inst = Singleton<SinManager>.Instance;
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
