@@ -1394,7 +1394,7 @@ namespace ModularSkillScripts
 					break;
 				case "endstage": Singleton<StageController>.Instance.EndStage(); break;
 				case "endbattle": Singleton<StageController>.Instance.EndBattlePhaseForcely(true); break; 
-				case "teamkill": modsa_skillModel._skillData.canTeamKill = circledSection == "True"; break;
+				case "skillteamkill": modsa_skillModel._skillData.canTeamKill = circledSection == "True"; break;
 				case "skillslotgive":{
 					SinManager sinManager_inst = Singleton<SinManager>.Instance;
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
@@ -1852,6 +1852,11 @@ namespace ModularSkillScripts
 					valueList[setvalue_idx] = value;
 				}
 				break;
+				case "coinisbroken": {
+					if (modsa_coinModel == null) return;
+					valueList[setvalue_idx] = modsa_coinModel.IsDestroyed ? 1 : 0;
+				}
+					break;
 			}
 		}
 		
