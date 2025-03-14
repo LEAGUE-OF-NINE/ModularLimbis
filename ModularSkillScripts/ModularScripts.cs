@@ -1431,8 +1431,16 @@ namespace ModularSkillScripts
 						unlockInfo_inst.UnlockPassiveStatus(targetModel.GetOriginUnitID(), pasID);
 					}
 				}
-                		case "appearance": SingletonBehavior<BattleObjectManager>.Instance.GetView(modsa_unitModel).ChangeAppearance(circledSection, true); break;
 					break;
+     				 case "appearance":
+				{
+		        		List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					foreach (BattleUnitModel targetModel in modelList)
+					{
+						SingletonBehavior<BattleObjectManager>.Instance.GetView(targetModel).ChangeAppearance(circles[1], true);
+					}
+				}
+				break;
 			}
 		}
 		
