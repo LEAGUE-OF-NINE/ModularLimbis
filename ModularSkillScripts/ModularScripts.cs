@@ -1410,8 +1410,8 @@ namespace ModularSkillScripts
 				case "endstage": Singleton<StageController>.Instance.EndStage(); break;
 				case "endbattle": Singleton<StageController>.Instance.EndBattlePhaseForcely(true); break; 
 				case "skillteamkill": break;
-                case "skillcanduel": modsa_skillModel.OverrideCanDuel(circledSection == "True"); break;
-                case "skillchangetarget": break;
+                		case "skillcanduel": modsa_skillModel.OverrideCanDuel(circledSection == "True"); break;
+                		case "skillchangetarget": break;
 				case "skilltargetnum": break;
 				case "skillcancel": break;
 				case "skillslotgive":{
@@ -1431,6 +1431,7 @@ namespace ModularSkillScripts
 						unlockInfo_inst.UnlockPassiveStatus(targetModel.GetOriginUnitID(), pasID);
 					}
 				}
+                		case "appearance": SingletonBehavior<BattleObjectManager>.Instance.GetView(modsa_unitModel).ChangeAppearance(circledSection, true); break;
 					break;
 			}
 		}
