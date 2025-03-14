@@ -58,6 +58,8 @@ namespace ModularSkillScripts
 			timingDict.Add("OnBreak", 22);
 			timingDict.Add("OnOtherBreak", 23);
 			timingDict.Add("OnDiscard", 24);
+			timingDict.Add("OnZeroHP", 25);
+			timingDict.Add("EnemyEndSkill", 26);
 			timingDict.Add("SpecialAction", 999);
 		}
 
@@ -89,7 +91,7 @@ namespace ModularSkillScripts
 
 		public const string NAME = "ModularSkillScripts";
 
-		public const string VERSION = "2.3.8";
+		public const string VERSION = "2.3.9";
 
 		public const string AUTHOR = "GlitchGames";
 

@@ -583,6 +583,7 @@ namespace ModularSkillScripts
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
 				MainClass.Logg.LogInfo("Found modpassive - OnDie: " + modpa.passiveID);
 				modpa.modsa_passiveModel = __instance;
+				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(killer);
 				modpa.Enact(__instance.Owner, null, null, null, 12, timing);
 			}
@@ -617,6 +618,7 @@ namespace ModularSkillScripts
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
 				if (Input.GetKeyInt(BepInEx.IL2CPP.UnityEngine.KeyCode.LeftControl)) MainClass.Logg.LogInfo("Found modpassive - OnDieOtherUnit: " + modpa.passiveID);
 				modpa.modsa_passiveModel = __instance;
+				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(dead);
 				modpa.Enact(__instance.Owner, null, null, null, 13, timing);
 			}
@@ -709,6 +711,7 @@ namespace ModularSkillScripts
 				if (modpa.passiveID != __instance.ClassInfo.ID) continue;
 				if (passiveModel_intlong != modpa.ptr_intlong) continue;
 				modpa.modsa_passiveModel = __instance;
+				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(breakedUnit);
 				modpa.Enact(__instance.Owner, null, null, null, 23, timing);
 			}
@@ -1153,6 +1156,40 @@ namespace ModularSkillScripts
 		}
 
 
+		[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnZeroHp))]
+		[HarmonyPrefix]
+		private static void Prefix_BattleUnitModel_OnZeroHp(BattleUnitModel __instance)
+		{
+			foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList) {
+				if (!passiveModel.CheckActiveCondition()) continue;
+				long passivemodel_intlong = passiveModel.Pointer.ToInt64();
+				foreach (ModularSA modpa in modpa_list) {
+					if (passivemodel_intlong != modpa.ptr_intlong) continue;
+					modpa.modsa_passiveModel = passiveModel;
+					modpa.Enact(__instance, null, null, null, 25, BATTLE_EVENT_TIMING.ALL_TIMING);
+				}
+			}
+		}
+		
+		
+		[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnEndEnemyAttack))]
+		[HarmonyPostfix]
+		private static void Postfix_BattleUnitModel_OnEndEnemyAttack(BattleActionModel action, BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
+		{
+			foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList) {
+				if (!passiveModel.CheckActiveCondition()) continue;
+				long passivemodel_intlong = passiveModel.Pointer.ToInt64();
+				foreach (ModularSA modpa in modpa_list) {
+					if (passivemodel_intlong != modpa.ptr_intlong) continue;
+					modpa.modsa_passiveModel = passiveModel;
+					modpa.modsa_target_list.Clear();
+					modpa.modsa_target_list.Add(__instance);
+					modpa.Enact(action.Model, action.Skill, action, null, 26, timing);
+				}
+			}
+		}
+		
+		
 		// end
 	}
 }

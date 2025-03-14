@@ -878,21 +878,21 @@ namespace ModularSkillScripts
 					int stack = GetNumFromParamString(circles[2]);
 					int turn = GetNumFromParamString(circles[3]);
 					int activeRound = GetNumFromParamString(circles[4]);
+					bool use = circles.Length >= 6;
 
-					foreach (BattleUnitModel targetModel in modelList)
-					{
-						if (stack < 0)
-						{
-							targetModel.LoseBuffStack(buf_keyword, stack * -1, battleTiming, activeRound);
+					foreach (BattleUnitModel targetModel in modelList) {
+						if (stack < 0) {
+							if (use) targetModel.UseBuffStack(buf_keyword, stack * -1, battleTiming);
+							else targetModel.LoseBuffStack(buf_keyword, stack * -1, battleTiming, activeRound);
 							stack = 0;
 						}
 						if (turn < 0)
 						{
-							targetModel.LoseBuffTurn(buf_keyword, turn * -1, battleTiming);
+							if (use) targetModel.UseBuffTurn(buf_keyword, turn * -1, battleTiming);
+							else targetModel.LoseBuffTurn(buf_keyword, turn * -1, battleTiming);
 							turn = 0;
 						}
-						if (stack > 0 || turn > 0)
-						{
+						if (stack > 0 || turn > 0) {
 							AbilityTriggeredData_GiveBuff triggerData = new AbilityTriggeredData_GiveBuff(buf_keyword, stack, turn, activeRound, false, true, targetModel.InstanceID, battleTiming, BUF_TYPE.Neutral);
 							if (abilityMode == 2)
 							{
@@ -1092,20 +1092,19 @@ namespace ModularSkillScripts
 				case "pattern":{
 					BattleUnitModel_Abnormality abnoModel = null;
 					if (modsa_unitModel is BattleUnitModel_Abnormality) abnoModel = (BattleUnitModel_Abnormality)modsa_unitModel;
-					else if (modsa_unitModel is BattleUnitModel_Abnormality_Part)
-					{
+					else if (modsa_unitModel is BattleUnitModel_Abnormality_Part) {
 						BattleUnitModel_Abnormality_Part partModel = (BattleUnitModel_Abnormality_Part)modsa_unitModel;
 						abnoModel = partModel.Abnormality;
 					}
 					if (abnoModel == null) return;
-					if (MainClass.logEnabled) MainClass.Logg.LogInfo("abnoModel not null");
+					MainClass.Logg.LogInfo("abnoModel not null");
 
 					PatternScript_Abnormality pattern = abnoModel.PatternScript;
 
 					//List<BattlePattern> battlePattern_list = pattern._patternList;
 
 					int pickedPattern_idx = GetNumFromParamString(circles[0]);
-					if (MainClass.logEnabled) MainClass.Logg.LogInfo("pickedPattern_idx: " + pickedPattern_idx);
+					MainClass.Logg.LogInfo("pickedPattern_idx: " + pickedPattern_idx);
 					pattern.currPatternIdx = pickedPattern_idx;
 					//int slotCount = -1;
 					//bool randomize = false;
@@ -1414,6 +1413,7 @@ namespace ModularSkillScripts
                 case "skillcanduel": modsa_skillModel.OverrideCanDuel(circledSection == "True"); break;
                 case "skillchangetarget": break;
 				case "skilltargetnum": break;
+				case "skillcancel": break;
 				case "skillslotgive":{
 					SinManager sinManager_inst = Singleton<SinManager>.Instance;
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
@@ -1532,13 +1532,23 @@ namespace ModularSkillScripts
 
 					BuffDetail bufDetail = targetModel._buffDetail;
 					//BuffModel buf = bufDetail.FindActivatedBuff(buf_keyword, false);
-					int stack = bufDetail.GetActivatedBuffStack(buf_keyword, false);
-					int turn = bufDetail.GetActivatedBuffTurn(buf_keyword, false);
+					int stack = 0;
+					int turn = 0;
+					bool usedcheck = circles.Length >= 4;
+					if (usedcheck) {
+						stack = 0;
+					}
+					else {
+						stack = bufDetail.GetActivatedBuffStack(buf_keyword, false);
+						turn = bufDetail.GetActivatedBuffTurn(buf_keyword, false);
+					}
+					
 
 					int finalValue = stack;
-					if (circles[2] == "turn") finalValue = turn;
-					else if (circles[2] == "+") finalValue = stack + turn;
-					else if (circles[2] == "*") finalValue = stack * turn;
+					string circle_2 = circles[2];
+					if (circle_2 == "turn") finalValue = turn;
+					else if (circle_2 == "+") finalValue = stack + turn;
+					else if (circle_2== "*") finalValue = stack * turn;
 					valueList[setvalue_idx] = finalValue;
 				}
 					break;
@@ -1603,12 +1613,12 @@ namespace ModularSkillScripts
 						abnoModel = partModel.Abnormality;
 					}
 					if (abnoModel == null) { valueList[setvalue_idx] = 0; return; }
-					if (MainClass.logEnabled) MainClass.Logg.LogInfo("getpattern: abnoModel exists");
-
+					MainClass.Logg.LogInfo("getpattern: abnoModel exists");
+					
 					PatternScript_Abnormality pattern = abnoModel.PatternScript;
 
 					int pattern_idx = pattern.currPatternIdx;
-					if (MainClass.logEnabled) MainClass.Logg.LogInfo("get pattern_idx: " + pattern_idx);
+					MainClass.Logg.LogInfo("getpattern pattern_idx: " + pattern_idx);
 					valueList[setvalue_idx] = pattern.currPatternIdx;
 				}
 					break;
@@ -1841,6 +1851,12 @@ namespace ModularSkillScripts
 					if (action == null) return;
 
 					valueList[setvalue_idx] = (int)action.Skill.GetAttributeType();
+				}
+					break;
+				case "skillslotcount":{
+					BattleUnitModel targetModel = GetTargetModel(circles[0]);
+					if (targetModel == null) return;
+					valueList[setvalue_idx] = targetModel.GetSinActionList().Count;
 				}
 					break;
 				case "amountattacks":
