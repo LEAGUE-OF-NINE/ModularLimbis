@@ -1432,7 +1432,7 @@ namespace ModularSkillScripts
 					}
 				}
 					break;
-     				 case "appearance":
+     				case "appearance":
 				{
 		        		List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
 					foreach (BattleUnitModel targetModel in modelList)
@@ -1440,7 +1440,19 @@ namespace ModularSkillScripts
 						SingletonBehavior<BattleObjectManager>.Instance.GetView(targetModel).ChangeAppearance(circles[1], true);
 					}
 				}
-				break;
+					break;
+    				case "coincancel":
+				{
+					foreach (string circle in circles)
+					{
+						int idx = GetNumFromParamString(circle);
+						if (idx < 0) { modsa_skillModel.DisableCoin(modsa_coinModel.GetOriginCoinIndex()); continue; }
+
+						idx = Math.Min(idx, modsa_skillModel.CoinList.Count - 1);
+						modsa_skillModel.DisableCoin(idx);
+        				}
+				}
+					break;
 			}
 		}
 		
