@@ -1891,7 +1891,6 @@ namespace ModularSkillScripts
 				case "getstat":{
 					BattleUnitModel targetModel = GetTargetModel(circles[0]);
 					if (targetModel == null) return;
-					int value = -1;
 
 					string circle_1 = circles[1];
 					if (circle_1 == "deployment") value = targetModel.PARTICIPATE_ORDER;
@@ -1903,17 +1902,15 @@ namespace ModularSkillScripts
 						string word = circle_1.Remove(0, 3);
 						ATK_BEHAVIOUR atk = ATK_BEHAVIOUR.NONE;
 						Enum.TryParse(word, true, out atk);
-						if (atk != ATK_BEHAVIOUR.NONE)
-						{
-							value = (int)(targetModel.GetAtkResistMultiplier(atk) * 100.0f);
+						if (atk != ATK_BEHAVIOUR.NONE) {
+							valueList[setvalue_idx] = (int)(targetModel.GetAtkResistMultiplier(atk) * 100.0f);
 							return;
 						}
 
 						ATTRIBUTE_TYPE sin = ATTRIBUTE_TYPE.NONE;
 						Enum.TryParse(word, true, out sin);
-						if (sin != ATTRIBUTE_TYPE.NONE) value = (int)(targetModel.GetAttributeResistMultiplier(sin) * 100.0f);
+						if (sin != ATTRIBUTE_TYPE.NONE) valueList[setvalue_idx] = (int)(targetModel.GetAttributeResistMultiplier(sin) * 100.0f);
 					}
-					valueList[setvalue_idx] = value;
 				}
 				break;
 				case "coinisbroken": {
