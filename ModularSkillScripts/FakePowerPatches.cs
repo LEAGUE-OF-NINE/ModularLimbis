@@ -116,5 +116,33 @@ namespace ModularSkillScripts
 				}
 			}
 		}
+		
+		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetExpectedCoinScaleAdder))]
+		[HarmonyPostfix]
+		private static void Postfix_SkillModel_GetExpectedCoinScaleAdder(BattleActionModel action, CoinModel coin, ref int __result, SkillModel __instance)
+		{
+			long skillmodel_intlong = __instance.Pointer.ToInt64();
+			if (SkillScriptInitPatch.modsaDict.ContainsKey(skillmodel_intlong)) {
+				foreach (ModularSA modsa in SkillScriptInitPatch.modsaDict[skillmodel_intlong])
+				{
+					if (modsa.activationTiming != 10) continue;
+					if (skillmodel_intlong != modsa.ptr_intlong) continue;
+					int power = modsa.coinScaleAdder;
+					__result += power;
+				}
+			}
+
+			foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList) {
+				long passivemodel_intlong = passiveModel.Pointer.ToInt64();
+				foreach (ModularSA modpa in SkillScriptInitPatch.modpa_list)
+				{
+					if (modpa.activationTiming != 10) continue;
+					if (passivemodel_intlong != modpa.ptr_intlong) continue;
+					int power = modpa.coinScaleAdder;
+					__result += power;
+				}
+			}
+		}
+		
 	}
 }
