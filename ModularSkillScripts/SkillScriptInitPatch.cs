@@ -558,69 +558,39 @@ namespace ModularSkillScripts
 		[HarmonyPostfix]
 		private static void Postfix_PassiveDetail_OnDie(BattleUnitModel killer, BattleActionModel actionOrNull, DAMAGE_SOURCE_TYPE dmgSrcType, BUFF_UNIQUE_KEYWORD keyword, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 		{
-			foreach (PassiveModel passiveModel in __instance.PassiveList)
-			{
+			BattleUnitModel deadUnit = __instance._owner;
+			foreach (PassiveModel passiveModel in __instance.PassiveList) {
 				if (!passiveModel.CheckActiveCondition()) continue;
-				List<string> requireIDList = passiveModel.ClassInfo.requireIDList;
-				foreach (string param in requireIDList)
-				{
-					if (param.StartsWith("Modular/"))
-					{
-						passiveModel.OnDie(killer, actionOrNull, dmgSrcType, keyword, timing);
-						break;
-					}
+				
+				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+				foreach (ModularSA modpa in modpa_list) {
+					if (modpa.passiveID != passiveModel.ClassInfo.ID) continue;
+					if (passiveModel_intlong != modpa.ptr_intlong) continue;
+					MainClass.Logg.LogInfo("Found modpassive - OnDie: " + modpa.passiveID);
+					modpa.modsa_passiveModel = passiveModel;
+					modpa.modsa_target_list.Clear();
+					modpa.modsa_target_list.Add(killer);
+					modpa.Enact(deadUnit, null, null, actionOrNull, 12, timing);
 				}
 			}
-		}
-		[HarmonyPatch(typeof(PassiveModel), nameof(PassiveModel.OnDie))]
-		[HarmonyPostfix]
-		private static void Postfix_PassiveModel_OnDie(BattleUnitModel killer, BattleActionModel actionOrNull, DAMAGE_SOURCE_TYPE dmgSrcType, BUFF_UNIQUE_KEYWORD keyword, BATTLE_EVENT_TIMING timing, PassiveModel __instance)
-		{
-			long passiveModel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modpa in modpa_list)
-			{
-				if (modpa.passiveID != __instance.ClassInfo.ID) continue;
-				if (passiveModel_intlong != modpa.ptr_intlong) continue;
-				MainClass.Logg.LogInfo("Found modpassive - OnDie: " + modpa.passiveID);
-				modpa.modsa_passiveModel = __instance;
-				modpa.modsa_target_list.Clear();
-				modpa.modsa_target_list.Add(killer);
-				modpa.Enact(__instance.Owner, null, null, null, 12, timing);
-			}
-		}
 
-		[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnDieOtherUnit))]
-		[HarmonyPostfix]
-		private static void Postfix_PassiveDetail_OnDieOtherUnit(BattleUnitModel killer, BattleUnitModel dead, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
-		{
-			foreach (PassiveModel passiveModel in __instance.PassiveList)
+			BattleObjectManager battleObjManager_inst = SingletonBehavior<BattleObjectManager>.Instance;
+			foreach (BattleUnitModel unit in battleObjManager_inst.GetAliveListExceptSelf(deadUnit, false, false))
 			{
-				if (!passiveModel.CheckActiveCondition()) continue;
-				List<string> requireIDList = passiveModel.ClassInfo.requireIDList;
-				foreach (string param in requireIDList)
-				{
-					if (param.StartsWith("Modular/"))
-					{
-						passiveModel.OnDieOtherUnit(killer, dead, timing, DAMAGE_SOURCE_TYPE.PASSIVE, BUFF_UNIQUE_KEYWORD.None);
-						break;
+				foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList) {
+					if (!passiveModel.CheckActiveCondition()) continue;
+				
+					long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+					foreach (ModularSA modpa in modpa_list) {
+						if (modpa.passiveID != passiveModel.ClassInfo.ID) continue;
+						if (passiveModel_intlong != modpa.ptr_intlong) continue;
+						MainClass.Logg.LogInfo("Found modpassive - OnOtherDie: " + modpa.passiveID);
+						modpa.modsa_passiveModel = passiveModel;
+						modpa.modsa_target_list.Clear();
+						modpa.modsa_target_list.Add(deadUnit);
+						modpa.Enact(unit, null, null, actionOrNull, 13, timing);
 					}
 				}
-			}
-		}
-		[HarmonyPatch(typeof(PassiveModel), nameof(PassiveModel.OnDieOtherUnit))]
-		[HarmonyPostfix]
-		private static void Postfix_PassiveModel_OnDieOtherUnit(BattleUnitModel dead, BATTLE_EVENT_TIMING timing, PassiveModel __instance)
-		{
-			long passiveModel_intlong = __instance.Pointer.ToInt64();
-			foreach (ModularSA modpa in modpa_list)
-			{
-				if (modpa.passiveID != __instance.ClassInfo.ID) continue;
-				if (passiveModel_intlong != modpa.ptr_intlong) continue;
-				if (Input.GetKeyInt(BepInEx.IL2CPP.UnityEngine.KeyCode.LeftControl)) MainClass.Logg.LogInfo("Found modpassive - OnDieOtherUnit: " + modpa.passiveID);
-				modpa.modsa_passiveModel = __instance;
-				modpa.modsa_target_list.Clear();
-				modpa.modsa_target_list.Add(dead);
-				modpa.Enact(__instance.Owner, null, null, null, 13, timing);
 			}
 		}
 
