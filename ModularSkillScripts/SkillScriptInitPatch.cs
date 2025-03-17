@@ -840,10 +840,7 @@ namespace ModularSkillScripts
 				if (modca.activationTiming == 10) continue;
 				if (coinmodel_intlong != modca.ptr_intlong) continue;
 				int power = modca.atkMultAdder;
-				if (power != 0)
-				{
-					__result += (float)power * 0.01f;
-				}
+				if (power != 0) __result += (float)power * 0.01f;
 			}
 			
 			long skillmodel_intlong = __instance.Pointer.ToInt64();

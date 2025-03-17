@@ -429,15 +429,19 @@ namespace ModularSkillScripts
 				List<BattleUnitModel> list = GetCustomTargetingList(battleObjectManager, param, thisFaction, enemyFaction);
 				
 				int num = 1;
-				string text = Regex.Replace(param, "\\D", "");
-				if (text.Length > 0) num = int.Parse(text);
+				if (param.Contains("VALUE_")) {
+					string[] circles = param.Split('$');
+					string numstring = circles[0].Substring(circles[0].Length - 7);
+					num = GetNumFromParamString(numstring);
+				}
+				else {
+					string text = Regex.Replace(param, "\\D", "");
+					if (text.Length > 0) num = int.Parse(text);
+				}
 				
 				num = Math.Min(num, list.Count);
 				if (num > 0) {
-					for (int i = 0; i < num; i++)
-					{
-						unitList.Add(list.ToArray()[i]);
-					}
+					for (int i = 0; i < num; i++) unitList.Add(list.ToArray()[i]);
 				}
 			}
 
