@@ -243,12 +243,9 @@ namespace ModularSkillScripts
 
 			ResetAdders();
 			List<BattleUnitModel> loopTarget_list = modsa_target_list;
-			modsa_target_list.Clear();
 			if (modsa_loopString.Any()) loopTarget_list = GetTargetModelList(modsa_loopString);
 			else if (loopTarget_list.Count < 1) loopTarget_list.Add(GetTargetModel("MainTarget"));
-
-			foreach (BattleUnitModel unit in loopTarget_list)
-			{
+			foreach (BattleUnitModel unit in loopTarget_list) {
 				modsa_loopTarget = unit;
 				_fullStop = false;
 				for (int i = 0; i < batch_list.Count; i++)
@@ -259,6 +256,7 @@ namespace ModularSkillScripts
 					ProcessBatch(batch);
 				}
 			}
+			modsa_target_list.Clear();
 			activationCounter += 1;
 		}
 
