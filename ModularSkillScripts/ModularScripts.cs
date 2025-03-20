@@ -1148,39 +1148,7 @@ namespace ModularSkillScripts
 					foreach (BattleUnitModel targetModel in modelList)
 					{
 						long targetPtr_intlong = targetModel.Pointer.ToInt64();
-						bool found = false;
-						foreach (ModUnitData unitMod in SkillScriptInitPatch.unitMod_list)
-						{
-							if (unitMod.unitPtr_intlong != targetPtr_intlong) continue;
-							
-							foreach (DataMod dataMod in unitMod.data_list) {
-								if (dataMod.dataID != dataID) continue;
-								found = true;
-								dataMod.dataValue = dataValue;
-								break;
-							}
-							if (!found) {
-								var dataMod = new DataMod();
-								dataMod.dataID = dataID;
-								dataMod.dataValue = dataValue;
-								unitMod.data_list.Add(dataMod);
-							}
-
-							found = true;
-							break;
-						}
-
-						if (!found)
-						{
-							var unitMod = new ModUnitData();
-							unitMod.unitPtr_intlong = targetPtr_intlong;
-							SkillScriptInitPatch.unitMod_list.Add(unitMod);
-
-							var dataMod = new DataMod();
-							dataMod.dataID = dataID;
-							dataMod.dataValue = dataValue;
-							unitMod.data_list.Add(dataMod);
-						}
+						SkillScriptInitPatch.SetModUnitData(targetPtr_intlong, dataID, dataValue);
 					}
 				}
 					break;
@@ -1666,18 +1634,9 @@ namespace ModularSkillScripts
 
 					int finalValue = 0;
 					int dataID = GetNumFromParamString(circles[1]);
-
 					long targetPtr_intlong = targetModel.Pointer.ToInt64();
-					foreach (ModUnitData unitMod in SkillScriptInitPatch.unitMod_list)
-					{
-						if (unitMod.unitPtr_intlong != targetPtr_intlong) continue;
-						foreach (DataMod dataMod in unitMod.data_list) {
-							if (dataMod.dataID != dataID) continue;
-							finalValue = dataMod.dataValue;
-							break;
-						}
-						break;
-					}
+					
+					finalValue = SkillScriptInitPatch.GetModUnitData(targetPtr_intlong, dataID);
 					valueList[setvalue_idx] = finalValue;
 				}
 					break;

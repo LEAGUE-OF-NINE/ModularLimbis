@@ -685,3 +685,5 @@ C:/Users/Glitch/Desktop/ModularSkillScripts repos/ModularSkillScripts/obj/Releas
 /media/glitch/ExtraWorld/repos/ModularSkillScripts repos/ModularSkillScripts/bin/Release/System.Security.AccessControl.xml
 /media/glitch/ExtraWorld/repos/ModularSkillScripts repos/ModularSkillScripts/bin/Release/System.Security.Permissions.xml
 /media/glitch/ExtraWorld/repos/ModularSkillScripts repos/ModularSkillScripts/bin/Release/System.Security.Principal.Windows.xml
+/media/glitch/ExtraWorld/repos/ModularSkillScripts repos/ModularSkillScripts/bin/Release/Assembly-CSharp.dll
+/media/glitch/ExtraWorld/repos/ModularSkillScripts repos/ModularSkillScripts/bin/Release/Il2Cppmscorlib.dll

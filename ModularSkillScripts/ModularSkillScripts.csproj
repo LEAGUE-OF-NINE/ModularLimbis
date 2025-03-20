@@ -47,9 +47,8 @@
     <Reference Include="Antlr4BuildTasks, Version=12.10.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Antlr4BuildTasks.12.10.0\lib\netstandard2.0\Antlr4BuildTasks.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Limbus Company\BepInEx\unhollowed\Assembly-CSharp.dll</HintPath>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\..\..\..\home\glitch\.local\share\Steam\steamapps\common\Limbus Company\BepInEx\unhollowed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="BepInEx.Core">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Limbus Company\BepInEx\core\BepInEx.Core.dll</HintPath>
@@ -58,7 +57,7 @@
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Limbus Company\BepInEx\core\BepInEx.IL2CPP.dll</HintPath>
     </Reference>
     <Reference Include="Il2Cppmscorlib">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Limbus Company\BepInEx\unhollowed\Il2Cppmscorlib.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\home\glitch\.local\share\Steam\steamapps\common\Limbus Company\BepInEx\unhollowed\Il2Cppmscorlib.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Build.Framework, Version=15.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Build.Framework.17.9.5\lib\net472\Microsoft.Build.Framework.dll</HintPath>

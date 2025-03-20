@@ -5,7 +5,7 @@ using Il2CppSystem.Collections.Generic;
 
 namespace ModularSkillScripts
 {
-	class SkillScriptInitPatch
+	public class SkillScriptInitPatch
 	{
 		[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.Init), new Type[] { })]
 		[HarmonyPostfix]
@@ -174,9 +174,51 @@ namespace ModularSkillScripts
 		public static Dictionary<long, List<ModularSA>> modsaDict = new();
 		public static List<ModularSA> modpa_list = new ();
 		public static List<ModularSA> modca_list = new ();
-		public static List<ModUnitData> unitMod_list = new ();
+		public static Dictionary<long, ModUnitData> unitMod_list = new ();
 		public static List<long> skillPtrsRoundStart = new ();
 
+
+		public static int GetModUnitData(long targetPtr_intlong, int dataID)
+		{
+			if (unitMod_list.ContainsKey(targetPtr_intlong)) {
+				foreach (DataMod dataMod in unitMod_list[targetPtr_intlong].data_list) {
+					if (dataMod.dataID != dataID) continue;
+					return dataMod.dataValue;
+				}
+			}
+			return 0;
+		}
+		public static void SetModUnitData(long targetPtr_intlong, int dataID, int dataValue)
+		{
+			bool found = false;
+			if (unitMod_list.ContainsKey(targetPtr_intlong)) {
+				foreach (DataMod dataMod in unitMod_list[targetPtr_intlong].data_list) {
+					if (dataMod.dataID != dataID) continue;
+					found = true;
+					dataMod.dataValue = dataValue;
+					break;
+				}
+				if (!found) {
+					var dataMod = new DataMod();
+					dataMod.dataID = dataID;
+					dataMod.dataValue = dataValue;
+					unitMod_list[targetPtr_intlong].data_list.Add(dataMod);
+				}
+
+				found = true;
+			}
+			
+			if (!found) {
+				var unitMod = new ModUnitData();
+				unitMod.unitPtr_intlong = targetPtr_intlong;
+				unitMod_list.Add(targetPtr_intlong, unitMod);
+				
+				var dataMod = new DataMod();
+				dataMod.dataID = dataID;
+				dataMod.dataValue = dataValue;
+				unitMod.data_list.Add(dataMod);
+			}
+		}
 
 		// REAL PATCHES START HERE
 
@@ -687,6 +729,8 @@ namespace ModularSkillScripts
 			}
 		}
 
+		// PASSIVES END
+		// PASSIVES END
 		// PASSIVES END
 
 
