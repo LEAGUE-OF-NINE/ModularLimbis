@@ -19,23 +19,13 @@ namespace ModularSkillScripts
 			foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList)
 			{
 				if (!passiveModel.CheckActiveCondition()) continue;
-				List<string> requireIDList = passiveModel.ClassInfo.requireIDList;
-				foreach (string param in requireIDList)
-				{
-					if (param.StartsWith("Modular/"))
-					{
-						long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-						foreach (ModularSA modpa in SkillScriptInitPatch.modpa_list)
-						{
-							if (modpa.passiveID != passiveModel.ClassInfo.ID) continue;
-							if (passiveModel_intlong != modpa.ptr_intlong) continue;
-							MainClass.Logg.LogInfo("Found modpassive - SPECIAL: " + modpa.passiveID);
-							modpa.modsa_passiveModel = passiveModel;
-							modpa.Enact(passiveModel.Owner, null, null, null, 999, BATTLE_EVENT_TIMING.ALL_TIMING);
-						}
-
-						break;
-					}
+				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+				if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
+					
+				foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong]) {
+					MainClass.Logg.LogInfo("Found modpassive - SPECIAL: " + modpa.passiveID);
+					modpa.modsa_passiveModel = passiveModel;
+					modpa.Enact(passiveModel.Owner, null, null, null, 999, BATTLE_EVENT_TIMING.ALL_TIMING);
 				}
 			}
 
@@ -55,11 +45,9 @@ namespace ModularSkillScripts
 			objManager.OnRoundStart_View_AfterChoice();
 			objManager.UpdateViewState(false, false);
 
-			foreach (BattleUnitView unitView in objManager.GetAliveViewList())
-			{
+			foreach (BattleUnitView unitView in objManager.GetAliveViewList()) {
 				unitView.RefreshAppearanceRenderer(true);
 			}
-
 
 			return false;
 		}

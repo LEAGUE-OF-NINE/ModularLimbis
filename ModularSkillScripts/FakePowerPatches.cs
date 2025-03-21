@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using Il2CppSystem.Collections.Generic;
 
 namespace ModularSkillScripts
 {
@@ -8,8 +9,14 @@ namespace ModularSkillScripts
 		[HarmonyPrefix]
 		private static void Postfix_SkillModelManager_GetExpectedWinRate(BattleActionModel selfAction)
 		{
-			foreach (ModularSA modpa in SkillScriptInitPatch.modpa_list) modpa.ResetAdders();
-
+			foreach (long key in SkillScriptInitPatch.modpaDict.Keys) {
+				List<ModularSA> value = SkillScriptInitPatch.modpaDict[key];
+				foreach (ModularSA modular in value) {
+					if (modular.activationTiming != 10) continue;
+					modular.ResetAdders();
+				}
+			}
+			
 			long skillmodel_intlong = selfAction.Skill.Pointer.ToInt64();
 			if (SkillScriptInitPatch.modsaDict.ContainsKey(skillmodel_intlong)) {
 				foreach (ModularSA modsa in SkillScriptInitPatch.modsaDict[skillmodel_intlong]) {
@@ -18,13 +25,13 @@ namespace ModularSkillScripts
 				}
 			}
 
-			foreach (PassiveModel passiveModel in selfAction.Model._passiveDetail.PassiveList)
-			{
+			foreach (PassiveModel passiveModel in selfAction.Model._passiveDetail.PassiveList) {
 				if (!passiveModel.CheckActiveCondition()) continue;
-				long passivemodel_intlong = passiveModel.Pointer.ToInt64();
-				foreach (ModularSA modpa in SkillScriptInitPatch.modpa_list)
-				{
-					if (passivemodel_intlong != modpa.ptr_intlong) continue;
+				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+				if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
+					
+				foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong]) {
+					if (modpa.activationTiming != 10) continue;
 					modpa.Enact(selfAction.Model, selfAction.Skill, selfAction, null, 10, BATTLE_EVENT_TIMING.NONE);
 				}
 			}
@@ -46,11 +53,12 @@ namespace ModularSkillScripts
 
 			foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList)
 			{
-				long passivemodel_intlong = passiveModel.Pointer.ToInt64();
-				foreach (ModularSA modpa in SkillScriptInitPatch.modpa_list)
-				{
+				if (!passiveModel.CheckActiveCondition()) continue;
+				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+				if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
+					
+				foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong]) {
 					if (modpa.activationTiming != 10) continue;
-					if (passivemodel_intlong != modpa.ptr_intlong) continue;
 					int power = modpa.skillPowerAdder;
 					__result += power;
 				}
@@ -74,13 +82,13 @@ namespace ModularSkillScripts
 				}
 			}
 
-			foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList)
-			{
-				long passivemodel_intlong = passiveModel.Pointer.ToInt64();
-				foreach (ModularSA modpa in SkillScriptInitPatch.modpa_list)
-				{
+			foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList) {
+				if (!passiveModel.CheckActiveCondition()) continue;
+				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+				if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
+					
+				foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong]) {
 					if (modpa.activationTiming != 10) continue;
-					if (passivemodel_intlong != modpa.ptr_intlong) continue;
 					int power = modpa.skillPowerResultAdder;
 					__result += power;
 				}
@@ -104,13 +112,13 @@ namespace ModularSkillScripts
 				}
 			}
 
-			foreach (PassiveModel passiveModel in actorAction.Model._passiveDetail.PassiveList)
-			{
-				long passivemodel_intlong = passiveModel.Pointer.ToInt64();
-				foreach (ModularSA modpa in SkillScriptInitPatch.modpa_list)
-				{
+			foreach (PassiveModel passiveModel in actorAction.Model._passiveDetail.PassiveList) {
+				if (!passiveModel.CheckActiveCondition()) continue;
+				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+				if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
+					
+				foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong]) {
 					if (modpa.activationTiming != 10) continue;
-					if (passivemodel_intlong != modpa.ptr_intlong) continue;
 					int power = modpa.parryingResultAdder;
 					__result += power;
 				}
@@ -133,11 +141,12 @@ namespace ModularSkillScripts
 			}
 
 			foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList) {
-				long passivemodel_intlong = passiveModel.Pointer.ToInt64();
-				foreach (ModularSA modpa in SkillScriptInitPatch.modpa_list)
-				{
+				if (!passiveModel.CheckActiveCondition()) continue;
+				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+				if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
+					
+				foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong]) {
 					if (modpa.activationTiming != 10) continue;
-					if (passivemodel_intlong != modpa.ptr_intlong) continue;
 					int power = modpa.coinScaleAdder;
 					__result += power;
 				}
