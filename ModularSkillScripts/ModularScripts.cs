@@ -1031,31 +1031,39 @@ namespace ModularSkillScripts
 					}
 				}
 					break;
-				case "explosion":{
-					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-					int times = GetNumFromParamString(circles[1]);
-
-					foreach (BattleUnitModel targetModel in modelList)
-					{
-						int tremorStack = targetModel._buffDetail.GetActivatedBuffStack(BUFF_UNIQUE_KEYWORD.Vibration, false);
-						for (int times_i = 0; times_i < times; times_i++)
-						{
-							if (abilityMode == 2)
-							{
-								dummyPassiveAbility.AddTriggeredData_BsGaugeUp(tremorStack, targetModel.InstanceID, battleTiming, true);
-								dummyPassiveAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, tremorStack, battleTiming, true);
-								//targetModel.VibrationExplosion(battleTiming, modsa_unitModel, dummyPassiveAbility);
-							}
-							else
-							{
-								//dummySkillAbility.AddTriggeredData_BsGaugeUp(tremorStack, targetModel.InstanceID, battleTiming, true);
-								dummySkillAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, tremorStack, battleTiming, true, modsa_selfAction);
-								//targetModel.VibrationExplosion(battleTiming, modsa_unitModel, dummySkillAbility);
-							}
-						}
-					}
-				}
-					break;
+				 case "explosion":
+				     {
+				         List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+				         int times = GetNumFromParamString(circles[1]);
+				
+				         foreach (BattleUnitModel targetModel in modelList)
+				         {
+				             int tremorStack = targetModel._buffDetail.GetActivatedBuffStack(BUFF_UNIQUE_KEYWORD.Vibration, false);
+				             for (int times_i = 0; times_i < times; times_i++)
+				             {
+				                 if (abilityMode == 2)
+				                 {
+				                     dummyPassiveAbility.AddTriggeredData_BsGaugeUp(tremorStack, targetModel.InstanceID, battleTiming, true);
+				                     dummyPassiveAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, tremorStack, battleTiming, true);
+				                     targetModel.VibrationExplosion(battleTiming, modsa_unitModel, dummyPassiveAbility);
+				                 }
+				                 else if (abilityMode == 1)
+				                 {
+				                     dummyCoinAbility.AddTriggeredData_BsGaugeUp(tremorStack, targetModel.InstanceID, battleTiming, true);
+				                     dummyCoinAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, tremorStack, battleTiming, true, modsa_selfAction, modsa_coinModel);
+				                     targetModel.VibrationExplosion(battleTiming, modsa_unitModel, dummyCoinAbility, modsa_selfAction, modsa_coinModel);
+				                 }
+				                 else
+				                 {
+				                     dummySkillAbility.AddTriggeredData_BsGaugeUp(tremorStack, targetModel.InstanceID, battleTiming, true);
+				                     dummySkillAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, tremorStack, battleTiming, true, modsa_selfAction);
+				                     targetModel.VibrationExplosion(battleTiming, modsa_unitModel, dummySkillAbility, modsa_selfAction);
+				                 }
+				             }
+				         }
+				     }
+				
+				     break;
 				case "healhp":{
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
 					if (modelList.Count < 1) return;
