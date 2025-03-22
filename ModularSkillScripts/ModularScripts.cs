@@ -1095,13 +1095,20 @@ namespace ModularSkillScripts
 					break;
 				case "pattern":{
 					BattleUnitModel_Abnormality abnoModel = null;
-					if (modsa_unitModel is BattleUnitModel_Abnormality) abnoModel = (BattleUnitModel_Abnormality)modsa_unitModel;
-					else if (modsa_unitModel is BattleUnitModel_Abnormality_Part) {
-						BattleUnitModel_Abnormality_Part partModel = (BattleUnitModel_Abnormality_Part)modsa_unitModel;
-						abnoModel = partModel.Abnormality;
+					if (modsa_unitModel.IsAbnormalityOrPart)
+					{
+						if (modsa_unitModel?.TryCast<BattleUnitModel_Abnormality_Part>() != null)
+						{
+							abnoModel = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>().Abnormality;
+						}
+						else
+						{
+							abnoModel = modsa_unitModel.TryCast<BattleUnitModel_Abnormality>();
+						}
 					}
+					else return;
+					
 					if (abnoModel == null) return;
-					MainClass.Logg.LogInfo("abnoModel not null");
 
 					PatternScript_Abnormality pattern = abnoModel.PatternScript;
 
@@ -1594,14 +1601,23 @@ namespace ModularSkillScripts
 					if (targetModel == null) { valueList[setvalue_idx] = 0; return; }
 
 					BattleUnitModel_Abnormality abnoModel = null;
-					if (targetModel is BattleUnitModel_Abnormality) abnoModel = (BattleUnitModel_Abnormality)targetModel;
-					else if (targetModel is BattleUnitModel_Abnormality_Part)
+					if (targetModel.IsAbnormalityOrPart)
 					{
-						BattleUnitModel_Abnormality_Part partModel = (BattleUnitModel_Abnormality_Part)targetModel;
-						abnoModel = partModel.Abnormality;
+						// ReSharper disable once ConditionIsAlwaysTrueOrFalse
+						if (targetModel?.TryCast<BattleUnitModel_Abnormality_Part>() != null)
+						{
+							abnoModel = targetModel.TryCast<BattleUnitModel_Abnormality_Part>().Abnormality;
+						}
+						
+						// ReSharper disable once ConditionIsAlwaysTrueOrFalse
+						if (targetModel?.TryCast<BattleUnitModel_Abnormality>() != null)
+						{
+							abnoModel = targetModel.TryCast<BattleUnitModel_Abnormality>();
+						}
 					}
-					if (abnoModel == null) { valueList[setvalue_idx] = 0; return; }
-					MainClass.Logg.LogInfo("getpattern: abnoModel exists");
+					else return;
+					
+					if (abnoModel == null) return;
 					
 					PatternScript_Abnormality pattern = abnoModel.PatternScript;
 
