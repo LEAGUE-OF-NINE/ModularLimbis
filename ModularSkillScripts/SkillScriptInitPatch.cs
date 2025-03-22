@@ -508,40 +508,25 @@ namespace ModularSkillScripts
 				}
 			}
 		}
+		
+		
 		[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnVibrationExplosionOtherUnit))]
 		[HarmonyPostfix]
 		private static void Postfix_PassiveDetail_OnVibrationExplosionOtherUnit(BattleUnitModel explodedUnit, BattleUnitModel giverOrNull, BattleActionModel actionOrNull, ABILITY_SOURCE_TYPE abilitySrc, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 		{
-		    foreach (PassiveModel passiveModel in __instance.PassiveList)
-		    {
-		        if (!passiveModel.CheckActiveCondition()) continue;
-		        List<string> requireIDList = passiveModel.ClassInfo.requireIDList;
-		        foreach (string param in requireIDList)
-		        {
-		            if (param.StartsWith("Modular/"))
-		            {
-		                passiveModel.OnVibrationExplosionOtherUnit(explodedUnit, giverOrNull, actionOrNull, abilitySrc, timing);
-		                break;
-		            }
-		        }
-		    }
+			foreach (PassiveModel passiveModel in __instance.PassiveList) {
+				if (!passiveModel.CheckActiveCondition()) continue;
+				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+				if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
+			
+				foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
+					modpa.modsa_passiveModel = passiveModel;
+					modpa.modsa_target_list.Clear();
+					modpa.modsa_target_list.Add(explodedUnit);
+					modpa.Enact(__instance._owner, null, null, null, 27, timing);
+				}
+			}
 		}
-		[HarmonyPatch(typeof(PassiveModel), nameof(PassiveModel.OnVibrationExplosionOtherUnit))]
-		[HarmonyPostfix]
-		private static void Postfix_PassiveModel_OnVibrationExplosionOtherUnit(BattleUnitModel explodedUnit, BattleUnitModel giverOrNull, BattleActionModel actionOrNull, ABILITY_SOURCE_TYPE abilitySrc, BATTLE_EVENT_TIMING timing, PassiveModel __instance)
-		{
-		    long passiveModel_intlong = __instance.Pointer.ToInt64();
-		    foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
-		    {
-		        if (modpa.passiveID != __instance.ClassInfo.ID) continue;
-		        if (passiveModel_intlong != modpa.ptr_intlong) continue;
-		        modpa.modsa_passiveModel = __instance;
-		        modpa.modsa_target_list.Clear();
-		        modpa.modsa_target_list.Add(__instance.Owner);
-		        modpa.Enact(explodedUnit, null, null, actionOrNull, 27, timing);
-		    }
-		}
-
 
 		// PASSIVES END
 		// PASSIVES END

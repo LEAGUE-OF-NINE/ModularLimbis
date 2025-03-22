@@ -60,7 +60,7 @@ namespace ModularSkillScripts
 			timingDict.Add("OnDiscard", 24);
 			timingDict.Add("OnZeroHP", 25);
 			timingDict.Add("EnemyEndSkill", 26);
-		        timingDict.Add("OnOtherBurst", 27);
+			timingDict.Add("OnOtherBurst", 27);
 			timingDict.Add("SpecialAction", 999);
 		}
 
