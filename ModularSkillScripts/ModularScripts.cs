@@ -1406,7 +1406,11 @@ namespace ModularSkillScripts
 				}
 					break;
 				case "doubleslot":{
-					foreach (BattleUnitModel targetModel in GetTargetModelList(circles[0])) StagePatches.doubleslotterIDList.Add(targetModel.InstanceID);
+					foreach (BattleUnitModel targetModel in GetTargetModelList(circles[0])) {
+						int instID = targetModel.InstanceID;
+						if (StagePatches.doubleslotterIDList.Contains(instID)) continue;
+						StagePatches.doubleslotterIDList.Add(instID);
+					}
 				}
 					break;
 				case "passivereveal":{
