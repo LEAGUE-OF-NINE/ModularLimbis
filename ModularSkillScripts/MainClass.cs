@@ -23,8 +23,7 @@ namespace ModularSkillScripts
 			ClassInjector.RegisterTypeInIl2Cpp<DataMod>();
 			ClassInjector.RegisterTypeInIl2Cpp<ModUnitData>();
 			ClassInjector.RegisterTypeInIl2Cpp<ModularSA>();
-			//ClassInjector.RegisterTypeInIl2Cpp<MODSA_HelloWorld>();
-			//harmony.PatchAll(typeof(PatchesForLethe));
+			//ClassInjector.RegisterTypeInIl2Cpp<ModularSA.BattleUnitComparer>();
 			harmony.PatchAll(typeof(SkillScriptInitPatch));
 			harmony.PatchAll(typeof(StagePatches));
 			harmony.PatchAll(typeof(UniquePatches));

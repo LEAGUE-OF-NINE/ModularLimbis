@@ -34,7 +34,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System.Runtime" />
     <Reference Include="$(LimbusCompanyFolder)\BepInEx\core\*.dll">
       <HintPath>%(Identity)</HintPath>
       <Private>false</Private>
