@@ -96,7 +96,7 @@ namespace ModularSkillScripts
 
 		public const string AUTHOR = "GlitchGames";
 
-		public const string GUID = "GlitchGames.ModularSkillScripts";
+		public const string GUID = $"{AUTHOR}.{NAME}";
 
 		public static ManualLogSource Logg;
 	}
