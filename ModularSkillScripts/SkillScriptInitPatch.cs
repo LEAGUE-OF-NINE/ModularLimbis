@@ -213,6 +213,15 @@ namespace ModularSkillScripts
 			}
 		}
 
+		private static List<ModularSA> GetAllModpaFromPasmodel(PassiveModel passiveModel)
+		{
+			if (passiveModel.CheckActiveCondition()) {
+				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+				if (modpaDict.ContainsKey(passiveModel_intlong)) return modpaDict[passiveModel_intlong];
+			}
+			return new List<ModularSA>();
+		}
+		
 		// REAL PATCHES START HERE
 		// REAL PATCHES START HERE
 		// REAL PATCHES START HERE
@@ -228,11 +237,7 @@ namespace ModularSkillScripts
 			}
 			
 			foreach (PassiveModel passiveModel in __instance.PassiveList) {
-				if (!passiveModel.CheckActiveCondition()) continue;
-				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-				if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-				
-				foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
+				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 					modpa.modsa_passiveModel = passiveModel;
 					modpa.Enact(__instance._owner, null, null, null, -1, timing);
 				}
@@ -260,11 +265,7 @@ namespace ModularSkillScripts
 		private static void Postfix_PassiveDetail_OnBattleStart(BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 		{
 			foreach (PassiveModel passiveModel in __instance.PassiveList) {
-				if (!passiveModel.CheckActiveCondition()) continue;
-				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-				if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-				
-				foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
+				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 					modpa.modsa_passiveModel = passiveModel;
 					modpa.Enact(__instance._owner, null, null, null, 0, timing);
 				}
@@ -277,11 +278,7 @@ namespace ModularSkillScripts
 		private static void Postfix_PassiveDetail_OnBattleEnd(BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 		{
 			foreach (PassiveModel passiveModel in __instance.PassiveList) {
-				if (!passiveModel.CheckActiveCondition()) continue;
-				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-				if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-				
-				foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
+				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 					modpa.modsa_passiveModel = passiveModel;
 					modpa.Enact(__instance._owner, null, null, null, 6, timing);
 				}
@@ -294,11 +291,7 @@ namespace ModularSkillScripts
 		private static void Postfix_PassiveDetail_OnStartTurn_BeforeLog(BattleActionModel action, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 		{
 			foreach (PassiveModel passiveModel in __instance.PassiveList) {
-				if (!passiveModel.CheckActiveCondition()) continue;
-				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-				if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-				
-				foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
+				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 					if (modpa.resetWhenUse) modpa.ResetAdders(); // on-demand power adder reset (used for passives)
 					modpa.modsa_passiveModel = passiveModel;
 					modpa.Enact(__instance._owner, action.Skill, action, null, 1, timing);
@@ -312,11 +305,7 @@ namespace ModularSkillScripts
 		private static void Postfix_PassiveDetail_OnStartDuel(BattleActionModel ownerAction, BattleActionModel opponentAction, PassiveDetail __instance)
 		{
 			foreach (PassiveModel passiveModel in __instance.PassiveList) {
-				if (!passiveModel.CheckActiveCondition()) continue;
-				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-				if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-				
-				foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
+				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 					modpa.modsa_passiveModel = passiveModel;
 					modpa.Enact(__instance._owner, ownerAction.Skill, ownerAction, opponentAction, 3, BATTLE_EVENT_TIMING.ON_START_DUEL);
 				}
@@ -327,11 +316,7 @@ namespace ModularSkillScripts
 		private static void Postfix_PassiveDetail_OnWinDuel(BattleActionModel selfAction, BattleActionModel oppoAction, int parryingCount, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 		{
 			foreach (PassiveModel passiveModel in __instance.PassiveList) {
-				if (!passiveModel.CheckActiveCondition()) continue;
-				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-				if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-				
-				foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
+				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 					modpa.modsa_passiveModel = passiveModel;
 					modpa.Enact(__instance._owner, selfAction.Skill, selfAction, oppoAction, 4, timing);
 				}
@@ -342,11 +327,7 @@ namespace ModularSkillScripts
 		private static void Postfix_PassiveDetail_OnLoseDuel(BattleActionModel selfAction, BattleActionModel oppoAction, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 		{
 			foreach (PassiveModel passiveModel in __instance.PassiveList) {
-				if (!passiveModel.CheckActiveCondition()) continue;
-				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-				if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-				
-				foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
+				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 					modpa.modsa_passiveModel = passiveModel;
 					modpa.Enact(__instance._owner, selfAction.Skill, selfAction, oppoAction, 5, timing);
 				}
@@ -359,11 +340,7 @@ namespace ModularSkillScripts
 		private static void Postfix_PassiveDetail_BeforeAttack(BattleActionModel action, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 		{
 			foreach (PassiveModel passiveModel in __instance.PassiveList) {
-				if (!passiveModel.CheckActiveCondition()) continue;
-				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-				if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-				
-				foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
+				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 					modpa.modsa_passiveModel = passiveModel;
 					modpa.Enact(__instance._owner, action.Skill, action, null, 2, timing);
 				}

@@ -16,8 +16,7 @@ namespace ModularSkillScripts
 			BattleUnitModel unit = sinAction.actionSlot.Owner;
 			if (!unit.IsActionable()) return true;
 
-			foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList)
-			{
+			foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList) {
 				if (!passiveModel.CheckActiveCondition()) continue;
 				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
 				if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
