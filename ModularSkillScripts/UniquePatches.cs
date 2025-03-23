@@ -1,7 +1,7 @@
 ﻿using BattleUI.Operation;
 using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
-using BepInEx.IL2CPP.UnityEngine;
+using BepInEx.Unity.IL2CPP.UnityEngine;
 
 namespace ModularSkillScripts
 {

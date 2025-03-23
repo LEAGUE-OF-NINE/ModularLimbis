@@ -1,5 +1,5 @@
 ﻿using System;
-using BepInEx.IL2CPP.UnityEngine;
+using BepInEx.Unity.IL2CPP.UnityEngine;
 using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
 
@@ -519,7 +519,7 @@ namespace ModularSkillScripts
 				foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 					if (modsa.activationTiming == 10) continue;
 					int power = modsa.coinScaleAdder;
-					if (Input.GetKeyInt(BepInEx.IL2CPP.UnityEngine.KeyCode.LeftControl))
+					if (Input.GetKeyInt(KeyCode.LeftControl))
 						MainClass.Logg.LogInfo("Found modsa - coin scale adder: " + power);
 					__result += power;
 				}

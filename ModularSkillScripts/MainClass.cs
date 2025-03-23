@@ -1,5 +1,5 @@
 ﻿using BepInEx;
-using BepInEx.IL2CPP;
+using BepInEx.Unity.IL2CPP;
 using BepInEx.Logging;
 using HarmonyLib;
 using UnhollowerRuntimeLib;
@@ -7,8 +7,8 @@ using System;
 using System.Linq;
 using Il2CppSystem.Collections.Generic;
 using System.Text.RegularExpressions;
-using Antlr4.Runtime;
-using Antlr4.Runtime.Tree;
+//using Antlr4.Runtime;
+//using Antlr4.Runtime.Tree;
 using ModsaLang;
 
 namespace ModularSkillScripts
@@ -18,8 +18,8 @@ namespace ModularSkillScripts
 	{
 		public override void Load()
 		{
-			Harmony harmony = new Harmony("ModularSkillScripts");
-			Logg = new ManualLogSource("ModularSkillScripts");
+			Harmony harmony = new Harmony(NAME);
+			Logg = new ManualLogSource(NAME);
 			BepInEx.Logging.Logger.Sources.Add(Logg);
 			ClassInjector.RegisterTypeInIl2Cpp<DataMod>();
 			ClassInjector.RegisterTypeInIl2Cpp<ModUnitData>();
