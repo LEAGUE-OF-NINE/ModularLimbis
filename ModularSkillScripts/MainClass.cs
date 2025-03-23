@@ -2,14 +2,13 @@
 using BepInEx.Unity.IL2CPP;
 using BepInEx.Logging;
 using HarmonyLib;
-using UnhollowerRuntimeLib;
 using System;
-using System.Linq;
 using Il2CppSystem.Collections.Generic;
 using System.Text.RegularExpressions;
+using Il2CppInterop.Runtime.Injection;
 //using Antlr4.Runtime;
 //using Antlr4.Runtime.Tree;
-using ModsaLang;
+//using ModsaLang;
 
 namespace ModularSkillScripts
 {
@@ -101,6 +100,7 @@ namespace ModularSkillScripts
 		public static ManualLogSource Logg;
 	}
 	
+	/*
 	public class ModsaEvaluator : ModsaLangBaseVisitor<double>
 	{
 		public void Appropriate(ModularSA modsa)
@@ -178,4 +178,5 @@ namespace ModularSkillScripts
 			return 0;
 		}
 	}
+	*/
 }

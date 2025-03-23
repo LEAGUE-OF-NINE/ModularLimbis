@@ -1,16 +1,13 @@
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Il2CppInterop.Runtime.Injection;
 using Il2CppSystem.Collections.Generic;
-using UnhollowerRuntimeLib;
 using UnityEngine;
 using static BattleActionModel.TargetDataDetail;
 using IntPtr = System.IntPtr;
-using Antlr4.Runtime;
-using Antlr4.Runtime.Tree;
-using CodeStage.AntiCheat.ObscuredTypes;
-using ModsaLang;
-using Il2CppSystem.Collections;
+//using CodeStage.AntiCheat.ObscuredTypes;
+//using Il2CppSystem.Collections;
 
 namespace ModularSkillScripts
 {
@@ -490,7 +487,7 @@ namespace ModularSkillScripts
 			
 			if (param.Contains("Random")) list = MainClass.ShuffleUnits(list);
 			else if (param.Contains("Deploy")) {
-				Func<BattleUnitModel, BattleUnitModel, int> value = (BattleUnitModel x, BattleUnitModel y) => x.PARTICIPATE_ORDER.CompareTo(y.PARTICIPATE_ORDER);
+				Comparison<BattleUnitModel> value = (x, y) => x.PARTICIPATE_ORDER.CompareTo(y.PARTICIPATE_ORDER);
 				list.Sort(value);
 			}
 			else if (param.Contains("Reversedeploy")) {
@@ -740,8 +737,8 @@ namespace ModularSkillScripts
 
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
 
-					foreach (BattleUnitModel targetModel in modelList)
-					{
+					foreach (BattleUnitModel targetModel in modelList) {
+						int loseAmount = 0;
 						if (mpAmount > 0)
 						{
 							if (abilityMode == 2)
@@ -765,17 +762,17 @@ namespace ModularSkillScripts
 							if (abilityMode == 2)
 							{
 								dummyPassiveAbility.AddTriggeredData_MpDamage(mpAmount * -1, targetModel.InstanceID, battleTiming);
-								targetModel.GiveMpDamage(targetModel, mpAmount * -1, battleTiming, DAMAGE_SOURCE_TYPE.PASSIVE, mpAmount * -1, modsa_selfAction);
+								targetModel.GiveMpDamage(targetModel, mpAmount * -1, battleTiming, DAMAGE_SOURCE_TYPE.PASSIVE, out loseAmount, modsa_selfAction);
 							}
 							else if (abilityMode == 1)
 							{
 								dummyCoinAbility.AddTriggeredData_MpDamage(mpAmount * -1, targetModel.InstanceID, battleTiming);
-								dummyCoinAbility.GiveMpDamage(modsa_unitModel, targetModel, mpAmount * -1, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, mpAmount * -1, modsa_selfAction);
+								dummyCoinAbility.GiveMpDamage(modsa_unitModel, targetModel, mpAmount * -1, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, out loseAmount, modsa_selfAction);
 							}
 							else
 							{
 								dummySkillAbility.AddTriggeredData_MpDamage(mpAmount * -1, targetModel.InstanceID, battleTiming);
-								targetModel.GiveMpDamage(targetModel, mpAmount * -1, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, mpAmount * -1, modsa_selfAction);
+								targetModel.GiveMpDamage(targetModel, mpAmount * -1, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, out loseAmount, modsa_selfAction);
 							}
 						}
 					}
@@ -806,37 +803,37 @@ namespace ModularSkillScripts
 					if (dmg_type != -1) atkBehv = (ATK_BEHAVIOUR)dmg_type;
 					if (dmg_sin != -1) sinKind = (ATTRIBUTE_TYPE)dmg_sin;
 
-					foreach (BattleUnitModel targetModel in modelList)
-					{
-						if (dmg_type == -1 && dmg_sin == -1)
-						{
+					foreach (BattleUnitModel targetModel in modelList) {
+						int hpDamageTaken = 0;
+						int shieldDamageTaken = 0;
+						if (dmg_type == -1 && dmg_sin == -1) {
 							AbilityTriggeredData_HpDamage triggerData = new AbilityTriggeredData_HpDamage(amount, targetModel.InstanceID, battleTiming);
 							if (abilityMode == 2)
 							{
-								dummyPassiveAbility.GiveAbsHpDamage(modsa_unitModel, targetModel, amount, amount, amount, battleTiming, DAMAGE_SOURCE_TYPE.PASSIVE);
+								dummyPassiveAbility.GiveAbsHpDamage(modsa_unitModel, targetModel, amount, out hpDamageTaken, out shieldDamageTaken, battleTiming, DAMAGE_SOURCE_TYPE.PASSIVE);
 								targetModel.AddTriggeredData(triggerData);
 							}
 							else if (abilityMode == 1)
 							{
-								dummyCoinAbility.GiveAbsHpDamage(modsa_unitModel, targetModel, amount, amount, amount, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, modsa_selfAction);
+								dummyCoinAbility.GiveAbsHpDamage(modsa_unitModel, targetModel, amount, out hpDamageTaken, out shieldDamageTaken, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, modsa_selfAction);
 								targetModel.AddTriggeredData(triggerData);
 							}
-							else dummySkillAbility.GiveAbsHpDamage(modsa_unitModel, targetModel, amount, amount, amount, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, modsa_selfAction);
+							else dummySkillAbility.GiveAbsHpDamage(modsa_unitModel, targetModel, amount, out hpDamageTaken, out shieldDamageTaken, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, modsa_selfAction);
 						}
 						else if (dmg_type == -1 && dmg_sin != -1)
 						{
 							AbilityTriggeredData_HpDamage triggerData = new AbilityTriggeredData_HpDamage(amount, targetModel.InstanceID, sinKind, battleTiming);
 							if (abilityMode == 2)
 							{
-								dummyPassiveAbility.GiveHpDamageAppliedAttributeResist(modsa_unitModel, targetModel, amount, sinKind, battleTiming, DAMAGE_SOURCE_TYPE.PASSIVE, amount);
+								dummyPassiveAbility.GiveHpDamageAppliedAttributeResist(modsa_unitModel, targetModel, amount, sinKind, battleTiming, DAMAGE_SOURCE_TYPE.PASSIVE, out hpDamageTaken);
 								targetModel.AddTriggeredData(triggerData);
 							}
 							else if (abilityMode == 1)
 							{
-								dummyCoinAbility.GiveHpDamageAppliedAttributeResist(modsa_unitModel, targetModel, amount, sinKind, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, amount);
+								dummyCoinAbility.GiveHpDamageAppliedAttributeResist(modsa_unitModel, targetModel, amount, sinKind, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, out hpDamageTaken);
 								targetModel.AddTriggeredData(triggerData);
 							}
-							else dummySkillAbility.GiveHpDamageAppliedAttributeResist(modsa_unitModel, targetModel, amount, sinKind, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, amount);
+							else dummySkillAbility.GiveHpDamageAppliedAttributeResist(modsa_unitModel, targetModel, amount, sinKind, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, out hpDamageTaken);
 						}
 						else if (dmg_type != -1 && dmg_sin == -1)
 						{
@@ -1074,24 +1071,24 @@ namespace ModularSkillScripts
 					{
 						int finalAmount = amount;
 						if (percentageheal) finalAmount = targetModel.MaxHp * finalAmount / 100;
-
+						int healingUnused = 0;
 						if (abilityMode == 2)
 						{
 							dummyPassiveAbility.AddTriggeredData_HpHeal(finalAmount, targetModel.InstanceID, battleTiming);
 							//dummyPassiveAbility.HealTargetHp(modsa_unitModel, modsa_selfAction, targetModel, finalAmount, battleTiming, finalAmount);
-							targetModel.TryRecoverHp(modsa_unitModel, null, finalAmount, ABILITY_SOURCE_TYPE.PASSIVE, battleTiming, finalAmount);
+							targetModel.TryRecoverHp(modsa_unitModel, null, finalAmount, ABILITY_SOURCE_TYPE.PASSIVE, battleTiming, out healingUnused);
 						}
 						else if (abilityMode == 1)
 						{
 							dummyCoinAbility.AddTriggeredData_HpHeal(finalAmount, targetModel.InstanceID, battleTiming);
 							//dummyCoinAbility.HealTargetHp(modsa_unitModel, modsa_selfAction, targetModel, finalAmount, battleTiming, finalAmount);
-							targetModel.TryRecoverHp(modsa_unitModel, null, finalAmount, ABILITY_SOURCE_TYPE.SKILL, battleTiming, finalAmount);
+							targetModel.TryRecoverHp(modsa_unitModel, null, finalAmount, ABILITY_SOURCE_TYPE.SKILL, battleTiming, out healingUnused);
 						}
 						else
 						{
 							dummySkillAbility.AddTriggeredData_HpHeal(finalAmount, targetModel.InstanceID, battleTiming);
 							//dummySkillAbility.HealTargetHp(modsa_unitModel, modsa_selfAction, targetModel, finalAmount, battleTiming, finalAmount);
-							targetModel.TryRecoverHp(modsa_unitModel, null, finalAmount, ABILITY_SOURCE_TYPE.SKILL, battleTiming, finalAmount);
+							targetModel.TryRecoverHp(modsa_unitModel, null, finalAmount, ABILITY_SOURCE_TYPE.SKILL, battleTiming, out healingUnused);
 						}
 					}
 
