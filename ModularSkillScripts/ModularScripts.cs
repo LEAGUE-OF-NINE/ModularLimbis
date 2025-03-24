@@ -129,6 +129,7 @@ public class ModularSA : MonoBehaviour
 	public bool wasClash = false;
 	public bool wasWin = false;
 	public int lastFinalDmg = 0;
+	public int lastHpDmg = 0;
 	public int activationCounter = 0;
 
 	public void ResetCoinConditionals()
@@ -586,7 +587,7 @@ public class ModularSA : MonoBehaviour
 				string circle_0 = circles[0];
 				if (MainClass.timingDict.ContainsKey(circle_0)) activationTiming = MainClass.timingDict[circle_0];
 					
-				if ((activationTiming == 7 || activationTiming == 28) && circles.Length > 1) {
+				if (circles.Length > 1) {
 					string hitArgs = circles[1];
 					if (hitArgs.Contains("Head"))  _onlyHeads = true;
 					else if (hitArgs.Contains("Tail")) _onlyTails = true;
@@ -1057,12 +1058,10 @@ public class ModularSA : MonoBehaviour
 				BattleUnitModel_Abnormality abnoModel = null;
 				if (modsa_unitModel.IsAbnormalityOrPart)
 				{
-					if (modsa_unitModel?.TryCast<BattleUnitModel_Abnormality_Part>() != null)
-					{
+					if (modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>() != null) {
 						abnoModel = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>().Abnormality;
 					}
-					else
-					{
+					else {
 						abnoModel = modsa_unitModel.TryCast<BattleUnitModel_Abnormality>();
 					}
 				}
@@ -1090,15 +1089,12 @@ public class ModularSA : MonoBehaviour
 				if (!add_max_instead) { slotAdder = amount; return; }
 
 				List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-				foreach (BattleUnitModel targetModel in modelList)
-				{
-					BattleUnitModel_Abnormality abnoModel = null;
-					if (targetModel is BattleUnitModel_Abnormality) abnoModel = (BattleUnitModel_Abnormality)targetModel;
-					else if (targetModel is BattleUnitModel_Abnormality_Part)
-					{
-						BattleUnitModel_Abnormality_Part partModel = (BattleUnitModel_Abnormality_Part)targetModel;
-						abnoModel = partModel.Abnormality;
-					}
+				foreach (BattleUnitModel targetModel in modelList) {
+					if (targetModel == null || !targetModel.IsAbnormalityOrPart) continue;
+					BattleUnitModel_Abnormality abnoModel;
+					BattleUnitModel_Abnormality_Part part = targetModel.TryCast<BattleUnitModel_Abnormality_Part>();
+					if (part != null) abnoModel = part.Abnormality;
+					else abnoModel = targetModel.TryCast<BattleUnitModel_Abnormality>();
 					if (abnoModel == null) continue;
 					PatternScript_Abnormality pattern = abnoModel.PatternScript;
 					pattern._slotMax = amount;
@@ -1517,6 +1513,8 @@ public class ModularSA : MonoBehaviour
 				break;
 			case "getdmg": valueList[setvalue_idx] = lastFinalDmg;
 				break;
+			case "gethpdmg": valueList[setvalue_idx] = lastHpDmg;
+				break;
 			case "round":{
 				StageController stageController_inst = Singleton<StageController>.Instance;
 				valueList[setvalue_idx] = stageController_inst.GetCurrentRound();
@@ -1748,10 +1746,13 @@ public class ModularSA : MonoBehaviour
 				break;
 			case "haskey":{
 				BattleUnitModel targetModel = GetTargetModel(circles[0]);
-				if (targetModel == null) {
-					valueList[setvalue_idx] = -1; // Target not found = -1
-					return;
+				if (targetModel == null) return;
+
+				if (targetModel.IsAbnormalityOrPart) {
+					BattleUnitModel_Abnormality_Part part = targetModel.TryCast<BattleUnitModel_Abnormality_Part>();
+					if (part != null) targetModel = part.Abnormality;
 				}
+				
 				List<string> unitKeywordList = targetModel._unitDataModel.ClassInfo.unitKeywordList;
 				List<string> associationList = targetModel._unitDataModel.ClassInfo.associationList;
 

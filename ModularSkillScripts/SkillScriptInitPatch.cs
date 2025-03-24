@@ -883,6 +883,7 @@ public class SkillScriptInitPatch
 		{
 			if (coinmodel_intlong != modca.ptr_intlong) continue;
 			modca.lastFinalDmg = realDmg;
+			modca.lastHpDmg = hpDamage;
 			modca.wasCrit = isCritical;
 			//modca.wasClash = isWinDuel.HasValue;
 			//if (modca.wasClash) modca.wasWin = isWinDuel.Value;
@@ -895,7 +896,10 @@ public class SkillScriptInitPatch
 		long skillmodel_intlong = action.Skill.Pointer.ToInt64();
 		if (modsaDict.ContainsKey(skillmodel_intlong)) {
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+				modsa.lastFinalDmg = realDmg;
+				modsa.lastHpDmg = hpDamage;
 				modsa.wasCrit = isCritical;
+				modsa.modsa_coinModel = coin;
 				modsa.modsa_target_list.Clear();
 				modsa.modsa_target_list.Add(__instance);
 				modsa.Enact(attacker, action.Skill, action, null, 7, timing);
@@ -905,6 +909,7 @@ public class SkillScriptInitPatch
 		foreach (PassiveModel passiveModel in attacker._passiveDetail.PassiveList) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 				modpa.lastFinalDmg = realDmg;
+				modpa.lastHpDmg = hpDamage;
 				modpa.wasCrit = isCritical;
 				modpa.modsa_coinModel = coin;
 				modpa.modsa_passiveModel = passiveModel;
@@ -917,6 +922,7 @@ public class SkillScriptInitPatch
 		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 				modpa.lastFinalDmg = realDmg;
+				modpa.lastHpDmg = hpDamage;
 				modpa.wasCrit = isCritical;
 				modpa.modsa_coinModel = coin;
 				modpa.modsa_passiveModel = passiveModel;
@@ -936,7 +942,6 @@ public class SkillScriptInitPatch
 		foreach (ModularSA modca in modca_list)
 		{
 			if (coinmodel_intlong != modca.ptr_intlong) continue;
-			//modca.lastFinalDmg = finalDmg;
 			modca.wasCrit = isCritical;
 			//modca.wasClash = isWinDuel.HasValue;
 			//if (modca.wasClash) modca.wasWin = isWinDuel.Value;
@@ -948,6 +953,7 @@ public class SkillScriptInitPatch
 		if (modsaDict.ContainsKey(skillmodel_intlong)) {
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				modsa.wasCrit = isCritical;
+				modsa.modsa_coinModel = coin;
 				modsa.Enact(__instance.Model, __instance.Skill, __instance, null, 28, timing);
 			}
 		}

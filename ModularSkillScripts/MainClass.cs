@@ -84,14 +84,14 @@ public class MainClass : BasePlugin
 		
 	public static bool fakepowerEnabled = true;
 
-	public static Random rng = new Random();
+	public static Random rng = new();
 
 	public static readonly Regex sWhitespace = new Regex(@"\s+");
 
 	public static bool logEnabled = false;
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "2.4.9";
+	public const string VERSION = "2.5.1";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
