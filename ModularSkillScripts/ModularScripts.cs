@@ -311,42 +311,51 @@ public class ModularSA : MonoBehaviour
 	public List<BattleUnitModel> GetTargetModelList(string param)
 	{
 		List<BattleUnitModel> unitList = new List<BattleUnitModel>();
-		if (param == "Null") return unitList;
-		else if (param == "Self") {
-			unitList.Add(modsa_unitModel);
-			return unitList;
-		}
-		else if (param == "Target") {
-			if (modsa_loopTarget != null) unitList.Add(modsa_loopTarget);
-			return unitList;
-		}
-		else if (param == "MainTarget")
-		{
-			if (modsa_selfAction == null) { unitList.Add(null); return unitList; }
-			TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
-			unitList.Add(targetDataSet.GetMainTarget());
-			return unitList;
-		}
-		else if (param == "EveryTarget")
-		{
-			TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
-			unitList.Add(targetDataSet.GetMainTarget());
-			foreach (SinActionModel sinActionModel in targetDataSet.GetSubTargetSinActionList())
-			{
-				BattleUnitModel model = sinActionModel.UnitModel;
-				if (!unitList.Contains(model)) unitList.Add(sinActionModel.UnitModel);
+		switch (param) {
+			case "Null": return unitList;
+			case "Self": {
+				unitList.Add(modsa_unitModel);
+				return unitList;
 			}
-			return unitList;
-		}
-		else if (param == "SubTarget")
-		{
-			TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
-			foreach (SinActionModel sinActionModel in targetDataSet.GetSubTargetSinActionList())
-			{
-				BattleUnitModel model = sinActionModel.UnitModel;
-				if (!unitList.Contains(model)) unitList.Add(sinActionModel.UnitModel);
+			case "SelfCore": {
+				BattleUnitModel_Abnormality_Part part = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
+				if (part != null) unitList.Add(part.Abnormality);
+				else unitList.Add(modsa_unitModel);
+				return unitList;
 			}
-			return unitList;
+			case "Target": {
+				if (modsa_loopTarget != null) unitList.Add(modsa_loopTarget);
+				return unitList;
+			}
+			case "TargetCore": {
+				BattleUnitModel_Abnormality_Part part = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality_Part>();
+				if (part != null) unitList.Add(part.Abnormality);
+				else unitList.Add(modsa_loopTarget);
+				return unitList;
+			}
+			case "MainTarget": {
+				if (modsa_selfAction == null) { unitList.Add(null); return unitList; }
+				TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
+				unitList.Add(targetDataSet.GetMainTarget());
+				return unitList;
+			}
+			case "EveryTarget": {
+				TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
+				unitList.Add(targetDataSet.GetMainTarget());
+				foreach (SinActionModel sinActionModel in targetDataSet.GetSubTargetSinActionList()) {
+					BattleUnitModel model = sinActionModel.UnitModel;
+					if (!unitList.Contains(model)) unitList.Add(sinActionModel.UnitModel);
+				}
+				return unitList;
+			}
+			case "SubTarget": {
+				TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
+				foreach (SinActionModel sinActionModel in targetDataSet.GetSubTargetSinActionList()) {
+					BattleUnitModel model = sinActionModel.UnitModel;
+					if (!unitList.Contains(model)) unitList.Add(sinActionModel.UnitModel);
+				}
+				return unitList;
+			}
 		}
 
 		SinManager sinManager_inst = Singleton<SinManager>.Instance;
@@ -507,7 +516,17 @@ public class ModularSA : MonoBehaviour
 	{
 		if (param == "Null") return null;
 		else if (param == "Self") return modsa_unitModel;
+		else if (param == "SelfCore") {
+			BattleUnitModel_Abnormality_Part part = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
+			if (part != null) return part.Abnormality;
+			else return modsa_unitModel;
+		}
 		else if (param == "Target") return modsa_loopTarget;
+		else if (param == "TargetCore") {
+			BattleUnitModel_Abnormality_Part part = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality_Part>();
+			if (part != null) return part.Abnormality;
+			else return modsa_loopTarget;
+		}
 		else if (param == "MainTarget")
 		{
 			if (modsa_selfAction == null) return null;
