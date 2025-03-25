@@ -1848,8 +1848,19 @@ public class ModularSA : MonoBehaviour
 						Enum.TryParse(word, true, out sin);
 						if (sin != ATTRIBUTE_TYPE.NONE) value = (int)(targetModel.GetAttributeResistMultiplier(sin) * 100.0f);
 					}
-					valueList[setvalue_idx] = value;
 				}
+				else if (circle_1.StartsWith("speed")) {
+					bool original = circle_1.Length >= 9;
+					if (circle_1[7] == 'x') {
+						value = targetModel.GetDefaultMaxSpeed();
+						if (original) value += targetModel.GetMaxSpeedAdder();
+					}
+					else {
+						value = targetModel.GetDefaultMinSpeed();
+						if (original) value += targetModel.GetMinSpeedAdder();
+					}
+				}
+				valueList[setvalue_idx] = value;
 			}
 				break;
 			case "coinisbroken": {

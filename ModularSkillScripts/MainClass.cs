@@ -86,12 +86,12 @@ public class MainClass : BasePlugin
 
 	public static Random rng = new();
 
-	public static readonly Regex sWhitespace = new Regex(@"\s+");
+	public static readonly Regex sWhitespace = new(@"\s+");
 
 	public static bool logEnabled = false;
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "2.5.1";
+	public const string VERSION = "2.5.2";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
