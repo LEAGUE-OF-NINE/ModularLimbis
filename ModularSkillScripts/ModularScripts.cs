@@ -1155,49 +1155,43 @@ public class ModularSA : MonoBehaviour
 
 					if (targetModel == modsa_unitModel)
 					{
-						if (slot == -2 && modsa_selfAction != null)
-						{
+						if (slot == -2 && modsa_selfAction != null) {
 							if (nextRound) modsa_selfAction.SinAction.StackNextTurnAggroAdder(amount);
 							else modsa_selfAction.SinAction.StackThisTurnAggroAdder(amount);
-						}
-						else if (slot == -1)
-						{
+						} else if (slot == -1) {
 							int quotient = amount / sinActionCount;
 							int remainder = amount % sinActionCount;
 
-							foreach (SinActionModel sinAction in sinActionList)
-							{
+							foreach (SinActionModel sinAction in sinActionList) {
 								int finalAmount = amount;
-								if (remainder > 0)
-								{
+								if (remainder > 0) {
 									finalAmount += 1;
 									remainder -= 1;
 								}
 								if (nextRound) sinAction.StackNextTurnAggroAdder(finalAmount);
 								else sinAction.StackThisTurnAggroAdder(finalAmount);
 							}
-							continue;
+						} else {
+							int chosenSlot = slot;
+							if (chosenSlot > sinActionCount - 1) chosenSlot = sinActionCount - 1;
+							if (chosenSlot < 0) chosenSlot = 0;
+							if (nextRound) sinActionList.ToArray()[chosenSlot].StackNextTurnAggroAdder(amount);
+							else sinActionList.ToArray()[chosenSlot].StackThisTurnAggroAdder(amount);
 						}
-							
-						int chosenSlot = Math.Min(slot, sinActionCount - 1);
-						if (nextRound) sinActionList.ToArray()[chosenSlot].StackNextTurnAggroAdder(amount);
-						else sinActionList.ToArray()[chosenSlot].StackThisTurnAggroAdder(amount);
 					}
 					else
 					{
 						int chosenSlot = Math.Min(slot, sinActionCount - 1);
 						if (chosenSlot == -2) chosenSlot = 0;
 							
-						if (chosenSlot == -1)
-						{
+						if (chosenSlot == -1) {
 							int quotient = amount / sinActionCount;
 							int remainder = amount % sinActionCount;
 
 							foreach (SinActionModel sinAction in sinActionList)
 							{
 								int finalAmount = quotient;
-								if (remainder > 0)
-								{
+								if (remainder > 0) {
 									finalAmount += 1;
 									remainder -= 1;
 								}
@@ -1206,9 +1200,11 @@ public class ModularSA : MonoBehaviour
 								else sinAction.StackThisTurnAggroAdder(finalAmount);
 							}
 							continue;
+						} else {
+							if (nextRound) sinActionList.ToArray()[chosenSlot].StackNextTurnAggroAdder(amount);
+							else sinActionList.ToArray()[chosenSlot].StackThisTurnAggroAdder(amount);
 						}
-						if (nextRound) sinActionList.ToArray()[chosenSlot].StackNextTurnAggroAdder(amount);
-						else sinActionList.ToArray()[chosenSlot].StackThisTurnAggroAdder(amount);
+						
 					}
 						
 				}
@@ -1704,15 +1700,14 @@ public class ModularSA : MonoBehaviour
 				ATTRIBUTE_TYPE sin; // default ATTRIBUTE_TYPE.NONE
 				
 				if (circledSection == "highres") {
-					//List<ATTRIBUTE_TYPE> sinList = new List<ATTRIBUTE_TYPE>();
-					//for (int i = 0; i<7; i++) sinList.Add((ATTRIBUTE_TYPE)i);
-					valueList[setvalue_idx] = res_manager.GetMaxAttributeResonanceOfAll(modsa_unitModel.Faction, out _);
+					List<ATTRIBUTE_TYPE> sinList = new List<ATTRIBUTE_TYPE>();
+					for (int i = 0; i<7; i++) sinList.Add((ATTRIBUTE_TYPE)i);
+					valueList[setvalue_idx] = res_manager.GetMaxAttributeResonanceOfAll(modsa_unitModel.Faction, out sinList);
 				}
 				else if (circledSection == "highperfect") {
-					List<ATTRIBUTE_TYPE> sinList = new List<ATTRIBUTE_TYPE>();
+					//List<ATTRIBUTE_TYPE> sinList = new List<ATTRIBUTE_TYPE>();
 					int highest = 0;
-					for (int i = 0; i < 7; i++)
-					{
+					for (int i = 0; i < 7; i++) {
 						int current = res_manager.GetMaxPerfectResonance(modsa_unitModel.Faction, (ATTRIBUTE_TYPE)i);
 						if (current > highest) highest = current;
 					}
