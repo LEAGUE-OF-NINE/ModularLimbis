@@ -1853,11 +1853,11 @@ public class ModularSA : MonoBehaviour
 					bool original = circle_1.Length >= 9;
 					if (circle_1[7] == 'x') {
 						value = targetModel.GetDefaultMaxSpeed();
-						if (original) value += targetModel.GetMaxSpeedAdder();
+						if (!original) value += targetModel.GetMaxSpeedAdder();
 					}
 					else {
 						value = targetModel.GetDefaultMinSpeed();
-						if (original) value += targetModel.GetMinSpeedAdder();
+						if (!original) value += targetModel.GetMinSpeedAdder();
 					}
 				}
 				valueList[setvalue_idx] = value;
