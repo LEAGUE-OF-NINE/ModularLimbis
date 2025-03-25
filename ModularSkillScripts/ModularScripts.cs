@@ -1316,7 +1316,7 @@ public class ModularSA : MonoBehaviour
 				if (circles.Length >= 3) faction = enemyFaction;
 
 				if (amount >= 0) stock_manager.AddSinStock(faction, sin, amount, 0);
-				else amount *= -1; stock_manager.RemoveSinStock(faction, sin, amount);
+				else stock_manager.RemoveSinStock(faction, sin, amount * -1);
 			}
 				break;
 			case "discard":{
@@ -1700,13 +1700,13 @@ public class ModularSA : MonoBehaviour
 				valueList[setvalue_idx] = 0;
 				SinManager sinmanager_inst = Singleton<SinManager>.Instance;
 				SinManager.ResonanceManager res_manager = sinmanager_inst._resManager;
-
-				ATTRIBUTE_TYPE sin = ATTRIBUTE_TYPE.NONE;
+	
+				ATTRIBUTE_TYPE sin; // default ATTRIBUTE_TYPE.NONE
 				
 				if (circledSection == "highres") {
-					List<ATTRIBUTE_TYPE> sinList = new List<ATTRIBUTE_TYPE>();
+					//List<ATTRIBUTE_TYPE> sinList = new List<ATTRIBUTE_TYPE>();
 					//for (int i = 0; i<7; i++) sinList.Add((ATTRIBUTE_TYPE)i);
-					valueList[setvalue_idx] = res_manager.GetMaxAttributeResonanceOfAll(modsa_unitModel.Faction, out sinList);
+					valueList[setvalue_idx] = res_manager.GetMaxAttributeResonanceOfAll(modsa_unitModel.Faction, out _);
 				}
 				else if (circledSection == "highperfect") {
 					List<ATTRIBUTE_TYPE> sinList = new List<ATTRIBUTE_TYPE>();
@@ -1718,13 +1718,11 @@ public class ModularSA : MonoBehaviour
 					}
 					valueList[setvalue_idx] = highest;
 				}
-				else if (circledSection.StartsWith("perfect"))
-				{
+				else if (circledSection.StartsWith("perfect")) {
 					Enum.TryParse(circledSection.Remove(0,7), true, out sin);
 					valueList[setvalue_idx] = res_manager.GetAttributeResonance(modsa_unitModel.Faction, sin);
 				}
-				else if (Enum.TryParse(circledSection, true, out sin))
-				{
+				else if (Enum.TryParse(circledSection, true, out sin)) {
 					valueList[setvalue_idx] = res_manager.GetAttributeResonance(modsa_unitModel.Faction, sin);
 				}
 			}
