@@ -1720,18 +1720,19 @@ public class ModularSA : MonoBehaviour
 				ATTRIBUTE_TYPE sin; // default ATTRIBUTE_TYPE.NONE
 				
 				if (circledSection == "highres") {
-					List<ATTRIBUTE_TYPE> sinList = new List<ATTRIBUTE_TYPE>();
-					for (int i = 0; i<7; i++) sinList.Add((ATTRIBUTE_TYPE)i);
-					valueList[setvalue_idx] = res_manager.GetMaxAttributeResonanceOfAll(modsa_unitModel.Faction, out sinList);
-				}
-				else if (circledSection == "highperfect") {
+					//List<ATTRIBUTE_TYPE> sinList = new List<ATTRIBUTE_TYPE>();
+					//for (int i = 0; i<7; i++) sinList.Add((ATTRIBUTE_TYPE)i);
+					//valueList[setvalue_idx] = res_manager.GetMaxAttributeResonanceOfAll(modsa_unitModel.Faction, out sinList);
 					//List<ATTRIBUTE_TYPE> sinList = new List<ATTRIBUTE_TYPE>();
 					int highest = 0;
 					for (int i = 0; i < 7; i++) {
-						int current = res_manager.GetMaxPerfectResonance(modsa_unitModel.Faction, (ATTRIBUTE_TYPE)i);
+						int current = res_manager.GetAttributeResonance(modsa_unitModel.Faction, (ATTRIBUTE_TYPE)i);
 						if (current > highest) highest = current;
 					}
 					valueList[setvalue_idx] = highest;
+				}
+				else if (circledSection == "highperfect") {
+					valueList[setvalue_idx] = res_manager.GetMaxPerfectResonanceOfAll(modsa_unitModel.Faction, out _);
 				}
 				else if (circledSection.StartsWith("perfect")) {
 					Enum.TryParse(circledSection.Remove(0,7), true, out sin);
