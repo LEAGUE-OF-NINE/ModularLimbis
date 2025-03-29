@@ -811,26 +811,7 @@ public class SkillScriptInitPatch
 		}
 	}
 
-	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnSucceedEvade))]
-	[HarmonyPostfix]
-	private static void Postfix_SkillModel_OnSucceedEvade(BattleActionModel attackerAction, BattleActionModel evadeAction, BATTLE_EVENT_TIMING timing, SkillModel __instance) {
-		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
-		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-			modsa.Enact(evadeAction.Model, __instance, evadeAction, attackerAction, 16, timing);
-		}
-	}
-	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnFailedEvade))]
-	[HarmonyPostfix]
-	private static void Postfix_SkillModel_OnFailedEvade(BattleActionModel attackerAction, BattleActionModel evadeAction, BATTLE_EVENT_TIMING timing, SkillModel __instance) {
-		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
-		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-			modsa.Enact(evadeAction.Model, __instance, evadeAction, attackerAction, 17, timing);
-		}
-	}
-		
-
+	
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnStartBehaviour))]
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_OnStartBehaviour(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance) {
@@ -1001,7 +982,31 @@ public class SkillScriptInitPatch
 		}
 	}
 		
-		
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnSucceedEvade))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_OnSucceedEvade(BattleActionModel evadeAction, BattleActionModel attackAction, BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
+	{
+		SkillModel skill = evadeAction.Skill;
+		long skillmodel_intlong = skill.Pointer.ToInt64();
+		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+			modsa.modsa_target_list.Clear();
+			modsa.modsa_target_list.Add(attackAction.Model);
+			modsa.Enact(__instance, skill, evadeAction, attackAction, 16, timing);
+		}
+	}
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnFailedEvade))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_OnFailedEvade(BattleActionModel evadeAction, BattleActionModel attackAction, BATTLE_EVENT_TIMING timing, BattleUnitModel __instance) {
+		SkillModel skill = evadeAction.Skill;
+		long skillmodel_intlong = skill.Pointer.ToInt64();
+		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+			modsa.modsa_target_list.Clear();
+			modsa.modsa_target_list.Add(attackAction.Model);
+			modsa.Enact(__instance, skill, evadeAction, attackAction, 17, timing);
+		}
+	}
 
 
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnKillTarget))]
