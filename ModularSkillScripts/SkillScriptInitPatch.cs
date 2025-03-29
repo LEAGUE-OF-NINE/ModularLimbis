@@ -885,49 +885,56 @@ public class SkillScriptInitPatch
 	private static void Postfix_BattleUnitModel_OnTakeAttackDamage(BattleActionModel action, CoinModel coin, int realDmg, int hpDamage, BATTLE_EVENT_TIMING timing, bool isCritical, BattleUnitModel __instance)
 	{
 		//MainClass.Logg.LogInfo(" OnTakeAttackDamage ");
+		
 		BattleUnitModel attacker = action.Model;
-		
-		long coinmodel_intlong = coin.Pointer.ToInt64();
-		foreach (ModularSA modca in modca_list)
+		if (__instance.TryCast<BattleUnitModel_Abnormality>() == null)
 		{
-			if (coinmodel_intlong != modca.ptr_intlong) continue;
-			modca.lastFinalDmg = realDmg;
-			modca.lastHpDmg = hpDamage;
-			modca.wasCrit = isCritical;
-			//modca.wasClash = isWinDuel.HasValue;
-			//if (modca.wasClash) modca.wasWin = isWinDuel.Value;
-			modca.modsa_coinModel = coin;
-			modca.modsa_target_list.Clear();
-			modca.modsa_target_list.Add(__instance);
-			modca.Enact(attacker, action.Skill, action, null, 7, timing);
-		}
-		
-		long skillmodel_intlong = action.Skill.Pointer.ToInt64();
-		if (modsaDict.ContainsKey(skillmodel_intlong)) {
-			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				modsa.lastFinalDmg = realDmg;
-				modsa.lastHpDmg = hpDamage;
-				modsa.wasCrit = isCritical;
-				modsa.modsa_coinModel = coin;
-				modsa.modsa_target_list.Clear();
-				modsa.modsa_target_list.Add(__instance);
-				modsa.Enact(attacker, action.Skill, action, null, 7, timing);
+			long coinmodel_intlong = coin.Pointer.ToInt64();
+			foreach (ModularSA modca in modca_list)
+			{
+				if (coinmodel_intlong != modca.ptr_intlong) continue;
+				modca.lastFinalDmg = realDmg;
+				modca.lastHpDmg = hpDamage;
+				modca.wasCrit = isCritical;
+				//modca.wasClash = isWinDuel.HasValue;
+				//if (modca.wasClash) modca.wasWin = isWinDuel.Value;
+				modca.modsa_coinModel = coin;
+				modca.modsa_target_list.Clear();
+				modca.modsa_target_list.Add(__instance);
+				modca.Enact(attacker, action.Skill, action, null, 7, timing);
+			}
+
+			long skillmodel_intlong = action.Skill.Pointer.ToInt64();
+			if (modsaDict.ContainsKey(skillmodel_intlong))
+			{
+				foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
+				{
+					modsa.lastFinalDmg = realDmg;
+					modsa.lastHpDmg = hpDamage;
+					modsa.wasCrit = isCritical;
+					modsa.modsa_coinModel = coin;
+					modsa.modsa_target_list.Clear();
+					modsa.modsa_target_list.Add(__instance);
+					modsa.Enact(attacker, action.Skill, action, null, 7, timing);
+				}
+			}
+
+			foreach (PassiveModel passiveModel in attacker._passiveDetail.PassiveList)
+			{
+				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
+				{
+					modpa.lastFinalDmg = realDmg;
+					modpa.lastHpDmg = hpDamage;
+					modpa.wasCrit = isCritical;
+					modpa.modsa_coinModel = coin;
+					modpa.modsa_passiveModel = passiveModel;
+					modpa.modsa_target_list.Clear();
+					modpa.modsa_target_list.Add(__instance);
+					modpa.Enact(attacker, action.Skill, action, null, 7, timing);
+				}
 			}
 		}
-		
-		foreach (PassiveModel passiveModel in attacker._passiveDetail.PassiveList) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
-				modpa.lastFinalDmg = realDmg;
-				modpa.lastHpDmg = hpDamage;
-				modpa.wasCrit = isCritical;
-				modpa.modsa_coinModel = coin;
-				modpa.modsa_passiveModel = passiveModel;
-				modpa.modsa_target_list.Clear();
-				modpa.modsa_target_list.Add(__instance);
-				modpa.Enact(attacker, action.Skill, action, null, 7, timing);
-			}
-		}
-		
+
 		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 				modpa.lastFinalDmg = realDmg;
