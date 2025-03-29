@@ -288,7 +288,7 @@ public class SkillScriptInitPatch
 
 	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnStartTurn_BeforeLog))]
 	[HarmonyPostfix]
-	private static void Postfix_PassiveDetail_OnStartTurn_BeforeLog(BattleActionModel action, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
+	private static void Postfix_PassiveDetail_OnStartTurnBeforeLog(BattleActionModel action, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
 		foreach (PassiveModel passiveModel in __instance.PassiveList) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
@@ -711,7 +711,6 @@ public class SkillScriptInitPatch
 			// Reset clash modifiers if for some reason this skill is used again
 			if (modsa.activationTiming == 14 || modsa.activationTiming == 15) modsa.ResetAdders();
 			// normal code
-			modsa.modsa_target_list = targets;
 			modsa.Enact(action.Model, __instance, action, null, 1, timing);
 		}
 	}
@@ -760,7 +759,17 @@ public class SkillScriptInitPatch
 			modsa.Enact(ownerAction.Model, __instance, ownerAction, oppoAction, 15, BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 	}
-
+	
+	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnStartDuel))]
+	[HarmonyPostfix]
+	private static void Postfix_SkillModel_OnStartDuel(BattleActionModel selfAction, BattleActionModel oppoAction, BATTLE_EVENT_TIMING timing, SkillModel __instance)
+	{
+		long skillmodel_intlong = __instance.Pointer.ToInt64();
+		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+			modsa.Enact(selfAction.Model, __instance, selfAction, oppoAction, MainClass.timingDict["StartDuel"], timing);
+		}
+	}
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnWinDuel))]
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_OnWinDuel(BattleActionModel selfAction, BattleActionModel oppoAction, BATTLE_EVENT_TIMING timing, int parryingCount, SkillModel __instance)

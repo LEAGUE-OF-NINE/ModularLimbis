@@ -514,26 +514,27 @@ public class ModularSA : MonoBehaviour
 		
 	public BattleUnitModel GetTargetModel(string param)
 	{
-		if (param == "Null") return null;
-		else if (param == "Self") return modsa_unitModel;
-		else if (param == "SelfCore") {
-			BattleUnitModel_Abnormality_Part part = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
-			if (part != null) return part.Abnormality;
-			else return modsa_unitModel;
+		switch (param) {
+			case "Null": return null;
+			case "Self": return modsa_unitModel;
+			case "SelfCore": {
+				BattleUnitModel_Abnormality_Part part = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
+				if (part != null) return part.Abnormality;
+				else return modsa_unitModel;
+			}
+			case "Target": return modsa_loopTarget;
+			case "TargetCore": {
+				BattleUnitModel_Abnormality_Part part = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality_Part>();
+				if (part != null) return part.Abnormality;
+				else return modsa_loopTarget;
+			}
+			case "MainTarget": {
+				if (modsa_selfAction == null) return null;
+				TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
+				return targetDataSet.GetMainTarget();
+			}
 		}
-		else if (param == "Target") return modsa_loopTarget;
-		else if (param == "TargetCore") {
-			BattleUnitModel_Abnormality_Part part = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality_Part>();
-			if (part != null) return part.Abnormality;
-			else return modsa_loopTarget;
-		}
-		else if (param == "MainTarget")
-		{
-			if (modsa_selfAction == null) return null;
-			TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
-			return targetDataSet.GetMainTarget();
-		}
-
+		
 		if (param.StartsWith("id")) {
 			SinManager sinManager_inst = Singleton<SinManager>.Instance;
 			BattleObjectManager battleObjectManager = sinManager_inst._battleObjectManager;
