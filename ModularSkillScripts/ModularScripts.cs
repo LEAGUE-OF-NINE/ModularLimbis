@@ -1736,7 +1736,7 @@ public class ModularSA : MonoBehaviour
 				}
 				else if (circledSection.StartsWith("perfect")) {
 					Enum.TryParse(circledSection.Remove(0,7), true, out sin);
-					valueList[setvalue_idx] = res_manager.GetAttributeResonance(modsa_unitModel.Faction, sin);
+					valueList[setvalue_idx] = res_manager.GetMaxPerfectResonance(modsa_unitModel.Faction, sin);
 				}
 				else if (Enum.TryParse(circledSection, true, out sin)) {
 					valueList[setvalue_idx] = res_manager.GetAttributeResonance(modsa_unitModel.Faction, sin);
