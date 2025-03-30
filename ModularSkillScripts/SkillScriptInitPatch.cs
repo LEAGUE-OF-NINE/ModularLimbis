@@ -591,7 +591,25 @@ public class SkillScriptInitPatch
 			}
 		}
 	}
-
+	
+	    [HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnDiscardSin))]
+	    [HarmonyPostfix]
+	    private static void Postfix_PassiveDetail_OnDiscardSin(UnitSinModel __0, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
+	    {	
+	        foreach (PassiveModel passiveModel in __instance.PassiveList)
+	        {
+	            if (!passiveModel.CheckActiveCondition()) continue;
+	            long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+	            if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
+	
+	            foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
+	            {
+	                modpa.modsa_passiveModel = passiveModel;
+	                modpa.Enact(__instance._owner, null, null, null, 24, timing);
+	            }
+	        }
+	    }
+		
 	// PASSIVES END
 	// PASSIVES END
 	// PASSIVES END
