@@ -1850,6 +1850,7 @@ public class ModularSA : MonoBehaviour
 				else if (circle_1 == "deadAllyCount") value = targetModel.deadAllyCount;
 				else if (circle_1 == "panicType") value = Convert.ToInt32(targetModel._defaultPanicType);
 				else if (circle_1 == "isRetreated") value = targetModel.IsRetreated() ? 1 : 0;
+				else if (circle_1 == "hasMp") value = targetModel.HasMp() ? 1 : 0;
 				else if (circle_1.StartsWith("res")) {
 					string word = circle_1.Remove(0, 3);
 					ATK_BEHAVIOUR atk = ATK_BEHAVIOUR.NONE;
