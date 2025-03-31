@@ -918,13 +918,14 @@ public class ModularSA : MonoBehaviour
 				if (modelList.Count < 1) return;
 				int amount = GetNumFromParamString(circles[1]);
 				if (amount == 0) return;
+				bool isBreakDmg = amount < 0;
+				if (isBreakDmg) amount *= -1;
 				int times = 1;
 				if (circles.Length > 2) times = GetNumFromParamString(circles[2]);
 
 				foreach (BattleUnitModel targetModel in modelList) {
 					for (int times_i = 0; times_i < times; times_i++) {
-						if (amount < 0) {
-							amount *= -1;
+						if (isBreakDmg) {
 							AbilityTriggeredData_BsGaugeDown triggerData = new AbilityTriggeredData_BsGaugeDown(amount, targetModel.InstanceID, battleTiming);
 							if (abilityMode == 2) dummyPassiveAbility.FirstBsGaugeDown(modsa_unitModel, targetModel, amount, battleTiming);
 							else if (abilityMode == 1) dummyCoinAbility.FirstBsGaugeDown(modsa_unitModel, targetModel, amount, battleTiming);
