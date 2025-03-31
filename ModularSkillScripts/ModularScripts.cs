@@ -784,66 +784,58 @@ public class ModularSA : MonoBehaviour
 				if (dmg_sin != -1) sinKind = (ATTRIBUTE_TYPE)dmg_sin;
 
 				foreach (BattleUnitModel targetModel in modelList) {
-					int hpDamageTaken = 0;
-					int shieldDamageTaken = 0;
 					if (dmg_type == -1 && dmg_sin == -1) {
-						AbilityTriggeredData_HpDamage triggerData = new AbilityTriggeredData_HpDamage(amount, targetModel.InstanceID, battleTiming);
+						//AbilityTriggeredData_HpDamage triggerData = new AbilityTriggeredData_HpDamage(amount, targetModel.InstanceID, battleTiming);
+						//targetModel.AddTriggeredData(triggerData);
 						if (abilityMode == 2)
-						{
-							dummyPassiveAbility.GiveAbsHpDamage(modsa_unitModel, targetModel, amount, out hpDamageTaken, out shieldDamageTaken, battleTiming, DAMAGE_SOURCE_TYPE.PASSIVE);
-							targetModel.AddTriggeredData(triggerData);
-						}
+							dummyPassiveAbility.GiveAbsHpDamage(modsa_unitModel, targetModel, amount, out _, out _, battleTiming,
+								DAMAGE_SOURCE_TYPE.PASSIVE);
 						else if (abilityMode == 1)
-						{
-							dummyCoinAbility.GiveAbsHpDamage(modsa_unitModel, targetModel, amount, out hpDamageTaken, out shieldDamageTaken, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, modsa_selfAction);
-							targetModel.AddTriggeredData(triggerData);
-						}
-						else dummySkillAbility.GiveAbsHpDamage(modsa_unitModel, targetModel, amount, out hpDamageTaken, out shieldDamageTaken, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, modsa_selfAction);
+							dummyCoinAbility.GiveAbsHpDamage(modsa_unitModel, targetModel, amount, out _, out _, battleTiming,
+								DAMAGE_SOURCE_TYPE.SKILL, modsa_selfAction);
+						else
+							dummySkillAbility.GiveAbsHpDamage(modsa_unitModel, targetModel, amount, out _, out _, battleTiming,
+								DAMAGE_SOURCE_TYPE.SKILL, modsa_selfAction);
 					}
-					else if (dmg_type == -1 && dmg_sin != -1)
-					{
-						AbilityTriggeredData_HpDamage triggerData = new AbilityTriggeredData_HpDamage(amount, targetModel.InstanceID, sinKind, battleTiming);
+					else if (dmg_type == -1 && dmg_sin != -1) {
+						//AbilityTriggeredData_HpDamage triggerData = new AbilityTriggeredData_HpDamage(amount, targetModel.InstanceID, sinKind, battleTiming);
+						//targetModel.AddTriggeredData(triggerData);
 						if (abilityMode == 2)
-						{
-							dummyPassiveAbility.GiveHpDamageAppliedAttributeResist(modsa_unitModel, targetModel, amount, sinKind, battleTiming, DAMAGE_SOURCE_TYPE.PASSIVE, out hpDamageTaken);
-							targetModel.AddTriggeredData(triggerData);
-						}
+							dummyPassiveAbility.GiveHpDamageAppliedAttributeResist(modsa_unitModel, targetModel, amount, sinKind,
+								battleTiming, DAMAGE_SOURCE_TYPE.PASSIVE, out _);
 						else if (abilityMode == 1)
-						{
-							dummyCoinAbility.GiveHpDamageAppliedAttributeResist(modsa_unitModel, targetModel, amount, sinKind, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, out hpDamageTaken);
-							targetModel.AddTriggeredData(triggerData);
-						}
-						else dummySkillAbility.GiveHpDamageAppliedAttributeResist(modsa_unitModel, targetModel, amount, sinKind, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, out hpDamageTaken);
+							dummyCoinAbility.GiveHpDamageAppliedAttributeResist(modsa_unitModel, targetModel, amount, sinKind,
+								battleTiming, DAMAGE_SOURCE_TYPE.SKILL, out _);
+						else
+							dummySkillAbility.GiveHpDamageAppliedAttributeResist(modsa_unitModel, targetModel, amount, sinKind,
+								battleTiming, DAMAGE_SOURCE_TYPE.SKILL, out _);
 					}
-					else if (dmg_type != -1 && dmg_sin == -1)
-					{
-						AbilityTriggeredData_HpDamage triggerData = new AbilityTriggeredData_HpDamage(amount, targetModel.InstanceID, atkBehv, battleTiming);
+					else if (dmg_type != -1 && dmg_sin == -1) {
+						//AbilityTriggeredData_HpDamage triggerData = new AbilityTriggeredData_HpDamage(amount, targetModel.InstanceID, atkBehv, battleTiming);
+						//targetModel.AddTriggeredData(triggerData);
 						if (abilityMode == 2)
-						{
-							dummyPassiveAbility.GiveHpDamageAppliedAtkResist(modsa_unitModel, targetModel, amount, atkBehv, battleTiming, DAMAGE_SOURCE_TYPE.PASSIVE, modsa_selfAction);
-							targetModel.AddTriggeredData(triggerData);
-						}
+							dummyPassiveAbility.GiveHpDamageAppliedAtkResist(modsa_unitModel, targetModel, amount, atkBehv,
+								battleTiming, DAMAGE_SOURCE_TYPE.PASSIVE, modsa_selfAction);
 						else if (abilityMode == 1)
-						{
-							dummyCoinAbility.GiveHpDamageAppliedAtkResist(modsa_unitModel, targetModel, amount, atkBehv, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, modsa_selfAction);
-							targetModel.AddTriggeredData(triggerData);
-						}
-						else dummySkillAbility.GiveHpDamageAppliedAtkResist(modsa_unitModel, targetModel, amount, atkBehv, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, modsa_selfAction);
+							dummyCoinAbility.GiveHpDamageAppliedAtkResist(modsa_unitModel, targetModel, amount, atkBehv, battleTiming,
+								DAMAGE_SOURCE_TYPE.SKILL, modsa_selfAction);
+						else
+							dummySkillAbility.GiveHpDamageAppliedAtkResist(modsa_unitModel, targetModel, amount, atkBehv,
+								battleTiming, DAMAGE_SOURCE_TYPE.SKILL, modsa_selfAction);
 					}
 					else
 					{
-						AbilityTriggeredData_HpDamage triggerData = new AbilityTriggeredData_HpDamage(amount, targetModel.InstanceID, sinKind, atkBehv, battleTiming);
+						//AbilityTriggeredData_HpDamage triggerData = new AbilityTriggeredData_HpDamage(amount, targetModel.InstanceID, sinKind, atkBehv, battleTiming);
+						//targetModel.AddTriggeredData(triggerData);
 						if (abilityMode == 2)
-						{
-							dummyPassiveAbility.GiveHpDamageAppliedAttributeAndAtkResist(modsa_unitModel, targetModel, amount, sinKind, atkBehv, battleTiming, DAMAGE_SOURCE_TYPE.PASSIVE, modsa_selfAction);
-							targetModel.AddTriggeredData(triggerData);
-						}
+							dummyPassiveAbility.GiveHpDamageAppliedAttributeAndAtkResist(modsa_unitModel, targetModel, amount,
+								sinKind, atkBehv, battleTiming, DAMAGE_SOURCE_TYPE.PASSIVE, modsa_selfAction);
 						else if (abilityMode == 1)
-						{
-							dummyCoinAbility.GiveHpDamageAppliedAttributeAndAtkResist(modsa_unitModel, targetModel, amount, sinKind, atkBehv, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, modsa_selfAction);
-							targetModel.AddTriggeredData(triggerData);
-						}
-						else dummySkillAbility.GiveHpDamageAppliedAttributeAndAtkResist(modsa_unitModel, targetModel, amount, sinKind, atkBehv, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, modsa_selfAction);
+							dummyCoinAbility.GiveHpDamageAppliedAttributeAndAtkResist(modsa_unitModel, targetModel, amount, sinKind,
+								atkBehv, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, modsa_selfAction);
+						else
+							dummySkillAbility.GiveHpDamageAppliedAttributeAndAtkResist(modsa_unitModel, targetModel, amount, sinKind,
+								atkBehv, battleTiming, DAMAGE_SOURCE_TYPE.SKILL, modsa_selfAction);
 					}
 				}
 			}
