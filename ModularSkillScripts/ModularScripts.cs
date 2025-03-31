@@ -867,25 +867,17 @@ public class ModularSA : MonoBehaviour
 						else targetModel.LoseBuffStack(buf_keyword, stack_temp * -1, battleTiming, activeRound);
 						stack_temp = 0;
 					}
-					if (turn_temp < 0)
-					{
+					if (turn_temp < 0) {
 						if (use) targetModel.UseBuffTurn(buf_keyword, turn_temp * -1, battleTiming);
 						else targetModel.LoseBuffTurn(buf_keyword, turn_temp * -1, battleTiming);
 						turn_temp = 0;
 					}
 					if (stack_temp > 0 || turn_temp > 0) {
 						AbilityTriggeredData_GiveBuff triggerData = new AbilityTriggeredData_GiveBuff(buf_keyword, stack_temp, turn_temp, activeRound, false, true, targetModel.InstanceID, battleTiming, BUF_TYPE.Neutral);
-						if (abilityMode == 2)
-						{
-							dummyPassiveAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound, battleTiming, modsa_selfAction);
-							targetModel.AddTriggeredData(triggerData);
-						}
-						else if (abilityMode == 1)
-						{
-							dummyCoinAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound, battleTiming, modsa_selfAction);
-							targetModel.AddTriggeredData(triggerData);
-						}
+						if (abilityMode == 2) dummyPassiveAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound, battleTiming, modsa_selfAction);
+						else if (abilityMode == 1) dummyCoinAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound, battleTiming, modsa_selfAction);
 						else dummySkillAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound, battleTiming, modsa_selfAction);
+						//targetModel.AddTriggeredData(triggerData);
 					}
 				}
 			}
