@@ -873,7 +873,7 @@ public class ModularSA : MonoBehaviour
 						turn_temp = 0;
 					}
 					if (stack_temp > 0 || turn_temp > 0) {
-						AbilityTriggeredData_GiveBuff triggerData = new AbilityTriggeredData_GiveBuff(buf_keyword, stack_temp, turn_temp, activeRound, false, true, targetModel.InstanceID, battleTiming, BUF_TYPE.Neutral);
+						//AbilityTriggeredData_GiveBuff triggerData = new AbilityTriggeredData_GiveBuff(buf_keyword, stack_temp, turn_temp, activeRound, false, true, targetModel.InstanceID, battleTiming, BUF_TYPE.Neutral);
 						if (abilityMode == 2) dummyPassiveAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound, battleTiming, modsa_selfAction);
 						else if (abilityMode == 1) dummyCoinAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound, battleTiming, modsa_selfAction);
 						else dummySkillAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound, battleTiming, modsa_selfAction);
@@ -926,12 +926,12 @@ public class ModularSA : MonoBehaviour
 				foreach (BattleUnitModel targetModel in modelList) {
 					for (int times_i = 0; times_i < times; times_i++) {
 						if (isBreakDmg) {
-							AbilityTriggeredData_BsGaugeDown triggerData = new AbilityTriggeredData_BsGaugeDown(amount, targetModel.InstanceID, battleTiming);
+							//AbilityTriggeredData_BsGaugeDown triggerData = new AbilityTriggeredData_BsGaugeDown(amount, targetModel.InstanceID, battleTiming);
 							if (abilityMode == 2) dummyPassiveAbility.FirstBsGaugeDown(modsa_unitModel, targetModel, amount, battleTiming);
 							else if (abilityMode == 1) dummyCoinAbility.FirstBsGaugeDown(modsa_unitModel, targetModel, amount, battleTiming);
 							else dummySkillAbility.FirstBsGaugeDown(modsa_unitModel, targetModel, amount, battleTiming);
 						} else {
-							AbilityTriggeredData_BsGaugeUp triggerData = new AbilityTriggeredData_BsGaugeUp(amount, targetModel.InstanceID, battleTiming);
+							//AbilityTriggeredData_BsGaugeUp triggerData = new AbilityTriggeredData_BsGaugeUp(amount, targetModel.InstanceID, battleTiming);
 							if (abilityMode == 2) dummyPassiveAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, amount, battleTiming, false);
 							else if (abilityMode == 1) dummyCoinAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, amount, battleTiming, false, modsa_selfAction);
 							else dummySkillAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, amount, battleTiming, false, modsa_selfAction);
