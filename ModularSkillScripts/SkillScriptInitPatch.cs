@@ -592,24 +592,18 @@ public class SkillScriptInitPatch
 		}
 	}
 	
-	    [HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnDiscardSin))]
-	    [HarmonyPostfix]
-	    private static void Postfix_PassiveDetail_OnDiscardSin(UnitSinModel __0, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
-	    {	
-	        foreach (PassiveModel passiveModel in __instance.PassiveList)
-	        {
-	            if (!passiveModel.CheckActiveCondition()) continue;
-	            long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-	            if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
+	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnDiscardSin))]
+	[HarmonyPostfix]
+	private static void Postfix_PassiveDetail_OnDiscardSin(UnitSinModel sin, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
+	{
+		foreach (PassiveModel passiveModel in __instance.PassiveList) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance._owner, sin.GetSkill(), null, null, MainClass.timingDict["OnDiscard"], timing);
+			}
+		}
+	}
 	
-	            foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
-	            {
-	                modpa.modsa_passiveModel = passiveModel;
-	                modpa.Enact(__instance._owner, null, null, null, 24, timing);
-	            }
-	        }
-	    }
-		
 	// PASSIVES END
 	// PASSIVES END
 	// PASSIVES END
@@ -746,13 +740,17 @@ public class SkillScriptInitPatch
 				if (power != 0) __result += power;
 			}
 		}
-
+		
 		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList) {
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-					
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modpa.activationTiming == 10) continue;
+				int power = modpa.atkDmgAdder;
+				if (power != 0) __result += power;
+			}
+		}
+		
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
 				if (modpa.activationTiming == 10) continue;
 				int power = modpa.atkDmgAdder;
 				if (power != 0) __result += power;
@@ -777,16 +775,20 @@ public class SkillScriptInitPatch
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				if (modsa.activationTiming == 10) continue;
 				int power = modsa.atkMultAdder;
-				if (power != 0) __result += (float)power * 0.01f;
+				if (power != 0) __result += power * 0.01f;
 			}
 		}
-
+		
 		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList) {
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-					
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modpa.activationTiming == 10) continue;
+				int power = modpa.atkMultAdder;
+				if (power != 0) __result += power * 0.01f;
+			}
+		}
+		
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
 				if (modpa.activationTiming == 10) continue;
 				int power = modpa.atkMultAdder;
 				if (power != 0) __result += power * 0.01f;
