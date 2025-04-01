@@ -53,10 +53,7 @@ public class ModularSA : MonoBehaviour
 	public void ResetValueList()
 	{
 		activationCounter = 0;
-		for (int i = 0; i < valueList.Length; i++)
-		{
-			valueList[i] = 0;
-		}
+		for (int i = 0; i < valueList.Length; i++) valueList[i] = 0;
 	}
 
 	public void EraseAllData()
@@ -85,6 +82,7 @@ public class ModularSA : MonoBehaviour
 
 	public int activationTiming = 0;
 	public bool resetWhenUse = false;
+	public bool clearValues = false;
 
 	private List<string> batch_list = new List<string>();
 
@@ -239,6 +237,7 @@ public class ModularSA : MonoBehaviour
 		}
 
 		ResetAdders();
+		if (clearValues) ResetValueList();
 		List<BattleUnitModel> loopTarget_list = modsa_target_list;
 		if (modsa_loopString.Any()) loopTarget_list = GetTargetModelList(modsa_loopString);
 		else if (loopTarget_list.Count < 1) loopTarget_list.Add(GetTargetModel("MainTarget"));
@@ -621,6 +620,7 @@ public class ModularSA : MonoBehaviour
 			}
 			else if (batch.StartsWith("LOOP:")) modsa_loopString = batch.Remove(0, 5);
 			else if (batch == "RESETWHENUSE") resetWhenUse = true;
+			else if (batch == "CLEARVALUES") clearValues = true;
 			else batch_list.Add(batch);
 		}
 	}
