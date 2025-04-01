@@ -977,17 +977,17 @@ public class ModularSA : MonoBehaviour
 					{
 						if (abilityMode == 2)
 						{
-							dummyPassiveAbility.AddTriggeredData_BsGaugeUp(tremorStack, targetModel.InstanceID, battleTiming, true);
+							//dummyPassiveAbility.AddTriggeredData_BsGaugeUp(tremorStack, targetModel.InstanceID, battleTiming, true);
 							dummyPassiveAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, tremorStack, battleTiming, true);
 							targetModel.VibrationExplosion(battleTiming, modsa_unitModel, dummyPassiveAbility);
 						}
 						else if (abilityMode == 1) 
 						{
-							dummyCoinAbility.AddTriggeredData_BsGaugeUp(tremorStack, targetModel.InstanceID, battleTiming, true);
+							//dummyCoinAbility.AddTriggeredData_BsGaugeUp(tremorStack, targetModel.InstanceID, battleTiming, true);
 							dummyCoinAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, tremorStack, battleTiming, true, modsa_selfAction, modsa_coinModel);
 							targetModel.VibrationExplosion(battleTiming, modsa_unitModel, dummyCoinAbility, modsa_selfAction, modsa_coinModel);
 						} else {
-							dummySkillAbility.AddTriggeredData_BsGaugeUp(tremorStack, targetModel.InstanceID, battleTiming, true);
+							//dummySkillAbility.AddTriggeredData_BsGaugeUp(tremorStack, targetModel.InstanceID, battleTiming, true);
 							dummySkillAbility.FirstBsGaugeUp(modsa_unitModel, targetModel, tremorStack, battleTiming, true, modsa_selfAction);
 							targetModel.VibrationExplosion(battleTiming, modsa_unitModel, dummySkillAbility, modsa_selfAction);
 						}
