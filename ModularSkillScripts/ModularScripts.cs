@@ -865,11 +865,22 @@ public class ModularSA : MonoBehaviour
 						turn_temp = 0;
 					}
 					if (stack_temp > 0 || turn_temp > 0) {
-						//AbilityTriggeredData_GiveBuff triggerData = new AbilityTriggeredData_GiveBuff(buf_keyword, stack_temp, turn_temp, activeRound, false, true, targetModel.InstanceID, battleTiming, BUF_TYPE.Neutral);
-						if (abilityMode == 2) dummyPassiveAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound, battleTiming, modsa_selfAction);
-						else if (abilityMode == 1) dummyCoinAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound, battleTiming, modsa_selfAction);
-						else dummySkillAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound, battleTiming, modsa_selfAction);
-						//targetModel.AddTriggeredData(triggerData);
+						if (activeRound == 2) {
+							if (abilityMode == 2) { 
+								dummyPassiveAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, 0, battleTiming, modsa_selfAction);
+								dummyPassiveAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, 1, battleTiming, modsa_selfAction); }
+							else if (abilityMode == 1) { 
+								dummyCoinAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, 0, battleTiming, modsa_selfAction);
+								dummyCoinAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, 1, battleTiming, modsa_selfAction); }
+							else {
+								dummySkillAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, 0, battleTiming, modsa_selfAction);
+								dummySkillAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, 2, battleTiming, modsa_selfAction); }
+						}
+						else {
+							if (abilityMode == 2) dummyPassiveAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound, battleTiming, modsa_selfAction);
+							else if (abilityMode == 1) dummyCoinAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound, battleTiming, modsa_selfAction);
+							else dummySkillAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound, battleTiming, modsa_selfAction);
+						}
 					}
 				}
 			}
@@ -1364,7 +1375,50 @@ public class ModularSA : MonoBehaviour
 				}
 			}
 				break;
-		}
+            case "summonassistant":
+                {
+                    int assistantID = GetNumFromParamString(circles[0]);
+                    int assistantlevel = GetNumFromParamString(circles[1]);
+                    int assistantSynclevel = GetNumFromParamString(circles[2]);
+                    BattleUnitModel summonedUnit = BattleObjectManager.Instance.CreateAssistantUnit(assistantID, assistantlevel, assistantSynclevel, assistantID);
+
+                    summonedUnit.InitActionSlots();
+
+                    var aliveList = BattleObjectManager.Instance.GetAliveList(true, UNIT_FACTION.NONE);
+
+                    foreach (BattleUnitModel unit in aliveList)
+                    {
+                        unit.RefreshSpeed();
+                    }
+
+                }
+                break;
+            case "summonenemy":
+                {
+                    int enemy_ID = GetNumFromParamString(circles[0]);
+                    int enemy_level = GetNumFromParamString(circles[1]);
+                    int enemy_Synclevel = GetNumFromParamString(circles[2]);
+                    int waveIndex = GetNumFromParamString(circles[3]);
+                    bool isenemy = circles.Length >= 5;
+                    BattleUnitModel summonedUnit = BattleObjectManager.Instance.CreateEnemyUnit(enemy_ID, enemy_level, enemy_Synclevel, waveIndex, enemy_ID, null, UNIT_POSITION.MAIN);
+
+                    if (isenemy) summonedUnit.InitActionSlots();
+
+                    var aliveList = BattleObjectManager.Instance.GetAliveList(true, UNIT_FACTION.NONE);
+
+                    foreach (BattleUnitModel unit in aliveList)
+                    {
+                        unit.RefreshSpeed();
+                    }
+
+                }
+                break;
+            case "summonunitfromqueue":
+                {
+                    BattleObjectManager.Instance.FlushAddUnitOnlyQueue();
+                }
+                break;
+        }
 	}
 		
 	private void AcquireValue(int setvalue_idx, string section)
@@ -1835,12 +1889,13 @@ public class ModularSA : MonoBehaviour
 				valueList[setvalue_idx] = value;
 			}
 				break;
-			case "coinisbroken": {
-				if (modsa_coinModel == null) return;
-				valueList[setvalue_idx] = modsa_coinModel.IsDestroyed ? 1 : 0;
-			}
-				break;
-		}
+            case "coinisbroken":
+                {
+                    if (modsa_coinModel == null) return;
+                    valueList[setvalue_idx] = modsa_coinModel.IsUsableInDuel ? 0 : 1;
+                }
+                break;
+        }
 	}
 		
 }
