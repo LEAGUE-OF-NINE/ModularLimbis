@@ -618,21 +618,22 @@ public class SkillScriptInitPatch
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				if (modsa.activationTiming == 10) continue;
 				int power = modsa.coinScaleAdder;
-				if (Input.GetKeyInt(KeyCode.LeftControl))
-					MainClass.Logg.LogInfo("Found modsa - coin scale adder: " + power);
 				__result += power;
 			}
 		}
 			
 		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList) {
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-					
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 				if (modpa.activationTiming == 10) continue;
 				int power = modpa.coinScaleAdder;
-				MainClass.Logg.LogInfo("Found modpa - coin scale adder: " + power);
+				if (power != 0) __result += power;
+			}
+		}
+		
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
+				if (modpa.activationTiming == 10) continue;
+				int power = modpa.coinScaleAdder;
 				if (power != 0) __result += power;
 			}
 		}
@@ -651,11 +652,16 @@ public class SkillScriptInitPatch
 		}
 			
 		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList) {
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-					
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modpa.activationTiming == 10) continue;
+				int power = modpa.skillPowerAdder;
+				if (power != 0) MainClass.Logg.LogInfo("Found modpa - base power adder: ");
+				__result += power;
+			}
+		}
+		
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
 				if (modpa.activationTiming == 10) continue;
 				int power = modpa.skillPowerAdder;
 				if (power != 0) MainClass.Logg.LogInfo("Found modpa - base power adder: ");
@@ -676,13 +682,18 @@ public class SkillScriptInitPatch
 				__result += power;
 			}
 		}
-
+		
 		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList) {
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-					
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modpa.activationTiming == 10) continue;
+				int power = modpa.skillPowerResultAdder;
+				if (power != 0) MainClass.Logg.LogInfo("Found modpa - final power adder: ");
+				__result += power;
+			}
+		}
+		
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
 				if (modpa.activationTiming == 10) continue;
 				int power = modpa.skillPowerResultAdder;
 				if (power != 0) MainClass.Logg.LogInfo("Found modpa - final power adder: ");
@@ -703,13 +714,18 @@ public class SkillScriptInitPatch
 				__result += power;
 			}
 		}
-			
+		
 		foreach (PassiveModel passiveModel in actorAction.Model._passiveDetail.PassiveList) {
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-					
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modpa.activationTiming == 10) continue;
+				int power = modpa.parryingResultAdder;
+				if (power != 0) MainClass.Logg.LogInfo("Found modpa - clash power adder: " + power);
+				__result += power;
+			}
+		}
+		
+		foreach (PassiveModel passiveModel in actorAction.Model._passiveDetail.EgoPassiveList) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
 				if (modpa.activationTiming == 10) continue;
 				int power = modpa.parryingResultAdder;
 				if (power != 0) MainClass.Logg.LogInfo("Found modpa - clash power adder: " + power);
