@@ -1406,6 +1406,7 @@ public class ModularSA : MonoBehaviour
 			}
 				break;
 			case "summonunitfromqueue": BattleObjectManager.Instance.FlushAddUnitOnlyQueue(); break;
+			default: MainClass.Logg.LogInfo("Invalid Consequence: " + mEth); break;
 		}
 	}
 		
@@ -1881,6 +1882,7 @@ public class ModularSA : MonoBehaviour
 				valueList[setvalue_idx] = modsa_coinModel.IsUsableInDuel ? 0 : 1;
 			}
 			break;
+			default: MainClass.Logg.LogInfo("Invalid Getter: " + methodology); break;
 		}
 	}
 		
