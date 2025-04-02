@@ -1058,10 +1058,19 @@ public class SkillScriptInitPatch
 	}
 	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnRoundEnd))]
 	[HarmonyPostfix]
-	private static void Postfix_SkillModel_OnRoundEnd(BattleUnitModel unit, BATTLE_EVENT_TIMING timing, BuffModel __instance) {
+	private static void Postfix_BuffModel_OnRoundEnd(BattleUnitModel unit, BATTLE_EVENT_TIMING timing, BuffModel __instance) {
 		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
 			modba.modsa_buffModel = __instance;
 			modba.Enact(unit, null, null, null, MainClass.timingDict["EndBattle"], timing);
+		}
+	}
+	
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnStartTurn_BeforeLog))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_OnStartTurnBeforeLog(BattleUnitModel unit, BattleActionModel action, BATTLE_EVENT_TIMING timing, BuffModel __instance) {
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
+			modba.modsa_buffModel = __instance;
+			modba.Enact(unit, action.Skill, action, null, MainClass.timingDict["WhenUse"], timing);
 		}
 	}
 	
@@ -1085,7 +1094,7 @@ public class SkillScriptInitPatch
 	}
 	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnLoseDuel))]
 	[HarmonyPostfix]
-	private static void Postfix_SkillModel_OnLoseDuel(BattleActionModel ownerAction, BattleActionModel opponentAction, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	private static void Postfix_BuffModel_OnLoseDuel(BattleActionModel ownerAction, BattleActionModel opponentAction, BATTLE_EVENT_TIMING timing, BuffModel __instance)
 	{
 		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
 			modba.modsa_buffModel = __instance;
@@ -1093,6 +1102,46 @@ public class SkillScriptInitPatch
 		}
 	}
 
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.GetSkillPowerAdder))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_GetSkillPowerAdder(ref int __result, BuffModel __instance) {
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
+			if (modba.activationTiming == 10) continue;
+			int power = modba.skillPowerAdder;
+			if (power != 0) MainClass.Logg.LogInfo("Found modba - base power adder: " + power);
+			__result += power;
+		}
+	}
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.GetSkillPowerResultAdder))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_GetSkillPowerResultAdder(ref int __result, BuffModel __instance) {
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
+			if (modba.activationTiming == 10) continue;
+			int power = modba.skillPowerResultAdder;
+			if (power != 0) MainClass.Logg.LogInfo("Found modba - final power adder: " + power);
+			__result += power;
+		}
+	}
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.GetParryingResultAdder))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_GetParryingResultAdder(ref int __result, BuffModel __instance) {
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
+			if (modba.activationTiming == 10) continue;
+			int power = modba.parryingResultAdder;
+			if (power != 0) MainClass.Logg.LogInfo("Found modba - clash power adder: " + power);
+			__result += power;
+		}
+	}
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.GetCoinScaleAdder))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_GetCoinScaleAdder(ref int __result, BuffModel __instance) {
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
+			if (modba.activationTiming == 10) continue;
+			int power = modba.coinScaleAdder;
+			if (power != 0) MainClass.Logg.LogInfo("Found modba - coin power adder: " + power);
+			__result += power;
+		}
+	}
 	
 	
 	// BUFFMODEL UP TO HERE
