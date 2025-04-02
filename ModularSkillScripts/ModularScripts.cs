@@ -1824,8 +1824,19 @@ public class ModularSA : MonoBehaviour
 				BattleActionModel action = modsa_selfAction;
 				if (circles[0] == "Target") action = modsa_oppoAction;
 				if (action == null) return;
-
 				valueList[setvalue_idx] = (int)action.Skill.GetAttributeType();
+			}
+				break;
+			case "skilldeftype": {
+				BattleActionModel action = modsa_selfAction;
+				if (circles[0] == "Target") action = modsa_oppoAction;
+				if (action != null) valueList[setvalue_idx] = (int)action.Skill.GetDefenseType();
+			}
+				break;
+			case "skillegotype": {
+				BattleActionModel action = modsa_selfAction;
+				if (circles[0] == "Target") action = modsa_oppoAction;
+				if (action != null) valueList[setvalue_idx] = (int)action.Skill.GetSkillEgoType();
 			}
 				break;
 			case "skillslotcount":{
