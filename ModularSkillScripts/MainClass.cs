@@ -13,6 +13,7 @@ using Il2CppInterop.Runtime.Injection;
 namespace ModularSkillScripts;
 
 [BepInPlugin(GUID, NAME, VERSION)]
+[BepInDependency("Lethe")]
 public class MainClass : BasePlugin
 {
 	public override void Load()
@@ -91,7 +92,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false;
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "2.6.0";
+	public const string VERSION = "2.6.1";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
