@@ -73,6 +73,7 @@ public class ModularSA : MonoBehaviour
 		modsa_skillModel = null;
 		modsa_passiveModel = null;
 		modsa_coinModel = null;
+		modsa_buffModel = null;
 		dummySkillAbility = null;
 		dummyPassiveAbility = null;
 		dummyCoinAbility = null;
@@ -100,6 +101,7 @@ public class ModularSA : MonoBehaviour
 	public SkillModel modsa_skillModel = null;
 	public PassiveModel modsa_passiveModel = null;
 	public CoinModel modsa_coinModel = null;
+	public BuffModel modsa_buffModel = null;
 	public SkillAbility dummySkillAbility = null;
 	public PassiveAbility dummyPassiveAbility = null;
 	public CoinAbility dummyCoinAbility = null;

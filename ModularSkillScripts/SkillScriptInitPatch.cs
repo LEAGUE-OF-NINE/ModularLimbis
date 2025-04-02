@@ -156,6 +156,48 @@ public class SkillScriptInitPatch
 		}
 	}
 
+	
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.Init))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_Init(BattleUnitModel owner, BuffModel __instance)
+	{
+		long ptr = __instance.Pointer.ToInt64();
+
+		List<BuffAbilityStaticData> abilityData_list = __instance._buffData.list;
+		for (int i = 0; i < abilityData_list.Count; i++)
+		{
+			BuffAbilityStaticData abilityData = abilityData_list.ToArray()[i];
+			string abilityScriptname = abilityData.ability;
+			if (!abilityScriptname.StartsWith("Modular/")) continue;
+			if (!MainClass.fakepowerEnabled && abilityScriptname.Contains("FakePower")) continue;
+
+			bool dictContainsKey = modbaDict.ContainsKey(ptr);
+			bool existsAlready = false;
+			if (dictContainsKey) {
+				foreach (ModularSA existingModsa in modbaDict[ptr]) {
+					if (existingModsa.originalString != abilityScriptname) continue;
+					existsAlready = true;
+					existingModsa.ResetValueList();
+					existingModsa.ResetAdders();
+					existingModsa.modsa_buffModel = __instance;
+					break;
+				}
+			}
+			if (existsAlready) continue;
+
+			var modsa = new ModularSA();
+			modsa.originalString = abilityScriptname;
+			modsa.modsa_buffModel = __instance;
+			modsa.abilityMode = 2; // 2 means passive
+			modsa.ptr_intlong = ptr;
+
+			modsa.SetupModular(abilityScriptname.Remove(0, 8));
+			if (!dictContainsKey) modbaDict.Add(ptr, new List<ModularSA>());
+			modbaDict[ptr].Add(modsa);
+		}
+	}
+	
+	
 	public static void ResetAllModsa() {
 		foreach (long key in modsaDict.Keys) {
 			List<ModularSA> value = modsaDict[key];
@@ -173,6 +215,13 @@ public class SkillScriptInitPatch
 			
 		foreach (ModularSA modular in modca_list) { modular.EraseAllData(); }
 
+		foreach (long key in modbaDict.Keys) {
+			List<ModularSA> value = modbaDict[key];
+			foreach (ModularSA modular in value) modular.EraseAllData();
+			value.Clear();
+		}
+		modbaDict.Clear();
+		
 		modca_list.Clear();
 		unitMod_list.Clear();
 		skillPtrsRoundStart.Clear();
@@ -181,6 +230,7 @@ public class SkillScriptInitPatch
 	public static Dictionary<long, List<ModularSA>> modsaDict = new();
 	public static Dictionary<long, List<ModularSA>> modpaDict = new();
 	public static List<ModularSA> modca_list = new ();
+	public static Dictionary<long, List<ModularSA>> modbaDict = new();
 	public static Dictionary<long, ModUnitData> unitMod_list = new ();
 	public static List<long> skillPtrsRoundStart = new ();
 
@@ -230,12 +280,19 @@ public class SkillScriptInitPatch
 	private static List<ModularSA> GetAllModpaFromPasmodel(PassiveModel passiveModel, bool checkActive = true)
 	{
 		if (!checkActive || passiveModel.CheckActiveCondition()) {
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (modpaDict.ContainsKey(passiveModel_intlong)) return modpaDict[passiveModel_intlong];
+			long ptr_intlong = passiveModel.Pointer.ToInt64();
+			if (modpaDict.ContainsKey(ptr_intlong)) return modpaDict[ptr_intlong];
 		}
 		return new List<ModularSA>();
 	}
 		
+	private static List<ModularSA> GetAllModbaFromBuffModel(BuffModel buffModel)
+	{
+		long ptr_intlong = buffModel.Pointer.ToInt64();
+		if (modbaDict.ContainsKey(ptr_intlong)) return modbaDict[ptr_intlong];
+		return new List<ModularSA>();
+	}
+	
 	// REAL PATCHES START HERE
 	// REAL PATCHES START HERE
 	// REAL PATCHES START HERE
@@ -977,6 +1034,23 @@ public class SkillScriptInitPatch
 	// SKILLMODEL UP TO HERE
 	// SKILLMODEL UP TO HERE
 
+	
+	
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnRoundStart_After_Event))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_OnRoundStart_After_Event(BattleUnitModel unit, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	{
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
+			modba.modsa_buffModel = __instance;
+			modba.Enact(unit, null, null, null, -1, timing);
+		}
+	}
+	
+	
+	// BUFFMODEL UP TO HERE
+	// BUFFMODEL UP TO HERE
+	// BUFFMODEL UP TO HERE
+	
 	/*[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnGiveHpDamage))]
 	[HarmonyPostfix]
 	private static void Postfix_BattleUnitModel_OnGiveHpDamage(BattleUnitModel target, BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
