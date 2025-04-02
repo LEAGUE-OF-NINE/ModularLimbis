@@ -1102,6 +1102,16 @@ public class SkillScriptInitPatch
 		}
 	}
 
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnStartBehaviour))]
+	[HarmonyPostfix]
+	private static void Postfix_PassiveDetail_BeforeAttack(BattleActionModel action, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	{
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
+			modba.modsa_buffModel = __instance;
+			modba.Enact(action.Model, action.Skill, action, null, MainClass.timingDict["OnStartBehaviour"], timing);
+		}
+	}
+	
 	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.GetSkillPowerAdder))]
 	[HarmonyPostfix]
 	private static void Postfix_BuffModel_GetSkillPowerAdder(ref int __result, BuffModel __instance) {

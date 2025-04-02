@@ -6,6 +6,7 @@ using Il2CppSystem.Collections.Generic;
 using UnityEngine;
 using static BattleActionModel.TargetDataDetail;
 using IntPtr = System.IntPtr;
+using Lethe.Patches;
 //using CodeStage.AntiCheat.ObscuredTypes;
 //using Il2CppSystem.Collections;
 
@@ -467,9 +468,7 @@ public class ModularSA : MonoBehaviour
 		if (filterKeyword) {
 			string[] circles = param.Split('$');
 			param = circles[0];
-			string bufKeyword_string = circles[1];
-			BUFF_UNIQUE_KEYWORD bufKeyword = BUFF_UNIQUE_KEYWORD.Enhancement;
-			Enum.TryParse(bufKeyword_string, true, out bufKeyword);
+			BUFF_UNIQUE_KEYWORD bufKeyword = CustomBuffs.ParseBuffUniqueKeyword(circles[1]);
 				
 			foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(bufKeyword, 0, false, filterFaction)) list.Add(unit);
 		}
@@ -846,8 +845,7 @@ public class ModularSA : MonoBehaviour
 				List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
 				if (modelList.Count < 1) return;
 
-				BUFF_UNIQUE_KEYWORD buf_keyword = BUFF_UNIQUE_KEYWORD.Enhancement;
-				Enum.TryParse(circles[1], true, out buf_keyword);
+				BUFF_UNIQUE_KEYWORD buf_keyword = CustomBuffs.ParseBuffUniqueKeyword(circles[1]);
 				int stack = GetNumFromParamString(circles[2]);
 				int turn = GetNumFromParamString(circles[3]);
 				int activeRound = GetNumFromParamString(circles[4]);
@@ -1528,8 +1526,7 @@ public class ModularSA : MonoBehaviour
 				BattleUnitModel targetModel = GetTargetModel(circles[0]);
 				if (targetModel == null) return;
 
-				BUFF_UNIQUE_KEYWORD buf_keyword = BUFF_UNIQUE_KEYWORD.Enhancement;
-				Enum.TryParse(circles[1], true, out buf_keyword);
+				BUFF_UNIQUE_KEYWORD buf_keyword = CustomBuffs.ParseBuffUniqueKeyword(circles[1]);
 
 				BuffDetail bufDetail = targetModel._buffDetail;
 				//BuffModel buf = bufDetail.FindActivatedBuff(buf_keyword, false);

@@ -631,3 +631,4 @@ C:/Users/Glitch/Desktop/ModularSkillScripts repos/ModularSkillScripts/obj/Releas
 /media/glitch/ExtraWorld/repos/ModularSkillScripts repos/ModularSkillScripts/bin/Release/BepInEx.Unity.IL2CPP.xml
 /media/glitch/ExtraWorld/repos/ModularSkillScripts repos/ModularSkillScripts/bin/Release/BepInEx.Unity.IL2CPP.dll.config
 /media/glitch/ExtraWorld/repos/ModularSkillScripts repos/ModularSkillScripts/obj/Release/ModularSkillScripts.csproj.CopyComplete
+/media/glitch/ExtraWorld/repos/ModularSkillScripts repos/ModularSkillScripts/bin/Release/Lethe.dll
