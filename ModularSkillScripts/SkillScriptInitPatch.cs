@@ -1056,6 +1056,43 @@ public class SkillScriptInitPatch
 			modba.Enact(unit, null, null, null, -1, timing);
 		}
 	}
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnRoundEnd))]
+	[HarmonyPostfix]
+	private static void Postfix_SkillModel_OnRoundEnd(BattleUnitModel unit, BATTLE_EVENT_TIMING timing, BuffModel __instance) {
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
+			modba.modsa_buffModel = __instance;
+			modba.Enact(unit, null, null, null, MainClass.timingDict["EndBattle"], timing);
+		}
+	}
+	
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnStartDuel))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_OnStartDuel(BattleActionModel ownerAction, BattleActionModel opponentAction, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	{
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
+			modba.modsa_buffModel = __instance;
+			modba.Enact(ownerAction.Model, ownerAction.Skill, ownerAction, opponentAction, MainClass.timingDict["StartDuel"], timing);
+		}
+	}
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnWinDuel))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_OnWinDuel(BattleActionModel ownerAction, BattleActionModel opponentAction, int parryingCount, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	{
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
+			modba.modsa_buffModel = __instance;
+			modba.Enact(ownerAction.Model, ownerAction.Skill, ownerAction, opponentAction, MainClass.timingDict["WinDuel"], timing);
+		}
+	}
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnLoseDuel))]
+	[HarmonyPostfix]
+	private static void Postfix_SkillModel_OnLoseDuel(BattleActionModel ownerAction, BattleActionModel opponentAction, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	{
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
+			modba.modsa_buffModel = __instance;
+			modba.Enact(ownerAction.Model, ownerAction.Skill, ownerAction, opponentAction, MainClass.timingDict["DefeatDuel"], timing);
+		}
+	}
+
 	
 	
 	// BUFFMODEL UP TO HERE
