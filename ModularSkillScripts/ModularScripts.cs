@@ -877,7 +877,7 @@ public class ModularSA : MonoBehaviour
 							}
 							else {
 								dummySkillAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, 0, battleTiming, modsa_selfAction);
-								dummySkillAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, 2, battleTiming, modsa_selfAction);
+								dummySkillAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, 1, battleTiming, modsa_selfAction);
 							}
 						}
 						else {

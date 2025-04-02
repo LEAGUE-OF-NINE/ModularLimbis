@@ -2,10 +2,12 @@
 using BepInEx.Unity.IL2CPP;
 using BepInEx.Logging;
 using HarmonyLib;
-using System;
 using Il2CppSystem.Collections.Generic;
 using System.Text.RegularExpressions;
 using Il2CppInterop.Runtime.Injection;
+using UnityEngine;
+using Random = System.Random;
+
 //using Antlr4.Runtime;
 //using Antlr4.Runtime.Tree;
 //using ModsaLang;
@@ -29,7 +31,7 @@ public class MainClass : BasePlugin
 		harmony.PatchAll(typeof(StagePatches));
 		harmony.PatchAll(typeof(UniquePatches));
 		if (fakepowerEnabled) harmony.PatchAll(typeof(FakePowerPatches));
-
+		
 		//modsaEval = new ModsaEvaluator();
 		timingDict.Add("RoundStart", -1);
 		timingDict.Add("StartBattle", 0);
