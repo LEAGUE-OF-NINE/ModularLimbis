@@ -1408,6 +1408,30 @@ public class ModularSA : MonoBehaviour
 			}
 				break;
 			case "summonunitfromqueue": BattleObjectManager.Instance.FlushAddUnitOnlyQueue(); break;
+			case "stack": {
+				if (modsa_buffModel == null) return;
+				int adder = GetNumFromParamString(circles[0]);
+				if (adder > 0) {
+					List<BuffHistory> bufHistoryList = new List<BuffHistory>();
+					BuffHistory bufHistory = new(adder, 0, ABILITY_SOURCE_TYPE.BUFF);
+					bufHistoryList.Add(bufHistory);
+					modsa_buffModel.AddBuffStackOrTurn(modsa_unitModel, bufHistoryList, 0, ABILITY_SOURCE_TYPE.BUFF, battleTiming, null, out _, out _);
+				}
+				else modsa_buffModel.LoseStack(modsa_unitModel, 0, battleTiming, adder * -1);
+			}
+				break;
+			case "turn":{
+				if (modsa_buffModel == null) return;
+				int adder = GetNumFromParamString(circles[0]);
+				if (adder > 0) {
+					List<BuffHistory> bufHistoryList = new List<BuffHistory>();
+					BuffHistory bufHistory = new(0, adder, ABILITY_SOURCE_TYPE.BUFF);
+					bufHistoryList.Add(bufHistory);
+					modsa_buffModel.AddBuffStackOrTurn(modsa_unitModel, bufHistoryList, 0, ABILITY_SOURCE_TYPE.BUFF, battleTiming, null, out _, out _);
+				}
+				else modsa_buffModel.LoseTurn(modsa_unitModel, battleTiming, adder * -1);
+			}
+				break;
 			default: MainClass.Logg.LogInfo("Invalid Consequence: " + mEth); break;
 		}
 	}
@@ -1895,6 +1919,14 @@ public class ModularSA : MonoBehaviour
 				valueList[setvalue_idx] = modsa_coinModel.IsUsableInDuel ? 0 : 1;
 			}
 			break;
+			case "stack":{
+				if (modsa_buffModel != null) valueList[setvalue_idx] = modsa_buffModel.GetStack(0);
+			}
+				break;
+			case "turn":{
+				if (modsa_buffModel != null) valueList[setvalue_idx] = modsa_buffModel.GetTurn(0);
+			}
+				break;
 			default: MainClass.Logg.LogInfo("Invalid Getter: " + methodology); break;
 		}
 	}
