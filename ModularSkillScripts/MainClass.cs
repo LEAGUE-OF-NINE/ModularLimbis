@@ -64,6 +64,7 @@ public class MainClass : BasePlugin
 		timingDict.Add("OnOtherBurst", 27);
 		timingDict.Add("BeforeSA", 28);
 		timingDict.Add("BeforeWhenHit", 29);
+		timingDict.Add("BeforeUse", 30);
 		timingDict.Add("SpecialAction", 999);
 	}
 

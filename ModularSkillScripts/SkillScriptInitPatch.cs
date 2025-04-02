@@ -881,6 +881,17 @@ public class SkillScriptInitPatch
 		}
 	}
 
+	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnBeforeTurn))]
+	[HarmonyPostfix]
+	private static void Postfix_SkillModel_OnBeforeTurn(BattleActionModel action, SkillModel __instance)
+	{
+		long skillmodel_intlong = __instance.Pointer.ToInt64();
+		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+			modsa.Enact(action.Model, __instance, action, null, MainClass.timingDict["BeforeUse"], BATTLE_EVENT_TIMING.ALL_TIMING);
+		}
+	}
+	
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnStartTurn_BeforeLog))]
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_OnStartTurnBeforeLog(BattleActionModel action, List<BattleUnitModel> targets, BATTLE_EVENT_TIMING timing, SkillModel __instance)
