@@ -1194,6 +1194,19 @@ public class SkillScriptInitPatch
 				}
 			}
 
+			foreach (BuffModel buffModel in attacker._buffDetail.GetActivatedBuffModelAll()) {
+				foreach (ModularSA modba in GetAllModbaFromBuffModel(buffModel)) {
+					modba.lastFinalDmg = realDmg;
+					modba.lastHpDmg = hpDamage;
+					modba.wasCrit = isCritical;
+					modba.modsa_coinModel = coin;
+					modba.modsa_buffModel = buffModel;
+					modba.modsa_target_list.Clear();
+					modba.modsa_target_list.Add(__instance);
+					modba.Enact(attacker, action.Skill, action, null, MainClass.timingDict["OnSucceedAttack"], timing);
+				}
+			}
+			
 			foreach (PassiveModel passiveModel in attacker._passiveDetail.PassiveList) {
 				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 					modpa.lastFinalDmg = realDmg;
@@ -1219,7 +1232,20 @@ public class SkillScriptInitPatch
 				}
 			}
 		}
-
+		
+		foreach (BuffModel buffModel in __instance._buffDetail.GetActivatedBuffModelAll()) {
+			foreach (ModularSA modba in GetAllModbaFromBuffModel(buffModel)) {
+				modba.lastFinalDmg = realDmg;
+				modba.lastHpDmg = hpDamage;
+				modba.wasCrit = isCritical;
+				modba.modsa_coinModel = coin;
+				modba.modsa_buffModel = buffModel;
+				modba.modsa_target_list.Clear();
+				modba.modsa_target_list.Add(__instance);
+				modba.Enact(attacker, action.Skill, action, null, MainClass.timingDict["WhenHit"], timing);
+			}
+		}
+		
 		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 				modpa.lastFinalDmg = realDmg;
@@ -1229,7 +1255,7 @@ public class SkillScriptInitPatch
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(__instance);
-				modpa.Enact(attacker, action.Skill, action, null, 8, timing);
+				modpa.Enact(attacker, action.Skill, action, null, MainClass.timingDict["WhenHit"], timing);
 			}
 		}
 		
@@ -1242,9 +1268,11 @@ public class SkillScriptInitPatch
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(__instance);
-				modpa.Enact(attacker, action.Skill, action, null, 8, timing);
+				modpa.Enact(attacker, action.Skill, action, null, MainClass.timingDict["WhenHit"], timing);
 			}
 		}
+		
+		
 	}
 	
 	
