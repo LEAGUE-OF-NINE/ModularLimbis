@@ -1326,9 +1326,11 @@ public class ModularSA : MonoBehaviour
 				List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
 				int id = GetNumFromParamString(circles[1]);
 				foreach (BattleUnitModel targetModel in modelList) {
+					List<PassiveModel> removal = new();
 					foreach (PassiveModel passive in targetModel.GetPassiveList()) {
-						if (passive.GetID() == id) targetModel.GetPassiveList().Remove(passive);
+						if (passive.GetID() == id) removal.Add(passive);
 					}
+					foreach (PassiveModel passive in removal) targetModel.GetPassiveList().Remove(passive);
 				}
 			}
 				break;
