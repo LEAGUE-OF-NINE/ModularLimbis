@@ -479,16 +479,18 @@ public class ModularSA : MonoBehaviour
 		}
 
 		if (param.Contains("AbnoOnly")) {
-			List<BattleUnitModel> goodones = new List<BattleUnitModel>();
+			System.Collections.Generic.List<BattleUnitModel> goodones = new();
 			foreach (BattleUnitModel unit in list) {
 				if (unit.IsAbnormalityOrPart) goodones.Add(unit);
 			}
+			list = goodones;
 		}
 		else if (param.Contains("NoAbnos")) {
-			List<BattleUnitModel> goodones = new List<BattleUnitModel>();
+			System.Collections.Generic.List<BattleUnitModel> goodones = new();
 			foreach (BattleUnitModel unit in list) {
 				if (!unit.IsAbnormalityOrPart) goodones.Add(unit);
 			}
+			list = goodones;
 		}
 
 		if (param.Contains("ExceptSelf")) list.Remove(modsa_unitModel);
