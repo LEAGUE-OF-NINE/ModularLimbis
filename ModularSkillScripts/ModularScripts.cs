@@ -462,6 +462,8 @@ public class ModularSA : MonoBehaviour
 		bool noCores = param.Contains("NoCores");
 		bool noParts = param.Contains("NoParts");
 
+		bool assistance = param.Contains("IncludeAssistants");
+
 		if (param.Contains("Enemy")) filterFaction = enemyFaction;
 		else if (param.Contains("Ally")) filterFaction = thisFaction;
 			
@@ -470,12 +472,12 @@ public class ModularSA : MonoBehaviour
 			param = circles[0];
 			BUFF_UNIQUE_KEYWORD bufKeyword = CustomBuffs.ParseBuffUniqueKeyword(circles[1]);
 				
-			foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(bufKeyword, 0, false, filterFaction)) list.Add(unit);
+			foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(bufKeyword, 0, assistance, filterFaction)) list.Add(unit);
 		}
 		else {
-			if (noCores) foreach (BattleUnitModel unit in battleObjectManager.GetAliveListExceptAbnormalitySelf(filterFaction, false)) list.Add(unit);
-			else if (noParts) foreach (BattleUnitModel unit in battleObjectManager.GetAliveListExceptAbnormalityPart(filterFaction, false)) list.Add(unit);
-			else foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(false, filterFaction)) list.Add(unit);
+			if (noCores) foreach (BattleUnitModel unit in battleObjectManager.GetAliveListExceptAbnormalitySelf(filterFaction, assistance)) list.Add(unit);
+			else if (noParts) foreach (BattleUnitModel unit in battleObjectManager.GetAliveListExceptAbnormalityPart(filterFaction, assistance)) list.Add(unit);
+			else foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(assistance, filterFaction)) list.Add(unit);
 		}
 
 		if (param.Contains("AbnoOnly")) {
@@ -1924,6 +1926,7 @@ public class ModularSA : MonoBehaviour
 				if (modsa_buffModel != null) valueList[setvalue_idx] = modsa_buffModel.GetTurn(0);
 			}
 				break;
+    			case "isfocused": valueList[setvalue_idx] = Singleton<StageController>.Instance.IsAbnormalityBattle() ? 1 : 0; break;
 			default: MainClass.Logg.LogInfo("Invalid Getter: " + methodology); break;
 		}
 	}
