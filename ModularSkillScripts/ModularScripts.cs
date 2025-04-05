@@ -488,7 +488,7 @@ public class ModularSA : MonoBehaviour
 		bool noCores = param.Contains("NoCores");
 		bool noParts = param.Contains("NoParts");
 
-		bool assistance = param.Contains("IncludeAssistants");
+		bool assistance = param.Contains("Assist");
 
 		if (param.Contains("Enemy")) filterFaction = enemyFaction;
 		else if (param.Contains("Ally")) filterFaction = thisFaction;
@@ -1954,7 +1954,7 @@ public class ModularSA : MonoBehaviour
 				if (modsa_buffModel != null) valueList[setvalue_idx] = modsa_buffModel.GetTurn(0);
 			}
 				break;
-    			case "isfocused": valueList[setvalue_idx] = Singleton<StageController>.Instance.IsAbnormalityBattle() ? 1 : 0; break;
+			case "isfocused": valueList[setvalue_idx] = Singleton<StageController>.Instance.IsAbnormalityBattle() ? 1 : 0; break;
 			default: MainClass.Logg.LogInfo("Invalid Getter: " + methodology); break;
 		}
 	}
