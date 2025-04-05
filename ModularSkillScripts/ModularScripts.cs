@@ -267,25 +267,51 @@ public class ModularSA : MonoBehaviour
 
 	private bool CheckIF(string param)
 	{
-		string[] sectionArgs = param.Split(parenthesisSeparator);
-		string circledSection = sectionArgs[1];
-		if (MainClass.logEnabled) MainClass.Logg.LogInfo("IF circledSection: " + circledSection);
+		string[] circles = param.Split(parenthesisSeparator)[1].Split(',');
 
-		MatchCollection symbols = Regex.Matches(circledSection, "(<|>|=)", RegexOptions.IgnoreCase);
+		int mode = -1; // AND
+		switch (circles[0])
+		{
+			case "AND": mode = 0; break;
+			case "OR": mode = 1; break;
+			case "XOR": mode = 2; break;
+		}
+
+		int idx = 0;
+		if (mode == -1) mode = 0;
+		else idx++;
+		
 		char[] ifSeparator = new char[] { '<', '>', '=' };
-		string[] parameters = circledSection.Split(ifSeparator);
-		string firstParam = parameters[0];
-		string secondParam = parameters[1];
-
-		int firstValue = GetNumFromParamString(firstParam);
-		int secondValue = GetNumFromParamString(secondParam);
-
 		bool success = false;
-		string symbol = symbols[0].Value;
-		if (symbol == "<") success = firstValue < secondValue;
-		else if (symbol == ">") success = firstValue > secondValue;
-		else if (symbol == "=") success = firstValue == secondValue;
-		MainClass.Logg.LogInfo("ifsuccess: " + success);
+		bool success_first = false;
+		for (int i = idx; i < circles.Length; i++) {
+			string circle_string = circles[i];
+			MatchCollection symbols = Regex.Matches(circle_string, "(<|>|=)", RegexOptions.IgnoreCase);
+			string[] parameters = circle_string.Split(ifSeparator);
+			string firstParam = parameters[0];
+			string secondParam = parameters[1];
+
+			int firstValue = GetNumFromParamString(firstParam);
+			int secondValue = GetNumFromParamString(secondParam);
+
+			string symbol = symbols[0].Value;
+			if (symbol == "<") success = firstValue < secondValue;
+			else if (symbol == ">") success = firstValue > secondValue;
+			else if (symbol == "=") success = firstValue == secondValue;
+
+			if (mode == 0) {
+				if (!success) break;
+			} else if (mode == 1) {
+				if (success) break;
+			} else {
+				if (i == idx) success_first = success;
+				else {
+					success = success_first == success;
+					if (!success) break;
+				}
+			}
+		}
+		MainClass.Logg.LogInfo("ifsuccess: " + param + " | " + success);
 		return success;
 	}
 
