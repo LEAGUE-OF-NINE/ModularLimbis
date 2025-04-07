@@ -318,20 +318,16 @@ public class ModularSA : MonoBehaviour
 	private int GetNumFromParamString(string param)
 	{
 		int value = 0;
-		bool negative = false;
-		if (param.StartsWith("VALUE_"))
-		{
+		bool negative = param[0] == '-';
+		if (negative) param = param.Remove(0, 1);
+		if (param.Last() == ')') param = param.Remove(param.Length - 1);
+		
+		if (param.StartsWith("VALUE_")) {
 			int value_idx = 0;
 			int.TryParse(param[6].ToString(), out value_idx);
 			value = valueList[value_idx];
-		}
-		else
-		{
-			if (param.Last() == ')') param = param.Remove(param.Length - 1);
-			negative = param[0] == '-';
-			if (negative) param = param.Remove(0, 1);
-			int.TryParse(param, out value);
-		}
+		} else int.TryParse(param, out value);
+		
 		if (negative) value *= -1;
 		return value;
 	}
@@ -1914,6 +1910,7 @@ public class ModularSA : MonoBehaviour
 				else if (circle_1 == "panicType") value = Convert.ToInt32(targetModel._defaultPanicType);
 				else if (circle_1 == "isRetreated") value = targetModel.IsRetreated() ? 1 : 0;
 				else if (circle_1 == "hasMp") value = targetModel.HasMp() ? 1 : 0;
+				//else if (circle_1 == "level") value = targetModel.Level;
 				else if (circle_1.StartsWith("res")) {
 					string word = circle_1.Remove(0, 3);
 					ATK_BEHAVIOUR atk = ATK_BEHAVIOUR.NONE;
