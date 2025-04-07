@@ -661,6 +661,57 @@ public class SkillScriptInitPatch
 		}
 	}
 	
+	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.CheckImmortal))]
+	[HarmonyPostfix]
+	private static void Postfix_PassiveDetail_CheckImmortalOtherUnit(BATTLE_EVENT_TIMING timing, int newHp, bool isInstantDeath, ref bool __result, PassiveDetail __instance)
+	{
+		if (isInstantDeath) return;
+		foreach (PassiveModel passiveModel in __instance.PassiveList) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
+				modpa.immortality = false;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance._owner, null, null, null, MainClass.timingDict["Immortal"], timing);
+				if (modpa.immortality) __result = true;
+			}
+		}
+		foreach (PassiveModel passiveModel in __instance.EgoPassiveList) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
+				modpa.immortality = false;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance._owner, null, null, null, MainClass.timingDict["Immortal"], timing);
+				if (modpa.immortality) __result = true;
+			}
+		}
+	}
+	
+	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.CheckImmortalOtherUnit))]
+	[HarmonyPostfix]
+	private static void Postfix_PassiveDetail_CheckImmortalOtherUnit(BattleUnitModel checkTarget, int newHp, bool isInstantDeath, ref bool __result, PassiveDetail __instance)
+	{
+		if (isInstantDeath) return;
+		foreach (PassiveModel passiveModel in __instance.PassiveList) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
+				modpa.immortality = false;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_target_list.Clear();
+				modpa.modsa_target_list.Add(checkTarget);
+				modpa.Enact(__instance._owner, null, null, null, MainClass.timingDict["ImmortalOther"], BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modpa.immortality) __result = true;
+			}
+		}
+		foreach (PassiveModel passiveModel in __instance.EgoPassiveList) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
+				modpa.immortality = false;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_target_list.Clear();
+				modpa.modsa_target_list.Add(checkTarget);
+				modpa.Enact(__instance._owner, null, null, null, MainClass.timingDict["ImmortalOther"], BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modpa.immortality) __result = true;
+			}
+		}
+	}
+	
+	
 	// PASSIVES END
 	// PASSIVES END
 	// PASSIVES END

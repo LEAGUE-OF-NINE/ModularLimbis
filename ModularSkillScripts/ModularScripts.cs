@@ -149,8 +149,7 @@ public class ModularSA : MonoBehaviour
 	private bool _onlyClashWin = false;
 	private bool _onlyClashLose = false;
 
-	private bool immortality = false;
-	private bool immortality_attempted = false;
+	public bool immortality = false;
 
 	private bool _fullStop = false;
 	BATTLE_EVENT_TIMING battleTiming = BATTLE_EVENT_TIMING.NONE;
@@ -257,12 +256,6 @@ public class ModularSA : MonoBehaviour
 		}
 		modsa_target_list.Clear();
 		activationCounter += 1;
-	}
-
-	public bool IsImmortal()
-	{
-		immortality_attempted = true;
-		return immortality;
 	}
 
 	private bool CheckIF(string param)
@@ -1481,10 +1474,9 @@ public class ModularSA : MonoBehaviour
 			char[] mathSeparator = new char[] { '-', '+', '*', '%', '!', '¡', '?' };
 			string[] parameters = circledSection.Split(mathSeparator);
 			string firstParam = parameters[0];
-			double finalValue = (double)GetNumFromParamString(firstParam);
+			double finalValue = GetNumFromParamString(firstParam);
 
-			for (int i = 0; i < symbols.Count; i++)
-			{
+			for (int i = 0; i < symbols.Count; i++) {
 				string param = parameters[i + 1];
 				string symbol_string = symbols[i].Value;
 				char symbol = symbol_string[0];
@@ -1692,8 +1684,6 @@ public class ModularSA : MonoBehaviour
 				if (targetModel == null) { valueList[setvalue_idx] = 0; return; }
 				valueList[setvalue_idx] = targetModel.deadAllyCount;
 			}
-				break;
-			case "trieddeath": valueList[setvalue_idx] = immortality_attempted ? 1 : 0;
 				break;
 			case "random":{
 				int minroll = GetNumFromParamString(circles[0]);

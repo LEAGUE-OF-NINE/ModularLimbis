@@ -65,6 +65,8 @@ public class MainClass : BasePlugin
 		timingDict.Add("BeforeSA", 28);
 		timingDict.Add("BeforeWhenHit", 29);
 		timingDict.Add("BeforeUse", 30);
+		timingDict.Add("Immortal", 31);
+		timingDict.Add("ImmortalOther", 32);
 		timingDict.Add("SpecialAction", 999);
 	}
 
