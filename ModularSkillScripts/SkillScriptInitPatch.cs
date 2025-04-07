@@ -661,51 +661,50 @@ public class SkillScriptInitPatch
 		}
 	}
 	
-	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.CheckImmortal))]
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.CheckImmortal))]
 	[HarmonyPostfix]
-	private static void Postfix_PassiveDetail_CheckImmortalOtherUnit(BATTLE_EVENT_TIMING timing, int newHp, bool isInstantDeath, ref bool __result, PassiveDetail __instance)
+	private static void Postfix_BattleUnitModel_CheckImmortal(BATTLE_EVENT_TIMING timing, int newHp, bool isInstantDeath, ref bool __result, BattleUnitModel __instance)
 	{
 		if (isInstantDeath) return;
-		foreach (PassiveModel passiveModel in __instance.PassiveList) {
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 				modpa.immortality = false;
 				modpa.modsa_passiveModel = passiveModel;
-				modpa.Enact(__instance._owner, null, null, null, MainClass.timingDict["Immortal"], timing);
+				modpa.Enact(__instance, null, null, null, MainClass.timingDict["Immortal"], timing);
 				if (modpa.immortality) __result = true;
 			}
 		}
-		foreach (PassiveModel passiveModel in __instance.EgoPassiveList) {
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
 				modpa.immortality = false;
 				modpa.modsa_passiveModel = passiveModel;
-				modpa.Enact(__instance._owner, null, null, null, MainClass.timingDict["Immortal"], timing);
+				modpa.Enact(__instance, null, null, null, MainClass.timingDict["Immortal"], timing);
 				if (modpa.immortality) __result = true;
 			}
 		}
 	}
-	
-	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.CheckImmortalOtherUnit))]
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.CheckImmortalOtherUnit), new Type[] {typeof(BattleUnitModel), typeof(int), typeof(bool), typeof(BUFF_UNIQUE_KEYWORD) })]
 	[HarmonyPostfix]
-	private static void Postfix_PassiveDetail_CheckImmortalOtherUnit(BattleUnitModel checkTarget, int newHp, bool isInstantDeath, ref bool __result, PassiveDetail __instance)
+	private static void Postfix_BattleUnitModel_CheckImmortalOtherUnit(BattleUnitModel checkTarget, int newHp, bool isInstantDeath, ref bool __result, BattleUnitModel __instance)
 	{
 		if (isInstantDeath) return;
-		foreach (PassiveModel passiveModel in __instance.PassiveList) {
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 				modpa.immortality = false;
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(checkTarget);
-				modpa.Enact(__instance._owner, null, null, null, MainClass.timingDict["ImmortalOther"], BATTLE_EVENT_TIMING.ALL_TIMING);
+				modpa.Enact(__instance, null, null, null, MainClass.timingDict["ImmortalOther"], BATTLE_EVENT_TIMING.ALL_TIMING);
 				if (modpa.immortality) __result = true;
 			}
 		}
-		foreach (PassiveModel passiveModel in __instance.EgoPassiveList) {
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
 				modpa.immortality = false;
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(checkTarget);
-				modpa.Enact(__instance._owner, null, null, null, MainClass.timingDict["ImmortalOther"], BATTLE_EVENT_TIMING.ALL_TIMING);
+				modpa.Enact(__instance, null, null, null, MainClass.timingDict["ImmortalOther"], BATTLE_EVENT_TIMING.ALL_TIMING);
 				if (modpa.immortality) __result = true;
 			}
 		}
