@@ -1458,6 +1458,17 @@ public class ModularSA : MonoBehaviour
 				}
 			}
 				break;
+			case "gnome":{
+				BattleObjectManager objManager = SingletonBehavior<BattleObjectManager>.Instance;
+				List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+				foreach (BattleUnitModel targetModel in modelList) {
+					BattleUnitView unitView = objManager.GetView(targetModel);
+					if (unitView == null) continue;
+					Vector3 vec3 = unitView.transform.localScale;
+					unitView.transform.localScale = new Vector3(vec3.x,vec3.y * 0.5f,vec3.z);
+				}
+			}
+			break;
 			default: MainClass.Logg.LogInfo("Invalid Consequence: " + mEth); break;
 		}
 	}
