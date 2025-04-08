@@ -1506,20 +1506,18 @@ public class ModularSA : MonoBehaviour
 		string circledSection = "";
 		if (sectionArgs.Length > 1) circledSection = sectionArgs[1];
 		string[] circles = circledSection.Split(',');
-			
-		if (methodology == "math") valueList[setvalue_idx] = DoMath(circledSection);
-			
+
 		valueList[setvalue_idx] = -1; // Default -1
 			
 		switch (methodology)
 		{
-			case "mpcheck":
-			{
+			case "math": valueList[setvalue_idx] = DoMath(circledSection); break;
+			case "mpcheck": {
 				BattleUnitModel targetModel = GetTargetModel(circledSection);
 				if (targetModel == null) return;
 				valueList[setvalue_idx] = targetModel.Mp;
-				break;
 			}
+				break;
 			case "hpcheck":{
 				BattleUnitModel targetModel = GetTargetModel(circles[0]);
 				if (targetModel == null) return;
