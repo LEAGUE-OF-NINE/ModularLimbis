@@ -9,10 +9,11 @@ class FakePowerPatches
 	[HarmonyPrefix]
 	private static void Postfix_SkillModelManager_GetExpectedWinRate(BattleActionModel selfAction)
 	{
+		int actevent_FakePower = MainClass.timingDict["FakePower"];
 		foreach (long key in SkillScriptInitPatch.modpaDict.Keys) {
 			List<ModularSA> value = SkillScriptInitPatch.modpaDict[key];
 			foreach (ModularSA modular in value) {
-				if (modular.activationTiming != 10) continue;
+				if (modular.activationTiming != actevent_FakePower) continue;
 				modular.ResetAdders();
 			}
 		}
@@ -21,7 +22,7 @@ class FakePowerPatches
 		if (SkillScriptInitPatch.modsaDict.ContainsKey(skillmodel_intlong)) {
 			foreach (ModularSA modsa in SkillScriptInitPatch.modsaDict[skillmodel_intlong]) {
 				if (skillmodel_intlong != modsa.ptr_intlong) continue;
-				modsa.Enact(selfAction.Model, selfAction.Skill, selfAction, null, 10, BATTLE_EVENT_TIMING.NONE);
+				modsa.Enact(selfAction.Model, selfAction.Skill, selfAction, null, actevent_FakePower, BATTLE_EVENT_TIMING.NONE);
 			}
 		}
 
@@ -31,8 +32,8 @@ class FakePowerPatches
 			if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
 					
 			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong]) {
-				if (modpa.activationTiming != 10) continue;
-				modpa.Enact(selfAction.Model, selfAction.Skill, selfAction, null, 10, BATTLE_EVENT_TIMING.NONE);
+				if (modpa.activationTiming != actevent_FakePower) continue;
+				modpa.Enact(selfAction.Model, selfAction.Skill, selfAction, null, actevent_FakePower, BATTLE_EVENT_TIMING.NONE);
 			}
 		}
 	}
@@ -40,11 +41,13 @@ class FakePowerPatches
 
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetExpectedSkillPowerAdder))]
 	[HarmonyPostfix]
-	private static void Postfix_SkillModel_GetExpectedSkillPowerAdder(BattleActionModel action, ref int __result, SkillModel __instance) {
+	private static void Postfix_SkillModel_GetExpectedSkillPowerAdder(BattleActionModel action, ref int __result, SkillModel __instance)
+	{
+		int actevent_FakePower = MainClass.timingDict["FakePower"];
 		long skillmodel_intlong = __instance.Pointer.ToInt64();
 		if (SkillScriptInitPatch.modsaDict.ContainsKey(skillmodel_intlong)) {
 			foreach (ModularSA modsa in SkillScriptInitPatch.modsaDict[skillmodel_intlong]) {
-				if (modsa.activationTiming != 10) continue;
+				if (modsa.activationTiming != actevent_FakePower) continue;
 				if (skillmodel_intlong != modsa.ptr_intlong) continue;
 				int power = modsa.skillPowerAdder;
 				__result += power;
@@ -58,7 +61,7 @@ class FakePowerPatches
 			if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
 					
 			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong]) {
-				if (modpa.activationTiming != 10) continue;
+				if (modpa.activationTiming != actevent_FakePower) continue;
 				int power = modpa.skillPowerAdder;
 				__result += power;
 			}
@@ -70,12 +73,13 @@ class FakePowerPatches
 	private static void Postfix_SkillModel_GetExpectedSkillPowerResultAdder(BattleActionModel action, ref int __result,
 		SkillModel __instance)
 	{
+		int actevent_FakePower = MainClass.timingDict["FakePower"];
 		long skillmodel_intlong = __instance.Pointer.ToInt64();
 		if (SkillScriptInitPatch.modsaDict.ContainsKey(skillmodel_intlong))
 		{
 			foreach (ModularSA modsa in SkillScriptInitPatch.modsaDict[skillmodel_intlong])
 			{
-				if (modsa.activationTiming != 10) continue;
+				if (modsa.activationTiming != actevent_FakePower) continue;
 				if (skillmodel_intlong != modsa.ptr_intlong) continue;
 				int power = modsa.skillPowerResultAdder;
 				__result += power;
@@ -88,7 +92,7 @@ class FakePowerPatches
 			if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
 					
 			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong]) {
-				if (modpa.activationTiming != 10) continue;
+				if (modpa.activationTiming != actevent_FakePower) continue;
 				int power = modpa.skillPowerResultAdder;
 				__result += power;
 			}
@@ -100,12 +104,13 @@ class FakePowerPatches
 	private static void Postfix_SkillModel_GetExpectedParryingResultAdder(BattleActionModel actorAction,
 		ref int __result, SkillModel __instance)
 	{
+		int actevent_FakePower = MainClass.timingDict["FakePower"];
 		long skillmodel_intlong = __instance.Pointer.ToInt64();
 		if (SkillScriptInitPatch.modsaDict.ContainsKey(skillmodel_intlong))
 		{
 			foreach (ModularSA modsa in SkillScriptInitPatch.modsaDict[skillmodel_intlong])
 			{
-				if (modsa.activationTiming != 10) continue;
+				if (modsa.activationTiming != actevent_FakePower) continue;
 				if (skillmodel_intlong != modsa.ptr_intlong) continue;
 				int power = modsa.parryingResultAdder;
 				__result += power;
@@ -118,7 +123,7 @@ class FakePowerPatches
 			if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
 					
 			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong]) {
-				if (modpa.activationTiming != 10) continue;
+				if (modpa.activationTiming != actevent_FakePower) continue;
 				int power = modpa.parryingResultAdder;
 				__result += power;
 			}
@@ -129,11 +134,12 @@ class FakePowerPatches
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_GetExpectedCoinScaleAdder(BattleActionModel action, CoinModel coin, ref int __result, SkillModel __instance)
 	{
+		int actevent_FakePower = MainClass.timingDict["FakePower"];
 		long skillmodel_intlong = __instance.Pointer.ToInt64();
 		if (SkillScriptInitPatch.modsaDict.ContainsKey(skillmodel_intlong)) {
 			foreach (ModularSA modsa in SkillScriptInitPatch.modsaDict[skillmodel_intlong])
 			{
-				if (modsa.activationTiming != 10) continue;
+				if (modsa.activationTiming != actevent_FakePower) continue;
 				if (skillmodel_intlong != modsa.ptr_intlong) continue;
 				int power = modsa.coinScaleAdder;
 				__result += power;
@@ -146,7 +152,7 @@ class FakePowerPatches
 			if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
 					
 			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong]) {
-				if (modpa.activationTiming != 10) continue;
+				if (modpa.activationTiming != actevent_FakePower) continue;
 				int power = modpa.coinScaleAdder;
 				__result += power;
 			}

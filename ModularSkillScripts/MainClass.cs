@@ -5,6 +5,7 @@ using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
 using System.Text.RegularExpressions;
 using Il2CppInterop.Runtime.Injection;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using UnityEngine;
 using Random = System.Random;
 
@@ -33,41 +34,51 @@ public class MainClass : BasePlugin
 		if (fakepowerEnabled) harmony.PatchAll(typeof(FakePowerPatches));
 		
 		//modsaEval = new ModsaEvaluator();
+		List<string> timingStringList = new();
+		timingStringList.Add("StartBattle"); // 0
+		timingStringList.Add("WhenUse");
+		timingStringList.Add("BeforeAttack");
+		timingStringList.Add("StartDuel");
+		timingStringList.Add("WinDuel");
+		timingStringList.Add("DefeatDuel"); // 5
+		timingStringList.Add("EndBattle");
+		timingStringList.Add("OnSucceedAttack");
+		timingStringList.Add("WhenHit");
+		timingStringList.Add("EndSkill");
+		timingStringList.Add("FakePower"); // 10
+		timingStringList.Add("BeforeDefense");
+		timingStringList.Add("OnDie");
+		timingStringList.Add("OnOtherDie");
+		timingStringList.Add("DuelClash");
+		timingStringList.Add("DuelClashAfter"); // 15
+		timingStringList.Add("OnSucceedEvade");
+		timingStringList.Add("OnDefeatEvade");
+		timingStringList.Add("OnStartBehaviour");
+		timingStringList.Add("BeforeBehaviour");
+		timingStringList.Add("OnEndBehaviour"); // 20
+		timingStringList.Add("EnemyKill");
+		timingStringList.Add("OnBreak");
+		timingStringList.Add("OnOtherBreak");
+		timingStringList.Add("OnDiscard");
+		timingStringList.Add("OnZeroHP"); // 25
+		timingStringList.Add("EnemyEndSkill");
+		timingStringList.Add("OnOtherBurst");
+		timingStringList.Add("BeforeSA");
+		timingStringList.Add("BeforeWhenHit");
+		timingStringList.Add("BeforeUse"); // 30
+		timingStringList.Add("Immortal");
+		timingStringList.Add("ImmortalOther");
+		timingStringList.Add("SpecialAction"); // 33
+		
+		Il2CppArrayBase<string> timingStringArray = timingStringList.ToArray();
+		int count = timingStringArray.Count;
+		for (int i = 0; i < count; i++) timingDict.Add(timingStringArray[i], i);
+		
 		timingDict.Add("RoundStart", -1);
-		timingDict.Add("StartBattle", 0);
-		timingDict.Add("WhenUse", 1);
-		timingDict.Add("BeforeAttack", 2);
-		timingDict.Add("StartDuel", 3);
-		timingDict.Add("WinDuel", 4);
-		timingDict.Add("DefeatDuel", 5);
-		timingDict.Add("EndBattle", 6);
-		timingDict.Add("OnSucceedAttack", 7);
-		timingDict.Add("WhenHit", 8);
-		timingDict.Add("EndSkill", 9);
-		timingDict.Add("FakePower", 10);
-		timingDict.Add("BeforeDefense", 11);
-		timingDict.Add("OnDie", 12);
-		timingDict.Add("OnOtherDie", 13);
-		timingDict.Add("DuelClash", 14);
-		timingDict.Add("DuelClashAfter", 15);
-		timingDict.Add("OnSucceedEvade", 16);
-		timingDict.Add("OnDefeatEvade", 17);
-		timingDict.Add("OnStartBehaviour", 18);
-		timingDict.Add("BeforeBehaviour", 19);
-		timingDict.Add("OnEndBehaviour", 20);
-		timingDict.Add("EnemyKill", 21);
-		timingDict.Add("OnBreak", 22);
-		timingDict.Add("OnOtherBreak", 23);
-		timingDict.Add("OnDiscard", 24);
-		timingDict.Add("OnZeroHP", 25);
-		timingDict.Add("EnemyEndSkill", 26);
-		timingDict.Add("OnOtherBurst", 27);
-		timingDict.Add("BeforeSA", 28);
-		timingDict.Add("BeforeWhenHit", 29);
-		timingDict.Add("BeforeUse", 30);
-		timingDict.Add("Immortal", 31);
-		timingDict.Add("ImmortalOther", 32);
-		timingDict.Add("SpecialAction", 999);
+		timingDict.Add("OSA", timingDict["OnSucceedAttack"]);
+		timingDict.Add("WH", timingDict["WhenHit"]);
+		timingDict.Add("BSA", timingDict["BeforeSA"]);
+		timingDict.Add("BWH", timingDict["BeforeWhenHit"]);
 	}
 
 	public static System.Collections.Generic.List<BattleUnitModel> ShuffleUnits(System.Collections.Generic.List<BattleUnitModel> list)
@@ -97,7 +108,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false;
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "2.6.6";
+	public const string VERSION = "2.6.7";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 

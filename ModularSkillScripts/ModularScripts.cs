@@ -691,11 +691,10 @@ public class ModularSA : MonoBehaviour
 			case "clash": parryingResultAdder = GetNumFromParamString(circledSection);
 				break;
 			case "scale":{
-				if (circles.Length == 1)
-				{
+				int actevent_FakePower = MainClass.timingDict["FakePower"];
+				if (circles.Length == 1) {
 					int power = 0;
-					if (activationTiming != 10)
-					{
+					if (activationTiming != actevent_FakePower) {
 						OPERATOR_TYPE coinOp = OPERATOR_TYPE.NONE;
 						if (circledSection == "ADD") coinOp = OPERATOR_TYPE.ADD;
 						else if (circledSection == "SUB") coinOp = OPERATOR_TYPE.SUB;
@@ -705,9 +704,7 @@ public class ModularSA : MonoBehaviour
 						else coinScaleAdder = power;
 					}
 					else coinScaleAdder = GetNumFromParamString(circledSection);
-				}
-				else if (activationTiming != 10)
-				{
+				} else if (activationTiming != actevent_FakePower) {
 					int coin_idx = -999;
 					coin_idx = GetNumFromParamString(circles[1]);
 					if (coin_idx == -999) return;

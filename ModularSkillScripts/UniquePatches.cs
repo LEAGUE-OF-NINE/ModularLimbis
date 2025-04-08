@@ -15,7 +15,7 @@ internal class UniquePatches
 
 		BattleUnitModel unit = sinAction.actionSlot.Owner;
 		if (!unit.IsActionable()) return true;
-
+		int actevent = MainClass.timingDict["SpecialAction"];
 		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList) {
 			if (!passiveModel.CheckActiveCondition()) continue;
 			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
@@ -24,7 +24,7 @@ internal class UniquePatches
 			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong]) {
 				MainClass.Logg.LogInfo("Found modpassive - SPECIAL: " + modpa.passiveID);
 				modpa.modsa_passiveModel = passiveModel;
-				modpa.Enact(passiveModel.Owner, null, null, null, 999, BATTLE_EVENT_TIMING.ALL_TIMING);
+				modpa.Enact(passiveModel.Owner, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 
