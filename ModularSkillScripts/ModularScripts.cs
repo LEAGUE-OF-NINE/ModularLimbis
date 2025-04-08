@@ -665,9 +665,9 @@ public class ModularSA : MonoBehaviour
 			else if (batchArgs[i].StartsWith("IF")) { if (!CheckIF(batchArgs[i])) break; else continue; }
 			else if (batchArgs[i].StartsWith("VALUE_")) {
 				string numChar = batchArgs[i][6].ToString();
-				int num = 0;
-				int.TryParse(numChar, out num);
-				AcquireValue(num, batchArgs[i + 1]); // GETTERS
+				int valueidx = 0;
+				int.TryParse(numChar, out valueidx);
+				valueList[valueidx] = AcquireValue(valueidx, batchArgs[i + 1]); // GETTERS
 				i += 1;
 				continue;
 			}
@@ -1492,35 +1492,32 @@ public class ModularSA : MonoBehaviour
 		return (int)finalValue;
 	}
 	
-	private void AcquireValue(int setvalue_idx, string section)
+	private int AcquireValue(int setvalue_idx, string section)
 	{
 		if (MainClass.logEnabled) MainClass.Logg.LogInfo("AcquireValue " + section);
 		string[] sectionArgs = section.Split(parenthesisSeparator);
 
-		if (char.IsNumber(section.Last())) {
-			valueList[setvalue_idx] = GetNumFromParamString(sectionArgs[0]);
-			return;
-		}
+		if (char.IsNumber(section.Last())) return GetNumFromParamString(sectionArgs[0]);
 
 		string methodology = sectionArgs[0];
 		string circledSection = "";
 		if (sectionArgs.Length > 1) circledSection = sectionArgs[1];
 		string[] circles = circledSection.Split(',');
 
-		valueList[setvalue_idx] = -1; // Default -1
-			
+		int finalResult = -1; // Default -1
+		
 		switch (methodology)
 		{
-			case "math": valueList[setvalue_idx] = DoMath(circledSection); break;
+			case "math": finalResult = DoMath(circledSection); break;
 			case "mpcheck": {
 				BattleUnitModel targetModel = GetTargetModel(circledSection);
-				if (targetModel == null) return;
-				valueList[setvalue_idx] = targetModel.Mp;
+				if (targetModel == null) break;
+				finalResult = targetModel.Mp;
 			}
 				break;
 			case "hpcheck":{
 				BattleUnitModel targetModel = GetTargetModel(circles[0]);
-				if (targetModel == null) return;
+				if (targetModel == null) break;
 
 				int hp = targetModel.Hp;
 				int hp_max = targetModel.MaxHp;
@@ -1531,12 +1528,12 @@ public class ModularSA : MonoBehaviour
 				if (circles[1] == "%") finalValue = hp_ptg_floor;
 				else if (circles[1] == "max") finalValue = hp_max;
 
-				valueList[setvalue_idx] = finalValue;
+				finalResult = finalValue;
 			}
 				break;
 			case "bufcheck":{
 				BattleUnitModel targetModel = GetTargetModel(circles[0]);
-				if (targetModel == null) return;
+				if (targetModel == null) break;
 
 				BUFF_UNIQUE_KEYWORD buf_keyword = CustomBuffs.ParseBuffUniqueKeyword(circles[1]);
 
@@ -1559,63 +1556,63 @@ public class ModularSA : MonoBehaviour
 				if (circle_2 == "turn") finalValue = turn;
 				else if (circle_2 == "+") finalValue = stack + turn;
 				else if (circle_2== "*") finalValue = stack * turn;
-				valueList[setvalue_idx] = finalValue;
+				finalResult = finalValue;
 			}
 				break;
-			case "getdmg": valueList[setvalue_idx] = lastFinalDmg;
+			case "getdmg": finalResult = lastFinalDmg;
 				break;
-			case "gethpdmg": valueList[setvalue_idx] = lastHpDmg;
+			case "gethpdmg": finalResult = lastHpDmg;
 				break;
 			case "round":{
 				StageController stageController_inst = Singleton<StageController>.Instance;
-				valueList[setvalue_idx] = stageController_inst.GetCurrentRound();
+				finalResult = stageController_inst.GetCurrentRound();
 			}
 				break;
 			case "wave":
 			{
 				StageController stageController_inst = Singleton<StageController>.Instance;
-				valueList[setvalue_idx] = stageController_inst.GetCurrentWave();
+				finalResult = stageController_inst.GetCurrentWave();
 			}
 				break;
-			case "activations":valueList[setvalue_idx] = activationCounter;
+			case "activations": finalResult = activationCounter;
 				break;
 			case "unitstate":{
 				BattleUnitModel targetModel = GetTargetModel(circledSection);
-				if (targetModel == null) return;
+				if (targetModel == null) break;
 				if (targetModel.IsDead())
 				{
-					valueList[setvalue_idx] = 0;
-					return;
+					finalResult = 0;
+					break;
 				}
-				valueList[setvalue_idx] = 1;
-				if (targetModel.IsBreak()) valueList[setvalue_idx] = 2;
+				finalResult = 1;
+				if (targetModel.IsBreak()) finalResult = 2;
 
 				if (targetModel is BattleUnitModel_Abnormality_Part)
 				{
 					BattleUnitModel_Abnormality_Part partModel = (BattleUnitModel_Abnormality_Part)targetModel;
-					if (!partModel.IsActionable()) valueList[setvalue_idx] = 2;
+					if (!partModel.IsActionable()) finalResult = 2;
 				}
 			}
 				break;
 			case "getid":{
 				BattleUnitModel targetModel = GetTargetModel(circledSection);
-				if (targetModel != null) valueList[setvalue_idx] = targetModel.GetUnitID();
+				if (targetModel != null) finalResult = targetModel.GetUnitID();
 			}
 				break;
 			case "instid":{
 				BattleUnitModel targetModel = GetTargetModel(circledSection);
-				if (targetModel != null) valueList[setvalue_idx] = targetModel.InstanceID;
+				if (targetModel != null) finalResult = targetModel.InstanceID;
 			}
 				break;
 			case "speedcheck":{
 				BattleUnitModel targetModel = GetTargetModel(circledSection);
-				if (targetModel == null) valueList[setvalue_idx] = 0;
-				else valueList[setvalue_idx] = targetModel.GetIntegerOfOriginSpeed();
+				if (targetModel == null) finalResult = 0;
+				else finalResult = targetModel.GetIntegerOfOriginSpeed();
 			}
 				break;
 			case "getpattern":{
 				BattleUnitModel targetModel = GetTargetModel(circledSection);
-				if (targetModel == null) { valueList[setvalue_idx] = 0; return; }
+				if (targetModel == null) break;
 
 				BattleUnitModel_Abnormality abnoModel = null;
 				if (targetModel.IsAbnormalityOrPart)
@@ -1632,21 +1629,21 @@ public class ModularSA : MonoBehaviour
 						abnoModel = targetModel.TryCast<BattleUnitModel_Abnormality>();
 					}
 				}
-				else return;
+				else break;
 					
-				if (abnoModel == null) return;
+				if (abnoModel == null) break;
 					
 				PatternScript_Abnormality pattern = abnoModel.PatternScript;
 
 				int pattern_idx = pattern.currPatternIdx;
 				MainClass.Logg.LogInfo("getpattern pattern_idx: " + pattern_idx);
-				valueList[setvalue_idx] = pattern.currPatternIdx;
+				finalResult = pattern.currPatternIdx;
 			}
 				break;
 			case "getabnoslotmax":{
-				valueList[setvalue_idx] = 0;
+				finalResult = 0;
 				BattleUnitModel targetModel = GetTargetModel(circledSection);
-				if (targetModel == null) { return; }
+				if (targetModel == null) break;
 
 				BattleUnitModel_Abnormality abnoModel = null;
 				if (targetModel is BattleUnitModel_Abnormality) abnoModel = (BattleUnitModel_Abnormality)targetModel;
@@ -1655,78 +1652,70 @@ public class ModularSA : MonoBehaviour
 					BattleUnitModel_Abnormality_Part partModel = (BattleUnitModel_Abnormality_Part)targetModel;
 					abnoModel = partModel.Abnormality;
 				}
-				if (abnoModel == null) { return; }
+				if (abnoModel == null) break;
 
 				PatternScript_Abnormality pattern = abnoModel.PatternScript;
-				valueList[setvalue_idx] = pattern.SlotMax;
+				finalResult = pattern.SlotMax;
 			}
 				break;
 			case "getdata":{
 				BattleUnitModel targetModel = GetTargetModel(circles[0]);
-				if (targetModel == null) { valueList[setvalue_idx] = 0; return; }
+				if (targetModel == null) break;
 
 				int finalValue = 0;
 				int dataID = GetNumFromParamString(circles[1]);
 				long targetPtr_intlong = targetModel.Pointer.ToInt64();
 					
 				finalValue = SkillScriptInitPatch.GetModUnitData(targetPtr_intlong, dataID);
-				valueList[setvalue_idx] = finalValue;
+				finalResult = finalValue;
 			}
 				break;
 			case "deadallies":{
 				BattleUnitModel targetModel = GetTargetModel(circledSection);
-				if (targetModel == null) { valueList[setvalue_idx] = 0; return; }
-				valueList[setvalue_idx] = targetModel.deadAllyCount;
+				if (targetModel == null) break;
+				finalResult = targetModel.deadAllyCount;
 			}
 				break;
 			case "random":{
 				int minroll = GetNumFromParamString(circles[0]);
 				int maxroll = GetNumFromParamString(circles[1]);
-				valueList[setvalue_idx] = MainClass.rng.Next(minroll, maxroll + 1);
+				finalResult = MainClass.rng.Next(minroll, maxroll + 1);
 			}
 				break;
 			case "areallied":{
 				BattleUnitModel targetModel1 = GetTargetModel(circles[0]);
 				BattleUnitModel targetModel2 = GetTargetModel(circles[1]);
-				if (targetModel1 == null || targetModel2 == null) { valueList[setvalue_idx] = -1; return; }
+				if (targetModel1 == null || targetModel2 == null) break;
 
-				valueList[setvalue_idx] = targetModel1.Faction == targetModel2.Faction ? 1 : 0;
+				finalResult = targetModel1.Faction == targetModel2.Faction ? 1 : 0;
 			}
 				break;
 			case "getshield":{
 				BattleUnitModel targetModel = GetTargetModel(circles[0]);
-				if (targetModel != null) valueList[setvalue_idx] = targetModel.GetShield();
+				if (targetModel != null) finalResult = targetModel.GetShield();
 			}
 				break;
 			case "getskillid":{
-				valueList[setvalue_idx] = 0;
-				if (modsa_skillModel != null) valueList[setvalue_idx] = modsa_skillModel.GetID();
-				else if (modsa_selfAction != null) valueList[setvalue_idx] = modsa_selfAction.Skill.GetID();
+				finalResult = 0;
+				if (modsa_skillModel != null) finalResult = modsa_skillModel.GetID();
+				else if (modsa_selfAction != null) finalResult = modsa_selfAction.Skill.GetID();
 			}
 				break;
 			case "getcoincount":{
 				BattleActionModel targetAction = modsa_selfAction;
 				if (circles[0] == "Target") targetAction = modsa_oppoAction;
-				if (targetAction == null)
-				{
-					valueList[setvalue_idx] = -1;
-					return;
-				}
+				if (targetAction == null) break;
 				
 				int coinCount = targetAction.Skill.GetAliveCoins().Count;
 				if (circles[1] == "og") coinCount = targetAction.Skill.CoinList.Count;
 
-				valueList[setvalue_idx] = coinCount;
+				finalResult = coinCount;
 			}
 				break;
 			case "allcoinstate":{
 				BattleActionModel targetAction = modsa_selfAction;
 				if (circles[0] == "Target") targetAction = modsa_oppoAction;
-				if (targetAction == null)
-				{
-					valueList[setvalue_idx] = -1;
-					return;
-				}
+				if (targetAction == null) break;
 
 				string way = circles[1];
 
@@ -1742,11 +1731,11 @@ public class ModularSA : MonoBehaviour
 				else if (way == "headcount") result = headCount;
 				else if (way == "tailcount") result = tailCount;
 
-				valueList[setvalue_idx] = result;
+				finalResult = result;
 			}
 				break;
 			case "resonance":{
-				valueList[setvalue_idx] = 0;
+				finalResult = 0;
 				SinManager sinmanager_inst = Singleton<SinManager>.Instance;
 				SinManager.ResonanceManager res_manager = sinmanager_inst._resManager;
 	
@@ -1755,29 +1744,29 @@ public class ModularSA : MonoBehaviour
 				if (circledSection == "highres") {
 					//List<ATTRIBUTE_TYPE> sinList = new List<ATTRIBUTE_TYPE>();
 					//for (int i = 0; i<7; i++) sinList.Add((ATTRIBUTE_TYPE)i);
-					//valueList[setvalue_idx] = res_manager.GetMaxAttributeResonanceOfAll(modsa_unitModel.Faction, out sinList);
+					//finalResult = res_manager.GetMaxAttributeResonanceOfAll(modsa_unitModel.Faction, out sinList);
 					//List<ATTRIBUTE_TYPE> sinList = new List<ATTRIBUTE_TYPE>();
 					int highest = 0;
 					for (int i = 0; i < 7; i++) {
 						int current = res_manager.GetAttributeResonance(modsa_unitModel.Faction, (ATTRIBUTE_TYPE)i);
 						if (current > highest) highest = current;
 					}
-					valueList[setvalue_idx] = highest;
+					finalResult = highest;
 				}
 				else if (circledSection == "highperfect") {
-					valueList[setvalue_idx] = res_manager.GetMaxPerfectResonanceOfAll(modsa_unitModel.Faction, out _);
+					finalResult = res_manager.GetMaxPerfectResonanceOfAll(modsa_unitModel.Faction, out _);
 				}
 				else if (circledSection.StartsWith("perfect")) {
 					Enum.TryParse(circledSection.Remove(0,7), true, out sin);
-					valueList[setvalue_idx] = res_manager.GetMaxPerfectResonance(modsa_unitModel.Faction, sin);
+					finalResult = res_manager.GetMaxPerfectResonance(modsa_unitModel.Faction, sin);
 				}
 				else if (Enum.TryParse(circledSection, true, out sin)) {
-					valueList[setvalue_idx] = res_manager.GetAttributeResonance(modsa_unitModel.Faction, sin);
+					finalResult = res_manager.GetAttributeResonance(modsa_unitModel.Faction, sin);
 				}
 			}
 				break;
 			case "resource":{
-				valueList[setvalue_idx] = 0;
+				finalResult = 0;
 
 				SinManager sinmanager_inst = Singleton<SinManager>.Instance;
 				SinManager.EgoStockManager stock_manager = sinmanager_inst._egoStockMangaer;
@@ -1788,12 +1777,12 @@ public class ModularSA : MonoBehaviour
 				Enum.TryParse(circles[0], true, out sin);
 				if (circles.Length >= 2) faction = enemyFaction;
 
-				valueList[setvalue_idx] = stock_manager.GetAttributeStockNumberByAttributeType(faction, sin);
+				finalResult = stock_manager.GetAttributeStockNumberByAttributeType(faction, sin);
 			}
 				break;
 			case "haskey":{
 				BattleUnitModel targetModel = GetTargetModel(circles[0]);
-				if (targetModel == null) return;
+				if (targetModel == null) break;
 
 				if (targetModel.IsAbnormalityOrPart) {
 					BattleUnitModel_Abnormality_Part part = targetModel.TryCast<BattleUnitModel_Abnormality_Part>();
@@ -1813,79 +1802,87 @@ public class ModularSA : MonoBehaviour
 
 					if (operator_OR == success) break; // [IF Statement] Simplification
 				}
-				valueList[setvalue_idx] = success ? 1 : 0;
+				finalResult = success ? 1 : 0;
 			}
 				break;
 			case "skillbase":{
 				BattleActionModel action = modsa_selfAction;
 				if (circledSection == "Target") action = modsa_oppoAction;
-				if (action == null) return;
-				valueList[setvalue_idx] = action.Skill.GetSkillDefaultPower();
+				if (action == null) break;
+				finalResult = action.Skill.GetSkillDefaultPower();
 			}
 				break;
 			case "skillatkweight":{
 				BattleActionModel action = modsa_selfAction;
 				if (circledSection == "Target") action = modsa_oppoAction;
-				if (action == null) return;
-				valueList[setvalue_idx] = action.Skill.GetAttackWeight(action);
+				if (action == null) break;
+				finalResult = action.Skill.GetAttackWeight(action);
 			}
 				break;
 			case "onescale":{
 				BattleActionModel action = modsa_selfAction;
 				if (circles[0] == "Target") action = modsa_oppoAction;
-				if (action == null) return;
+				if (action == null) break;
 
 				int coin_idx = GetNumFromParamString(circles[1]);
 				int coinAmount = action.Skill.CoinList.Count;
-				if (coinAmount < 1) return;
+				if (coinAmount < 1) break;
 				if (coin_idx >= coinAmount) coin_idx = coinAmount - 1;
 
-				valueList[setvalue_idx] = action.Skill.CoinList.ToArray()[coin_idx]._scale;
+				finalResult = action.Skill.CoinList.ToArray()[coin_idx]._scale;
 			}
 				break;
 			case "skillatk":{
 				BattleActionModel action = modsa_selfAction;
 				if (circles[0] == "Target") action = modsa_oppoAction;
-				if (action == null) return;
+				if (action == null) break;
 
-				valueList[setvalue_idx] = (int)action.Skill.GetAttackType();
+				finalResult = (int)action.Skill.GetAttackType();
+			}
+				break;
+			case "skillatklevel":{
+				BattleActionModel action = modsa_selfAction;
+				if (circles[0] == "Target") action = modsa_oppoAction;
+				if (action == null) break;
+
+				finalResult = action.Skill.GetSkillLevelCorrection();
 			}
 				break;
 			case "skillattribute":{
 				BattleActionModel action = modsa_selfAction;
 				if (circles[0] == "Target") action = modsa_oppoAction;
-				if (action == null) return;
-				valueList[setvalue_idx] = (int)action.Skill.GetAttributeType();
+				if (action == null) break;
+				finalResult = (int)action.Skill.GetAttributeType();
 			}
 				break;
 			case "skilldeftype": {
 				BattleActionModel action = modsa_selfAction;
 				if (circles[0] == "Target") action = modsa_oppoAction;
-				if (action != null) valueList[setvalue_idx] = (int)action.Skill.GetDefenseType();
+				if (action != null) finalResult = (int)action.Skill.GetDefenseType();
 			}
 				break;
 			case "skillegotype": {
 				BattleActionModel action = modsa_selfAction;
 				if (circles[0] == "Target") action = modsa_oppoAction;
-				if (action != null) valueList[setvalue_idx] = (int)action.Skill.GetSkillEgoType();
+				if (action != null) finalResult = (int)action.Skill.GetSkillEgoType();
 			}
 				break;
 			case "skillslotcount":{
 				BattleUnitModel targetModel = GetTargetModel(circles[0]);
-				if (targetModel == null) return;
-				valueList[setvalue_idx] = targetModel.GetSinActionList().Count;
+				if (targetModel == null) break;
+				finalResult = targetModel.GetSinActionList().Count;
 			}
 				break;
 			case "amountattacks":{
 				SinManager sinManager_inst = Singleton<SinManager>.Instance;
 				BattleUnitModel targetModel = GetTargetModel(circles[0]);
-				if (targetModel == null || sinManager_inst == null) return;
-				valueList[setvalue_idx] = sinManager_inst.GetActionListTargetingUnit(targetModel).Count;
+				if (targetModel == null || sinManager_inst == null) break;
+				finalResult = sinManager_inst.GetActionListTargetingUnit(targetModel).Count;
 			}
 				break;
 			case "getstat":{
 				BattleUnitModel targetModel = GetTargetModel(circles[0]);
-				if (targetModel == null) return;
+				if (targetModel == null) break;
 				int value = -1;
 
 				string circle_1 = circles[1];
@@ -1894,6 +1891,7 @@ public class ModularSA : MonoBehaviour
 				else if (circle_1 == "panicType") value = Convert.ToInt32(targetModel._defaultPanicType);
 				else if (circle_1 == "isRetreated") value = targetModel.IsRetreated() ? 1 : 0;
 				else if (circle_1 == "hasMp") value = targetModel.HasMp() ? 1 : 0;
+				else if (circle_1 == "deflevel") value = targetModel.GetDefense(out _, out _);
 				//else if (circle_1 == "level") value = targetModel.Level;
 				else if (circle_1.StartsWith("res")) {
 					string word = circle_1.Remove(0, 3);
@@ -1919,25 +1917,27 @@ public class ModularSA : MonoBehaviour
 						if (!original) value += targetModel.GetMinSpeedAdder();
 					}
 				}
-				valueList[setvalue_idx] = value;
+				finalResult = value;
 			}
 				break;
 			case "coinisbroken":{
-				if (modsa_coinModel == null) return;
-				valueList[setvalue_idx] = modsa_coinModel.IsUsableInDuel ? 0 : 1;
+				if (modsa_coinModel == null) break;
+				finalResult = modsa_coinModel.IsUsableInDuel ? 0 : 1;
 			}
 			break;
 			case "stack":{
-				if (modsa_buffModel != null) valueList[setvalue_idx] = modsa_buffModel.GetStack(0);
+				if (modsa_buffModel != null) finalResult = modsa_buffModel.GetStack(0);
 			}
 				break;
 			case "turn":{
-				if (modsa_buffModel != null) valueList[setvalue_idx] = modsa_buffModel.GetTurn(0);
+				if (modsa_buffModel != null) finalResult = modsa_buffModel.GetTurn(0);
 			}
 				break;
-			case "isfocused": valueList[setvalue_idx] = Singleton<StageController>.Instance.IsAbnormalityBattle() ? 1 : 0; break;
+			case "isfocused": finalResult = Singleton<StageController>.Instance.IsAbnormalityBattle() ? 1 : 0; break;
 			default: MainClass.Logg.LogInfo("Invalid Getter: " + methodology); break;
 		}
+
+		return finalResult;
 	}
 		
 }
