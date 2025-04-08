@@ -1446,6 +1446,15 @@ public class ModularSA : MonoBehaviour
 				else modsa_buffModel.LoseTurn(modsa_unitModel, battleTiming, adder * -1);
 			}
 				break;
+			case "vibrationswitch":{
+				List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+				BUFF_UNIQUE_KEYWORD buf_keyword = CustomBuffs.ParseBuffUniqueKeyword(circles[1]);
+				bool isEntangled = circles.Length > 2;
+				foreach (BattleUnitModel targetModel in modelList) {
+					targetModel.SwitchVibrationToSpecial(modsa_unitModel, buf_keyword, battleTiming, ABILITY_SOURCE_TYPE.SKILL, modsa_selfAction, out _, out _, out _, out _, isEntangled);
+				}
+			}
+				break;
 			default: MainClass.Logg.LogInfo("Invalid Consequence: " + mEth); break;
 		}
 	}
