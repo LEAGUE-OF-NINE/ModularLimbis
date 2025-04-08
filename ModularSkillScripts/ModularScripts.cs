@@ -311,10 +311,13 @@ public class ModularSA : MonoBehaviour
 	private int GetNumFromParamString(string param)
 	{
 		int value = 0;
+		bool math = param[0] == 'm';
 		bool negative = param[0] == '-';
-		if (negative) param = param.Remove(0, 1);
+		if (math || negative) param = param.Remove(0, 1);
 		if (param.Last() == ')') param = param.Remove(param.Length - 1);
 		
+		if (math) return DoMath(param); // math escape
+			
 		if (param.StartsWith("VALUE_")) {
 			int value_idx = 0;
 			int.TryParse(param[6].ToString(), out value_idx);
@@ -1458,7 +1461,37 @@ public class ModularSA : MonoBehaviour
 			default: MainClass.Logg.LogInfo("Invalid Consequence: " + mEth); break;
 		}
 	}
-		
+
+
+	private int DoMath(string s) {
+		MatchCollection symbols = Regex.Matches(s, "(-|\\+|\\*|%|!|¡|\\?)", RegexOptions.IgnoreCase);
+		char[] mathSeparator = new[] { '-', '+', '*', '%', '!', '¡', '?' };
+		string[] parameters = s.Split(mathSeparator);
+		string firstParam = parameters[0];
+		double finalValue = GetNumFromParamString(firstParam);
+
+		for (int i = 0; i < symbols.Count; i++) {
+			string param = parameters[i + 1];
+			string symbol_string = symbols[i].Value;
+			char symbol = symbol_string[0];
+			int amount = GetNumFromParamString(param);
+			if (MainClass.logEnabled) MainClass.Logg.LogInfo("mathparam " + param + " | mathsymbol " + symbol);
+
+			switch (symbol)
+			{
+				case '+': finalValue += amount; break;
+				case '-': finalValue -= amount; break;
+				case '*': finalValue *= amount; break;
+				case '%': finalValue /= amount; break;
+				case '!': finalValue = Math.Min(finalValue, amount); break;
+				case '¡': finalValue = Math.Max(finalValue, amount); break;
+				case '?': finalValue %= amount; break;
+			}
+		}
+
+		return (int)finalValue;
+	}
+	
 	private void AcquireValue(int setvalue_idx, string section)
 	{
 		if (MainClass.logEnabled) MainClass.Logg.LogInfo("AcquireValue " + section);
@@ -1474,50 +1507,7 @@ public class ModularSA : MonoBehaviour
 		if (sectionArgs.Length > 1) circledSection = sectionArgs[1];
 		string[] circles = circledSection.Split(',');
 			
-		if (methodology == "math")
-		{
-			MatchCollection symbols = Regex.Matches(circledSection, "(-|\\+|\\*|%|!|¡|\\?)", RegexOptions.IgnoreCase);
-			char[] mathSeparator = new char[] { '-', '+', '*', '%', '!', '¡', '?' };
-			string[] parameters = circledSection.Split(mathSeparator);
-			string firstParam = parameters[0];
-			double finalValue = GetNumFromParamString(firstParam);
-
-			for (int i = 0; i < symbols.Count; i++) {
-				string param = parameters[i + 1];
-				string symbol_string = symbols[i].Value;
-				char symbol = symbol_string[0];
-				int amount = GetNumFromParamString(param);
-				if (MainClass.logEnabled) MainClass.Logg.LogInfo("mathparam " + param + " | mathsymbol " + symbol);
-
-				switch (symbol)
-				{
-					case '+':
-						finalValue += amount;
-						break;
-					case '-':
-						finalValue -= amount;
-						break;
-					case '*':
-						finalValue *= amount;
-						break;
-					case '%':
-						finalValue /= amount;
-						break;
-					case '!':
-						finalValue = Math.Min(finalValue, amount);
-						break;
-					case '¡':
-						finalValue = Math.Max(finalValue, amount);
-						break;
-					case '?':
-						finalValue %= amount;
-						break;
-				}
-			}
-
-			valueList[setvalue_idx] = (int)finalValue;
-			return; // End acquisition here
-		}
+		if (methodology == "math") valueList[setvalue_idx] = DoMath(circledSection);
 			
 		valueList[setvalue_idx] = -1; // Default -1
 			
