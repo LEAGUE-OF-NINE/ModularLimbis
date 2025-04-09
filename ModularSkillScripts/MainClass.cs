@@ -104,7 +104,9 @@ public class MainClass : BasePlugin
 	public static Random rng = new();
 
 	public static readonly Regex sWhitespace = new(@"\s+");
-
+	public static readonly Regex mathsymbolRegex = new("(-|\\+|\\*|%|!|¡|\\?)");
+	public static readonly char[] mathSeparator = new[] { '-', '+', '*', '%', '!', '¡', '?' };
+	
 	public static bool logEnabled = false;
 
 	public const string NAME = "ModularSkillScripts";

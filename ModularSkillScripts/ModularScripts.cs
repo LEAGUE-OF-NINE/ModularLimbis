@@ -1462,23 +1462,22 @@ public class ModularSA : MonoBehaviour
 			}
 				break;
 			case "changemap": {
-				var mapname = circles[0];
+				string mapname = circles[0];
 				float mapsize = GetNumFromParamString(circles[1]);
 				BattleMapManager.Instance.LoadAndAddMap(mapname, mapsize);
 				BattleMapManager.Instance.ChangeMap(mapname, mapsize);
-					
-				}
+			}
 				break;
 			case "battledialogline": {
-				  var line_played = circles[1];
-					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-					foreach (BattleUnitModel targetModel in modelList)
-					{
-						BattleUnitView view = BattleObjectManager.Instance.GetView(targetModel);
-						BattleDialogLine dialogline = new BattleDialogLine(line_played, "");
-						view._uiManager.ShowDialog(dialogline);
-					}
+			  string line_played = circles[1];
+				List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+				foreach (BattleUnitModel targetModel in modelList)
+				{
+					BattleUnitView view = BattleObjectManager.Instance.GetView(targetModel);
+					BattleDialogLine dialogline = new BattleDialogLine(line_played, "");
+					view._uiManager.ShowDialog(dialogline);
 				}
+			}
 				break;
 			case "gnome":{
 				BattleObjectManager objManager = SingletonBehavior<BattleObjectManager>.Instance;
@@ -1497,9 +1496,8 @@ public class ModularSA : MonoBehaviour
 
 
 	private int DoMath(string s) {
-		MatchCollection symbols = Regex.Matches(s, "(-|\\+|\\*|%|!|¡|\\?)", RegexOptions.IgnoreCase);
-		char[] mathSeparator = new[] { '-', '+', '*', '%', '!', '¡', '?' };
-		string[] parameters = s.Split(mathSeparator);
+		MatchCollection symbols = MainClass.mathsymbolRegex.Matches(s);
+		string[] parameters = s.Split(MainClass.mathSeparator);
 		string firstParam = parameters[0];
 		double finalValue = GetNumFromParamString(firstParam);
 
