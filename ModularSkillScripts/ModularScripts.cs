@@ -1355,7 +1355,11 @@ public class ModularSA : MonoBehaviour
 			}
 				break;
 			case "endstage": Singleton<StageController>.Instance.EndStage(); break;
-			case "endbattle": Singleton<StageController>.Instance.EndBattlePhaseForcely(true); break; 
+			case "endbattle": Singleton<StageController>.Instance.EndBattlePhaseForcely(true); break;
+			case "endlimbus": {
+				Environment.FailFast("Immediately crashed Limbus");
+				}
+				break;
 			case "skillteamkill": break;
 			case "skillcanduel": modsa_skillModel.OverrideCanDuel(circledSection == "True"); break;
 			case "skillchangetarget": break;

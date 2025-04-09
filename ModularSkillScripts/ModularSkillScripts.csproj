@@ -104,7 +104,7 @@
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Limbus Company\BepInEx\core\LibCpp2IL.dll</HintPath>
     </Reference>
     <Reference Include="Merged">
-      <HintPath>..\..\..\..\..\..\home\glitch\.local\share\Steam\steamapps\common\Limbus Company\BepInEx\plugins\Lethe.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Limbus Company\BepInEx\plugins\Lethe.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Limbus Company\BepInEx\core\Mono.Cecil.dll</HintPath>
