@@ -6,7 +6,6 @@ using Il2CppSystem.Collections.Generic;
 using System.Text.RegularExpressions;
 using Il2CppInterop.Runtime.Injection;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using UnityEngine;
 using Random = System.Random;
 
 //using Antlr4.Runtime;
@@ -110,7 +109,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false;
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "2.6.9";
+	public const string VERSION = "2.7.1";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 

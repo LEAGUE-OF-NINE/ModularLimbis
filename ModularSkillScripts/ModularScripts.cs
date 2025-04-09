@@ -1470,9 +1470,10 @@ public class ModularSA : MonoBehaviour
 				break;
 			case "battledialogline": {
 			  string line_played = circles[1];
+			  
+			  
 				List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-				foreach (BattleUnitModel targetModel in modelList)
-				{
+				foreach (BattleUnitModel targetModel in modelList) {
 					BattleUnitView view = BattleObjectManager.Instance.GetView(targetModel);
 					BattleDialogLine dialogline = new BattleDialogLine(line_played, "");
 					view._uiManager.ShowDialog(dialogline);
