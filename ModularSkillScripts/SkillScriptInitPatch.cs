@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using BepInEx.Unity.IL2CPP.UnityEngine;
+using Dungeon;
 using HarmonyLib;
 using Il2CppSystem.Collections;
 using Il2CppSystem.Collections.Generic;
@@ -946,7 +947,6 @@ public class SkillScriptInitPatch
 		}
 	}
 
-
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnBattleStart))]
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_OnBattleStart(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance)
@@ -954,10 +954,26 @@ public class SkillScriptInitPatch
 		int actevent = MainClass.timingDict["StartBattle"];
 		long skillmodel_intlong = __instance.Pointer.ToInt64();
 		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
-		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+		foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
+		{
 			modsa.Enact(action.Model, __instance, action, null, actevent, timing);
 		}
 	}
+
+
+	//[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetAttackWeightAdder))]
+	//[HarmonyPostfix]
+	//private static void Postfix_BattleUnitModel_GetAttackWeightAdder(BattleActionModel action, int __result)
+	//{
+	//	__result += 5;
+	//}
+
+	//[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetAttackWeight))]
+	//[HarmonyPostfix]
+	//private static void Postfix_SkillModel_GetAttackWeight(BattleActionModel action, int __result, SkillModel __instance)
+	//{
+	//	__result += 5;
+	//}
 
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnBeforeTurn))]
 	[HarmonyPostfix]

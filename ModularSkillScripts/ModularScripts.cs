@@ -7,6 +7,7 @@ using UnityEngine;
 using static BattleActionModel.TargetDataDetail;
 using IntPtr = System.IntPtr;
 using Lethe.Patches;
+using BattleUI.Dialog;
 //using CodeStage.AntiCheat.ObscuredTypes;
 //using Il2CppSystem.Collections;
 
@@ -117,6 +118,7 @@ public class ModularSA : MonoBehaviour
 		parryingResultAdder = 0;
 		atkDmgAdder = 0;
 		atkMultAdder = 0;
+		//atkWeightAdder = 0;
 	}
 	public int coinScaleAdder = 0;
 	public int skillPowerAdder = 0;
@@ -124,6 +126,7 @@ public class ModularSA : MonoBehaviour
 	public int parryingResultAdder = 0;
 	public int atkDmgAdder = 0;
 	public int atkMultAdder = 0;
+	//public int atkWeightAdder = 0;
 	public int slotAdder = 0;
 
 	public bool wasCrit = false;
@@ -1457,6 +1460,25 @@ public class ModularSA : MonoBehaviour
 					targetModel.SwitchVibrationToSpecial(modsa_unitModel, buf_keyword, battleTiming, ABILITY_SOURCE_TYPE.SKILL, modsa_selfAction, out _, out _, out _, out _, isEntangled);
 				}
 			}
+				break;
+			case "changemap": {
+				var mapname = circles[0];
+				float mapsize = GetNumFromParamString(circles[1]);
+				BattleMapManager.Instance.LoadAndAddMap(mapname, mapsize);
+				BattleMapManager.Instance.ChangeMap(mapname, mapsize);
+					
+				}
+				break;
+			case "battledialogline": {
+				  var line_played = circles[1];
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					foreach (BattleUnitModel targetModel in modelList)
+					{
+						BattleUnitView view = BattleObjectManager.Instance.GetView(targetModel);
+						BattleDialogLine dialogline = new BattleDialogLine(line_played, "");
+						view._uiManager.ShowDialog(dialogline);
+					}
+				}
 				break;
 			case "gnome":{
 				BattleObjectManager objManager = SingletonBehavior<BattleObjectManager>.Instance;
