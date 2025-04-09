@@ -1470,7 +1470,7 @@ public class ModularSA : MonoBehaviour
 				break;
 			case "battledialogline": {
 			  string line_played = circles[1];
-			  
+			  line_played = Regex.Replace(line_played, @"_", " ");
 			  
 				List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
 				foreach (BattleUnitModel targetModel in modelList) {
