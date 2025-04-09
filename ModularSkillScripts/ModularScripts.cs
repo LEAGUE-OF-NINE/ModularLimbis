@@ -314,9 +314,10 @@ public class ModularSA : MonoBehaviour
 	private int GetNumFromParamString(string param)
 	{
 		int value = 0;
-		bool math = param[0] == 'm';
 		bool negative = param[0] == '-';
-		if (math || negative) param = param.Remove(0, 1);
+		if (negative) param = param.Remove(0, 1);
+		bool math = param[0] == 'm';
+		if (math) param = param.Remove(0, 1);
 		if (param.Last() == ')') param = param.Remove(param.Length - 1);
 		
 		if (math) return DoMath(param); // math escape
