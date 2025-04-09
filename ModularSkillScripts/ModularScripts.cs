@@ -1041,12 +1041,11 @@ public class ModularSA : MonoBehaviour
 				bool percentageheal = circle_1.Last() == '%';
 				if (percentageheal) circle_1 = circle_1.Remove(circle_1.Length - 1);
 				int amount = GetNumFromParamString(circle_1);
-				if (amount < 1) return;
 
 				foreach (BattleUnitModel targetModel in modelList) {
 					int finalAmount = amount;
 					if (percentageheal) finalAmount = targetModel.MaxHp * finalAmount / 100;
-					if (finalAmount < 0) targetModel.TakeAbsHpDamage(null, finalAmount, out _, out _, battleTiming, DAMAGE_SOURCE_TYPE.NONE);
+					if (finalAmount < 0) targetModel.TakeAbsHpDamage(null, finalAmount * -1, out _, out _, battleTiming, DAMAGE_SOURCE_TYPE.NONE);
 					else {
 						if (abilityMode == 2) {
 							dummyPassiveAbility.AddTriggeredData_HpHeal(finalAmount, targetModel.InstanceID, battleTiming);
