@@ -320,9 +320,8 @@ public class ModularSA : MonoBehaviour
 		if (math) param = param.Remove(0, 1);
 		if (param.Last() == ')') param = param.Remove(param.Length - 1);
 		
-		if (math) return DoMath(param); // math escape
-			
-		if (param.StartsWith("VALUE_")) {
+		if (math) value = DoMath(param);
+		else if (param.StartsWith("VALUE_")) {
 			int value_idx = 0;
 			int.TryParse(param[6].ToString(), out value_idx);
 			value = valueList[value_idx];
