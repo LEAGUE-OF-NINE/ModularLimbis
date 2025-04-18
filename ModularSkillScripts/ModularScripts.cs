@@ -1472,7 +1472,7 @@ public class ModularSA : MonoBehaviour
 			}
 				break;
 			case "battledialogline": {
-			  string line_played = circles[1];
+			  string line_played = circledSection.Remove(circles[0].Length + 1);
 			  line_played = Regex.Replace(line_played, @"_", " ");
 			  
 				List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
