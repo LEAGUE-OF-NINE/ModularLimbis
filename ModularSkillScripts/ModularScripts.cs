@@ -1561,8 +1561,10 @@ public class ModularSA : MonoBehaviour
 				int hp_ptg_floor = (int)Math.Floor(hp_ptg * 100.0);
 
 				int finalValue = hp;
-				if (circles[1] == "%") finalValue = hp_ptg_floor;
-				else if (circles[1] == "max") finalValue = hp_max;
+					if (circles[1] == "%") finalValue = hp_ptg_floor;
+					else if (circles[1] == "max") finalValue = hp_max;
+					else if (circles[1] == "missing") finalValue = hp_max - hp;
+					else if (circles[1] == "missing%") finalValue = 100 - hp_ptg_floor;
 
 				finalResult = finalValue;
 			}
@@ -1730,6 +1732,22 @@ public class ModularSA : MonoBehaviour
 				BattleUnitModel targetModel = GetTargetModel(circles[0]);
 				if (targetModel != null) finalResult = targetModel.GetShield();
 			}
+				break;
+			case "getdmgtaken":
+				{
+					BattleUnitModel targetModel = GetTargetModel(circles[0]);
+					var turntime = circles[1];
+					if (targetModel != null && turntime == "prev") finalResult = targetModel.GetHitAttackDamagePrevRound(); 
+					else if (targetModel != null) finalResult = targetModel.GetHitAttackDamageThisRound();
+				}
+				break;
+			case "getbuffcount":
+				{
+					BattleUnitModel targetModel = GetTargetModel(circles[0]);
+					var type = circles[1];
+					if (targetModel != null && type == "neg") finalResult = targetModel.GetNegativeBuffCount();
+					else if (targetModel != null) finalResult = targetModel.GetPositiveBuffCount();
+				}
 				break;
 			case "getskillid":{
 				finalResult = 0;

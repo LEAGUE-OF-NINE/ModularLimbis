@@ -7,20 +7,20 @@
       "RelativeMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|solutionrelative:modularskillscripts\\modularscripts.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|C:\\Users\\jonas\\Documents\\modding\\modular\\ModularLimbis\\modularskillscripts\\stagepatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|solutionrelative:modularskillscripts\\stagepatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|C:\\Users\\jonas\\Documents\\modding\\modular\\ModularLimbis\\modularskillscripts\\skillscriptinitpatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|solutionrelative:modularskillscripts\\skillscriptinitpatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|C:\\Users\\jonas\\Documents\\modding\\modular\\ModularLimbis\\modularskillscripts\\uniquepatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|solutionrelative:modularskillscripts\\uniquepatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|C:\\Users\\jonas\\Documents\\modding\\modular\\ModularLimbis\\modularskillscripts\\mainclass.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|solutionrelative:modularskillscripts\\mainclass.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|C:\\Users\\jonas\\Documents\\modding\\modular\\ModularLimbis\\modularskillscripts\\uniquepatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|solutionrelative:modularskillscripts\\uniquepatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|C:\\Users\\jonas\\Documents\\modding\\modular\\ModularLimbis\\modularskillscripts\\skillscriptinitpatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|solutionrelative:modularskillscripts\\skillscriptinitpatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|C:\\Users\\jonas\\Documents\\modding\\modular\\ModularLimbis\\modularskillscripts\\stagepatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9BD2576C-8D44-494C-82A6-FFC78D610AB6}|ModularSkillScripts\\ModularSkillScripts.csproj|solutionrelative:modularskillscripts\\stagepatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -50,20 +50,19 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "MainClass.cs",
               "DocumentMoniker": "C:\\Users\\jonas\\Documents\\modding\\modular\\ModularLimbis\\ModularSkillScripts\\MainClass.cs",
               "RelativeDocumentMoniker": "ModularSkillScripts\\MainClass.cs",
               "ToolTip": "C:\\Users\\jonas\\Documents\\modding\\modular\\ModularLimbis\\ModularSkillScripts\\MainClass.cs",
               "RelativeToolTip": "ModularSkillScripts\\MainClass.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAGYAAAAAAAAAAAAqwBMAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-29T21:33:26.057Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-29T21:33:26.057Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 1,
               "Title": "UniquePatches.cs",
               "DocumentMoniker": "C:\\Users\\jonas\\Documents\\modding\\modular\\ModularLimbis\\ModularSkillScripts\\UniquePatches.cs",
               "RelativeDocumentMoniker": "ModularSkillScripts\\UniquePatches.cs",
@@ -71,12 +70,11 @@
               "RelativeToolTip": "ModularSkillScripts\\UniquePatches.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAA2AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-26T02:32:55.195Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-12-26T02:32:55.195Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 4,
               "Title": "StagePatches.cs",
               "DocumentMoniker": "C:\\Users\\jonas\\Documents\\modding\\modular\\ModularLimbis\\ModularSkillScripts\\StagePatches.cs",
               "RelativeDocumentMoniker": "ModularSkillScripts\\StagePatches.cs",
@@ -84,21 +82,19 @@
               "RelativeToolTip": "ModularSkillScripts\\StagePatches.cs",
               "ViewState": "AgIAAFYAAAAAAAAAAAASwGUAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-08T01:53:28.549Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-12-08T01:53:28.549Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "SkillScriptInitPatch.cs",
               "DocumentMoniker": "C:\\Users\\jonas\\Documents\\modding\\modular\\ModularLimbis\\ModularSkillScripts\\SkillScriptInitPatch.cs",
               "RelativeDocumentMoniker": "ModularSkillScripts\\SkillScriptInitPatch.cs",
               "ToolTip": "C:\\Users\\jonas\\Documents\\modding\\modular\\ModularLimbis\\ModularSkillScripts\\SkillScriptInitPatch.cs",
               "RelativeToolTip": "ModularSkillScripts\\SkillScriptInitPatch.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAANAAAAAAAAAA==",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAAwAUAAAAnAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-29T21:33:35.742Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-29T21:33:35.742Z"
             },
             {
               "$type": "Document",
@@ -108,7 +104,7 @@
               "RelativeDocumentMoniker": "ModularSkillScripts\\ModularScripts.cs",
               "ToolTip": "C:\\Users\\jonas\\Documents\\modding\\modular\\ModularLimbis\\ModularSkillScripts\\ModularScripts.cs",
               "RelativeToolTip": "ModularSkillScripts\\ModularScripts.cs",
-              "ViewState": "AgIAAD0FAAAAAAAAAAAqwE8FAAAsAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-29T21:33:39.343Z",
               "EditorCaption": ""
