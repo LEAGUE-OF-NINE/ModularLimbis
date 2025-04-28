@@ -1267,18 +1267,34 @@ public class SkillScriptInitPatch
 			__result += power;
 		}
 	}
-	
-	
+
+
+
+
 	// BUFFMODEL UP TO HERE
 	// BUFFMODEL UP TO HERE
 	// BUFFMODEL UP TO HERE
-	
+
 	/*[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnGiveHpDamage))]
 	[HarmonyPostfix]
 	private static void Postfix_BattleUnitModel_OnGiveHpDamage(BattleUnitModel target, BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
 	{
 		MainClass.Logg.LogInfo(" OnGiveHpDamage ");
 	}*/
+
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnVibrationExplosion))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_OnOtherBurst(BattleUnitModel unit, BattleUnitModel giverOrNull, BattleActionModel actionOrNull, ABILITY_SOURCE_TYPE abilitySrc, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	{
+		int actevent = MainClass.timingDict["OnOtherBurst"];
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance))
+		{
+			modba.modsa_target_list.Clear();
+			modba.modsa_target_list.Add(giverOrNull);
+			modba.modsa_buffModel = __instance;
+			modba.Enact(unit, actionOrNull.Skill, actionOrNull, null, actevent, timing);
+		}
+	}
 
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnTakeAttackDamage))]
 	[HarmonyPostfix]

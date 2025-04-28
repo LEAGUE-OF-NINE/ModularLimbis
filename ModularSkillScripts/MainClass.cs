@@ -1,4 +1,4 @@
-﻿using BepInEx;
+using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using BepInEx.Logging;
 using HarmonyLib;
@@ -109,7 +109,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false;
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "2.7.3";
+	public const string VERSION = "2.7.5";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 

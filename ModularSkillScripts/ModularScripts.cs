@@ -644,9 +644,9 @@ public class ModularSA : MonoBehaviour
 					else if (hitArgs.Contains("Lose")) _onlyClashLose = true;						
 				}
 			}
-			else if (batch.StartsWith("LOOP:")) modsa_loopString = batch.Remove(0, 5);
-			else if (batch == "RESETWHENUSE") resetWhenUse = true;
-			else if (batch == "CLEARVALUES") clearValues = true;
+			else if (batch.StartsWith("LOOP:", StringComparison.OrdinalIgnoreCase)) modsa_loopString = batch.Remove(0, 5);
+			else if (batch.Equals("RESETWHENUSE", StringComparison.OrdinalIgnoreCase)) resetWhenUse = true;
+			else if (batch.Equals("CLEARVALUES", StringComparison.OrdinalIgnoreCase)) clearValues = true;
 			else batch_list.Add(batch);
 		}
 	}
