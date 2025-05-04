@@ -100,6 +100,10 @@
     <Reference Include="Il2Cppmscorlib">
       <HintPath>D:\Zwei\game\BepInEx\interop\Il2Cppmscorlib.dll</HintPath>
     </Reference>
+    <Reference Include="Lethe, Version=0.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Limbus Company\BepInEx\plugins\Lethe.dll</HintPath>
+    </Reference>
     <Reference Include="LibCpp2IL">
       <HintPath>D:\Zwei\game\BepInEx\core\LibCpp2IL.dll</HintPath>
     </Reference>

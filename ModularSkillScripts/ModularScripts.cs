@@ -1493,7 +1493,22 @@ public class ModularSA : MonoBehaviour
 					unitView.transform.localScale = new Vector3(vec3.x,vec3.y * 0.5f,vec3.z);
 				}
 			}
-			break;
+				break;
+			case "effectlabel":
+				{
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					BattleObjectManager objManager = SingletonBehavior<BattleObjectManager>.Instance;
+					bool effectActive = GetNumFromParamString(circles[2]) != 0;
+					EFFECT_LAYER_TYPE layerType = EFFECT_LAYER_TYPE.NONE;
+					Enum.TryParse(circles[3], true, out layerType);
+					foreach (BattleUnitModel targetModel in modelList)
+					{
+						BattleUnitView unitView = objManager.GetView(targetModel);
+						if (unitView == null) continue;
+						unitView.SetEffect_Label(circles[1], effectActive, layerType);
+					}
+				}
+				break;
 			default: MainClass.Logg.LogInfo("Invalid Consequence: " + mEth); break;
 		}
 	}
