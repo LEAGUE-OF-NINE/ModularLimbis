@@ -1509,6 +1509,22 @@ public class ModularSA : MonoBehaviour
 					}
 				}
 				break;
+			case "sanchoshield":
+				{
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					bool effectActive = GetNumFromParamString(circles[1]) != 0;
+					foreach (BattleUnitModel targetModel in modelList){
+						var appearance = SingletonBehavior<BattleObjectManager>.Instance.GetViewAppaearance(targetModel);
+						if (appearance == null) continue;
+						var berserkAppearance = appearance.TryCast<CharacterAppearance_1079>();
+						var managerAppearance = appearance.TryCast<CharacterAppearance_8380>();
+						var identityAppearance = appearance.TryCast<CharacterAppearance_10310>();
+						berserkAppearance?.SetShieldEffect(effectActive);
+						managerAppearance?.SetShieldEffect(effectActive);
+						identityAppearance?.SetShieldEffect(effectActive);
+					}
+				}
+				break;
 			default: MainClass.Logg.LogInfo("Invalid Consequence: " + mEth); break;
 		}
 	}
