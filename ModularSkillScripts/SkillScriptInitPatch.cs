@@ -339,8 +339,60 @@ public class SkillScriptInitPatch
 		}
 	}
 
-	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnBattleStart))]
+	[HarmonyPatch(typeof(StageController), nameof(StageController.StartRoundAfterAbnormalityChoice_Init))]
 	[HarmonyPostfix]
+	private static void Postfix_StageController_StartRoundAfterAbnormalityChoice_Init()
+	{
+		foreach (KeyValuePair<int, BattleObjectManager.BattleUnit> allUnit in SingletonBehavior<BattleObjectManager>.Instance._allUnitDictionary)
+		{
+			PassiveDetail __instance = allUnit.Value?.Model._passiveDetail;
+			int actevent = MainClass.timingDict["AfterSlots"];
+			foreach (long key in modpaDict.Keys)
+			{
+				List<ModularSA> value = modpaDict[key];
+				foreach (ModularSA modular in value) modular.ResetAdders();
+			}
+
+			foreach (PassiveModel passiveModel in __instance.PassiveList)
+			{
+				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
+				{
+					modpa.modsa_passiveModel = passiveModel;
+					modpa.Enact(__instance._owner, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				}
+			}
+			foreach (PassiveModel passiveModel in __instance.EgoPassiveList)
+			{
+				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+				{
+					modpa.modsa_passiveModel = passiveModel;
+					modpa.Enact(__instance._owner, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				}
+			}
+
+			foreach (SinActionModel sinAction in __instance._owner.GetSinActionList())
+			{
+				foreach (UnitSinModel sinModel in sinAction.currentSinList)
+				{
+					SkillModel skillModel = sinModel.GetSkill();
+					if (skillModel == null) continue;
+					long skillmodel_intlong = skillModel.Pointer.ToInt64();
+
+					if (!modsaDict.ContainsKey(skillmodel_intlong)) continue;
+					foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
+					{
+						//MainClass.Logg.LogInfo("Found modsa - RoundStart");
+						modsa.Enact(__instance._owner, skillModel, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+					}
+				}
+			}
+		}
+	}
+		[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnBattleStart))]
+		[HarmonyPostfix]
+	
+
+
 	private static void Postfix_PassiveDetail_OnBattleStart(BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
 		int actevent = MainClass.timingDict["StartBattle"];
