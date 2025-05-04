@@ -68,6 +68,7 @@ public class MainClass : BasePlugin
 		timingStringList.Add("Immortal");
 		timingStringList.Add("ImmortalOther");
 		timingStringList.Add("SpecialAction"); // 33
+		timingStringList.Add("AfterSlots"); // 34
 		
 		Il2CppArrayBase<string> timingStringArray = timingStringList.ToArray();
 		int count = timingStringArray.Count;
@@ -109,7 +110,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false;
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "2.7.5";
+	public const string VERSION = "2.7.7";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 

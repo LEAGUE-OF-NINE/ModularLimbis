@@ -344,6 +344,7 @@ public class ModularSA : MonoBehaviour
 				BattleUnitModel_Abnormality_Part part = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
 				if (part != null) unitList.Add(part.Abnormality);
 				else unitList.Add(modsa_unitModel);
+
 				return unitList;
 			}
 			case "Target": {
@@ -923,6 +924,41 @@ public class ModularSA : MonoBehaviour
 				}
 			}
 				break;
+			case "activatebuf":
+				{
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					BUFF_UNIQUE_KEYWORD buf_keyword = CustomBuffs.ParseBuffUniqueKeyword(circles[1]);
+					int stack = 0;
+					int count = 1;
+					int limit = 99;
+					if (circles.Length > 2) count = GetNumFromParamString(circles[2]);
+					if (circles.Length > 3) stack = GetNumFromParamString(circles[3]);
+					if (circles.Length > 4) limit = GetNumFromParamString(circles[4]);
+
+					var nullableLimit = new Il2CppSystem.Nullable<int>(limit);
+					if (!nullableLimit.HasValue)
+					{
+						nullableLimit.value = limit;
+					}
+
+					foreach (BattleUnitModel targetModel in modelList)
+					{
+						var buff = targetModel.GetBuffInfo(buf_keyword, 0);
+						if (buff != null && buff.IsSinBuff())
+						{
+							MainClass.Logg.LogMessage($"Calling ForceToActivateSinBuffEffect: stack={stack}, count={count}, limit={nullableLimit}, battleTiming= {battleTiming}, keyword={buf_keyword}");
+							try { targetModel.ForceToActivateSinBuffEffect(modsa_unitModel, stack, count, nullableLimit, battleTiming, buf_keyword);}
+							catch (Exception ex) { MainClass.Logg.LogWarning("Error in ForceToActivateSinBuf	fEffect: " + ex); }			
+						}
+						else
+						{
+							MainClass.Logg.LogMessage("Activating ForceToActivateBuffEffect");
+							try { targetModel.ForceToActivateBuffEffect(buf_keyword, modsa_unitModel, stack, count, null, battleTiming); }
+							catch (Exception ex) { MainClass.Logg.LogWarning("Error in ForceToActivateBuffEffect: " + ex); }
+						}
+					}
+				}
+				break;
 			case "break":{
 				List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
 				if (modelList.Count < 1) return;
@@ -1472,8 +1508,8 @@ public class ModularSA : MonoBehaviour
 			}
 				break;
 			case "battledialogline": {
-			  string line_played = circledSection.Remove(circles[0].Length + 1);
-			  line_played = Regex.Replace(line_played, @"_", " ");
+					string line_played = circledSection.Remove(0, circles[0].Length + 1);
+					line_played = Regex.Replace(line_played, @"_", " ");
 			  
 				List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
 				foreach (BattleUnitModel targetModel in modelList) {
