@@ -936,24 +936,25 @@ public class ModularSA : MonoBehaviour
 					if (circles.Length > 4) limit = GetNumFromParamString(circles[4]);
 
 					var nullableLimit = new Il2CppSystem.Nullable<int>(limit);
-					if (!nullableLimit.HasValue)
-					{
-						nullableLimit.value = limit;
-					}
+					//var nullableLimit = new Il2CppSystem.Nullable<int>(99);
+					//if (!nullableLimit.HasValue)
+					//{
+					//	nullableLimit.value = limit;
+					//}
 
 					foreach (BattleUnitModel targetModel in modelList)
 					{
 						var buff = targetModel.GetBuffInfo(buf_keyword, 0);
 						if (buff != null && buff.IsSinBuff())
 						{
-							MainClass.Logg.LogMessage($"Calling ForceToActivateSinBuffEffect: stack={stack}, count={count}, limit={nullableLimit}, battleTiming= {battleTiming}, keyword={buf_keyword}");
+							MainClass.Logg.LogMessage($"Calling ForceToActivateSinBuffEffect: stack={stack}, count={count}, limit={nullableLimit.Value}, battleTiming= {battleTiming}, keyword={buf_keyword}");
 							try { targetModel.ForceToActivateSinBuffEffect(modsa_unitModel, stack, count, nullableLimit, battleTiming, buf_keyword);}
 							catch (Exception ex) { MainClass.Logg.LogWarning("Error in ForceToActivateSinBuf	fEffect: " + ex); }			
 						}
 						else
 						{
 							MainClass.Logg.LogMessage("Activating ForceToActivateBuffEffect");
-							try { targetModel.ForceToActivateBuffEffect(buf_keyword, modsa_unitModel, stack, count, null, battleTiming); }
+							try { targetModel.ForceToActivateBuffEffect(buf_keyword, modsa_unitModel, stack, count, nullableLimit, battleTiming); }
 							catch (Exception ex) { MainClass.Logg.LogWarning("Error in ForceToActivateBuffEffect: " + ex); }
 						}
 					}
@@ -1530,6 +1531,38 @@ public class ModularSA : MonoBehaviour
 				}
 			}
 			break;
+			case "effectlabel":
+				{
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					BattleObjectManager objManager = SingletonBehavior<BattleObjectManager>.Instance;
+					bool effectActive = GetNumFromParamString(circles[2]) != 0;
+					EFFECT_LAYER_TYPE layerType = EFFECT_LAYER_TYPE.NONE;
+					Enum.TryParse(circles[3], true, out layerType);
+					foreach (BattleUnitModel targetModel in modelList)
+					{
+						BattleUnitView unitView = objManager.GetView(targetModel);
+						if (unitView == null) continue;
+						unitView.SetEffect_Label(circles[1], effectActive, layerType);
+					}
+				}
+				break;
+			case "sanchoshield":
+				{
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					bool effectActive = GetNumFromParamString(circles[1]) != 0;
+					foreach (BattleUnitModel targetModel in modelList)
+					{
+						var appearance = SingletonBehavior<BattleObjectManager>.Instance.GetViewAppaearance(targetModel);
+						if (appearance == null) continue;
+						var berserkAppearance = appearance.TryCast<CharacterAppearance_1079>();
+						var managerAppearance = appearance.TryCast<CharacterAppearance_8380>();
+						var identityAppearance = appearance.TryCast<CharacterAppearance_10310>();
+						berserkAppearance?.SetShieldEffect(effectActive);
+						managerAppearance?.SetShieldEffect(effectActive);
+						identityAppearance?.SetShieldEffect(effectActive);
+					}
+				}
+				break;
 			default: MainClass.Logg.LogInfo("Invalid Consequence: " + mEth); break;
 		}
 	}
