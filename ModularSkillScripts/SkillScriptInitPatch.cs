@@ -308,9 +308,20 @@ public class SkillScriptInitPatch
 			List<ModularSA> value = modpaDict[key];
 			foreach (ModularSA modular in value) modular.ResetAdders();
 		}
+
+		//Il2CppSystem.Collections.Generic.List<SupportUnitModel> supportUnitList = BattleObjectManager.Instance.GetSupportUnitModels(UNIT_FACTION.PLAYER);
 		
-		foreach (PassiveModel passiveModel in __instance.PassiveList) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
+		//foreach (SupportUnitModel supportUnitModel in supportUnitList) {
+		//	var passiveModel = supportUnitModel.PassiveDetail;
+		//	foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
+		//		modpa.modsa_passiveModel = passiveModel;
+		//		modpa.Enact(__instance._owner, null, null, null, actevent, timing);
+		//	}
+		//}
+		foreach (PassiveModel passiveModel in __instance.PassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
+			{
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(__instance._owner, null, null, null, actevent, timing);
 			}
