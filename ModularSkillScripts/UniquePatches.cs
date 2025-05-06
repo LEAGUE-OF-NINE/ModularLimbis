@@ -1,4 +1,4 @@
-﻿using BattleUI.Operation;
+using BattleUI.Operation;
 using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
 using BepInEx.Unity.IL2CPP.UnityEngine;
@@ -22,6 +22,19 @@ internal class UniquePatches
 			if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
 					
 			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong]) {
+				MainClass.Logg.LogInfo("Found modpassive - SPECIAL: " + modpa.passiveID);
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(passiveModel.Owner, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+		foreach (PassiveModel passiveModel in unit._passiveDetail.EgoPassiveList)
+		{
+			if (!passiveModel.CheckActiveCondition()) continue;
+			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+			if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
+
+			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong])
+			{
 				MainClass.Logg.LogInfo("Found modpassive - SPECIAL: " + modpa.passiveID);
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(passiveModel.Owner, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
