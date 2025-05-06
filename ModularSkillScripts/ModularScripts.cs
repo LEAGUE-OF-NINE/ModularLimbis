@@ -1686,7 +1686,25 @@ public class ModularSA : MonoBehaviour
 				finalResult = finalValue;
 			}
 				break;
-			case "getday": finalResult = (int)DateTime.Now.DayOfWeek;
+			case "timeget": 
+				{
+					var balls = circles[0];
+					int year = 1984;
+					if (circles.Length >= 2)
+					{
+						year = GetNumFromParamString(circles[1]);
+					}
+
+					finalResult = (int)DateTime.Now.DayOfWeek;
+					if (balls == "dayofmonth") { finalResult = DateTime.Now.Day; }
+					else if(balls == "dayofyear") { finalResult = DateTime.Now.DayOfYear; }
+					else if(balls == "hours") { finalResult = DateTime.Now.Hour; }
+					else if(balls == "minutes") { finalResult = DateTime.Now.Minute; }
+					else if(balls == "seconds") { finalResult = DateTime.Now.Second; }
+					else if(balls == "miliseconds") { finalResult = DateTime.Now.Millisecond; }
+					else if(balls == "ticks") { finalResult = (int)DateTime.Now.Ticks; }
+					else if(balls == "isleapyear") { finalResult = DateTime.IsLeapYear(year) ? 0 : 1 ; }	
+				};
 				break;
 			case "getdmg": finalResult = lastFinalDmg;
 				break;
