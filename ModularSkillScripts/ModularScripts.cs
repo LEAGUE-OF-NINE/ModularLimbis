@@ -1699,25 +1699,29 @@ public class ModularSA : MonoBehaviour
 				finalResult = finalValue;
 			}
 				break;
-			case "timeget": 
+			case "timeget": {
+				var balls = circles[0];
+				int year = 1984;
+				if (circles.Length >= 2)
 				{
-					var balls = circles[0];
-					int year = 1984;
-					if (circles.Length >= 2)
-					{
-						year = GetNumFromParamString(circles[1]);
-					}
+					year = GetNumFromParamString(circles[1]);
+				}
 
-					finalResult = (int)DateTime.Now.DayOfWeek;
-					if (balls == "dayofmonth") { finalResult = DateTime.Now.Day; }
-					else if(balls == "dayofyear") { finalResult = DateTime.Now.DayOfYear; }
-					else if(balls == "hours") { finalResult = DateTime.Now.Hour; }
-					else if(balls == "minutes") { finalResult = DateTime.Now.Minute; }
-					else if(balls == "seconds") { finalResult = DateTime.Now.Second; }
-					else if(balls == "miliseconds") { finalResult = DateTime.Now.Millisecond; }
-					else if(balls == "ticks") { finalResult = (int)DateTime.Now.Ticks; }
-					else if(balls == "isleapyear") { finalResult = DateTime.IsLeapYear(year) ? 0 : 1 ; }	
-				};
+				switch (balls)
+				{
+					case "dayofweek":	finalResult = (int)DateTime.Now.DayOfWeek; break;
+					case "dayofmonth": finalResult = DateTime.Now.Day; break;
+					case "dayofyear": finalResult = DateTime.Now.DayOfYear; break;
+					case "hours": finalResult = DateTime.Now.Hour; break;
+					case "minutes": finalResult = DateTime.Now.Minute; break;
+					case "seconds": finalResult = DateTime.Now.Second; break;
+					case "milliseconds": finalResult = DateTime.Now.Millisecond; break;
+					case "ticks": finalResult = (int)DateTime.Now.Ticks; break;
+					case "month": finalResult = DateTime.Now.Month; break;
+					case "year": finalResult = DateTime.Now.Year; break;
+					case "isleapyear": finalResult = DateTime.IsLeapYear(year) ? 0 : 1; break;
+				}
+			};
 				break;
 			case "getdmg": finalResult = lastFinalDmg;
 				break;
