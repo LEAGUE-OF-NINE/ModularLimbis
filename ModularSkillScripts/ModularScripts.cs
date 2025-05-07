@@ -162,7 +162,11 @@ public class ModularSA : MonoBehaviour
 	public void Enact(BattleUnitModel unitModel, SkillModel skillModel_inst, BattleActionModel selfAction, BattleActionModel oppoAction, int actevent, BATTLE_EVENT_TIMING timing)
 	{
 		interactionTimer = 0;
-		if (activationTiming != actevent) return;
+		if (activationTiming != actevent)
+		{
+			modsa_target_list.Clear();
+			return;
+		}
 
 		modsa_unitModel = unitModel;
 		modsa_skillModel = skillModel_inst;
@@ -346,6 +350,7 @@ public class ModularSA : MonoBehaviour
 				BattleUnitModel_Abnormality_Part part = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
 				if (part != null) unitList.Add(part.Abnormality);
 				else unitList.Add(modsa_unitModel);
+
 				return unitList;
 			}
 			case "Target": {
@@ -925,6 +930,42 @@ public class ModularSA : MonoBehaviour
 				}
 			}
 				break;
+			//case "activatebuf":
+			//	{
+			//		List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+			//		BUFF_UNIQUE_KEYWORD buf_keyword = CustomBuffs.ParseBuffUniqueKeyword(circles[1]);
+			//		int stack = 0;
+			//		int count = 1;
+			//		int limit = 99;
+			//		if (circles.Length > 2) count = GetNumFromParamString(circles[2]);
+			//		if (circles.Length > 3) stack = GetNumFromParamString(circles[3]);
+			//		if (circles.Length > 4) limit = GetNumFromParamString(circles[4]);
+
+			//		var nullableLimit = new Il2CppSystem.Nullable<int>(limit);
+			//		//var nullableLimit = new Il2CppSystem.Nullable<int>(99);
+			//		//if (!nullableLimit.HasValue)
+			//		//{
+			//		//	nullableLimit.value = limit;
+			//		//}
+
+			//		foreach (BattleUnitModel targetModel in modelList)
+			//		{
+			//			var buff = targetModel.GetBuffInfo(buf_keyword, 0);
+			//			if (buff != null && buff.IsSinBuff())
+			//			{
+			//				MainClass.Logg.LogMessage($"Calling ForceToActivateSinBuffEffect: stack={stack}, count={count}, limit={nullableLimit.Value}, battleTiming= {battleTiming}, keyword={buf_keyword}");
+			//				try { targetModel.ForceToActivateSinBuffEffect(modsa_unitModel, stack, count, nullableLimit, battleTiming, buf_keyword);}
+			//				catch (Exception ex) { MainClass.Logg.LogWarning("Error in ForceToActivateSinBuf	fEffect: " + ex); }			
+			//			}
+			//			else
+			//			{
+			//				MainClass.Logg.LogMessage("Activating ForceToActivateBuffEffect");
+			//				try { targetModel.ForceToActivateBuffEffect(buf_keyword, modsa_unitModel, stack, count, nullableLimit, battleTiming); }
+			//				catch (Exception ex) { MainClass.Logg.LogWarning("Error in ForceToActivateBuffEffect: " + ex); }
+			//			}
+			//		}
+			//	}
+			//	break;
 			case "break":{
 				List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
 				if (modelList.Count < 1) return;
@@ -1289,27 +1330,44 @@ public class ModularSA : MonoBehaviour
 				break;
 			case "skillreuse": foreach (BattleUnitModel targetModel in GetTargetModelList(circledSection)) targetModel.ReuseAction(modsa_selfAction);
 				break;
-			case "skillslotreplace":{
-				if (modsa_unitModel == null) {
-					MainClass.Logg.LogInfo("skillslotreplace Self == null");
-					return;
-				}
-
-				List<SinActionModel> sinActionList = modsa_unitModel.GetSinActionList();
-				int skillID_1 = GetNumFromParamString(circles[1]);
-				int skillID_2 = GetNumFromParamString(circles[2]);
-				if (circles[0] == "All") {
-					foreach (SinActionModel sinslot in sinActionList) sinslot.ReplaceSkillAtoB(skillID_1, skillID_2);
-				}
-				else
-				{
-					int slot = GetNumFromParamString(circles[0]);
-					if (slot >= sinActionList.Count || slot < 0) {
-						MainClass.Logg.LogInfo("skillslotreplace invalid slot");
+			case "skillslotreplace": {
+					if (modsa_unitModel == null) {
+						MainClass.Logg.LogInfo("skillslotreplace Self == null");
 						return;
 					}
-					sinActionList.ToArray()[slot].ReplaceSkillAtoB(skillID_1, skillID_2);
-				}
+
+					List<SinActionModel> sinActionList = modsa_unitModel.GetSinActionList();
+					int skillID_1 = GetNumFromParamString(circles[1]);
+					int skillID_2 = GetNumFromParamString(circles[2]);
+
+
+					if (circles[1] == "All") 
+					{ 
+						foreach (SinActionModel sinslot in sinActionList)
+						{
+							var skillList = sinslot.UnitModel.GetSkillList();
+							foreach (SkillModel x in skillList)
+							{
+								var x_id = x.GetID();
+								sinslot.ReplaceSkillAtoB(x_id, skillID_2);
+							}
+
+						}
+					}
+					else if (circles[0] == "All")
+					{
+						foreach (SinActionModel sinslot in sinActionList) sinslot.ReplaceSkillAtoB(skillID_1, skillID_2);
+					}
+					else
+					{
+						int slot = GetNumFromParamString(circles[0]);
+						if (slot >= sinActionList.Count || slot < 0)
+						{
+							MainClass.Logg.LogInfo("skillslotreplace invalid slot");
+							return;
+						}
+						sinActionList.ToArray()[slot].ReplaceSkillAtoB(skillID_1, skillID_2);
+					}
 			}
 				break;
 			case "resource":{
@@ -1473,8 +1531,8 @@ public class ModularSA : MonoBehaviour
 			}
 				break;
 			case "battledialogline": {
-			  string line_played = circledSection.Remove(circles[0].Length + 1);
-			  line_played = Regex.Replace(line_played, @"_", " ");
+					string line_played = circledSection.Remove(0, circles[0].Length + 1);
+					line_played = Regex.Replace(line_played, @"_", " ");
 			  
 				List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
 				foreach (BattleUnitModel targetModel in modelList) {
@@ -1640,6 +1698,26 @@ public class ModularSA : MonoBehaviour
 				else if (circle_2== "*") finalValue = stack * turn;
 				finalResult = finalValue;
 			}
+				break;
+			case "timeget": 
+				{
+					var balls = circles[0];
+					int year = 1984;
+					if (circles.Length >= 2)
+					{
+						year = GetNumFromParamString(circles[1]);
+					}
+
+					finalResult = (int)DateTime.Now.DayOfWeek;
+					if (balls == "dayofmonth") { finalResult = DateTime.Now.Day; }
+					else if(balls == "dayofyear") { finalResult = DateTime.Now.DayOfYear; }
+					else if(balls == "hours") { finalResult = DateTime.Now.Hour; }
+					else if(balls == "minutes") { finalResult = DateTime.Now.Minute; }
+					else if(balls == "seconds") { finalResult = DateTime.Now.Second; }
+					else if(balls == "miliseconds") { finalResult = DateTime.Now.Millisecond; }
+					else if(balls == "ticks") { finalResult = (int)DateTime.Now.Ticks; }
+					else if(balls == "isleapyear") { finalResult = DateTime.IsLeapYear(year) ? 0 : 1 ; }	
+				};
 				break;
 			case "getdmg": finalResult = lastFinalDmg;
 				break;
