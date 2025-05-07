@@ -8,6 +8,8 @@ using static BattleActionModel.TargetDataDetail;
 using IntPtr = System.IntPtr;
 using Lethe.Patches;
 using BattleUI.Dialog;
+using FMOD;
+using FMODUnity;
 //using CodeStage.AntiCheat.ObscuredTypes;
 //using Il2CppSystem.Collections;
 
@@ -1135,22 +1137,21 @@ public class ModularSA : MonoBehaviour
 				immortality = amount > 0;
 			}
 				break;
-			case "retreat":{
-				BattleObjectManager battleObjectManager_inst = SingletonBehavior<BattleObjectManager>.Instance;
-				if (battleObjectManager_inst == null) return;
-
-				List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-				//if (modelList.Count < 1) continue;
-				//bool comeback = circles.Length > 1;
-
-				foreach (BattleUnitModel targetModel in modelList)
+			case "retreat":
 				{
-					if (battleObjectManager_inst.TryReservateForRetreat(targetModel, modsa_unitModel, BUFF_UNIQUE_KEYWORD.Retreat))
+					BattleObjectManager battleObjectManager_inst = SingletonBehavior<BattleObjectManager>.Instance;
+					if (battleObjectManager_inst == null) return;
+
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					BUFF_UNIQUE_KEYWORD buf_keyword = CustomBuffs.ParseBuffUniqueKeyword(circles[1]);
+					//if (modelList.Count < 1) continue;
+					//bool comeback = circles.Length > 1;
+
+					foreach (BattleUnitModel targetModel in modelList)
 					{
-						targetModel.Retreat(modsa_unitModel, battleTiming);
+						battleObjectManager_inst.TryReservateForRetreat(targetModel, modsa_unitModel, buf_keyword);
 					}
 				}
-			}
 				break;
 			case "aggro":{
 				List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
@@ -1523,6 +1524,19 @@ public class ModularSA : MonoBehaviour
 						managerAppearance?.SetShieldEffect(effectActive);
 						identityAppearance?.SetShieldEffect(effectActive);
 					}
+					break;
+				}
+			case "sfx":
+				{
+					string guid = circles[0];
+					SoundGenerator._soundManager.PlayOnShot(GUID.Parse(circles[0]));
+				}
+				break;
+			case "bgm":
+				{
+					BattleSoundGenerator.StopBGM();
+					var Bgm = RuntimeManager.CreateInstance(GUID.Parse(circles[0]));
+					SingletonBehavior<SoundManager>.Instance.ChangeBGM(Bgm);
 				}
 				break;
 			default: MainClass.Logg.LogInfo("Invalid Consequence: " + mEth); break;

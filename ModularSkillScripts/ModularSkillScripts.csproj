@@ -79,6 +79,13 @@
     <Reference Include="Disarm">
       <HintPath>D:\Zwei\game\BepInEx\core\Disarm.dll</HintPath>
     </Reference>
+    <Reference Include="FMODUnity, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Limbus Company\BepInEx\interop\FMODUnity.dll</HintPath>
+    </Reference>
+    <Reference Include="FMODUnityResonance">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Limbus Company\BepInEx\interop\FMODUnityResonance.dll</HintPath>
+    </Reference>
     <Reference Include="Gee.External.Capstone">
       <HintPath>D:\Zwei\game\BepInEx\core\Gee.External.Capstone.dll</HintPath>
     </Reference>
