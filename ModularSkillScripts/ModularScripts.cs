@@ -1597,6 +1597,32 @@ public class ModularSA : MonoBehaviour
 					SingletonBehavior<SoundManager>.Instance.ChangeBGM(Bgm);
 				}
 				break;
+			case "addability":
+				{
+					SYSTEM_ABILITY_KEYWORD ability = SYSTEM_ABILITY_KEYWORD.NONE;
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					Enum.TryParse(circles[1], true, out ability);
+					int stack = GetNumFromParamString(circles[2]);
+					int turn = GetNumFromParamString(circles[3]);
+					int activeround = GetNumFromParamString(circles[4]);
+					foreach (BattleUnitModel targetModel in modelList)
+					{
+						if (activeround == 0) { SystemAbility addAbility = targetModel._systemAbilityDetail.FindOrAddAbilityThisRound(targetModel.InstanceID, ability, stack, turn); }
+						else { SystemAbility addAbility = targetModel._systemAbilityDetail.FindOrAddAbilityNextRound(targetModel.InstanceID, ability, stack, turn); }
+					}
+				}
+				break;
+			case "removeability":
+				{
+					SYSTEM_ABILITY_KEYWORD ability = SYSTEM_ABILITY_KEYWORD.NONE;
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					Enum.TryParse(circles[1], true, out ability);
+					foreach (BattleUnitModel targetModel in modelList)
+					{
+						targetModel._systemAbilityDetail.DestoryAbility(ability);
+					}
+				}
+				break;
 			default: MainClass.Logg.LogInfo("Invalid Consequence: " + mEth); break;
 		}
 	}
