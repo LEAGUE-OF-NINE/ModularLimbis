@@ -1448,6 +1448,33 @@ public class ModularSA : MonoBehaviour
 				}
 			}
 				break;
+			case "skillreveal":
+				{
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					int skillID = GetNumFromParamString(circles[1]);
+					UnlockInformationManager unlockInfo_inst = Singleton<UnlockInformationManager>.Instance;
+					foreach (BattleUnitModel targetModel in modelList)
+					{
+						unlockInfo_inst.UnlockSkill(targetModel.GetOriginUnitID(), targetModel.UnitDataModel.GetSkillModel(skillID));
+					}
+				}
+				break;
+			case "resistreveal":
+				{
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					int partID = GetNumFromParamString(circles[1]);
+					ATK_BEHAVIOUR type = ATK_BEHAVIOUR.NONE;
+					ATTRIBUTE_TYPE attribute = ATTRIBUTE_TYPE.NONE;
+					if (circles[3] == "type") Enum.TryParse(circles[2], true, out type);
+					if (circles[3] == "attribute") Enum.TryParse(circles[2], true, out attribute);
+					UnlockInformationManager unlockInfo_inst = Singleton<UnlockInformationManager>.Instance;
+					foreach (BattleUnitModel targetModel in modelList)
+					{
+						if (circles[3] == "type") unlockInfo_inst.UnlockResistStatus(targetModel.GetOriginUnitID(), partID, type);
+						if (circles[3] == "attribute") unlockInfo_inst.UnlockResistStatus(targetModel.GetOriginUnitID(), partID, attribute);
+					}
+				}
+				break;
 			case "appearance":{
 				List<BattleUnitModel> modelList = GetTargetModelList(circles[0]); 
 				foreach (BattleUnitModel targetModel in modelList) {
@@ -1533,13 +1560,22 @@ public class ModularSA : MonoBehaviour
 			case "battledialogline": {
 					string line_played = circledSection.Remove(0, circles[0].Length + 1);
 					line_played = Regex.Replace(line_played, @"_", " ");
-			  
-				List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-				foreach (BattleUnitModel targetModel in modelList) {
-					BattleUnitView view = BattleObjectManager.Instance.GetView(targetModel);
-					BattleDialogLine dialogline = new BattleDialogLine(line_played, "");
-					view._uiManager.ShowDialog(dialogline);
-				}
+
+					BattleUIRoot battleUiRoot_inst = SingletonBehavior<BattleUIRoot>.Instance;
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					if (circles.Length > 2)
+					{
+						battleUiRoot_inst._outterGradiantEffectController.SetDialog_Upper(line_played, 1.5f, GetNumFromParamString(circles[2]));
+					}
+					else
+					{
+						foreach (BattleUnitModel targetModel in modelList)
+						{
+							BattleUnitView view = BattleObjectManager.Instance.GetView(targetModel);
+							BattleDialogLine dialogline = new BattleDialogLine(line_played, "");
+							view._uiManager.ShowDialog(dialogline);
+						}
+					}
 			}
 				break;
 			case "gnome":{
