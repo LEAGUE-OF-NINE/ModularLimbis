@@ -10,6 +10,7 @@ using Lethe.Patches;
 using BattleUI.Dialog;
 using FMOD;
 using FMODUnity;
+using BattleUI;
 //using CodeStage.AntiCheat.ObscuredTypes;
 //using Il2CppSystem.Collections;
 
@@ -317,6 +318,7 @@ public class ModularSA : MonoBehaviour
 		return success;
 	}
 
+	
 	private int GetNumFromParamString(string param)
 	{
 		int value = 0;
@@ -324,6 +326,8 @@ public class ModularSA : MonoBehaviour
 		if (negative) param = param.Remove(0, 1);
 		bool math = param[0] == 'm';
 		if (math) param = param.Remove(0, 1);
+		bool acquire = param[0] == 'G';
+		if (acquire) param = param.Remove(0, 1);
 		if (param.Last() == ')') param = param.Remove(param.Length - 1);
 		
 		if (math) value = DoMath(param);
@@ -331,11 +335,20 @@ public class ModularSA : MonoBehaviour
 			int value_idx = 0;
 			int.TryParse(param[6].ToString(), out value_idx);
 			value = valueList[value_idx];
-		} else int.TryParse(param, out value);
+		}
+		else if (acquire)
+		{
+			param = Regex.Replace(param, @"{", "(");
+			param = Regex.Replace(param, @"}", ")");
+			param = Regex.Replace(param, @"-", ",");
+			value = AcquireValue(param);
+		}
+		else int.TryParse(param, out value);
 		
 		if (negative) value *= -1;
 		return value;
 	}
+
 
 	public List<BattleUnitModel> GetTargetModelList(string param)
 	{
@@ -677,7 +690,7 @@ public class ModularSA : MonoBehaviour
 				string numChar = batchArgs[i][6].ToString();
 				int valueidx = 0;
 				int.TryParse(numChar, out valueidx);
-				valueList[valueidx] = AcquireValue(valueidx, batchArgs[i + 1]); // GETTERS
+				valueList[valueidx] = AcquireValue(batchArgs[i + 1]); // GETTERS
 				i += 1;
 				continue;
 			}
@@ -1697,7 +1710,7 @@ public class ModularSA : MonoBehaviour
 		return (int)finalValue;
 	}
 	
-	private int AcquireValue(int setvalue_idx, string section)
+	private int AcquireValue(string section)
 	{
 		if (MainClass.logEnabled) MainClass.Logg.LogInfo("AcquireValue " + section);
 		string[] sectionArgs = section.Split(parenthesisSeparator);
