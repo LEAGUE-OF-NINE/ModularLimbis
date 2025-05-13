@@ -1677,6 +1677,30 @@ public class ModularSA : MonoBehaviour
 					}
 				}
 				break;
+			case "surge":
+				{
+					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+					int amount = GetNumFromParamString(circles[1]);
+					foreach (BattleUnitModel targetModel in modelList)
+					{
+						if (abilityMode == 2)
+						{
+							dummyPassiveAbility.AddTriggeredData_SinkingSurge(amount, targetModel.InstanceID, battleTiming);
+							targetModel.SinkingSurge(amount, battleTiming, modsa_unitModel, dummyPassiveAbility, modsa_selfAction, modsa_coinModel);
+						}
+						else if (abilityMode == 1)
+						{
+							dummyCoinAbility.AddTriggeredData_SinkingSurge(amount, targetModel.InstanceID, battleTiming);
+							dummyCoinAbility.SinkingSurge(modsa_unitModel, targetModel, battleTiming, modsa_selfAction, modsa_coinModel);
+						}
+						else
+						{
+							dummySkillAbility.AddTriggeredData_SinkingSurge(amount, targetModel.InstanceID, battleTiming);
+							targetModel.SinkingSurge(amount, battleTiming, modsa_unitModel, dummySkillAbility, modsa_selfAction, modsa_coinModel);
+						}
+					}
+				}
+				break;
 			default: MainClass.Logg.LogInfo("Invalid Consequence: " + mEth); break;
 		}
 	}
