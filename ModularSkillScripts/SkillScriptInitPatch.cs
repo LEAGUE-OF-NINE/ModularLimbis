@@ -1631,6 +1631,76 @@ public class SkillScriptInitPatch
 		}
 	}
 		
-		
+	
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnStartCoin))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_OnStartCoin(BattleActionModel action, CoinModel coin, BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
+	{
+		int actevent = MainClass.timingDict["OnCoinToss"];
+		BattleUnitModel attacker = action.Model;
+		if (__instance.TryCast<BattleUnitModel_Abnormality>() == null)
+		{
+			long coinmodel_intlong = coin.Pointer.ToInt64();
+			foreach (ModularSA modca in modca_list)
+			{
+				if (coinmodel_intlong != modca.ptr_intlong) continue;
+			
+				//modca.wasClash = isWinDuel.HasValue;
+				//if (modca.wasClash) modca.wasWin = isWinDuel.Value;
+				modca.modsa_coinModel = coin;
+				modca.modsa_target_list.Clear();
+				modca.modsa_target_list.Add(__instance);
+				modca.Enact(attacker, action.Skill, action, null, actevent, timing);
+			}
+
+			long skillmodel_intlong = action.Skill.Pointer.ToInt64();
+			if (modsaDict.ContainsKey(skillmodel_intlong))
+			{
+				foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
+				{
+					modsa.modsa_coinModel = coin;
+					modsa.modsa_target_list.Clear();
+					modsa.modsa_target_list.Add(__instance);
+					modsa.Enact(attacker, action.Skill, action, null, actevent, timing);
+				}
+			}
+
+			foreach (BuffModel buffModel in attacker._buffDetail.GetActivatedBuffModelAll())
+			{
+				foreach (ModularSA modba in GetAllModbaFromBuffModel(buffModel))
+				{
+					modba.modsa_coinModel = coin;
+					modba.modsa_buffModel = buffModel;
+					modba.modsa_target_list.Clear();
+					modba.modsa_target_list.Add(__instance);
+					modba.Enact(attacker, action.Skill, action, null, actevent, timing);
+				}
+			}
+
+			foreach (PassiveModel passiveModel in attacker._passiveDetail.PassiveList)
+			{
+				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
+				{
+					modpa.modsa_coinModel = coin;
+					modpa.modsa_passiveModel = passiveModel;
+					modpa.modsa_target_list.Clear();
+					modpa.modsa_target_list.Add(__instance);
+					modpa.Enact(attacker, action.Skill, action, null, actevent, timing);
+				}
+			}
+			foreach (PassiveModel passiveModel in attacker._passiveDetail.EgoPassiveList)
+			{
+				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+				{
+					modpa.modsa_coinModel = coin;
+					modpa.modsa_passiveModel = passiveModel;
+					modpa.modsa_target_list.Clear();
+					modpa.modsa_target_list.Add(__instance);
+					modpa.Enact(attacker, action.Skill, action, null, actevent, timing);
+				}
+			}
+		}
+	}
+	
 	// end
 }
