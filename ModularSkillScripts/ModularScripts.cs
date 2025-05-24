@@ -2218,6 +2218,23 @@ public class ModularSA : MonoBehaviour
 			}
 				break;
 			case "isfocused": finalResult = Singleton<StageController>.Instance.IsAbnormalityBattle() ? 1 : 0; break;
+   			
+			case "unitcount":
+				{
+					finalResult = GetTargetModelList(circledSection).Count;
+				}
+				break;
+			case "breakcount":
+				{
+					finalResult = GetTargetModel(circledSection).GetBreakSections().Count;
+				}
+				break;
+			case "breakvalue":
+				{
+					List<BreakSection> sectionlist = GetTargetModel(circles[0]).GetBreakSections();
+					finalResult = sectionlist[GetNumFromParamString(circles[1])]._hp;
+				}
+				break;
 			default: MainClass.Logg.LogInfo("Invalid Getter: " + methodology); break;
 		}
 
