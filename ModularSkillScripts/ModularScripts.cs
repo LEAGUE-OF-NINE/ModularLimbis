@@ -1701,6 +1701,28 @@ public class ModularSA : MonoBehaviour
 					}
 				}
 				break;
+			case "makeunbreakable":
+				{
+					if (string.Equals(circles[0], "all", StringComparison.OrdinalIgnoreCase))
+					{
+						foreach (CoinModel coin in modsa_skillModel.CoinList)
+						{
+							Singleton<SkillAbility_OverwriteToSuperCoinViaBuffCheck>.Instance.AddScriptToCoin(coin);
+						}
+					}
+					else
+					{
+						foreach (string circle in circles)
+						{
+							int idx = GetNumFromParamString(circle);
+							if (idx < 0) { Singleton<SkillAbility_OverwriteToSuperCoinViaBuffCheck>.Instance.AddScriptToCoin(modsa_skillModel.GetCoin(modsa_coinModel.GetOriginCoinIndex())); continue; }
+
+							idx = Math.Min(idx, modsa_skillModel.CoinList.Count - 1);
+							Singleton<SkillAbility_OverwriteToSuperCoinViaBuffCheck>.Instance.AddScriptToCoin(modsa_skillModel.GetCoin(idx));
+						}
+					}
+				}
+				break;
 			default: MainClass.Logg.LogInfo("Invalid Consequence: " + mEth); break;
 		}
 	}
