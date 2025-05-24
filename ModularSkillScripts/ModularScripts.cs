@@ -2235,6 +2235,12 @@ public class ModularSA : MonoBehaviour
 					finalResult = sectionlist[GetNumFromParamString(circles[1])]._hp;
 				}
 				break;
+   
+			case "coinrerolled":
+				{	
+					finalResult = modsa_coinModel.IsReRolled() ? 1 : 0;
+				}
+				break;
 			default: MainClass.Logg.LogInfo("Invalid Getter: " + methodology); break;
 		}
 
