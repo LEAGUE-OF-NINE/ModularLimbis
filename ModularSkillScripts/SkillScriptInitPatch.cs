@@ -1216,6 +1216,7 @@ public class SkillScriptInitPatch
 		}
 	}
 
+
 	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnRoundEnd))]
 	[HarmonyPostfix]
 	private static void Postfix_BuffModel_OnRoundEnd(BattleUnitModel unit, BATTLE_EVENT_TIMING timing, BuffModel __instance) {
@@ -1235,7 +1236,19 @@ public class SkillScriptInitPatch
 			modba.Enact(unit, action.Skill, action, null, actevent, timing);
 		}
 	}
-	
+
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnEndTurn))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_OnEndTurn(BattleActionModel action, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	{
+		int actevent = MainClass.timingDict["EndSkill"];
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance))
+		{
+			modba.modsa_buffModel = __instance;
+			modba.Enact(action.Model, action.Skill, action, null, actevent, timing);
+		}
+	}
+
 	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnStartDuel))]
 	[HarmonyPostfix]
 	private static void Postfix_BuffModel_OnStartDuel(BattleActionModel ownerAction, BattleActionModel opponentAction, BATTLE_EVENT_TIMING timing, BuffModel __instance)
@@ -1256,6 +1269,7 @@ public class SkillScriptInitPatch
 			modba.Enact(ownerAction.Model, ownerAction.Skill, ownerAction, opponentAction, actevent, timing);
 		}
 	}
+
 	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnLoseDuel))]
 	[HarmonyPostfix]
 	private static void Postfix_BuffModel_OnLoseDuel(BattleActionModel ownerAction, BattleActionModel opponentAction, BATTLE_EVENT_TIMING timing, BuffModel __instance)
@@ -1269,12 +1283,36 @@ public class SkillScriptInitPatch
 
 	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnStartBehaviour))]
 	[HarmonyPostfix]
-	private static void Postfix_PassiveDetail_BeforeAttack(BattleActionModel action, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	private static void Postfix_BuffModel_OnStartBehaviour(BattleActionModel action, BATTLE_EVENT_TIMING timing, BuffModel __instance)
 	{
 		int actevent = MainClass.timingDict["OnStartBehaviour"];
 		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
 			modba.modsa_buffModel = __instance;
 			modba.Enact(action.Model, action.Skill, action, null, actevent, timing);
+		}
+	}
+
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnEndBehaviour))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_OnEndBehaviour(BattleActionModel action, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	{
+		int actevent = MainClass.timingDict["OnEndBehaviour"];
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance))
+		{
+			modba.modsa_buffModel = __instance;
+			modba.Enact(action.Model, action.Skill, action, null, actevent, timing);
+		}
+	}
+
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnDiscardSin))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_OnDiscardSint(BattleUnitModel unit, UnitSinModel sin, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	{
+		int actevent = MainClass.timingDict["OnDiscard"];
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance))
+		{
+			modba.modsa_buffModel = __instance;
+			modba.Enact(unit, sin.GetSkill(), null, null, actevent, timing);
 		}
 	}
 
