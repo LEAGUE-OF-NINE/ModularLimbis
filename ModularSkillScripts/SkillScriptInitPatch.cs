@@ -4,6 +4,7 @@ using Dungeon;
 using HarmonyLib;
 using Il2CppSystem.Collections;
 using Il2CppSystem.Collections.Generic;
+using static MirrorDungeonSelectThemeUIPanel.UIResources;
 
 namespace ModularSkillScripts;
 
@@ -644,33 +645,7 @@ public class SkillScriptInitPatch
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnVibrationExplosionOtherUnit(BattleUnitModel explodedUnit, BattleUnitModel giverOrNull, BattleActionModel actionOrNull, ABILITY_SOURCE_TYPE abilitySrc, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
-		int actevent = MainClass.timingDict["OnOtherBurst"];
-		foreach (PassiveModel passiveModel in __instance.PassiveList) {
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-			
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
-				modpa.modsa_passiveModel = passiveModel;
-				modpa.modsa_target_list.Clear();
-				modpa.modsa_target_list.Add(explodedUnit);
-				modpa.Enact(__instance._owner, null, null, null, actevent, timing);
-			}
-		}
-		foreach (PassiveModel passiveModel in __instance.EgoPassiveList)
-		{
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
-			{
-				modpa.modsa_passiveModel = passiveModel;
-				modpa.modsa_target_list.Clear();
-				modpa.modsa_target_list.Add(explodedUnit);
-				modpa.Enact(__instance._owner, null, null, null, actevent, timing);
-			}
-		}
+		copypastesolution(explodedUnit, actionOrNull.Skill, null, null, "OnBurst", timing, __instance);
 	}
 	
 	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnDiscardSin))]
@@ -950,15 +925,43 @@ public class SkillScriptInitPatch
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_OnBattleStart(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance)
 	{
+		BattleUnitModel unit = action.Model;
 		int actevent = MainClass.timingDict["StartBattle"];
 		long skillmodel_intlong = __instance.Pointer.ToInt64();
 		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 		foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
 		{
-			modsa.Enact(action.Model, __instance, action, null, actevent, timing);
+			modsa.Enact(unit, __instance, action, null, actevent, timing);
+		}
+
+		actevent = MainClass.timingDict["SBS"];
+
+		foreach (BuffModel buf in action.Model.GetActivatedBuffModels())
+		{
+			foreach (ModularSA modba in GetAllModbaFromBuffModel(buf))
+			{
+				modba.modsa_buffModel = buf;
+				modba.Enact(unit, __instance, action, null, actevent, timing);
+			}
+		}
+
+		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
+			{
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(unit, __instance, action, null, actevent, timing);
+			}
+		}
+		foreach (PassiveModel passiveModel in unit._passiveDetail.EgoPassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			{
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(unit, __instance, action, null, actevent, timing);
+			}
 		}
 	}
-
 
 	//[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetAttackWeightAdder))]
 	//[HarmonyPostfix]
@@ -1160,8 +1163,8 @@ public class SkillScriptInitPatch
 	// SKILLMODEL UP TO HERE
 	// SKILLMODEL UP TO HERE
 
-	
-	
+
+
 	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnRoundStart_After_Event))]
 	[HarmonyPostfix]
 	private static void Postfix_BuffModel_OnRoundStart_After_Event(BattleUnitModel unit, BATTLE_EVENT_TIMING timing, BuffModel __instance)
@@ -1172,6 +1175,19 @@ public class SkillScriptInitPatch
 			modba.Enact(unit, null, null, null, actevent, timing);
 		}
 	}
+
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnBattleStart))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_OnBattleStart(BattleUnitModel unit, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	{
+		int actevent = MainClass.timingDict["StartBattle"];
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance))
+		{
+			modba.modsa_buffModel = __instance;
+			modba.Enact(unit, null, null, null, actevent, timing);
+		}
+	}
+
 	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnRoundEnd))]
 	[HarmonyPostfix]
 	private static void Postfix_BuffModel_OnRoundEnd(BattleUnitModel unit, BATTLE_EVENT_TIMING timing, BuffModel __instance) {
@@ -1233,7 +1249,33 @@ public class SkillScriptInitPatch
 			modba.Enact(action.Model, action.Skill, action, null, actevent, timing);
 		}
 	}
-	
+
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnBeforeParryingOnce_AfterLog))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_OnBeforeParryingOnce_AfterLog(BattleUnitModel unit, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	{
+		int actevent = MainClass.timingDict["DuelClash"];
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance))
+		{
+			modba.modsa_buffModel = __instance;
+			modba.Enact(unit, null, null, null, actevent, timing);
+		}
+	}
+
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnVibrationExplosion))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_OnOtherBurst(BattleUnitModel unit, BattleUnitModel giverOrNull, BattleActionModel actionOrNull, ABILITY_SOURCE_TYPE abilitySrc, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	{
+		int actevent = MainClass.timingDict["OnBurst"];
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance))
+		{
+			modba.modsa_target_list.Clear();
+			modba.modsa_target_list.Add(giverOrNull);
+			modba.modsa_buffModel = __instance;
+			modba.Enact(unit, actionOrNull.Skill, actionOrNull, null, actevent, timing);
+		}
+	}
+
 	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.GetSkillPowerAdder))]
 	[HarmonyPostfix]
 	private static void Postfix_BuffModel_GetSkillPowerAdder(ref int __result, BuffModel __instance) {
@@ -1292,20 +1334,6 @@ public class SkillScriptInitPatch
 	{
 		MainClass.Logg.LogInfo(" OnGiveHpDamage ");
 	}*/
-
-	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnVibrationExplosion))]
-	[HarmonyPostfix]
-	private static void Postfix_BuffModel_OnOtherBurst(BattleUnitModel unit, BattleUnitModel giverOrNull, BattleActionModel actionOrNull, ABILITY_SOURCE_TYPE abilitySrc, BATTLE_EVENT_TIMING timing, BuffModel __instance)
-	{
-		int actevent = MainClass.timingDict["OnOtherBurst"];
-		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance))
-		{
-			modba.modsa_target_list.Clear();
-			modba.modsa_target_list.Add(giverOrNull);
-			modba.modsa_buffModel = __instance;
-			modba.Enact(unit, actionOrNull.Skill, actionOrNull, null, actevent, timing);
-		}
-	}
 
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnTakeAttackDamage))]
 	[HarmonyPostfix]
@@ -1630,77 +1658,60 @@ public class SkillScriptInitPatch
 			}
 		}
 	}
-		
-	
+
+
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnStartCoin))]
 	[HarmonyPostfix]
 	private static void Postfix_BattleUnitModel_OnStartCoin(BattleActionModel action, CoinModel coin, BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
 	{
 		int actevent = MainClass.timingDict["OnCoinToss"];
-		BattleUnitModel attacker = action.Model;
-		if (__instance.TryCast<BattleUnitModel_Abnormality>() == null)
+
+		long coinmodel_intlong = coin.Pointer.ToInt64();
+		foreach (ModularSA modca in modca_list)
 		{
-			long coinmodel_intlong = coin.Pointer.ToInt64();
-			foreach (ModularSA modca in modca_list)
-			{
-				if (coinmodel_intlong != modca.ptr_intlong) continue;
-			
-				//modca.wasClash = isWinDuel.HasValue;
-				//if (modca.wasClash) modca.wasWin = isWinDuel.Value;
-				modca.modsa_coinModel = coin;
-				modca.modsa_target_list.Clear();
-				modca.modsa_target_list.Add(__instance);
-				modca.Enact(attacker, action.Skill, action, null, actevent, timing);
-			}
+			if (coinmodel_intlong != modca.ptr_intlong) continue;
+			modca.modsa_coinModel = coin;
+			modca.Enact(__instance, action.Skill, action, null, actevent, timing);
+		}
 
-			long skillmodel_intlong = action.Skill.Pointer.ToInt64();
-			if (modsaDict.ContainsKey(skillmodel_intlong))
+		long skillmodel_intlong = action.Skill.Pointer.ToInt64();
+		if (modsaDict.ContainsKey(skillmodel_intlong))
+		{
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
 			{
-				foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
-				{
-					modsa.modsa_coinModel = coin;
-					modsa.modsa_target_list.Clear();
-					modsa.modsa_target_list.Add(__instance);
-					modsa.Enact(attacker, action.Skill, action, null, actevent, timing);
-				}
+				modsa.modsa_coinModel = coin;
+				modsa.Enact(__instance, action.Skill, action, null, actevent, timing);
 			}
+		}
 
-			foreach (BuffModel buffModel in attacker._buffDetail.GetActivatedBuffModelAll())
+		foreach (BuffModel buffModel in __instance._buffDetail.GetActivatedBuffModelAll())
+		{
+			foreach (ModularSA modba in GetAllModbaFromBuffModel(buffModel))
 			{
-				foreach (ModularSA modba in GetAllModbaFromBuffModel(buffModel))
-				{
-					modba.modsa_coinModel = coin;
-					modba.modsa_buffModel = buffModel;
-					modba.modsa_target_list.Clear();
-					modba.modsa_target_list.Add(__instance);
-					modba.Enact(attacker, action.Skill, action, null, actevent, timing);
-				}
+				modba.modsa_coinModel = coin;
+				modba.modsa_buffModel = buffModel;
+				modba.Enact(__instance, action.Skill, action, null, actevent, timing);
 			}
+		}
 
-			foreach (PassiveModel passiveModel in attacker._passiveDetail.PassiveList)
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
 			{
-				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
-				{
-					modpa.modsa_coinModel = coin;
-					modpa.modsa_passiveModel = passiveModel;
-					modpa.modsa_target_list.Clear();
-					modpa.modsa_target_list.Add(__instance);
-					modpa.Enact(attacker, action.Skill, action, null, actevent, timing);
-				}
+				modpa.modsa_coinModel = coin;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance, action.Skill, action, null, actevent, timing);
 			}
-			foreach (PassiveModel passiveModel in attacker._passiveDetail.EgoPassiveList)
+		}
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
 			{
-				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
-				{
-					modpa.modsa_coinModel = coin;
-					modpa.modsa_passiveModel = passiveModel;
-					modpa.modsa_target_list.Clear();
-					modpa.modsa_target_list.Add(__instance);
-					modpa.Enact(attacker, action.Skill, action, null, actevent, timing);
-				}
+				modpa.modsa_coinModel = coin;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance, action.Skill, action, null, actevent, timing);
 			}
 		}
 	}
-	
 	// end
 }

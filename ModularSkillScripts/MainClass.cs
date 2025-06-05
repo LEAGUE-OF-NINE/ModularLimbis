@@ -70,7 +70,8 @@ public class MainClass : BasePlugin
 		timingStringList.Add("SpecialAction"); // 33
 		timingStringList.Add("AfterSlots"); // 34
 		timingStringList.Add("OnCoinToss"); // 35
-		
+		timingStringList.Add("StartBattleSkill"); // 36
+
 		Il2CppArrayBase<string> timingStringArray = timingStringList.ToArray();
 		int count = timingStringArray.Count;
 		for (int i = 0; i < count; i++) timingDict.Add(timingStringArray[i], i);
@@ -80,6 +81,7 @@ public class MainClass : BasePlugin
 		timingDict.Add("WH", timingDict["WhenHit"]);
 		timingDict.Add("BSA", timingDict["BeforeSA"]);
 		timingDict.Add("BWH", timingDict["BeforeWhenHit"]);
+		timingDict.Add("SBS", timingDict["StartBattleSkill"]);
 	}
 
 	public static System.Collections.Generic.List<BattleUnitModel> ShuffleUnits(System.Collections.Generic.List<BattleUnitModel> list)

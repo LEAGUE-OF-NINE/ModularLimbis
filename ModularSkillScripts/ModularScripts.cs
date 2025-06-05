@@ -1452,23 +1452,59 @@ public class ModularSA : MonoBehaviour
 				}
 			}
 				break;
+			case "stageextraslot":
+				{
+					int amount = GetNumFromParamString(circles[0]);
+					bool isAdder = circles.Length >= 2;
+					if (isAdder) StagePatches.extraSlot += amount;
+					else StagePatches.extraSlot = amount;
+				}
+				break;
 			case "passivereveal":{
 				List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
 				int pasID = GetNumFromParamString(circles[1]);
 				UnlockInformationManager unlockInfo_inst = Singleton<UnlockInformationManager>.Instance;
-				foreach (BattleUnitModel targetModel in modelList) {
-					unlockInfo_inst.UnlockPassiveStatus(targetModel.GetOriginUnitID(), pasID);
+
+				bool unlockAllPassives = circles[1].Equals("all", StringComparison.OrdinalIgnoreCase);
+				foreach (var targetModel in modelList)
+				{
+					if (unlockAllPassives)
+					{
+						var allPassives = targetModel.GetPassiveList();
+						foreach (var passive in allPassives)
+						{
+							unlockInfo_inst.UnlockPassiveStatus(targetModel.GetOriginUnitID(), pasID);
+						}
+					}
+					else
+					{
+						unlockInfo_inst.UnlockPassiveStatus(targetModel.GetOriginUnitID(), pasID);
+					}
 				}
-			}
+
+				}
 				break;
 			case "skillreveal":
 				{
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
 					int skillID = GetNumFromParamString(circles[1]);
 					UnlockInformationManager unlockInfo_inst = Singleton<UnlockInformationManager>.Instance;
-					foreach (BattleUnitModel targetModel in modelList)
+
+					bool unlockAllSkills = circles[1].Equals("all", StringComparison.OrdinalIgnoreCase);
+					foreach (var targetModel in modelList)
 					{
-						unlockInfo_inst.UnlockSkill(targetModel.GetOriginUnitID(), targetModel.UnitDataModel.GetSkillModel(skillID));
+						if (unlockAllSkills)
+						{
+							var allSkills = targetModel.GetSkillList();
+							foreach (var skill in allSkills)
+							{
+								unlockInfo_inst.UnlockSkill(targetModel.GetOriginUnitID(), skill);
+							}
+						}
+						else
+						{
+							unlockInfo_inst.UnlockSkill(targetModel.GetOriginUnitID(), targetModel.UnitDataModel.GetSkillModel(skillID));
+						}
 					}
 				}
 				break;
@@ -1576,9 +1612,9 @@ public class ModularSA : MonoBehaviour
 
 					BattleUIRoot battleUiRoot_inst = SingletonBehavior<BattleUIRoot>.Instance;
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-					if (circles.Length > 2)
+					if (circles[0].ToLower() == "upper")
 					{
-						battleUiRoot_inst._outterGradiantEffectController.SetDialog_Upper(line_played, 1.5f, GetNumFromParamString(circles[2]));
+						battleUiRoot_inst._outterGradiantEffectController.SetDialog_Upper(line_played, 1.5f, 2);
 					}
 					else
 					{
@@ -2173,6 +2209,13 @@ public class ModularSA : MonoBehaviour
 				if (action != null) finalResult = (int)action.Skill.GetSkillEgoType();
 			}
 				break;
+			case "skillrank":
+				{
+					BattleActionModel action = modsa_selfAction;
+					if (circles[0] == "Target") action = modsa_oppoAction;
+					if (action != null) finalResult = (int)action.Skill.GetSkillTier();
+				}
+				break;
 			case "skillslotcount":{
 				BattleUnitModel targetModel = GetTargetModel(circles[0]);
 				if (targetModel == null) break;
@@ -2254,7 +2297,7 @@ public class ModularSA : MonoBehaviour
 			case "breakvalue":
 				{
 					List<BreakSection> sectionlist = GetTargetModel(circles[0]).GetBreakSections();
-					finalResult = sectionlist[GetNumFromParamString(circles[1])]._hp;
+					finalResult = (int)sectionlist[GetNumFromParamString(circles[1])].HP;
 				}
 				break;
    
@@ -2262,6 +2305,9 @@ public class ModularSA : MonoBehaviour
 				{	
 					finalResult = modsa_coinModel.IsReRolled() ? 1 : 0;
 				}
+				break;
+			case "stageextraslot":
+				finalResult = StagePatches.extraSlot;
 				break;
 			default: MainClass.Logg.LogInfo("Invalid Getter: " + methodology); break;
 		}

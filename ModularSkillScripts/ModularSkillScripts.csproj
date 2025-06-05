@@ -37,9 +37,6 @@
     <Reference Include="0Harmony">
       <HintPath>D:\Zwei\game\BepInEx\core\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="ACTk.Runtime">
-      <HintPath>D:\Zwei\game\\interop\ACTk.Runtime.dll</HintPath>
-    </Reference>
     <Reference Include="AsmResolver">
       <HintPath>D:\Zwei\game\BepInEx\core\AsmResolver.dll</HintPath>
     </Reference>
@@ -81,10 +78,10 @@
     </Reference>
     <Reference Include="FMODUnity, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Limbus Company\BepInEx\interop\FMODUnity.dll</HintPath>
+      <HintPath>D:\Zwei\game\BepInEx\interop\FMODUnity.dll</HintPath>
     </Reference>
     <Reference Include="FMODUnityResonance">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Limbus Company\BepInEx\interop\FMODUnityResonance.dll</HintPath>
+      <HintPath>D:\Zwei\game\BepInEx\interop\FMODUnityResonance.dll</HintPath>
     </Reference>
     <Reference Include="Gee.External.Capstone">
       <HintPath>D:\Zwei\game\BepInEx\core\Gee.External.Capstone.dll</HintPath>
@@ -109,7 +106,7 @@
     </Reference>
     <Reference Include="Lethe, Version=0.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Limbus Company\BepInEx\plugins\Lethe.dll</HintPath>
+      <HintPath>D:\Zwei\game\BepInEx\plugins\Lethe.dll</HintPath>
     </Reference>
     <Reference Include="LibCpp2IL">
       <HintPath>D:\Zwei\game\BepInEx\core\LibCpp2IL.dll</HintPath>
