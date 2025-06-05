@@ -71,6 +71,8 @@ public class MainClass : BasePlugin
 		timingStringList.Add("AfterSlots"); // 34
 		timingStringList.Add("OnCoinToss"); // 35
 		timingStringList.Add("StartBattleSkill"); // 36
+		timingStringList.Add("OnBurst"); // 37
+		timingStringList.Add("OnOtherBurst"); // 38
 
 		Il2CppArrayBase<string> timingStringArray = timingStringList.ToArray();
 		int count = timingStringArray.Count;

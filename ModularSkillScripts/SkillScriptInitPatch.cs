@@ -639,15 +639,43 @@ public class SkillScriptInitPatch
 			}
 		}
 	}
-		
-		
+
+
 	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnVibrationExplosionOtherUnit))]
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnVibrationExplosionOtherUnit(BattleUnitModel explodedUnit, BattleUnitModel giverOrNull, BattleActionModel actionOrNull, ABILITY_SOURCE_TYPE abilitySrc, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
-		copypastesolution(explodedUnit, actionOrNull.Skill, null, null, "OnBurst", timing, __instance);
+		int actevent = MainClass.timingDict["OnOtherBurst"];
+		foreach (PassiveModel passiveModel in __instance.PassiveList)
+		{
+			if (!passiveModel.CheckActiveCondition()) continue;
+			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
+
+			foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
+			{
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_target_list.Clear();
+				modpa.modsa_target_list.Add(explodedUnit);
+				modpa.Enact(__instance._owner, null, null, null, actevent, timing);
+			}
+		}
+		foreach (PassiveModel passiveModel in __instance.EgoPassiveList)
+		{
+			if (!passiveModel.CheckActiveCondition()) continue;
+			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
+
+			foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
+			{
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_target_list.Clear();
+				modpa.modsa_target_list.Add(explodedUnit);
+				modpa.Enact(__instance._owner, null, null, null, actevent, timing);
+			}
+		}
 	}
-	
+
 	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnDiscardSin))]
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnDiscardSin(UnitSinModel sin, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
@@ -1264,7 +1292,7 @@ public class SkillScriptInitPatch
 
 	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnVibrationExplosion))]
 	[HarmonyPostfix]
-	private static void Postfix_BuffModel_OnOtherBurst(BattleUnitModel unit, BattleUnitModel giverOrNull, BattleActionModel actionOrNull, ABILITY_SOURCE_TYPE abilitySrc, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	private static void Postfix_BuffModel_OnVibrationExplosion(BattleUnitModel unit, BattleUnitModel giverOrNull, BattleActionModel actionOrNull, ABILITY_SOURCE_TYPE abilitySrc, BATTLE_EVENT_TIMING timing, BuffModel __instance)
 	{
 		int actevent = MainClass.timingDict["OnBurst"];
 		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance))
