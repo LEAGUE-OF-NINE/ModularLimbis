@@ -111,9 +111,6 @@
     <Reference Include="LibCpp2IL">
       <HintPath>D:\Zwei\game\BepInEx\core\LibCpp2IL.dll</HintPath>
     </Reference>
-    <Reference Include="Merged">
-      <HintPath>D:\Zwei\game\BepInEx\plugins\Lethe.dll</HintPath>
-    </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>D:\Zwei\game\BepInEx\core\Mono.Cecil.dll</HintPath>
     </Reference>

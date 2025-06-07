@@ -956,10 +956,12 @@ public class SkillScriptInitPatch
 		BattleUnitModel unit = action.Model;
 		int actevent = MainClass.timingDict["StartBattle"];
 		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
-		foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
+		if (modsaDict.ContainsKey(skillmodel_intlong))
 		{
-			modsa.Enact(unit, __instance, action, null, actevent, timing);
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
+			{
+				modsa.Enact(unit, __instance, action, null, actevent, timing);
+			}
 		}
 
 		actevent = MainClass.timingDict["SBS"];
@@ -1318,13 +1320,13 @@ public class SkillScriptInitPatch
 
 	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnBeforeParryingOnce_AfterLog))]
 	[HarmonyPostfix]
-	private static void Postfix_BuffModel_OnBeforeParryingOnce_AfterLog(BattleUnitModel unit, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	private static void Postfix_BuffModel_OnBeforeParryingOnce_AfterLog(BattleActionModel ownerAction, BattleActionModel opponentAction, BuffModel __instance)
 	{
 		int actevent = MainClass.timingDict["DuelClash"];
 		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance))
 		{
 			modba.modsa_buffModel = __instance;
-			modba.Enact(unit, null, null, null, actevent, timing);
+			modba.Enact(ownerAction.Model, null, ownerAction, opponentAction, actevent, BATTLE_EVENT_TIMING.ON_START_DUEL);
 		}
 	}
 

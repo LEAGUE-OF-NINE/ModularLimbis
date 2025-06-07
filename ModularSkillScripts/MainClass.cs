@@ -20,18 +20,6 @@ public class MainClass : BasePlugin
 {
 	public override void Load()
 	{
-		Harmony harmony = new Harmony(NAME);
-		Logg = new ManualLogSource(NAME);
-		BepInEx.Logging.Logger.Sources.Add(Logg);
-		ClassInjector.RegisterTypeInIl2Cpp<DataMod>();
-		ClassInjector.RegisterTypeInIl2Cpp<ModUnitData>();
-		ClassInjector.RegisterTypeInIl2Cpp<ModularSA>();
-		//ClassInjector.RegisterTypeInIl2Cpp<ModularSA.BattleUnitComparer>();
-		harmony.PatchAll(typeof(SkillScriptInitPatch));
-		harmony.PatchAll(typeof(StagePatches));
-		harmony.PatchAll(typeof(UniquePatches));
-		if (fakepowerEnabled) harmony.PatchAll(typeof(FakePowerPatches));
-		
 		//modsaEval = new ModsaEvaluator();
 		List<string> timingStringList = new();
 		timingStringList.Add("StartBattle"); // 0
@@ -72,7 +60,6 @@ public class MainClass : BasePlugin
 		timingStringList.Add("OnCoinToss"); // 35
 		timingStringList.Add("StartBattleSkill"); // 36
 		timingStringList.Add("OnBurst"); // 37
-		timingStringList.Add("OnOtherBurst"); // 38
 
 		Il2CppArrayBase<string> timingStringArray = timingStringList.ToArray();
 		int count = timingStringArray.Count;
@@ -84,6 +71,18 @@ public class MainClass : BasePlugin
 		timingDict.Add("BSA", timingDict["BeforeSA"]);
 		timingDict.Add("BWH", timingDict["BeforeWhenHit"]);
 		timingDict.Add("SBS", timingDict["StartBattleSkill"]);
+
+		Harmony harmony = new Harmony(NAME);
+		Logg = new ManualLogSource(NAME);
+		BepInEx.Logging.Logger.Sources.Add(Logg);
+		ClassInjector.RegisterTypeInIl2Cpp<DataMod>();
+		ClassInjector.RegisterTypeInIl2Cpp<ModUnitData>();
+		ClassInjector.RegisterTypeInIl2Cpp<ModularSA>();
+		//ClassInjector.RegisterTypeInIl2Cpp<ModularSA.BattleUnitComparer>();
+		harmony.PatchAll(typeof(SkillScriptInitPatch));
+		harmony.PatchAll(typeof(StagePatches));
+		harmony.PatchAll(typeof(UniquePatches));
+		if (fakepowerEnabled) harmony.PatchAll(typeof(FakePowerPatches));
 	}
 
 	public static System.Collections.Generic.List<BattleUnitModel> ShuffleUnits(System.Collections.Generic.List<BattleUnitModel> list)
@@ -115,7 +114,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false;
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "2.8.5";
+	public const string VERSION = "2.8.7";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
