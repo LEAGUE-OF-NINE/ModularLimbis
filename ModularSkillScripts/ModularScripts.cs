@@ -182,7 +182,7 @@ public class ModularSA : MonoBehaviour
 		if (MainClass.logEnabled) MainClass.Logg.LogInfo("activation good");
 
 		if (activationTiming == 1) markedForDeath = true;
-		if (activationTiming == 7)
+		if (activationTiming == MainClass.timingDict["OSA"] || activationTiming == MainClass.timingDict["BSA"])
 		{
 			if (modsa_coinModel == null)
 			{
@@ -190,18 +190,20 @@ public class ModularSA : MonoBehaviour
 				return;
 			}
 
+			//MainClass.Logg.LogWarning($"IsHead = {modsa_coinModel.IsHead()}");
 			if (modsa_coinModel.IsHead() && _onlyTails) return;
 			else if (modsa_coinModel.IsTail() && _onlyHeads) return;
 
+			//MainClass.Logg.LogWarning($"wasCrit = {wasCrit}");
 			if (wasCrit && _onlyNonCrit) return;
 			else if (!wasCrit && _onlyCrit) return;
 
-			if (_onlyClashWin || _onlyClashLose)
-			{
-				if (!wasClash) return;
-				else if (wasWin && _onlyClashLose) return;
-				else if (!wasWin && _onlyClashWin) return;
-			}
+			//if (_onlyClashWin || _onlyClashLose)
+			//{
+			//	if (!wasClash) return;
+			//	else if (wasWin && _onlyClashLose) return;
+			//	else if (!wasWin && _onlyClashWin) return;
+			//}
 		}
 
 

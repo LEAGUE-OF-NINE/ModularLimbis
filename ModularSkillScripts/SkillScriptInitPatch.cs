@@ -804,10 +804,25 @@ public class SkillScriptInitPatch
 	}
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetSkillPowerResultAdder))]
 	[HarmonyPostfix]
-	private static void Postfix_SkillModel_GetSkillPowerResultAdder(BattleActionModel action, ref int __result, SkillModel __instance)
+	private static void Postfix_SkillModel_GetSkillPowerResultAdder(BattleActionModel action, BATTLE_EVENT_TIMING timing, CoinModel coinOrNull, ref int __result, SkillModel __instance)
 	{
 		int actevent_FakePower = MainClass.timingDict["FakePower"];
+
+		if (coinOrNull != null) 
+		{
+			long coinmodel_intlong = coinOrNull.Pointer.ToInt64();
+			foreach (ModularSA modca in modca_list)
+			{
+				if (modca.activationTiming == actevent_FakePower) continue;
+				if (coinmodel_intlong != modca.ptr_intlong) continue;
+				int power = modca.skillPowerResultAdder;
+				if (power != 0) MainClass.Logg.LogInfo("Found modca - final power adder: " + power);
+				if (power != 0) __result += power;
+			}
+		}
+
 		long skillmodel_intlong = __instance.Pointer.ToInt64();
+
 		if (modsaDict.ContainsKey(skillmodel_intlong)) {
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				if (modsa.activationTiming == actevent_FakePower) continue;
