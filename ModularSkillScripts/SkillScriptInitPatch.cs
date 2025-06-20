@@ -1798,13 +1798,13 @@ public class SkillScriptInitPatch
 	}
 	// end
 
-	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.StartCoinToss))]
+	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.OpenSkillInfoUI))] // needs to be a string for some reason wtf
 	[HarmonyPrefix]
-	private static void StartCoinToss(BattleUnitView __instance, int skillId)
+	private static void OpenSkillInfoUI(BattleUnitView __instance, int skillID)
 	{
-		var skillData = Singleton<StaticDataManager>.Instance._skillList.GetData(skillId);
+		var skillData = Singleton<StaticDataManager>.Instance._skillList.GetData(skillID);
 		var model = __instance._unitModel.UnitDataModel;
-		MainClass.Logg.LogInfo($"Coin toss, skill = {skillId}, model level = {model.Level}, model sync level = {model.SyncLevel}");
+		MainClass.Logg.LogInfo($"Coin toss, skill = {skillID}, model level = {model.Level}, model sync level = {model.SyncLevel}");
 		
 		var skillModel = new SkillModel(skillData, model.Level, model.SyncLevel);
 		skillModel.Init(); // needed to get noticed by modular skill timing?
