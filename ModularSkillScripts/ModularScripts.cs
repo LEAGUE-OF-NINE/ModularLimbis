@@ -1614,6 +1614,7 @@ public class ModularSA : MonoBehaviour
 			case "battledialogline": {
 					string line_played = circledSection.Remove(0, circles[0].Length + 1);
 					line_played = Regex.Replace(line_played, @"_", " ");
+					line_played = line_played.Replace("^n", "\n");
 
 					BattleUIRoot battleUiRoot_inst = SingletonBehavior<BattleUIRoot>.Instance;
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
