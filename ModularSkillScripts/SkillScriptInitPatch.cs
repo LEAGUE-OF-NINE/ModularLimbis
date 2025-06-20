@@ -1798,7 +1798,7 @@ public class SkillScriptInitPatch
 	}
 	// end
 
-	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.OpenSkillInfoUI))] // needs to be a string for some reason wtf
+	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.OpenSkillInfoUI))]
 	[HarmonyPrefix]
 	private static void OpenSkillInfoUI(BattleUnitView __instance, int skillID)
 	{
@@ -1812,6 +1812,24 @@ public class SkillScriptInitPatch
 		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 			modsa.Enact(__instance._unitModel, skillModel, null, null, MainClass.timingDict["StartVisualCoinToss"], BATTLE_EVENT_TIMING.ALL_TIMING);
+		}
+	}
+
+	[HarmonyPatch(typeof(BattleUnitView),  nameof(BattleUnitView.StartBehaviourAction))]
+	[HarmonyPrefix]
+	private static void StartBehaviourAction(BattleUnitView __instance)
+	{
+		var skillID = __instance.GetCurrentSkillViewer().curSkillID;
+		var skillData = Singleton<StaticDataManager>.Instance._skillList.GetData(skillID);
+		var model = __instance._unitModel.UnitDataModel;
+		MainClass.Logg.LogInfo($"SBA, skill = {skillID}, model level = {model.Level}, model sync level = {model.SyncLevel}");
+		
+		var skillModel = new SkillModel(skillData, model.Level, model.SyncLevel);
+		skillModel.Init(); // needed to get noticed by modular skill timing?
+		long skillmodel_intlong = skillModel.Pointer.ToInt64();
+		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+			modsa.Enact(__instance._unitModel, skillModel, null, null, MainClass.timingDict["StartVisualSkillUse"], BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 	}
 
