@@ -404,3 +404,4 @@ FodyWeavers.xsd
 ModularSkillScripts/.vs/
 ModularSkillScripts/bin/
 ModularSkillScripts/obj
+Directory.Build.props

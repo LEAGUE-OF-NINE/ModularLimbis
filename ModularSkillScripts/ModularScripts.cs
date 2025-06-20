@@ -11,6 +11,9 @@ using BattleUI.Dialog;
 using FMOD;
 using FMODUnity;
 using BattleUI;
+using Il2CppSystem.Text.RegularExpressions;
+using TimeSpan = Il2CppSystem.TimeSpan;
+
 //using CodeStage.AntiCheat.ObscuredTypes;
 //using Il2CppSystem.Collections;
 
@@ -291,7 +294,7 @@ public class ModularSA : MonoBehaviour
 		bool success_first = false;
 		for (int i = idx; i < circles.Length; i++) {
 			string circle_string = circles[i];
-			MatchCollection symbols = Regex.Matches(circle_string, "(<|>|=)", RegexOptions.IgnoreCase);
+			MatchCollection symbols = Regex.Matches(circle_string, "(<|>|=)", RegexOptions.IgnoreCase, TimeSpan.FromMinutes(1));
 			string[] parameters = circle_string.Split(ifSeparator);
 			string firstParam = parameters[0];
 			string secondParam = parameters[1];

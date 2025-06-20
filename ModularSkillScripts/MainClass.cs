@@ -3,9 +3,9 @@ using BepInEx.Unity.IL2CPP;
 using BepInEx.Logging;
 using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
-using System.Text.RegularExpressions;
 using Il2CppInterop.Runtime.Injection;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using Il2CppSystem.Text.RegularExpressions;
 using Random = System.Random;
 
 //using Antlr4.Runtime;
