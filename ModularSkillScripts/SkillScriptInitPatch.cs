@@ -1800,12 +1800,19 @@ public class SkillScriptInitPatch
 
 	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.StartCoinToss))]
 	[HarmonyPrefix]
-
 	private static void StartCoinToss(BattleUnitView __instance, int skillId)
 	{
-		PassiveDetail passive = __instance._unitModel?._passiveDetail;
-		SkillModel skill = __instance.GetCurrentSkillViewer().CurrentSkillModel;
-		copypastesolution(__instance._unitModel, skill, null, null, "StartVisualCoinToss", BATTLE_EVENT_TIMING.ALL_TIMING, passive);
+		var skillData = Singleton<StaticDataManager>.Instance._skillList.GetData(skillId);
+		var model = __instance._unitModel.UnitDataModel;
+		MainClass.Logg.LogInfo($"Coin toss, skill = {skillId}, model level = {model.Level}, model sync level = {model.SyncLevel}");
+		
+		var skillModel = new SkillModel(skillData, model.Level, model.SyncLevel);
+		skillModel.Init(); // needed to get noticed by modular skill timing?
+		long skillmodel_intlong = skillModel.Pointer.ToInt64();
+		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+			modsa.Enact(__instance._unitModel, skillModel, null, null, MainClass.timingDict["StartVisualCoinToss"], BATTLE_EVENT_TIMING.ALL_TIMING);
+		}
 	}
 
 }
