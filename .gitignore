@@ -399,3 +399,8 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 .idea/
+
+# Modular
+ModularSkillScripts/.vs/
+ModularSkillScripts/bin/
+ModularSkillScripts/obj
