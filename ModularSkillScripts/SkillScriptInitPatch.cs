@@ -1803,8 +1803,9 @@ public class SkillScriptInitPatch
 
 	private static void StartCoinToss(BattleUnitView __instance, int skillId)
 	{
-		PassiveDetail __detail = __instance._unitModel?._passiveDetail;
-		copypastesolution(__instance._unitModel, null, null, null, "StartVisualCoinToss", BATTLE_EVENT_TIMING.ALL_TIMING, __detail);
+		PassiveDetail passive = __instance._unitModel?._passiveDetail;
+		SkillModel skill = __instance.GetCurrentSkillViewer().CurrentSkillModel;
+		copypastesolution(__instance._unitModel, skill, null, null, "StartVisualCoinToss", BATTLE_EVENT_TIMING.ALL_TIMING, passive);
 	}
 
 }
