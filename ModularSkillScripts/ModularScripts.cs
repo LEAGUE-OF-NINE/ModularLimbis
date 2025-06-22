@@ -1671,22 +1671,35 @@ public class ModularSA : MonoBehaviour
 					break;
 				}
 			case "sound":
+			{
+				string guid = circles[1];
+				switch (circles[0])
 				{
-					string guid = circles[1];
-					GUID parsed_guid = GUID.Parse(guid);
-					if (circles[0] == "bgm")
+					case "bgm":
 					{
+						GUID parsed_guid = GUID.Parse(guid);
 						BattleSoundGenerator.StopBGM();
 						SoundGenerator._currentBGM = RuntimeManager.CreateInstance(parsed_guid);
 						SingletonBehavior<SoundManager>.Instance.ChangeBGM(SoundGenerator._currentBGM, true);
 						MainClass.Logg.LogWarning($"activating sound bgm consequence with parsed guid: {parsed_guid}, second_param={circles[1]}");
+						break;
 					}
-					else if (circles[0] == "sfx")
+					case "sfx":
 					{
+						GUID parsed_guid = GUID.Parse(guid);
 						SoundGenerator._soundManager.PlayOnShot(parsed_guid);
 						MainClass.Logg.LogWarning($"activating sfx consequence with parsed guid: {parsed_guid}");
+						break;
+					}
+					case "voice":
+					{
+						var unitID = modsa_unitModel._unitDataModel.ClassInfo.id;
+						MainClass.Logg.LogWarning($"playing sound \"{circles[1]}\" for {unitID}");
+						VoiceGenerator.PlayMultiVoice(unitID, circles[1]);
+						break;
 					}
 				}
+			}
 				break;
 			case "addability":
 				{
