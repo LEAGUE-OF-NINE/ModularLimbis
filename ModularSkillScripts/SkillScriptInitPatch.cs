@@ -1800,11 +1800,11 @@ public class SkillScriptInitPatch
 
 	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.OpenSkillInfoUI))]
 	[HarmonyPrefix]
-	private static void OpenSkillInfoUI(BattleUnitView __instance, int skillID)
+	private static void OpenSkillInfoUI(BattleUnitView __instance, int skillID, int coinLogIndex, int originCoinIdx)
 	{
 		var skillData = Singleton<StaticDataManager>.Instance._skillList.GetData(skillID);
 		var model = __instance._unitModel.UnitDataModel;
-		MainClass.Logg.LogInfo($"Coin toss, skill = {skillID}, model level = {model.Level}, model sync level = {model.SyncLevel}");
+		MainClass.Logg.LogInfo($"Coin toss, skill = {skillID}, model level = {model.Level}, model sync level = {model.SyncLevel}, coin idx = {originCoinIdx}");
 		
 		var skillModel = new SkillModel(skillData, model.Level, model.SyncLevel);
 		skillModel.Init(); // needed to get noticed by modular skill timing?
@@ -1812,6 +1812,16 @@ public class SkillScriptInitPatch
 		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 			modsa.Enact(__instance._unitModel, skillModel, null, null, MainClass.timingDict["StartVisualCoinToss"], BATTLE_EVENT_TIMING.ALL_TIMING);
+		}
+				
+		if (originCoinIdx >= skillModel.CoinList.Count) return;
+		var coin = skillModel.CoinList[originCoinIdx];
+		long coinmodel_intlong = coin.Pointer.ToInt64();
+		foreach (ModularSA modca in modca_list)
+		{
+			if (coinmodel_intlong != modca.ptr_intlong) continue;
+			modca.modsa_coinModel = coin;
+			modca.Enact(__instance._unitModel, skillModel, null, null, MainClass.timingDict["StartVisualCoinToss"], BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 	}
 
