@@ -1703,6 +1703,11 @@ public class ModularSA : MonoBehaviour
 						VoiceGenerator.PlayMultiVoice(unitID, circles[1]);
 						break;
 					}
+					case "announcer": // example: "Modular/TIMING:StartVisualCoinToss/sound(announcer,20,announcer_round_takebigdmg_20_1)"
+					{
+						VoiceGenerator.PlayAnnouncerBasicVoice(GetNumFromParamString(circles[1]), circles[2]);
+						break;
+					}
 				}
 			}
 				break;
