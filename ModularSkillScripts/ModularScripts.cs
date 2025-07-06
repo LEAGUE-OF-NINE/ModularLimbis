@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Il2CppInterop.Runtime.Injection;
@@ -14,6 +15,7 @@ using FMODUnity;
 using BattleUI;
 using BepInEx.Unity.IL2CPP.Utils;
 using Il2CppSystem.Text.RegularExpressions;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 using TimeSpan = Il2CppSystem.TimeSpan;
 
@@ -1615,44 +1617,56 @@ public class ModularSA : MonoBehaviour
 				BattleMapManager.Instance.ChangeMap(mapname, mapsize);
 			}
 				break;
+			case "lyrics":
+			{
+				string line_played = circledSection.Remove(0, circles[0].Length + 1);
+				line_played = Regex.Replace(line_played, @"_", " ");
+				line_played = line_played.Replace("^n", "\n");
+				BattleUIRoot battleUiRoot_inst = SingletonBehavior<BattleUIRoot>.Instance;
+				
+				battleUiRoot_inst._outterGradiantEffectController.SetDialog_Upper(line_played, 1.5f, 2);
+				var num = Util.RandomRangeInclusive(0, 2);
+				const string lyricsObjectName = "ModularUpperDialog";
+				var pool = SingletonBehavior<BattleEffectManager>.Instance.EffectPool;
+				MainClass.Logg.LogInfo($"Checking for {lyricsObjectName}");
+				if (!pool.GetComponentsInChildren<Transform>().Any(child => child.name.Contains(lyricsObjectName)))
+				{
+					MainClass.Logg.LogInfo($"Could not find {lyricsObjectName}! Making one");
+					var lyricsObject = Resources.Load<GameObject>("Prefab/Battle/Effect/Tmp/BattleLyricsController");
+					lyricsObject.name = lyricsObjectName;
+					pool.AddObject(lyricsObject);
+				}
+				MainClass.Logg.LogInfo($"Spawning lyrics");
+				var obj = SingletonBehavior<BattleEffectManager>.Instance.EffectPool.Get(lyricsObjectName);
+				obj.GetComponent<BattleLyricsContoller>().StartCoroutine(LyricsCoroutine(obj, line_played, num));
+				MainClass.Logg.LogInfo($"Lyrics: {line_played}");
+			}
+				break;
+			case "uppertext":
+			{
+				string line_played = circledSection.Remove(0, circles[0].Length + 1);
+				line_played = Regex.Replace(line_played, @"_", " ");
+				line_played = line_played.Replace("^n", "\n");
+				BattleUIRoot battleUiRoot_inst = SingletonBehavior<BattleUIRoot>.Instance;
+
+				int.TryParse(circles[0], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var color);
+				byte r = (byte)((color >> 16) & 0xFF);
+				byte g = (byte)((color >> 8) & 0xFF);
+				byte b = (byte)((color) & 0xFF);
+				var controller = battleUiRoot_inst._outterGradiantEffectController;
+				controller.StartCoroutine(UpperTextCoroutine(controller, new Color32(r,g,b,255), line_played));
+			}
+				break;
 			case "battledialogline": {
 					string line_played = circledSection.Remove(0, circles[0].Length + 1);
 					line_played = Regex.Replace(line_played, @"_", " ");
 					line_played = line_played.Replace("^n", "\n");
-
-					BattleUIRoot battleUiRoot_inst = SingletonBehavior<BattleUIRoot>.Instance;
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
-
-					if (circles[0].ToLower() == "upper")
+					foreach (BattleUnitModel targetModel in modelList)
 					{
-					} 
-					else if (circles[0].ToLower() == "lyrics")
-					{
-						battleUiRoot_inst._outterGradiantEffectController.SetDialog_Upper(line_played, 1.5f, 2);
-						var num = Util.RandomRangeInclusive(0, 2);
-						const string lyricsObjectName = "ModularUpperDialog";
-						var pool = SingletonBehavior<BattleEffectManager>.Instance.EffectPool;
-						MainClass.Logg.LogInfo($"Checking for {lyricsObjectName}");
-						if (!pool.GetComponentsInChildren<Transform>().Any(child => child.name.Contains(lyricsObjectName)))
-						{
-							MainClass.Logg.LogInfo($"Could not find {lyricsObjectName}! Making one");
-							var lyricsObject = Resources.Load<GameObject>("Prefab/Battle/Effect/Tmp/BattleLyricsController");
-							lyricsObject.name = lyricsObjectName;
-							pool.AddObject(lyricsObject);
-						}
-						MainClass.Logg.LogInfo($"Spawning lyrics");
-						var obj = SingletonBehavior<BattleEffectManager>.Instance.EffectPool.Get(lyricsObjectName);
-						obj.GetComponent<BattleLyricsContoller>().StartCoroutine(LyricsCoroutine(obj, line_played, num));
-						MainClass.Logg.LogInfo($"Lyrics: {line_played}");
-					}
-					else
-					{
-						foreach (BattleUnitModel targetModel in modelList)
-						{
-							BattleUnitView view = BattleObjectManager.Instance.GetView(targetModel);
-							BattleDialogLine dialogline = new BattleDialogLine(line_played, "");
-							view._uiManager.ShowDialog(dialogline);
-						}
+						BattleUnitView view = BattleObjectManager.Instance.GetView(targetModel);
+						BattleDialogLine dialogline = new BattleDialogLine(line_played, "");
+						view._uiManager.ShowDialog(dialogline);
 					}
 			}
 				break;
@@ -1810,11 +1824,25 @@ public class ModularSA : MonoBehaviour
 		}
 	}
 
+	private IEnumerator UpperTextCoroutine(OutterGradiantEffectController controller, Color32 color32, string linePlayed)
+	{
+		MainClass.Logg.LogInfo($"Upper text color: {color32}");
+		const float waitTime = 2;
+		var text = controller._dialogText_Upper;
+		text.m_faceColor = color32;
+		controller._text_faceColor_Upper = color32;
+		controller._text_faceHDRFactor_Upper = 0.7f;
+		controller.SetDialog_Upper(linePlayed, 1.5f, waitTime);
+		var shadow = controller._dialogText_Upper.GetComponentInParent<Image>();
+		if (shadow.enabled) yield break;
+		shadow.enabled = true;
+		yield return new WaitForSeconds(waitTime);
+		shadow.enabled = false;
+	}
+
 	private IEnumerator LyricsCoroutine(GameObject obj, string linePlayed, int num)
 	{
 		var position = SingletonBehavior<BattleCamManager>.Instance.MainCam.transform.position;
-		var screenGround = BattleSoundGenerator.GetScreenGround(num, position);
-		var worldPoint = SingletonBehavior<BattleCamManager>.Instance.MainCam.ScreenToWorldPoint(Util.RandomRangeVector(screenGround.Item1, screenGround.Item2));
 		obj.SetActive(true);
 		obj.transform.localScale = Vector3.one * Eases.Linear(0.65f, 1f, position.z / 150f);
 		var controller = obj.GetComponent<BattleLyricsContoller>();
