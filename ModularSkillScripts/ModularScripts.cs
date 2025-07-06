@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Il2CppInterop.Runtime.Injection;
@@ -11,11 +12,14 @@ using BattleUI.Dialog;
 using FMOD;
 using FMODUnity;
 using BattleUI;
+using BepInEx.Unity.IL2CPP.Utils;
 using Il2CppSystem.Text.RegularExpressions;
+using Random = UnityEngine.Random;
 using TimeSpan = Il2CppSystem.TimeSpan;
 
 //using CodeStage.AntiCheat.ObscuredTypes;
 //using Il2CppSystem.Collections;
+
 
 namespace ModularSkillScripts;
 
@@ -1618,9 +1622,28 @@ public class ModularSA : MonoBehaviour
 
 					BattleUIRoot battleUiRoot_inst = SingletonBehavior<BattleUIRoot>.Instance;
 					List<BattleUnitModel> modelList = GetTargetModelList(circles[0]);
+
 					if (circles[0].ToLower() == "upper")
 					{
+					} 
+					else if (circles[0].ToLower() == "lyrics")
+					{
 						battleUiRoot_inst._outterGradiantEffectController.SetDialog_Upper(line_played, 1.5f, 2);
+						var num = Util.RandomRangeInclusive(0, 2);
+						const string lyricsObjectName = "ModularUpperDialog";
+						var pool = SingletonBehavior<BattleEffectManager>.Instance.EffectPool;
+						MainClass.Logg.LogInfo($"Checking for {lyricsObjectName}");
+						if (!pool.GetComponentsInChildren<Transform>().Any(child => child.name.Contains(lyricsObjectName)))
+						{
+							MainClass.Logg.LogInfo($"Could not find {lyricsObjectName}! Making one");
+							var lyricsObject = Resources.Load<GameObject>("Prefab/Battle/Effect/Tmp/BattleLyricsController");
+							lyricsObject.name = lyricsObjectName;
+							pool.AddObject(lyricsObject);
+						}
+						MainClass.Logg.LogInfo($"Spawning lyrics");
+						var obj = SingletonBehavior<BattleEffectManager>.Instance.EffectPool.Get(lyricsObjectName);
+						obj.GetComponent<BattleLyricsContoller>().StartCoroutine(LyricsCoroutine(obj, line_played, num));
+						MainClass.Logg.LogInfo($"Lyrics: {line_played}");
 					}
 					else
 					{
@@ -1787,6 +1810,21 @@ public class ModularSA : MonoBehaviour
 		}
 	}
 
+	private IEnumerator LyricsCoroutine(GameObject obj, string linePlayed, int num)
+	{
+		var position = SingletonBehavior<BattleCamManager>.Instance.MainCam.transform.position;
+		var screenGround = BattleSoundGenerator.GetScreenGround(num, position);
+		var worldPoint = SingletonBehavior<BattleCamManager>.Instance.MainCam.ScreenToWorldPoint(Util.RandomRangeVector(screenGround.Item1, screenGround.Item2));
+		obj.SetActive(true);
+		obj.transform.localScale = Vector3.one * Eases.Linear(0.65f, 1f, position.z / 150f);
+		var controller = obj.GetComponent<BattleLyricsContoller>();
+		var x = Random.RandomRange(-10f, 5f);
+		var y = Random.RandomRange(-5f, 5f);
+		controller.transform.localPosition = new Vector3(x, y, 0);
+		controller.Init(linePlayed, 120f, num, false, 0);
+		yield return new WaitForSeconds(linePlayed.Length / 6.0f);
+		obj.SetActiveRecursively(false);
+	}
 
 	private int DoMath(string s) {
 		MatchCollection symbols = MainClass.mathsymbolRegex.Matches(s);
