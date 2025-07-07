@@ -50,6 +50,7 @@
 		</Reference>
 	</ItemGroup>
   <ItemGroup>
+    <Compile Include="Consequence\*.cs" />
     <Compile Include="FakePowerPatches.cs" />
     <Compile Include="MainClass.cs" />
     <Compile Include="ModularScripts.cs" />
