@@ -50,7 +50,10 @@
 		</Reference>
 	</ItemGroup>
   <ItemGroup>
+    <Compile Include="Consequence\*.cs" />
+    <Compile Include="Acquirer\*.cs" />
     <Compile Include="FakePowerPatches.cs" />
+    <Compile Include="LogoPlayerPatches.cs" />
     <Compile Include="MainClass.cs" />
     <Compile Include="ModularScripts.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
