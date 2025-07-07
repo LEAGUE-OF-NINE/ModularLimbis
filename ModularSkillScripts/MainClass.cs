@@ -86,11 +86,10 @@ public class MainClass : BasePlugin
 		harmony.PatchAll(typeof(SkillScriptInitPatch));
 		harmony.PatchAll(typeof(StagePatches));
 		harmony.PatchAll(typeof(UniquePatches));
+		harmony.PatchAll(typeof(LogoPlayerPatches));
 		if (fakepowerEnabled) harmony.PatchAll(typeof(FakePowerPatches));
 		RegisterConsequences();
 		RegisterAcquirers();
-		Logg.LogInfo($"{consequenceDict.Count} consequences registered: {string.Join(", ", consequenceDict.Keys)}");
-		Logg.LogInfo($"{acquirerDict.Count} acquirers registered: {string.Join(", ", acquirerDict.Keys)}");
 	}
 
 	private static void RegisterConsequences()
