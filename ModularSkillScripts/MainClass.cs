@@ -173,8 +173,8 @@ public class MainClass : BasePlugin
 	}
 
 	//public static ModsaEvaluator modsaEval = null;
-	public static readonly Dictionary<string, int> timingDict = new();
-	public static readonly Dictionary<string, IModularConsequence> consequenceDict = new();
+	public static readonly System.Collections.Generic.Dictionary<string, int> timingDict = new();
+	public static readonly System.Collections.Generic.Dictionary<string, IModularConsequence> consequenceDict = new();
 
 	public static bool fakepowerEnabled = true;
 
