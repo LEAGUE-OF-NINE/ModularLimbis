@@ -6,7 +6,7 @@ public class AcquirerGetPattern : IModularAcquirer
 	{
 		BattleUnitModel targetModel = modular.GetTargetModel(circledSection);
 		if (targetModel is not { IsAbnormalityOrPart: true }) return -1;
-		PatternScript_Abnormality pattern = Util.AsAbnormalityModel(targetModel)?.PatternScript;
+		PatternScript_Abnormality pattern = ModularSA.AsAbnormalityModel(targetModel)?.PatternScript;
 		if (pattern == null) return -1;
 		int pattern_idx = pattern.currPatternIdx;
 		MainClass.Logg.LogInfo("getpattern pattern_idx: " + pattern_idx);

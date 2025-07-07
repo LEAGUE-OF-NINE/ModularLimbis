@@ -774,6 +774,12 @@ public class ModularSA : MonoBehaviour
 		MainClass.Logg.LogInfo("Invalid Getter: " + methodology);
 		return -1;
 	}
+	
+	public static BattleUnitModel_Abnormality AsAbnormalityModel(BattleUnitModel targetModel)
+	{
+		var abnoPart = targetModel.TryCast<BattleUnitModel_Abnormality_Part>();
+		return abnoPart != null ? abnoPart.Abnormality : targetModel.TryCast<BattleUnitModel_Abnormality>();
+	}
 		
 }
 

@@ -7,7 +7,7 @@ public class AcquirerGetAbnoSlotMax : IModularAcquirer
 		BattleUnitModel targetModel = modular.GetTargetModel(circledSection);
 		if (targetModel == null) return 0;
 
-		BattleUnitModel_Abnormality abnoModel = Util.AsAbnormalityModel(targetModel);
+		BattleUnitModel_Abnormality abnoModel = ModularSA.AsAbnormalityModel(targetModel);
 		return abnoModel == null ? 0 : abnoModel.PatternScript.SlotMax;
 	}
 }
