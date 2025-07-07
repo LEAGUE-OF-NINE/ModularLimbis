@@ -167,7 +167,7 @@ public class ModularSA : MonoBehaviour
 	public bool immortality = false;
 
 	private bool _fullStop = false;
-	BATTLE_EVENT_TIMING battleTiming = BATTLE_EVENT_TIMING.NONE;
+	public BATTLE_EVENT_TIMING battleTiming = BATTLE_EVENT_TIMING.NONE;
 
 	public void Enact(BattleUnitModel unitModel, SkillModel skillModel_inst, BattleActionModel selfAction, BattleActionModel oppoAction, int actevent, BATTLE_EVENT_TIMING timing)
 	{
@@ -329,8 +329,8 @@ public class ModularSA : MonoBehaviour
 		return success;
 	}
 
-	
-	private int GetNumFromParamString(string param)
+
+	public int GetNumFromParamString(string param)
 	{
 		int value = 0;
 		bool negative = param[0] == '-';
@@ -2405,4 +2405,19 @@ public class ModularSA : MonoBehaviour
 		return finalResult;
 	}
 		
+}
+
+/// <summary>
+/// Interface for defining modular consequences in the system.
+/// </summary>
+public interface IModularConsequence
+{
+    /// <summary>
+    /// Executes a consequence based on the provided parameters.
+    /// </summary>
+    /// <param name="modular">The modular instance, where all the controlling values and helper functions can be found</param>
+    /// <param name="section">The raw string of the consequence declaration, e.g. "consequence(Self, argument, 3, 4)"</param>
+    /// <param name="circledSection">The section inside parenthesis, e.g. "Self, argument, 3, 4"</param>
+    /// <param name="circles">Arguments specified in the circled section, e.g. ["Self", "argument", "3", "4"]</param>
+    void ExecuteConsequence(ModularSA modular, string section, string circledSection, string[] circles);
 }
