@@ -6,6 +6,7 @@ using Il2CppSystem.Collections.Generic;
 using Il2CppInterop.Runtime.Injection;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem.Text.RegularExpressions;
+using ModularSkillScripts.Consequence;
 using Random = System.Random;
 
 //using Antlr4.Runtime;
@@ -66,7 +67,7 @@ public class MainClass : BasePlugin
 		Il2CppArrayBase<string> timingStringArray = timingStringList.ToArray();
 		int count = timingStringArray.Count;
 		for (int i = 0; i < count; i++) timingDict.Add(timingStringArray[i], i);
-		
+
 		timingDict.Add("RoundStart", -1);
 		timingDict.Add("OSA", timingDict["OnSucceedAttack"]);
 		timingDict.Add("WH", timingDict["WhenHit"]);
@@ -85,9 +86,78 @@ public class MainClass : BasePlugin
 		harmony.PatchAll(typeof(StagePatches));
 		harmony.PatchAll(typeof(UniquePatches));
 		if (fakepowerEnabled) harmony.PatchAll(typeof(FakePowerPatches));
+		RegisterConsequences();
+		Logg.LogInfo($"{consequenceDict.Count} consequences registered: {string.Join(", ", consequenceDict.Keys)}");
 	}
 
-	public static System.Collections.Generic.List<BattleUnitModel> ShuffleUnits(System.Collections.Generic.List<BattleUnitModel> list)
+	private static void RegisterConsequences()
+	{
+		consequenceDict["log"] = new ConsequenceLog();
+		consequenceDict["base"] = new ConsequenceBase();
+		consequenceDict["final"] = new ConsequenceFinal();
+		consequenceDict["clash"] = new ConsequenceClash();
+		consequenceDict["scale"] = new ConsequenceScale();
+		consequenceDict["dmgadd"] = new ConsequenceDmgAdd();
+		consequenceDict["dmgmult"] = new ConsequenceDmgMult();
+		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
+		consequenceDict["reusecoin"] = new ConsequenceReuseCoin();
+		consequenceDict["bonusdmg"] = new ConsequenceBonusDmg();
+		consequenceDict["buf"] = new ConsequenceBuf();
+		consequenceDict["shield"] = new ConsequenceShield();
+		consequenceDict["break"] = new ConsequenceBreak();
+		consequenceDict["breakdmg"] = new ConsequenceBreakDmg();
+		consequenceDict["breakrecover"] = new ConsequenceBreakRecover();
+		consequenceDict["breakaddbar"] = new ConsequenceBreakAddBar();
+		consequenceDict["explosion"] = new ConsequenceExplosion();
+		consequenceDict["healhp"] = new ConsequenceHealHp();
+		consequenceDict["pattern"] = new ConsequencePattern();
+		consequenceDict["setslotadder"] = new ConsequenceSetSlotAdder();
+		consequenceDict["setdata"] = new ConsequenceSetData();
+		consequenceDict["changeskill"] = new ConsequenceChangeSkill();
+		consequenceDict["setimmortal"] = new ConsequenceSetImmortal();
+		consequenceDict["retreat"] = new ConsequenceRetreat();
+		consequenceDict["aggro"] = new ConsequenceAggro();
+		consequenceDict["skillsend"] = new ConsequenceSkillSend();
+		consequenceDict["skillreuse"] = new ConsequenceSkillReuse();
+		consequenceDict["skillslotreplace"] = new ConsequenceSkillSlotReplace();
+		consequenceDict["resource"] = new ConsequenceResource();
+		consequenceDict["discard"] = new ConsequenceDiscard();
+		consequenceDict["passiveadd"] = new ConsequencePassiveAdd();
+		consequenceDict["passiveremove"] = new ConsequencePassiveRemove();
+		consequenceDict["endstage"] = new ConsequenceEndStage();
+		consequenceDict["endbattle"] = new ConsequenceEndBattle();
+		consequenceDict["endlimbus"] = new ConsequenceEndLimbus();
+		consequenceDict["skillcanduel"] = new ConsequenceSkillCanDuel();
+		consequenceDict["skillslotgive"] = new ConsequenceSkillSlotGive();
+		consequenceDict["doubleslot"] = new ConsequenceDoubleSlot();
+		consequenceDict["stageextraslot"] = new ConsequenceStageExtraSlot();
+		consequenceDict["passivereveal"] = new ConsequencePassiveReveal();
+		consequenceDict["skillreveal"] = new ConsequenceSkillReveal();
+		consequenceDict["resistreveal"] = new ConsequenceResistReveal();
+		consequenceDict["appearance"] = new ConsequenceAppearance();
+		consequenceDict["coincancel"] = new ConsequenceCoinCancel();
+		consequenceDict["summonassistant"] = new ConsequenceSummonAssistant();
+		consequenceDict["summonenemy"] = new ConsequenceSummonEnemy();
+		consequenceDict["summonunitfromqueue"] = new ConsequenceSummonUnitFromQueue();
+		consequenceDict["stack"] = new ConsequenceStack();
+		consequenceDict["turn"] = new ConsequenceTurn();
+		consequenceDict["vibrationswitch"] = new ConsequenceVibrationSwitch();
+		consequenceDict["changemap"] = new ConsequenceChangeMap();
+		consequenceDict["lyrics"] = new ConsequenceLyrics();
+		consequenceDict["uppertext"] = new ConsequenceUpperText();
+		consequenceDict["battledialogline"] = new ConsequenceBattleDialogLine();
+		consequenceDict["gnome"] = new ConsequenceGnome();
+		consequenceDict["effectlabel"] = new ConsequenceEffectLabel();
+		consequenceDict["sanchoshield"] = new ConsequenceSanchoShield();
+		consequenceDict["sound"] = new ConsequenceSound();
+		consequenceDict["addability"] = new ConsequenceAddAbility();
+		consequenceDict["removeability"] = new ConsequenceRemoveAbility();
+		consequenceDict["surge"] = new ConsequenceSurge();
+		consequenceDict["makeunbreakable"] = new ConsequenceMakeUnbreakable();
+	}
+
+	public static System.Collections.Generic.List<BattleUnitModel> ShuffleUnits(
+		System.Collections.Generic.List<BattleUnitModel> list)
 	{
 		int n = list.Count;
 		while (n > 1)
@@ -103,8 +173,9 @@ public class MainClass : BasePlugin
 	}
 
 	//public static ModsaEvaluator modsaEval = null;
-	public static Dictionary<string, int> timingDict = new();
-		
+	public static readonly Dictionary<string, int> timingDict = new();
+	public static readonly Dictionary<string, IModularConsequence> consequenceDict = new();
+
 	public static bool fakepowerEnabled = true;
 
 	public static Random rng = new();
@@ -112,7 +183,7 @@ public class MainClass : BasePlugin
 	public static readonly Regex sWhitespace = new(@"\s+");
 	public static readonly Regex mathsymbolRegex = new("(-|\\+|\\*|%|!|¡|\\?)");
 	public static readonly char[] mathSeparator = new[] { '-', '+', '*', '%', '!', '¡', '?' };
-	
+
 	public static bool logEnabled = false;
 
 	public const string NAME = "ModularSkillScripts";
@@ -122,7 +193,7 @@ public class MainClass : BasePlugin
 
 	public static ManualLogSource Logg;
 }
-	
+
 /*
 public class ModsaEvaluator : ModsaLangBaseVisitor<double>
 {
