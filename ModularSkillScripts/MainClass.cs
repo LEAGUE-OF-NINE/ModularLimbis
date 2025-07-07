@@ -6,6 +6,7 @@ using Il2CppSystem.Collections.Generic;
 using Il2CppInterop.Runtime.Injection;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem.Text.RegularExpressions;
+using ModularSkillScripts.Acquirer;
 using ModularSkillScripts.Consequence;
 using Random = System.Random;
 
@@ -85,9 +86,10 @@ public class MainClass : BasePlugin
 		harmony.PatchAll(typeof(SkillScriptInitPatch));
 		harmony.PatchAll(typeof(StagePatches));
 		harmony.PatchAll(typeof(UniquePatches));
+		harmony.PatchAll(typeof(LogoPlayerPatches));
 		if (fakepowerEnabled) harmony.PatchAll(typeof(FakePowerPatches));
 		RegisterConsequences();
-		Logg.LogInfo($"{consequenceDict.Count} consequences registered: {string.Join(", ", consequenceDict.Keys)}");
+		RegisterAcquirers();
 	}
 
 	private static void RegisterConsequences()
@@ -156,6 +158,60 @@ public class MainClass : BasePlugin
 		consequenceDict["makeunbreakable"] = new ConsequenceMakeUnbreakable();
 	}
 
+	private static void RegisterAcquirers()
+	{
+		acquirerDict["math"] = new AcquirerMath();
+		acquirerDict["mpcheck"] = new AcquirerMpCheck();
+		acquirerDict["hpcheck"] = new AcquirerHpCheck();
+		acquirerDict["bufcheck"] = new AcquirerBufCheck();
+		acquirerDict["timeget"] = new AcquirerTimeGet();
+		acquirerDict["getdmg"] = new AcquirerGetDmg();
+		acquirerDict["gethpdmg"] = new AcquirerGetHpDmg();
+		acquirerDict["round"] = new AcquirerRound();
+		acquirerDict["wave"] = new AcquirerWave();
+		acquirerDict["activations"] = new AcquirerActivations();
+		acquirerDict["unitstate"] = new AcquirerUnitState();
+		acquirerDict["getid"] = new AcquirerGetId();
+		acquirerDict["instid"] = new AcquirerInstId();
+		acquirerDict["speedcheck"] = new AcquirerSpeedCheck();
+		acquirerDict["getpattern"] = new AcquirerGetPattern();
+		acquirerDict["getabnoslotmax"] = new AcquirerGetAbnoSlotMax();
+		acquirerDict["getdata"] = new AcquirerGetData();
+		acquirerDict["deadallies"] = new AcquirerDeadAllies();
+		acquirerDict["random"] = new AcquirerRandom();
+		acquirerDict["areallied"] = new AcquirerAreAllied();
+		acquirerDict["getshield"] = new AcquirerGetShield();
+		acquirerDict["getdmgtaken"] = new AcquirerGetDmgTaken();
+		acquirerDict["getbuffcount"] = new AcquirerGetBuffCount();
+		acquirerDict["getskillid"] = new AcquirerGetSkillId();
+		acquirerDict["getcoincount"] = new AcquirerGetCoinCount();
+		acquirerDict["allcoinstate"] = new AcquirerAllCoinState();
+		acquirerDict["resonance"] = new AcquirerResonance();
+		acquirerDict["resource"] = new AcquirerResource();
+		acquirerDict["haskey"] = new AcquirerHasKey();
+		acquirerDict["skillbase"] = new AcquirerSkillBase();
+		acquirerDict["skillatkweight"] = new AcquirerSkillAtkWeight();
+		acquirerDict["onescale"] = new AcquirerOneScale();
+		acquirerDict["skillatk"] = new AcquirerSkillAtk();
+		acquirerDict["skillatklevel"] = new AcquirerSkillAtkLevel();
+		acquirerDict["skillattribute"] = new AcquirerSkillAttribute();
+		acquirerDict["skilldeftype"] = new AcquirerSkillDefType();
+		acquirerDict["skillegotype"] = new AcquirerSkillEgoType();
+		acquirerDict["skillrank"] = new AcquirerSkillRank();
+		acquirerDict["skillslotcount"] = new AcquirerSkillSlotCount();
+		acquirerDict["amountattacks"] = new AcquirerAmountAttacks();
+		acquirerDict["getstat"] = new AcquirerGetStat();
+		acquirerDict["coinisbroken"] = new AcquirerCoinIsBroken();
+		acquirerDict["stack"] = new AcquirerStack();
+		acquirerDict["turn"] = new AcquirerTurn();
+		acquirerDict["isfocused"] = new AcquirerIsFocused();
+		acquirerDict["unitcount"] = new AcquirerUnitCount();
+		acquirerDict["breakcount"] = new AcquirerBreakCount();
+		acquirerDict["breakvalue"] = new AcquirerBreakValue();
+		acquirerDict["coinrerolled"] = new AcquirerCoinRerolled();
+		acquirerDict["stageextraslot"] = new AcquirerStageExtraSlot();
+	}
+
 	public static System.Collections.Generic.List<BattleUnitModel> ShuffleUnits(
 		System.Collections.Generic.List<BattleUnitModel> list)
 	{
@@ -175,6 +231,7 @@ public class MainClass : BasePlugin
 	//public static ModsaEvaluator modsaEval = null;
 	public static readonly System.Collections.Generic.Dictionary<string, int> timingDict = new();
 	public static readonly System.Collections.Generic.Dictionary<string, IModularConsequence> consequenceDict = new();
+	public static readonly System.Collections.Generic.Dictionary<string, IModularAcquirer> acquirerDict = new();
 
 	public static bool fakepowerEnabled = true;
 
