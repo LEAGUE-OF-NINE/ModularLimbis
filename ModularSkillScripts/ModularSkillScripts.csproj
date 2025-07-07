@@ -59,6 +59,7 @@
     <Compile Include="SkillScriptInitPatch.cs" />
     <Compile Include="StagePatches.cs" />
     <Compile Include="UniquePatches.cs" />
+    <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
