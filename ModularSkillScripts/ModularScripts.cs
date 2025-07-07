@@ -726,7 +726,7 @@ public class ModularSA : MonoBehaviour
 		}
 	}
 
-	private int DoMath(string s) {
+	public int DoMath(string s) {
 		MatchCollection symbols = MainClass.mathsymbolRegex.Matches(s);
 		string[] parameters = s.Split(MainClass.mathSeparator);
 		string firstParam = parameters[0];
@@ -856,7 +856,7 @@ public class ModularSA : MonoBehaviour
 				finalResult = stageController_inst.GetCurrentRound();
 			}
 				break;
-			case "wave":
+			case "wave": // wave
 			{
 				StageController stageController_inst = Singleton<StageController>.Instance;
 				finalResult = stageController_inst.GetCurrentWave();
@@ -1292,4 +1292,20 @@ public interface IModularConsequence
     /// <param name="circledSection">The section inside parenthesis, e.g. "Self, argument, 3, 4"</param>
     /// <param name="circles">Arguments specified in the circled section, e.g. ["Self", "argument", "3", "4"]</param>
     void ExecuteConsequence(ModularSA modular, string section, string circledSection, string[] circles);
+}
+
+/// <summary>
+/// Interface for defining modular value getters in the system.
+/// </summary>
+public interface IModularAcquirer
+{
+    /// <summary>
+    /// Executes a value getter based on the provided parameters.
+    /// </summary>
+    /// <param name="modular">The modular instance, where all the controlling values and helper functions can be found</param>
+    /// <param name="section">The raw string of the consequence declaration, e.g. "consequence(Self, argument, 3, 4)"</param>
+    /// <param name="circledSection">The section inside parenthesis, e.g. "Self, argument, 3, 4"</param>
+    /// <param name="circles">Arguments specified in the circled section, e.g. ["Self", "argument", "3", "4"]</param>
+    /// <returns>The value which this value getter evalutes to</returns>
+    int ExecuteAcquirer(ModularSA modular, string section, string circledSection, string[] circles);
 }
