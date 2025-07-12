@@ -20,7 +20,7 @@ public class AcquirerHpCheck : IModularAcquirer
 			"max" => hp_max,
 			"missing" => hp_max - hp,
 			"missing%" => 100 - hp_ptg_floor,
-			_ => -1
+			_ => hp
 		};
 	}
 }
