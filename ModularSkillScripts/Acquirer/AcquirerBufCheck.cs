@@ -32,7 +32,7 @@ public class AcquirerBufCheck : IModularAcquirer
 			"turn" => turn,
 			"+" => stack + turn,
 			"*" => stack * turn,
-			_ => -1
+			_ => stack
 		};
 	}
 }
