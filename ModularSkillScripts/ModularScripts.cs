@@ -672,7 +672,7 @@ public class ModularSA : MonoBehaviour
 					else if (hitArgs.Contains("Crit")) _onlyCrit = true;
 
 					if (hitArgs.Contains("Win")) _onlyClashWin = true;
-					else if (hitArgs.Contains("Lose")) _onlyClashLose = true;						
+					else if (hitArgs.Contains("Lose")) _onlyClashLose = true;
 				}
 			}
 			else if (batch.StartsWith("LOOP:", StringComparison.OrdinalIgnoreCase)) modsa_loopString = batch.Remove(0, 5);

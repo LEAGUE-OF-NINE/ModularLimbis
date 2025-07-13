@@ -64,6 +64,7 @@ public class MainClass : BasePlugin
 		timingStringList.Add("OnBurst"); // 37
 		timingStringList.Add("StartVisualCoinToss"); // 38
 		timingStringList.Add("StartVisualSkillUse"); // 39
+		timingStringList.Add("WhenGained"); // 40
 
 		Il2CppArrayBase<string> timingStringArray = timingStringList.ToArray();
 		int count = timingStringArray.Count;
@@ -156,6 +157,7 @@ public class MainClass : BasePlugin
 		consequenceDict["removeability"] = new ConsequenceRemoveAbility();
 		consequenceDict["surge"] = new ConsequenceSurge();
 		consequenceDict["makeunbreakable"] = new ConsequenceMakeUnbreakable();
+		consequenceDict["bloodfeast"] = new ConsequenceBloodfeast();
 	}
 
 	private static void RegisterAcquirers()
@@ -210,6 +212,7 @@ public class MainClass : BasePlugin
 		acquirerDict["breakvalue"] = new AcquirerBreakValue();
 		acquirerDict["coinrerolled"] = new AcquirerCoinRerolled();
 		acquirerDict["stageextraslot"] = new AcquirerStageExtraSlot();
+		acquirerDict["getbloodfeast"] = new AcquirerGetBloodfeast();
 	}
 
 	public static System.Collections.Generic.List<BattleUnitModel> ShuffleUnits(

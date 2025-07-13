@@ -1403,7 +1403,17 @@ public class SkillScriptInitPatch
 			__result += power;
 		}
 	}
-
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.RightAfterGettingBuff))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_RightAfterGettingBuff(BattleUnitModel unit, int gettingNewStack, ABILITY_SOURCE_TYPE abilitySrcType, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	{
+		int actevent = MainClass.timingDict["WhenGained"];
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance))
+		{
+			modba.modsa_buffModel = __instance;
+			modba.Enact(unit, null, null, null, actevent, timing);
+		}
+	}
 
 
 
