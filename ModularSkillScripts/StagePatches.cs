@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
 
@@ -123,7 +123,7 @@ internal class StagePatches
 			foreach (BattleUnitModel unitModel in playerUnit_list) sinAction_count += unitModel._actionSlotDetail.GetSinActionList().Count;
 			MainClass.Logg.LogInfo("current player slot count:" + sinAction_count);
 				
-			int slot_max = stageModel.GetStageMaxParticipantCount();
+			int slot_max = stageModel.GetStageMaxSlotCount();
 			int multislot_max = (int)Math.Ceiling((double)slot_max / stageModel.ClassInfo.ParticipantInfo.Max);
 
 			int highestSlotter = 1;
@@ -191,7 +191,7 @@ internal class StagePatches
 
 		
 
-	[HarmonyPatch(typeof(StageModel), nameof(StageModel.GetStageMaxParticipantCount))]
+	[HarmonyPatch(typeof(StageModel), nameof(StageModel.GetStageMaxSlotCount))]
 	[HarmonyPostfix]
 	private static void Postfix_StageModel_GetStageMaxParticipantCount(ref int __result, StageModel __instance)
 	{

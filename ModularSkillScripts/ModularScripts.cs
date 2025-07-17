@@ -154,15 +154,15 @@ public class ModularSA : MonoBehaviour
 		_onlyTails = false;
 		_onlyCrit = false;
 		_onlyNonCrit = false;
-		_onlyClashWin = false;
-		_onlyClashLose = false;
+		//_onlyClashWin = false;
+		//_onlyClashLose = false;
 	}
 	private bool _onlyHeads = false;
 	private bool _onlyTails = false;
 	private bool _onlyCrit = false;
 	private bool _onlyNonCrit = false;
-	private bool _onlyClashWin = false;
-	private bool _onlyClashLose = false;
+	//private bool _onlyClashWin = false;
+	//private bool _onlyClashLose = false;
 
 	public bool immortality = false;
 
@@ -671,8 +671,8 @@ public class ModularSA : MonoBehaviour
 					if (hitArgs.Contains("NoCrit")) _onlyNonCrit = true;
 					else if (hitArgs.Contains("Crit")) _onlyCrit = true;
 
-					if (hitArgs.Contains("Win")) _onlyClashWin = true;
-					else if (hitArgs.Contains("Lose")) _onlyClashLose = true;
+					//if (hitArgs.Contains("Win")) _onlyClashWin = true;
+					//else if (hitArgs.Contains("Lose")) _onlyClashLose = true;
 				}
 			}
 			else if (batch.StartsWith("LOOP:", StringComparison.OrdinalIgnoreCase)) modsa_loopString = batch.Remove(0, 5);

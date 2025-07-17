@@ -14,7 +14,7 @@ public class ConsequenceStack : IModularConsequence
 			BuffHistory bufHistory = new(adder, 0, ABILITY_SOURCE_TYPE.BUFF);
 			bufHistoryList.Add(bufHistory);
 			modular.modsa_buffModel.AddBuffStackOrTurn(modular.modsa_unitModel, bufHistoryList, 0, ABILITY_SOURCE_TYPE.BUFF, modular.battleTiming,
-				null, out _, out _);
+				null, out _, out _, out _, out _);
 		}
 		else modular.modsa_buffModel.LoseStack(modular.modsa_unitModel, 0, modular.battleTiming, adder * -1);
 	}
