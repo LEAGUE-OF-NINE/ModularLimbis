@@ -2,6 +2,6 @@
 	<PropertyGroup>
 		<!-- Modify this file and change it to Directory.Build.props -->
 		<!-- LimbusCompanyFolder should be where your LimbusCompany.exe lives -->
-		<LimbusCompanyFolder>>D:\Zwei\game</LimbusCompanyFolder>
+		<LimbusCompanyFolder>D:\Zwei\game</LimbusCompanyFolder>
 	</PropertyGroup>
 </Project>
