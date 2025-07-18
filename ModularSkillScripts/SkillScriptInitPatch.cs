@@ -680,7 +680,7 @@ public class SkillScriptInitPatch
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnDiscardSin(UnitSinModel sin, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
-		copypastesolution(__instance._owner, sin.GetSkill(), null, null, "OnDiscard", timing, __instance);
+		copypastesolution(__instance._owner, sin.GetSkill(), sin._currentAction, null, "OnDiscard", timing, __instance);
 	}
 
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.CheckImmortal))]
