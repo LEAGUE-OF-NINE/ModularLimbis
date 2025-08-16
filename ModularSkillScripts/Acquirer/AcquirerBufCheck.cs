@@ -10,11 +10,12 @@ public class AcquirerBufCheck : IModularAcquirer
 		if (targetModel == null) return -1;
 
 		BUFF_UNIQUE_KEYWORD buf_keyword = CustomBuffs.ParseBuffUniqueKeyword(circles[1]);
-
+		BattleUnitBuffManager instance = Singleton<BattleUnitBuffManager>.Instance;
 		BuffDetail bufDetail = targetModel._buffDetail;
 		//BuffModel buf = bufDetail.FindActivatedBuff(buf_keyword, false);
 		int stack = 0;
 		int turn = 0;
+		int amtConsumed = 0;
 		bool usedcheck = circles.Length >= 4;
 		if (usedcheck)
 		{
@@ -24,6 +25,7 @@ public class AcquirerBufCheck : IModularAcquirer
 		{
 			stack = bufDetail.GetActivatedBuffStack(buf_keyword, false);
 			turn = bufDetail.GetActivatedBuffTurn(buf_keyword, false);
+			amtConsumed = instance.GetUsedBuffTurn(targetModel.InstanceID, buf_keyword);
 		}
 
 
@@ -32,6 +34,7 @@ public class AcquirerBufCheck : IModularAcquirer
 			"turn" => turn,
 			"+" => stack + turn,
 			"*" => stack * turn,
+			"consumed" => amtConsumed,
 			_ => stack
 		};
 	}
