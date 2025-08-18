@@ -162,6 +162,7 @@ public class MainClass : BasePlugin
 
 	private static void RegisterAcquirers()
 	{
+ 		acquirerDict["getcharacterid"] = new AcquirerGetCharacterID();
  		acquirerDict["getlevel"] = new AcquirerGetLevel();
 		acquirerDict["math"] = new AcquirerMath();
 		acquirerDict["mpcheck"] = new AcquirerMpCheck();
