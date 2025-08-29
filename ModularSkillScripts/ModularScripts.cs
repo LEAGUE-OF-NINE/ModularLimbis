@@ -229,7 +229,7 @@ public class ModularSA : MonoBehaviour
 			{
 				if (MainClass.logEnabled) MainClass.Logg.LogInfo("creating dummy passive");
 				PassiveAbility pa = new PassiveAbility();
-				pa.Init(modsa_unitModel, new List<PassiveConditionStaticData> { }, new List<PassiveConditionStaticData> { });
+				pa.Init(modsa_unitModel, new List<PassiveConditionStaticData> { }, new List<PassiveConditionStaticData> { }, new List<int>());
 				dummyPassiveAbility = pa;
 			}
 		}
