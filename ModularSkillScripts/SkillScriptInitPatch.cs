@@ -88,7 +88,7 @@ public class SkillScriptInitPatch
 		if (isModular)
 		{
 			PassiveAbility pa = new PassiveAbility();
-			pa.Init(owner, __instance.ClassInfo.attributeResonanceCondition, __instance.ClassInfo.attributeStockCondition, new List<int>());
+			pa.Init(owner, __instance.ClassInfo.attributeResonanceCondition, __instance.ClassInfo.attributeStockCondition, __instance.ClassInfo.controlValueList);
 			__instance._script = pa;
 		}
 	}

@@ -36,7 +36,7 @@ public class ConsequenceSkillSend : IModularConsequence
 				break;
 			}
 			default:
-				int.TryParse(circle_2, out skillID);
+				skillID = modular.GetNumFromParamString(circle_2);
 				break;
 		}
 
