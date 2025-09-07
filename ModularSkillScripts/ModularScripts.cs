@@ -63,11 +63,11 @@ public class ModularSA : MonoBehaviour
 	public string originalString = "";
 	public char[] parenthesisSeparator = new char[] { '(', ')' };
 
-	public int[] valueList = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	public Dictionary<string, int> valueList = new();
 	public void ResetValueList()
 	{
 		activationCounter = 0;
-		for (int i = 0; i < valueList.Length; i++) valueList[i] = 0;
+		valueList.Clear();
 	}
 
 	public void EraseAllData()
@@ -345,9 +345,7 @@ public class ModularSA : MonoBehaviour
 		
 		if (math) value = DoMath(param);
 		else if (param.StartsWith("VALUE_")) {
-			int value_idx = 0;
-			int.TryParse(param[6].ToString(), out value_idx);
-			value = valueList[value_idx];
+			value = valueList[param];
 		}
 		else if (acquire)
 		{
@@ -700,10 +698,7 @@ public class ModularSA : MonoBehaviour
 			else if (batchArgs[i].StartsWith("IFNOT")) { if (CheckIF(batchArgs[i])) break; else continue; }
 			else if (batchArgs[i].StartsWith("IF")) { if (!CheckIF(batchArgs[i])) break; else continue; }
 			else if (batchArgs[i].StartsWith("VALUE_")) {
-				string numChar = batchArgs[i][6].ToString();
-				int valueidx = 0;
-				int.TryParse(numChar, out valueidx);
-				valueList[valueidx] = AcquireValue(batchArgs[i + 1]); // GETTERS
+				valueList[batchArgs[i]] = AcquireValue(batchArgs[i + 1]); // GETTERS
 				i += 1;
 				continue;
 			}
