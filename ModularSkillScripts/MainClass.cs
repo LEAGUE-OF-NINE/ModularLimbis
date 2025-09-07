@@ -158,6 +158,7 @@ public class MainClass : BasePlugin
 		consequenceDict["surge"] = new ConsequenceSurge();
 		consequenceDict["makeunbreakable"] = new ConsequenceMakeUnbreakable();
 		consequenceDict["bloodfeast"] = new ConsequenceBloodfeast();
+		consequenceDict["critchance"] = new ConsequenceCritChance();
 	}
 
 	private static void RegisterAcquirers()

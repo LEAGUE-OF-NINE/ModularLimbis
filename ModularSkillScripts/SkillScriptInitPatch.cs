@@ -883,6 +883,42 @@ public class SkillScriptInitPatch
 			}
 		}
 	}
+
+	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetCriticalChanceAdder))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitMode_GetCriticalChance(BattleActionModel action, CoinModel coin, SkillModel __instance, ref float __result) {
+		int actevent_FakePower = MainClass.timingDict["FakePower"];
+		long coinmodel_intlong = coin.Pointer.ToInt64();
+		foreach (ModularSA modca in modca_list) {
+			if (modca.activationTiming == actevent_FakePower) continue;
+			if (coinmodel_intlong != modca.ptr_intlong) continue;
+			__result += modca.critAdder / 100f;
+		}
+
+		long skillmodel_intlong = __instance.Pointer.ToInt64();
+		if (modsaDict.ContainsKey(skillmodel_intlong)) {
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+				if (modsa.activationTiming == actevent_FakePower) continue;
+				__result += modsa.critAdder / 100f;
+			}
+		}
+
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modpa.activationTiming == actevent_FakePower) continue;
+				__result += modpa.critAdder / 100f;
+			}
+		}
+
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
+				if (modpa.activationTiming == actevent_FakePower) continue;
+				__result += modpa.critAdder / 100f;
+			}
+		}
+	}
+
+
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetAttackDmgAdder))]
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_GetAttackDmgAdder(BattleActionModel action, CoinModel coin, ref int __result, SkillModel __instance)

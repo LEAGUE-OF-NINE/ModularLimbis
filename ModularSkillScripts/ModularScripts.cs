@@ -131,6 +131,7 @@ public class ModularSA : MonoBehaviour
 		atkDmgAdder = 0;
 		atkMultAdder = 0;
 		//atkWeightAdder = 0;
+		critAdder = 0;
 	}
 	public int coinScaleAdder = 0;
 	public int skillPowerAdder = 0;
@@ -140,6 +141,7 @@ public class ModularSA : MonoBehaviour
 	public int atkMultAdder = 0;
 	//public int atkWeightAdder = 0;
 	public int slotAdder = 0;
+	public int critAdder = 0;
 
 	public bool wasCrit = false;
 	public bool wasClash = false;
