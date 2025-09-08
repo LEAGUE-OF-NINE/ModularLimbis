@@ -999,7 +999,20 @@ public class SkillScriptInitPatch
 			}
 		}
 	}
-
+	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetOriginAttackWeight))]
+	[HarmonyPostfix]
+	private static void Postfix_SkillModel_GetAttackWeight(ref int __result, SkillModel __instance)
+	{
+		long skillmodel_intlong = __instance.Pointer.ToInt64();
+		if (modsaDict.ContainsKey(skillmodel_intlong))
+		{
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
+			{
+				int power = modsa.atkWeightAdder;
+				__result += power;
+			}
+		}
+	}
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnBattleStart))]
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_OnBattleStart(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance)
