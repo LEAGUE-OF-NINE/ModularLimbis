@@ -14,6 +14,7 @@ using FMOD;
 using FMODUnity;
 using BattleUI;
 using BepInEx.Unity.IL2CPP.Utils;
+using Il2CppInterop.Runtime.InteropTypes;
 using Il2CppSystem.Text.RegularExpressions;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -25,7 +26,7 @@ using TimeSpan = Il2CppSystem.TimeSpan;
 
 namespace ModularSkillScripts;
 
-public class ModUnitData : MonoBehaviour
+public class ModUnitData : Il2CppSystem.Object
 {
 	public ModUnitData(IntPtr ptr) : base(ptr) { }
 
@@ -38,7 +39,7 @@ public class ModUnitData : MonoBehaviour
 	public List<DataMod> data_list = new List<DataMod>();
 }
 
-public class DataMod : MonoBehaviour
+public class DataMod : Il2CppSystem.Object
 {
 	public DataMod(IntPtr ptr) : base(ptr) { }
 
@@ -51,7 +52,7 @@ public class DataMod : MonoBehaviour
 	public int dataValue = 0;
 }
 
-public class ModularSA : MonoBehaviour
+public class ModularSA : Il2CppSystem.Object
 {
 	public ModularSA(IntPtr ptr) : base(ptr) { }
 

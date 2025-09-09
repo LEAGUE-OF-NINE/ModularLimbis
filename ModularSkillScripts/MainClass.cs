@@ -88,6 +88,7 @@ public class MainClass : BasePlugin
 		harmony.PatchAll(typeof(StagePatches));
 		harmony.PatchAll(typeof(UniquePatches));
 		harmony.PatchAll(typeof(LogoPlayerPatches));
+		harmony.PatchAll(typeof(ReloadPatches));
 		if (fakepowerEnabled) harmony.PatchAll(typeof(FakePowerPatches));
 		RegisterConsequences();
 		RegisterAcquirers();
@@ -251,7 +252,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false;
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "3.1.0";
+	public const string VERSION = "4.0.0";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
