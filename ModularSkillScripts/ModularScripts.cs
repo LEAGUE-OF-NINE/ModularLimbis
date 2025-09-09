@@ -750,6 +750,17 @@ public class ModularSA : MonoBehaviour
 				case '!': finalValue = Math.Min(finalValue, amount); break;
 				case '¡': finalValue = Math.Max(finalValue, amount); break;
 				case '?': finalValue %= amount; break;
+				case '^': finalValue = Math.Pow(finalValue, amount); break;
+				case '√': finalValue = Math.Sqrt(finalValue); break;
+				case '㏒': finalValue = Math.Log10(finalValue); break;
+				case '@': finalValue = Math.Sin(finalValue); break;
+				case '#': finalValue = Math.Cos(finalValue); break;
+				case '$': finalValue = Math.Tan(finalValue); break;
+					//case 'Σ':
+					//case 'Π':
+					//case '∫':
+					//case '∂':
+					/// The above code will be added whenever I learn what the fuck I'm actually doing.
 			}
 		}
 
