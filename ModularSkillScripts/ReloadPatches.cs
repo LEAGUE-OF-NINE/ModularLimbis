@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using HarmonyLib;
@@ -30,6 +31,11 @@ public class ReloadPatches
 					continue;
 				}
 				var content = File.ReadAllText(luaPath);
+				if (String.IsNullOrWhiteSpace(content))
+				{
+					MainClass.Logg.LogWarning($"Modular Lua Script '{name}' in '{luaPath}' is empty. Skipping.");
+					continue;
+				}
 				loadedScripts[name] = content;
 				MainClass.Logg.LogInfo($"Loaded Modular Lua Script '{name}' from '{luaPath}'.");
 			}

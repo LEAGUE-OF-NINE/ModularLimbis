@@ -94,6 +94,7 @@ public class ModularSA : Il2CppSystem.Object
 		dummyCoinAbility = null;
 		modsa_loopTarget = null;
 		modsa_loopString = "";
+		modsa_luaScript = "";
 	}
 
 	public int activationTiming = 0;
@@ -122,6 +123,7 @@ public class ModularSA : Il2CppSystem.Object
 	public CoinAbility dummyCoinAbility = null;
 	public BattleUnitModel modsa_loopTarget = null;
 	public string modsa_loopString = "";
+	public string modsa_luaScript = "";
 
 	public void ResetAdders()
 	{
@@ -656,6 +658,7 @@ public class ModularSA : Il2CppSystem.Object
 			
 		instructions = MainClass.sWhitespace.Replace(instructions, "");
 		string[] batches = instructions.Split('/');
+		bool luaFound = false;
 
 		for (int i = 0; i < batches.Length; i++) {
 			string batch = batches[i];
@@ -678,9 +681,37 @@ public class ModularSA : Il2CppSystem.Object
 					//else if (hitArgs.Contains("Lose")) _onlyClashLose = true;
 				}
 			}
-			else if (batch.StartsWith("LOOP:", StringComparison.OrdinalIgnoreCase)) modsa_loopString = batch.Remove(0, 5);
+			else if (batch.StartsWith("LUA:", StringComparison.OrdinalIgnoreCase))
+			{
+				if (!String.IsNullOrWhiteSpace(modsa_loopString))
+				{
+					MainClass.Logg.LogError("LUA cannot be used with LOOP");
+					return;
+				}
+				var luaScriptName = batch.Remove(0, 4);
+				if (!ReloadPatches.loadedScripts.TryGetValue(luaScriptName, out modsa_luaScript))
+				{
+					MainClass.Logg.LogError("LUA script used but not found: " + luaScriptName);
+					return;
+				}
+				luaFound = true;
+			}
+			else if (batch.StartsWith("LOOP:", StringComparison.OrdinalIgnoreCase))
+			{
+				if (!String.IsNullOrWhiteSpace(modsa_luaScript))
+				{
+					MainClass.Logg.LogError("LOOP cannot be used with LUA");
+					return;
+				}
+				modsa_loopString = batch.Remove(0, 5);
+			}
 			else if (batch.Equals("RESETWHENUSE", StringComparison.OrdinalIgnoreCase)) resetWhenUse = true;
 			else if (batch.Equals("CLEARVALUES", StringComparison.OrdinalIgnoreCase)) clearValues = true;
+			else if (luaFound)
+			{
+				MainClass.Logg.LogError("LUA cannot be used with other batches");
+				return;
+			}
 			else batch_list.Add(batch);
 		}
 	}
