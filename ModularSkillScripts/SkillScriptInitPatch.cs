@@ -4,6 +4,7 @@ using Dungeon;
 using HarmonyLib;
 using Il2CppSystem.Collections;
 using Il2CppSystem.Collections.Generic;
+using ModularSkillScripts.Consequence;
 using static MirrorDungeonSelectThemeUIPanel.UIResources;
 
 namespace ModularSkillScripts;
@@ -13,25 +14,43 @@ public class SkillScriptInitPatch
 	private static void copypastesolution(BattleUnitModel unitModel, SkillModel skillModel_inst, BattleActionModel selfAction, BattleActionModel oppoAction, string actevent, BATTLE_EVENT_TIMING timing, PassiveDetail __instance, bool resetWhenUse = false)
 	{
 		int acteventint = MainClass.timingDict[actevent];
-		foreach (PassiveModel passiveModel in __instance.PassiveList)
+		for (int i = 0; i < __instance.PassiveList.Count; i++)
 		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
+			var passiveModel = __instance.PassiveList[i];
+			var modpaList = GetAllModpaFromPasmodel(passiveModel);
+			for (int j = 0; j < modpaList.Count; j++)
 			{
-				if (resetWhenUse && modpa.resetWhenUse) modpa.ResetAdders(); // on-demand power adder reset (used for passives)
+				var modpa = modpaList[j];
+				if (resetWhenUse && modpa.resetWhenUse) modpa.ResetAdders();
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(unitModel, skillModel_inst, selfAction, oppoAction, acteventint, timing);
 			}
 		}
-		foreach (PassiveModel passiveModel in __instance.EgoPassiveList)
+		for (int i = 0; i < __instance.EgoPassiveList.Count; i++)
 		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			var passiveModel = __instance.EgoPassiveList[i];
+			var modpaList = GetAllModpaFromPasmodel(passiveModel, false);
+			for (int j = 0; j < modpaList.Count; j++)
 			{
-				if (resetWhenUse && modpa.resetWhenUse) modpa.ResetAdders(); // on-demand power adder reset (used for passives)
+				var modpa = modpaList[j];
+				if (resetWhenUse && modpa.resetWhenUse) modpa.ResetAdders();
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(unitModel, skillModel_inst, selfAction, oppoAction, acteventint, timing);
 			}
 		}
 	}
+	public static System.Collections.Generic.List<Dictionary<long, List<ModularSA>>> gimmeshi()
+	{
+		System.Collections.Generic.List<Dictionary<long, List<ModularSA>>> list = new System.Collections.Generic.List<Dictionary<long, List<ModularSA>>>();
+		list.Add(modbaDict);
+		list.Add(modsaDict);
+		list.Add(modpaDict);
+		Dictionary<long,List<ModularSA>> dictionary = new Dictionary<long, List<ModularSA>>();
+		dictionary.Add(1,modca_list);
+		list.Add(dictionary);
+		return list;
+	}
+
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.Init), new Type[] { })]
 	[HarmonyPostfix]
 	private static void Postfix_SkillModelInit_AddSkillScript(SkillModel __instance)
@@ -68,6 +87,7 @@ public class SkillScriptInitPatch
 			modsa.SetupModular(abilityScriptname.Remove(0, 8));
 			if (!modsaDict.ContainsKey(ptr)) modsaDict.Add(ptr, new List<ModularSA>());
 			modsaDict[ptr].Add(modsa);
+			MainClass.Logg.LogInfo($"Init ptr: {__instance.Pointer.ToInt64()}, GetID: {__instance.GetID()}, Name: {__instance.GetSkillName()}");
 		}
 	}
 
@@ -1087,13 +1107,171 @@ public class SkillScriptInitPatch
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_BeforeAttack(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance)
 	{
+		MainClass.Logg.LogInfo("=== BeforeAttack START ===");
 		int actevent = MainClass.timingDict["BeforeAttack"];
 		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
-		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-			modsa.Enact(action.Model, __instance, action, null, actevent, timing);
+		MainClass.Logg.LogInfo($"BeforeAttack ptr: {__instance.Pointer.ToInt64()}, GetID: {__instance.GetID()}, Name: {__instance.GetSkillName()}");
+		MainClass.Logg.LogInfo($"SkillModel ptr: {skillmodel_intlong}, timing: {timing}, actevent: {actevent}");
+
+		if (modsaDict.ContainsKey(skillmodel_intlong))
+		{
+			MainClass.Logg.LogInfo($"Found {modsaDict[skillmodel_intlong].Count} modsa for this SkillModel");
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
+			{
+				MainClass.Logg.LogInfo($"Enacting modsa: {modsa}");
+				modsa.Enact(action.Model, __instance, action, null, actevent, timing);
+			}
 		}
+		else
+		{
+			MainClass.Logg.LogInfo("No modsa found for this SkillModel");
+		}
+
+		var allAssist = new System.Collections.Generic.List<ModularSA.AssistData>();
+
+		void CollectAssistData(List<ModularSA> mods)
+		{
+			for (int mi = 0; mi < mods.Count; mi++)
+			{
+				var mod = mods[mi];
+				MainClass.Logg.LogInfo($"Collecting assistData from modsa: {mod}, count: {mod.assistData?.Count ?? 0}");
+				var assistCount = mod.assistData == null ? 0 : mod.assistData.Count;
+				for (int ai = 0; ai < assistCount; ai++)
+				{
+					var ad = mod.assistData[ai];
+					if (ad == null) MainClass.Logg.LogInfo("Null assistaction");
+					allAssist.Add(ad);
+					MainClass.Logg.LogInfo($"Added AssistData -> defender: {ad.defender}, defended count: {(ad.defended == null ? "NULL" : ad.defended.Count.ToString())}, skillID: {ad.skillID}, priority: {ad.priority}");
+				}
+			}
+		}
+
+		foreach (var kvp in modsaDict) CollectAssistData(kvp.Value);
+		foreach (var kvp in modpaDict) CollectAssistData(kvp.Value);
+		CollectAssistData(modca_list);
+		foreach (var kvp in modbaDict) CollectAssistData(kvp.Value);
+
+
+		MainClass.Logg.LogInfo($"Total allAssist count: {allAssist.Count}");
+		if (allAssist.Count == 0)
+		{
+			MainClass.Logg.LogInfo("No assist data, skipping");
+			MainClass.Logg.LogInfo("=== BeforeAttack END ===");
+			return;
+		}
+
+		var mainTarget = action.GetMainTarget();
+		MainClass.Logg.LogInfo($"Main target: {(mainTarget == null ? "NULL" : mainTarget.ToString())}");
+		if (mainTarget == null)
+		{
+			MainClass.Logg.LogInfo("Main target was null, skipping");
+			MainClass.Logg.LogInfo("=== BeforeAttack END ===");
+			return;
+		}
+
+		MainClass.Logg.LogInfo("Sorting assists by priority...");
+		for (int i = 0; i < allAssist.Count - 1; i++)
+		{
+			for (int j = i + 1; j < allAssist.Count; j++)
+			{
+				if (allAssist[j].priority > allAssist[i].priority)
+				{
+					var temp = allAssist[i];
+					allAssist[i] = allAssist[j];
+					allAssist[j] = temp;
+					MainClass.Logg.LogInfo($"Swapped positions {i} and {j}");
+				}
+			}
+		}
+
+		MainClass.Logg.LogInfo("Iterating assists for mainTarget...");
+		foreach (var ad in allAssist)
+		{
+			MainClass.Logg.LogInfo($"Checking AssistData -> defender: {ad.defender}, defended count: {(ad.defended == null ? "NULL" : ad.defended.Count.ToString())}, skillID: {ad.skillID}, priority: {ad.priority}");
+			bool defendedContains = false;
+			if (ad.defended != null)
+			{
+				for (int k = 0; k < ad.defended.Count; k++)
+				{
+					if (ad.defended[k] == mainTarget)
+					{
+						defendedContains = true;
+						break;
+					}
+				}
+			}
+			MainClass.Logg.LogInfo($"defendedContains mainTarget? {defendedContains}");
+			if (defendedContains)
+			{
+				MainClass.Logg.LogInfo("Main target is defended! Creating defense action...");
+				SinActionModel fromSinAction_new = ad.defender.AddNewSinActionModel();
+				UnitSinModel fromSinModel_new = new UnitSinModel(ad.skillID, ad.defender, fromSinAction_new);
+				BattleActionModel fromAction_new = new BattleActionModel(fromSinModel_new, ad.defender, fromSinAction_new);
+				var targetSinActionList = new List<SinActionModel>();
+				List<SinActionModel> sinActionList = action.Model.GetSinActionList();
+				if (sinActionList.Count < 1) continue;
+				targetSinActionList.Add(sinActionList.ToArray()[0]);
+
+
+				fromAction_new._targetDataDetail.ReadyOriginTargeting(fromAction_new);
+				if (fromSinModel_new.GetSkill().IsDefenseNotCounter()) ad.defender.CutInDefenseActionForcely(fromAction_new, true);
+				else
+				{
+					ad.defender.CutInAction(fromAction_new);
+					if (targetSinActionList.Count > 0)
+					{
+						fromAction_new.ChangeMainTargetSinAction(targetSinActionList.ToArray()[0], null, true);
+					}
+				}
+			MainClass.Logg.LogInfo("Defense action inserted");
+
+			try { MainClass.Logg.LogInfo($"post-insert mainTarget: {(action.GetMainTarget() == null ? "NULL" : action.GetMainTarget().ToString())}"); }
+				catch (Exception e) { MainClass.Logg.LogInfo("Could not query action.GetMainTarget() after insert: " + e.ToString()); }
+
+				try
+				{
+					var aType = action.GetType();
+					var fields = aType.GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+					for (int f = 0; f < fields.Length; f++)
+					{
+						var fi = fields[f];
+						var name = fi.Name;
+						if (!name.ToLower().Contains("target") && !name.ToLower().Contains("targets")) continue;
+						object val = null;
+						try { val = fi.GetValue(action); } catch { MainClass.Logg.LogInfo($"Field {name} getValue failed"); continue; }
+						if (val == null) { MainClass.Logg.LogInfo($"Field {name} = null"); continue; }
+						MainClass.Logg.LogInfo($"Field {name} Type={val.GetType().FullName}");
+						if (val is System.Collections.IEnumerable)
+						{
+							int idx = 0;
+							foreach (var it in (System.Collections.IEnumerable)val)
+							{
+								MainClass.Logg.LogInfo($" {name}[{idx}] = {(it == null ? "NULL" : it.ToString())}");
+								idx++;
+							}
+							MainClass.Logg.LogInfo($" {name} total {idx} items");
+						}
+						else
+						{
+							MainClass.Logg.LogInfo($" {name} value = {val}");
+						}
+					}
+				}
+				catch (Exception e)
+				{
+					MainClass.Logg.LogInfo("Reflection dump failed: " + e.ToString());
+				}
+
+				MainClass.Logg.LogInfo("Dumping defenseaction objects");
+				try { MainClass.Logg.LogInfo("defenseactionsin = " + (fromSinAction_new == null ? "NULL" : fromSinAction_new.ToString())); } catch { MainClass.Logg.LogInfo("defenseactionsin ToString failed"); }
+				try { MainClass.Logg.LogInfo("defenseactionbattle = " + (fromAction_new == null ? "NULL" : fromAction_new.ToString())); } catch { MainClass.Logg.LogInfo("defenseactionbattle ToString failed"); }
+				MainClass.Logg.LogInfo("=== BeforeAttack END (defense inserted) ===");
+				break;
+			}
+		}
+		MainClass.Logg.LogInfo("=== BeforeAttack END ===");
 	}
+
 
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnBeforeParryingOnce))]
 	[HarmonyPostfix]

@@ -76,6 +76,8 @@ public class ModularSA : MonoBehaviour
 		ResetAdders();
 		ResetCoinConditionals();
 
+
+		assistData.Clear();
 		ptr_intlong = 0;
 		passiveID = 0;
 
@@ -149,6 +151,18 @@ public class ModularSA : MonoBehaviour
 	public int lastFinalDmg = 0;
 	public int lastHpDmg = 0;
 	public int activationCounter = 0;
+
+
+	public class AssistData
+	{
+		public BattleUnitModel defender { get; set; }
+		public System.Collections.Generic.List<BattleUnitModel> defended { get; set; }
+		public int skillID { get; set; }
+		public int priority { get; set; }
+	}
+	public System.Collections.Generic.List<AssistData> assistData = new System.Collections.Generic.List<AssistData>();
+
+
 
 	public void ResetCoinConditionals()
 	{

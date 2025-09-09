@@ -159,6 +159,7 @@ public class MainClass : BasePlugin
 		consequenceDict["makeunbreakable"] = new ConsequenceMakeUnbreakable();
 		consequenceDict["bloodfeast"] = new ConsequenceBloodfeast();
 		consequenceDict["critchance"] = new ConsequenceCritChance();
+		consequenceDict["assistdefense"] = new ConsequenceAssistDefense();
 	}
 
 	private static void RegisterAcquirers()
