@@ -18,6 +18,8 @@ using Il2CppInterop.Runtime.InteropTypes;
 using Il2CppSystem.Text.RegularExpressions;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
+using Regex = System.Text.RegularExpressions.Regex;
+using RegexOptions = System.Text.RegularExpressions.RegexOptions;
 using TimeSpan = Il2CppSystem.TimeSpan;
 
 //using CodeStage.AntiCheat.ObscuredTypes;
@@ -305,7 +307,7 @@ public class ModularSA : Il2CppSystem.Object
 		bool success_first = false;
 		for (int i = idx; i < circles.Length; i++) {
 			string circle_string = circles[i];
-			MatchCollection symbols = Regex.Matches(circle_string, "(<|>|=)", RegexOptions.IgnoreCase, TimeSpan.FromMinutes(1));
+			var symbols = Regex.Matches(circle_string, "(<|>|=)", RegexOptions.IgnoreCase, System.TimeSpan.FromMinutes(1));
 			string[] parameters = circle_string.Split(ifSeparator);
 			string firstParam = parameters[0];
 			string secondParam = parameters[1];
@@ -761,7 +763,7 @@ public class ModularSA : Il2CppSystem.Object
 	}
 
 	public int DoMath(string s) {
-		MatchCollection symbols = MainClass.mathsymbolRegex.Matches(s);
+		var symbols = MainClass.mathsymbolRegex.Matches(s);
 		string[] parameters = s.Split(MainClass.mathSeparator);
 		string firstParam = parameters[0];
 		double finalValue = GetNumFromParamString(firstParam);
