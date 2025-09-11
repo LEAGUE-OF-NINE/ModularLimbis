@@ -367,6 +367,11 @@ public class ModularSA : Il2CppSystem.Object
 		return value;
 	}
 
+	public bool GetBoolFromParamString(string str)
+	{
+		if (GetNumFromParamString(str) != 0) return true;
+		return str.ToLowerInvariant() == "true";
+	}
 
 	public List<BattleUnitModel> GetTargetModelList(string param)
 	{
