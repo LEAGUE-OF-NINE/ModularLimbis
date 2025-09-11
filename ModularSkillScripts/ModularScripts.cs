@@ -16,6 +16,8 @@ using BattleUI;
 using BepInEx.Unity.IL2CPP.Utils;
 using Il2CppInterop.Runtime.InteropTypes;
 using Il2CppSystem.Text.RegularExpressions;
+using Lua;
+using Lua.Standard;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 using Regex = System.Text.RegularExpressions.Regex;
@@ -814,6 +816,65 @@ public class ModularSA : Il2CppSystem.Object
 		
 		MainClass.Logg.LogInfo("Invalid Getter: " + methodology);
 		return -1;
+	}
+
+	private string[] LuaToConsequenceArgs(LuaFunctionExecutionContext context, String name)
+	{
+		var args = new string[context.ArgumentCount];
+		for (int i = 0; i < context.ArgumentCount; i++)
+		{
+			var value = context.GetArgument(i);
+			args[i] = value.Type switch
+			{
+				LuaValueType.Boolean => value.Read<bool>() ? "1" : "0",
+				LuaValueType.Number => value.Read<int>().ToString(),
+				LuaValueType.String => value.Read<string>(),
+				_ => throw new LuaException(
+					$"Unsupported Lua argument type when calling {name}: {value.Type}")
+			};
+		}
+
+		return args;
+	}
+	
+	private LuaFunction LuaConsequence(String name)
+	{
+		return new LuaFunction(async (context, buffer, ct) =>
+		{
+			var args = LuaToConsequenceArgs(context, name);
+			var circledSection = String.Join(",", args);
+			MainClass.consequenceDict[name].ExecuteConsequence(this, $"{name}(${circledSection})", circledSection, args);
+			return 0;
+		});
+	}
+	
+	private LuaFunction LuaAcquirer(String name)
+	{
+		return new LuaFunction(async (context, buffer, ct) =>
+		{
+			var args = LuaToConsequenceArgs(context, name);
+			var circledSection = String.Join(",", args);
+			buffer.Span[0] = MainClass.acquirerDict[name].ExecuteAcquirer(this, $"{name}(${circledSection})", circledSection, args);
+			return 1;
+		});
+	}
+
+	private void InitializeLuaState(LuaState state)
+	{
+		state.OpenBasicLibrary();
+		state.OpenBitwiseLibrary();
+		state.OpenMathLibrary();
+		state.OpenModuleLibrary();
+		state.OpenStringLibrary();
+		state.OpenTableLibrary();
+		foreach (var key in MainClass.consequenceDict.Keys)
+		{
+			state.Environment[key] = LuaConsequence(key);
+		}
+		foreach (var key in MainClass.acquirerDict.Keys)
+		{
+			state.Environment[key] = LuaAcquirer(key);
+		}
 	}
 	
 	public static BattleUnitModel_Abnormality AsAbnormalityModel(BattleUnitModel targetModel)
