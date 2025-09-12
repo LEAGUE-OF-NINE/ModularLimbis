@@ -409,6 +409,9 @@ public class ModularSA : Il2CppSystem.Object
 	public List<BattleUnitModel> GetTargetModelList(string param)
 	{
 		List<BattleUnitModel> unitList = new List<BattleUnitModel>();
+		SinManager sinManager_inst = Singleton<SinManager>.Instance;
+		BattleObjectManager battleObjectManager = sinManager_inst._battleObjectManager;
+
 		switch (param) {
 			case "Null": return unitList;
 			case "Self": {
@@ -455,10 +458,9 @@ public class ModularSA : Il2CppSystem.Object
 				}
 				return unitList;
 			}
+			case "All":
+				return battleObjectManager.GetModelList();
 		}
-
-		SinManager sinManager_inst = Singleton<SinManager>.Instance;
-		BattleObjectManager battleObjectManager = sinManager_inst._battleObjectManager;
 
 		if (param.StartsWith("id")) {
 			string id_string = param.Remove(0, 2);
