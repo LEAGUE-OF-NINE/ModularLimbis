@@ -306,13 +306,13 @@ public class ModularSA : Il2CppSystem.Object
 				var buffer = ArrayPool<LuaValue>.Shared.Rent(1024);
 				return await state.RunAsync(modsa_luaScript, buffer);
 			});
-			if (result.Exception != null)
-			{
-				MainClass.Logg.LogError($"Lua Script Exception: {result.Exception}");
-			}
-			else
+			try
 			{
 				MainClass.Logg.LogInfo($"Lua Script executed successfully: {result.Result}");
+			}
+			catch (AggregateException ex)
+			{
+				MainClass.Logg.LogError($"Lua Script execution failed: {ex.Message}: {ex.StackTrace}");
 			}
 		}
 		
@@ -894,12 +894,6 @@ public class ModularSA : Il2CppSystem.Object
 
 	private void InitializeLuaState(LuaState state)
 	{
-		state.OpenBasicLibrary();
-		state.OpenBitwiseLibrary();
-		state.OpenMathLibrary();
-		state.OpenModuleLibrary();
-		state.OpenStringLibrary();
-		state.OpenTableLibrary();
 		foreach (var key in MainClass.consequenceDict.Keys)
 		{
 			state.Environment[key] = LuaConsequence(key);
@@ -908,6 +902,14 @@ public class ModularSA : Il2CppSystem.Object
 		{
 			state.Environment[key] = LuaAcquirer(key);
 		}
+	
+		state.OpenBasicLibrary();
+		state.OpenBitwiseLibrary();
+		state.OpenMathLibrary();
+		state.OpenModuleLibrary();
+		state.OpenStringLibrary();
+		state.OpenTableLibrary();
+		
 		state.Environment["clearvalues"] = new LuaFunction(async (context, buffer, ct) =>
 		{
 			ResetValueList();
