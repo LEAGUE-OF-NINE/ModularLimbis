@@ -18,6 +18,7 @@ using Il2CppInterop.Runtime.InteropTypes;
 using Il2CppSystem.Text.RegularExpressions;
 using Lua;
 using Lua.Standard;
+using SharpCompress;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 using Regex = System.Text.RegularExpressions.Regex;
@@ -437,7 +438,7 @@ public class ModularSA : Il2CppSystem.Object
 			}
 			return unitList;
 		}
-		else if (param.StartsWith("inst")) {
+		if (param.StartsWith("inst")) {
 			string id_string = param.Remove(0, 4);
 			int id = GetNumFromParamString(id_string);
 			foreach (BattleUnitModel unit in battleObjectManager.GetModelList()) {
@@ -445,7 +446,7 @@ public class ModularSA : Il2CppSystem.Object
 			}
 			return unitList;
 		}
-		else if (param.StartsWith("adj"))
+		if (param.StartsWith("adj"))
 		{
 			string side_string = param.Remove(0, 3);
 			if (side_string == "Left")
@@ -875,6 +876,29 @@ public class ModularSA : Il2CppSystem.Object
 		{
 			state.Environment[key] = LuaAcquirer(key);
 		}
+		state.Environment["clearvalues"] = new LuaFunction(async (context, buffer, ct) =>
+		{
+			ResetValueList();
+			return 0;
+		});
+		state.Environment["resetadders"] = new LuaFunction(async (context, buffer, ct) =>
+		{
+			ResetAdders();
+			return 0;
+		});
+		state.Environment["selecttargets"] = new LuaFunction(async (context, buffer, ct) =>
+		{
+			var table = new LuaTable();
+			GetTargetModelList(context.GetArgument(0).Read<string>())
+				.ToArray()
+				.Select((unit, i) => (i + 1, $"inst{unit.InstanceID}"))
+				.ForEach(x =>
+				{
+					table[x.Item1] = x.Item2;
+				});
+			buffer.Span[0] = table;
+			return 1;
+		});
 	}
 	
 	public static BattleUnitModel_Abnormality AsAbnormalityModel(BattleUnitModel targetModel)
