@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using HarmonyLib;
 using Lethe;
+using Lua.CodeAnalysis.Compilation;
+using Lua.CodeAnalysis.Syntax;
+using Lua.Runtime;
 using MainUI;
 
 namespace ModularSkillScripts;
 
 public class ReloadPatches
 {
-	public static Dictionary<string, string> loadedScripts = new Dictionary<string, string>();
+	public static Dictionary<string, Chunk> loadedScripts = new();
 	
 	[HarmonyPatch(typeof(LobbyUIPresenter), nameof(LobbyUIPresenter.Initialize))]
 	[HarmonyPostfix]
@@ -36,8 +39,17 @@ public class ReloadPatches
 					MainClass.Logg.LogWarning($"Modular Lua Script '{name}' in '{luaPath}' is empty. Skipping.");
 					continue;
 				}
-				loadedScripts[name] = content;
-				MainClass.Logg.LogInfo($"Loaded Modular Lua Script '{name}' from '{luaPath}'.");
+
+				try
+				{
+					var syntaxTree = LuaSyntaxTree.Parse(content, name);
+					loadedScripts[name] = LuaCompiler.Default.Compile(syntaxTree, name);
+					MainClass.Logg.LogInfo($"Loaded Modular Lua Script '{name}' from '{luaPath}'.");
+				}
+				catch (Exception ex)
+				{
+					MainClass.Logg.LogError($"Failed to load Modular Lua Script '{name}' from '{luaPath}': {ex.Message}");
+				}
 			}
 		}
 	}

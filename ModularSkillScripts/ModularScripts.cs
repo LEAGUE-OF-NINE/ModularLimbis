@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections;
 using System.Globalization;
 using System.Linq;
@@ -18,6 +19,9 @@ using BepInEx.Unity.IL2CPP.Utils;
 using Il2CppInterop.Runtime.InteropTypes;
 using Il2CppSystem.Text.RegularExpressions;
 using Lua;
+using Lua.CodeAnalysis.Compilation;
+using Lua.CodeAnalysis.Syntax;
+using Lua.Runtime;
 using Lua.Standard;
 using SharpCompress;
 using UnityEngine.UI;
@@ -100,7 +104,7 @@ public class ModularSA : Il2CppSystem.Object
 		dummyCoinAbility = null;
 		modsa_loopTarget = null;
 		modsa_loopString = "";
-		modsa_luaScript = "";
+		modsa_luaScript = null;
 	}
 
 	public int activationTiming = 0;
@@ -129,7 +133,7 @@ public class ModularSA : Il2CppSystem.Object
 	public CoinAbility dummyCoinAbility = null;
 	public BattleUnitModel modsa_loopTarget = null;
 	public string modsa_loopString = "";
-	public string modsa_luaScript = "";
+	public Chunk modsa_luaScript = null;
 
 	public void ResetAdders()
 	{
@@ -273,7 +277,7 @@ public class ModularSA : Il2CppSystem.Object
 		ResetAdders();
 		if (clearValues) ResetValueList();
 
-		if (String.IsNullOrWhiteSpace(modsa_luaScript))
+		if (modsa_luaScript == null)
 		{
 			// normal non-lua execution
 			List<BattleUnitModel> loopTarget_list = modsa_target_list;
@@ -296,7 +300,20 @@ public class ModularSA : Il2CppSystem.Object
 		{
 			var state = LuaState.Create();
 			InitializeLuaState(state);
-			Task.Run(async () => { await state.DoStringAsync(modsa_luaScript); });
+			var result = Task.Run(async () =>
+			{
+				MainClass.Logg.LogInfo($"Executing Lua Script in task: {modsa_luaScript.Name}...");
+				var buffer = ArrayPool<LuaValue>.Shared.Rent(1024);
+				return await state.RunAsync(modsa_luaScript, buffer);
+			});
+			if (result.Exception != null)
+			{
+				MainClass.Logg.LogError($"Lua Script Exception: {result.Exception}");
+			}
+			else
+			{
+				MainClass.Logg.LogInfo($"Lua Script executed successfully: {result.Result}");
+			}
 		}
 		
 		activationCounter += 1;
@@ -721,7 +738,7 @@ public class ModularSA : Il2CppSystem.Object
 			}
 			else if (batch.StartsWith("LOOP:", StringComparison.OrdinalIgnoreCase))
 			{
-				if (!String.IsNullOrWhiteSpace(modsa_luaScript))
+				if (modsa_luaScript != null)
 				{
 					MainClass.Logg.LogError("LOOP cannot be used with LUA");
 					return;
