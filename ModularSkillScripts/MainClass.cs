@@ -257,5 +257,6 @@ public class MainClass : BasePlugin
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
 	public static ManualLogSource Logg;
+ 	public static DirectoryInfo pluginPath = Directory.CreateDirectory(Path.Combine(Paths.PluginPath, "Lethe", "ModTemplate", "modular_lua"));
 }
 
