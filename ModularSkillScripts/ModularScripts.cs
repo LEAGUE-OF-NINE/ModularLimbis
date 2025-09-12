@@ -3,6 +3,7 @@ using System.Collections;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Il2CppInterop.Runtime.Injection;
 using Il2CppSystem.Collections.Generic;
 using UnityEngine;
@@ -271,21 +272,33 @@ public class ModularSA : Il2CppSystem.Object
 
 		ResetAdders();
 		if (clearValues) ResetValueList();
-		List<BattleUnitModel> loopTarget_list = modsa_target_list;
-		if (modsa_loopString.Any()) loopTarget_list = GetTargetModelList(modsa_loopString);
-		else if (loopTarget_list.Count < 1) loopTarget_list.Add(GetTargetModel("MainTarget"));
-		foreach (BattleUnitModel unit in loopTarget_list) {
-			modsa_loopTarget = unit;
-			_fullStop = false;
-			for (int i = 0; i < batch_list.Count; i++)
-			{
-				if (_fullStop) break;
-				string batch = batch_list.ToArray()[i];
-				if (MainClass.logEnabled) MainClass.Logg.LogInfo("batch " + i.ToString() + ": " + batch);
-				ProcessBatch(batch);
+
+		if (String.IsNullOrWhiteSpace(modsa_luaScript))
+		{
+			// normal non-lua execution
+			List<BattleUnitModel> loopTarget_list = modsa_target_list;
+			if (modsa_loopString.Any()) loopTarget_list = GetTargetModelList(modsa_loopString);
+			else if (loopTarget_list.Count < 1) loopTarget_list.Add(GetTargetModel("MainTarget"));
+			foreach (BattleUnitModel unit in loopTarget_list) {
+				modsa_loopTarget = unit;
+				_fullStop = false;
+				for (int i = 0; i < batch_list.Count; i++)
+				{
+					if (_fullStop) break;
+					string batch = batch_list.ToArray()[i];
+					if (MainClass.logEnabled) MainClass.Logg.LogInfo("batch " + i.ToString() + ": " + batch);
+					ProcessBatch(batch);
+				}
 			}
+			modsa_target_list.Clear();
 		}
-		modsa_target_list.Clear();
+		else
+		{
+			var state = LuaState.Create();
+			InitializeLuaState(state);
+			Task.Run(async () => { await state.DoStringAsync(modsa_luaScript); });
+		}
+		
 		activationCounter += 1;
 	}
 
