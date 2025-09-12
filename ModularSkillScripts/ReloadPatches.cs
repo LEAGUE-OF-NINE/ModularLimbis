@@ -12,13 +12,12 @@ namespace ModularSkillScripts;
 
 public class ReloadPatches
 {
-	public static Dictionary<string, Chunk> loadedScripts = new();
 	
 	[HarmonyPatch(typeof(LobbyUIPresenter), nameof(LobbyUIPresenter.Initialize))]
 	[HarmonyPostfix]
 	private static void PostMainUILoad()
 	{
-		loadedScripts.Clear();
+		LuaScript.loadedScripts.Clear();
 		MainClass.Logg.LogInfo("PostMainUILoad - Reloading Modular Lua Scripts");
 		foreach (var modPath in Directory.GetDirectories(LetheMain.modsPath.FullPath))
 		{
@@ -28,7 +27,7 @@ public class ReloadPatches
 			foreach (var luaPath in Directory.GetFiles(expectedPath, "*.lua", SearchOption.AllDirectories))
 			{
 				var name = Path.GetFileNameWithoutExtension(luaPath);
-				if (loadedScripts.ContainsKey(name))
+				if (LuaScript.loadedScripts.ContainsKey(name))
 				{
 					MainClass.Logg.LogError($"Duplicate Modular Lua Script name '{name}' found in '{luaPath}'. Skipping.");
 					continue;
@@ -43,7 +42,8 @@ public class ReloadPatches
 				try
 				{
 					var syntaxTree = LuaSyntaxTree.Parse(content, name);
-					loadedScripts[name] = LuaCompiler.Default.Compile(syntaxTree, name);
+					var script = LuaCompiler.Default.Compile(syntaxTree, name);
+					LuaScript.loadedScripts[name] = new LuaScript { Body = content, Content = script, Name = name };
 					MainClass.Logg.LogInfo($"Loaded Modular Lua Script '{name}' from '{luaPath}'.");
 				}
 				catch (Exception ex)

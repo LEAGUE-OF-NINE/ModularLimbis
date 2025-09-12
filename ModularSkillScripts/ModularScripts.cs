@@ -1,38 +1,17 @@
 using System;
 using System.Buffers;
-using System.Collections;
-using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Il2CppInterop.Runtime.Injection;
 using Il2CppSystem.Collections.Generic;
-using UnityEngine;
 using static BattleActionModel.TargetDataDetail;
 using IntPtr = System.IntPtr;
 using Lethe.Patches;
-using BattleUI.Dialog;
-using FMOD;
-using FMODUnity;
-using BattleUI;
-using BepInEx.Unity.IL2CPP.Utils;
-using Il2CppInterop.Runtime.InteropTypes;
-using Il2CppSystem.Text.RegularExpressions;
 using Lua;
-using Lua.CodeAnalysis.Compilation;
-using Lua.CodeAnalysis.Syntax;
-using Lua.Runtime;
 using Lua.Standard;
 using SharpCompress;
-using UnityEngine.UI;
-using Random = UnityEngine.Random;
 using Regex = System.Text.RegularExpressions.Regex;
 using RegexOptions = System.Text.RegularExpressions.RegexOptions;
-using TimeSpan = Il2CppSystem.TimeSpan;
-
-//using CodeStage.AntiCheat.ObscuredTypes;
-//using Il2CppSystem.Collections;
-
 
 namespace ModularSkillScripts;
 
@@ -133,7 +112,7 @@ public class ModularSA : Il2CppSystem.Object
 	public CoinAbility dummyCoinAbility = null;
 	public BattleUnitModel modsa_loopTarget = null;
 	public string modsa_loopString = "";
-	public Chunk modsa_luaScript = null;
+	public LuaScript modsa_luaScript = null;
 
 	public void ResetAdders()
 	{
@@ -304,7 +283,7 @@ public class ModularSA : Il2CppSystem.Object
 			{
 				MainClass.Logg.LogInfo($"Executing Lua Script in task: {modsa_luaScript.Name}...");
 				var buffer = ArrayPool<LuaValue>.Shared.Rent(1024);
-				return await state.RunAsync(modsa_luaScript, buffer);
+				return await state.RunAsync(modsa_luaScript.Content, buffer);
 			});
 			try
 			{
@@ -731,7 +710,7 @@ public class ModularSA : Il2CppSystem.Object
 					return;
 				}
 				var luaScriptName = batch.Remove(0, 4);
-				if (!ReloadPatches.loadedScripts.TryGetValue(luaScriptName, out modsa_luaScript))
+				if (!LuaScript.loadedScripts.TryGetValue(luaScriptName, out modsa_luaScript))
 				{
 					MainClass.Logg.LogError("LUA script used but not found: " + luaScriptName);
 					return;
@@ -894,6 +873,7 @@ public class ModularSA : Il2CppSystem.Object
 
 	private void InitializeLuaState(LuaState state)
 	{
+		state.ModuleLoader = new LuaScript.ModularLuaModuleLoader();
 		foreach (var key in MainClass.consequenceDict.Keys)
 		{
 			state.Environment[key] = LuaConsequence(key);
@@ -909,7 +889,7 @@ public class ModularSA : Il2CppSystem.Object
 		state.OpenModuleLibrary();
 		state.OpenStringLibrary();
 		state.OpenTableLibrary();
-		
+	
 		state.Environment["clearvalues"] = new LuaFunction(async (context, buffer, ct) =>
 		{
 			ResetValueList();
