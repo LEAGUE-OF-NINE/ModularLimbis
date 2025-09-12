@@ -1,31 +1,21 @@
 using System;
-using System.Collections;
-using System.Globalization;
+using System.Buffers;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Il2CppInterop.Runtime.Injection;
 using Il2CppSystem.Collections.Generic;
-using UnityEngine;
 using static BattleActionModel.TargetDataDetail;
 using IntPtr = System.IntPtr;
 using Lethe.Patches;
-using BattleUI.Dialog;
-using FMOD;
-using FMODUnity;
-using BattleUI;
-using BepInEx.Unity.IL2CPP.Utils;
-using Il2CppSystem.Text.RegularExpressions;
-using UnityEngine.UI;
-using Random = UnityEngine.Random;
-using TimeSpan = Il2CppSystem.TimeSpan;
-
-//using CodeStage.AntiCheat.ObscuredTypes;
-//using Il2CppSystem.Collections;
-
+using Lua;
+using Lua.Standard;
+using SharpCompress;
+using Regex = System.Text.RegularExpressions.Regex;
+using RegexOptions = System.Text.RegularExpressions.RegexOptions;
 
 namespace ModularSkillScripts;
 
-public class ModUnitData : MonoBehaviour
+public class ModUnitData : Il2CppSystem.Object
 {
 	public ModUnitData(IntPtr ptr) : base(ptr) { }
 
@@ -38,7 +28,7 @@ public class ModUnitData : MonoBehaviour
 	public List<DataMod> data_list = new List<DataMod>();
 }
 
-public class DataMod : MonoBehaviour
+public class DataMod : Il2CppSystem.Object
 {
 	public DataMod(IntPtr ptr) : base(ptr) { }
 
@@ -51,7 +41,7 @@ public class DataMod : MonoBehaviour
 	public int dataValue = 0;
 }
 
-public class ModularSA : MonoBehaviour
+public class ModularSA : Il2CppSystem.Object
 {
 	public ModularSA(IntPtr ptr) : base(ptr) { }
 
@@ -93,6 +83,7 @@ public class ModularSA : MonoBehaviour
 		dummyCoinAbility = null;
 		modsa_loopTarget = null;
 		modsa_loopString = "";
+		modsa_luaScript = null;
 	}
 
 	public int activationTiming = 0;
@@ -121,6 +112,7 @@ public class ModularSA : MonoBehaviour
 	public CoinAbility dummyCoinAbility = null;
 	public BattleUnitModel modsa_loopTarget = null;
 	public string modsa_loopString = "";
+	public LuaScript modsa_luaScript = null;
 
 	public void ResetAdders()
 	{
@@ -263,21 +255,46 @@ public class ModularSA : MonoBehaviour
 
 		ResetAdders();
 		if (clearValues) ResetValueList();
-		List<BattleUnitModel> loopTarget_list = modsa_target_list;
-		if (modsa_loopString.Any()) loopTarget_list = GetTargetModelList(modsa_loopString);
-		else if (loopTarget_list.Count < 1) loopTarget_list.Add(GetTargetModel("MainTarget"));
-		foreach (BattleUnitModel unit in loopTarget_list) {
-			modsa_loopTarget = unit;
-			_fullStop = false;
-			for (int i = 0; i < batch_list.Count; i++)
+
+		if (modsa_luaScript == null)
+		{
+			// normal non-lua execution
+			List<BattleUnitModel> loopTarget_list = modsa_target_list;
+			if (modsa_loopString.Any()) loopTarget_list = GetTargetModelList(modsa_loopString);
+			else if (loopTarget_list.Count < 1) loopTarget_list.Add(GetTargetModel("MainTarget"));
+			foreach (BattleUnitModel unit in loopTarget_list) {
+				modsa_loopTarget = unit;
+				_fullStop = false;
+				for (int i = 0; i < batch_list.Count; i++)
+				{
+					if (_fullStop) break;
+					string batch = batch_list.ToArray()[i];
+					if (MainClass.logEnabled) MainClass.Logg.LogInfo("batch " + i.ToString() + ": " + batch);
+					ProcessBatch(batch);
+				}
+			}
+			modsa_target_list.Clear();
+		}
+		else
+		{
+			var state = LuaState.Create();
+			InitializeLuaState(state);
+			var result = Task.Run(async () =>
 			{
-				if (_fullStop) break;
-				string batch = batch_list.ToArray()[i];
-				if (MainClass.logEnabled) MainClass.Logg.LogInfo("batch " + i.ToString() + ": " + batch);
-				ProcessBatch(batch);
+				MainClass.Logg.LogInfo($"Executing Lua Script in task: {modsa_luaScript.Name}...");
+				var buffer = ArrayPool<LuaValue>.Shared.Rent(1024);
+				return await state.RunAsync(modsa_luaScript.Content, buffer);
+			});
+			try
+			{
+				MainClass.Logg.LogInfo($"Lua Script executed successfully: {result.Result}");
+			}
+			catch (AggregateException ex)
+			{
+				MainClass.Logg.LogError($"Lua Script execution failed: {ex.Message}: {ex.StackTrace}");
 			}
 		}
-		modsa_target_list.Clear();
+		
 		activationCounter += 1;
 	}
 
@@ -302,7 +319,7 @@ public class ModularSA : MonoBehaviour
 		bool success_first = false;
 		for (int i = idx; i < circles.Length; i++) {
 			string circle_string = circles[i];
-			MatchCollection symbols = Regex.Matches(circle_string, "(<|>|=)", RegexOptions.IgnoreCase, TimeSpan.FromMinutes(1));
+			var symbols = Regex.Matches(circle_string, "(<|>|=)", RegexOptions.IgnoreCase, System.TimeSpan.FromMinutes(1));
 			string[] parameters = circle_string.Split(ifSeparator);
 			string firstParam = parameters[0];
 			string secondParam = parameters[1];
@@ -362,10 +379,18 @@ public class ModularSA : MonoBehaviour
 		return value;
 	}
 
+	public bool GetBoolFromParamString(string str)
+	{
+		if (GetNumFromParamString(str) != 0) return true;
+		return str.ToLowerInvariant() == "true";
+	}
 
 	public List<BattleUnitModel> GetTargetModelList(string param)
 	{
 		List<BattleUnitModel> unitList = new List<BattleUnitModel>();
+		SinManager sinManager_inst = Singleton<SinManager>.Instance;
+		BattleObjectManager battleObjectManager = sinManager_inst._battleObjectManager;
+
 		switch (param) {
 			case "Null": return unitList;
 			case "Self": {
@@ -412,10 +437,9 @@ public class ModularSA : MonoBehaviour
 				}
 				return unitList;
 			}
+			case "All":
+				return battleObjectManager.GetModelList();
 		}
-
-		SinManager sinManager_inst = Singleton<SinManager>.Instance;
-		BattleObjectManager battleObjectManager = sinManager_inst._battleObjectManager;
 
 		if (param.StartsWith("id")) {
 			string id_string = param.Remove(0, 2);
@@ -425,7 +449,7 @@ public class ModularSA : MonoBehaviour
 			}
 			return unitList;
 		}
-		else if (param.StartsWith("inst")) {
+		if (param.StartsWith("inst")) {
 			string id_string = param.Remove(0, 4);
 			int id = GetNumFromParamString(id_string);
 			foreach (BattleUnitModel unit in battleObjectManager.GetModelList()) {
@@ -433,7 +457,7 @@ public class ModularSA : MonoBehaviour
 			}
 			return unitList;
 		}
-		else if (param.StartsWith("adj"))
+		if (param.StartsWith("adj"))
 		{
 			string side_string = param.Remove(0, 3);
 			if (side_string == "Left")
@@ -655,6 +679,7 @@ public class ModularSA : MonoBehaviour
 			
 		instructions = MainClass.sWhitespace.Replace(instructions, "");
 		string[] batches = instructions.Split('/');
+		bool luaFound = false;
 
 		for (int i = 0; i < batches.Length; i++) {
 			string batch = batches[i];
@@ -677,9 +702,37 @@ public class ModularSA : MonoBehaviour
 					//else if (hitArgs.Contains("Lose")) _onlyClashLose = true;
 				}
 			}
-			else if (batch.StartsWith("LOOP:", StringComparison.OrdinalIgnoreCase)) modsa_loopString = batch.Remove(0, 5);
+			else if (batch.StartsWith("LUA:", StringComparison.OrdinalIgnoreCase))
+			{
+				if (!String.IsNullOrWhiteSpace(modsa_loopString))
+				{
+					MainClass.Logg.LogError("LUA cannot be used with LOOP");
+					return;
+				}
+				var luaScriptName = batch.Remove(0, 4);
+				if (!LuaScript.loadedScripts.TryGetValue(luaScriptName, out modsa_luaScript))
+				{
+					MainClass.Logg.LogError("LUA script used but not found: " + luaScriptName);
+					return;
+				}
+				luaFound = true;
+			}
+			else if (batch.StartsWith("LOOP:", StringComparison.OrdinalIgnoreCase))
+			{
+				if (modsa_luaScript != null)
+				{
+					MainClass.Logg.LogError("LOOP cannot be used with LUA");
+					return;
+				}
+				modsa_loopString = batch.Remove(0, 5);
+			}
 			else if (batch.Equals("RESETWHENUSE", StringComparison.OrdinalIgnoreCase)) resetWhenUse = true;
 			else if (batch.Equals("CLEARVALUES", StringComparison.OrdinalIgnoreCase)) clearValues = true;
+			else if (luaFound)
+			{
+				MainClass.Logg.LogError("LUA cannot be used with other batches");
+				return;
+			}
 			else batch_list.Add(batch);
 		}
 	}
@@ -729,7 +782,7 @@ public class ModularSA : MonoBehaviour
 	}
 
 	public int DoMath(string s) {
-		MatchCollection symbols = MainClass.mathsymbolRegex.Matches(s);
+		var symbols = MainClass.mathsymbolRegex.Matches(s);
 		string[] parameters = s.Split(MainClass.mathSeparator);
 		string firstParam = parameters[0];
 		double finalValue = GetNumFromParamString(firstParam);
@@ -775,6 +828,91 @@ public class ModularSA : MonoBehaviour
 		
 		MainClass.Logg.LogInfo("Invalid Getter: " + methodology);
 		return -1;
+	}
+
+	private string[] LuaToConsequenceArgs(LuaFunctionExecutionContext context, String name)
+	{
+		var args = new string[context.ArgumentCount];
+		for (int i = 0; i < context.ArgumentCount; i++)
+		{
+			var value = context.GetArgument(i);
+			args[i] = value.Type switch
+			{
+				LuaValueType.Boolean => value.Read<bool>() ? "1" : "0",
+				LuaValueType.Number => value.Read<int>().ToString(),
+				LuaValueType.String => value.Read<string>(),
+				_ => throw new LuaException(
+					$"Unsupported Lua argument type when calling {name}: {value.Type}")
+			};
+		}
+
+		return args;
+	}
+	
+	private LuaFunction LuaConsequence(String name)
+	{
+		return new LuaFunction(async (context, buffer, ct) =>
+		{
+			var args = LuaToConsequenceArgs(context, name);
+			var circledSection = String.Join(",", args);
+			MainClass.consequenceDict[name].ExecuteConsequence(this, $"{name}(${circledSection})", circledSection, args);
+			return 0;
+		});
+	}
+	
+	private LuaFunction LuaAcquirer(String name)
+	{
+		return new LuaFunction(async (context, buffer, ct) =>
+		{
+			var args = LuaToConsequenceArgs(context, name);
+			var circledSection = String.Join(",", args);
+			buffer.Span[0] = MainClass.acquirerDict[name].ExecuteAcquirer(this, $"{name}(${circledSection})", circledSection, args);
+			return 1;
+		});
+	}
+
+	private void InitializeLuaState(LuaState state)
+	{
+		state.ModuleLoader = new LuaScript.ModularLuaModuleLoader();
+		foreach (var key in MainClass.consequenceDict.Keys)
+		{
+			state.Environment[key] = LuaConsequence(key);
+		}
+		foreach (var key in MainClass.acquirerDict.Keys)
+		{
+			state.Environment[key] = LuaAcquirer(key);
+		}
+	
+		state.OpenBasicLibrary();
+		state.OpenBitwiseLibrary();
+		state.OpenMathLibrary();
+		state.OpenModuleLibrary();
+		state.OpenStringLibrary();
+		state.OpenTableLibrary();
+	
+		state.Environment["clearvalues"] = new LuaFunction(async (context, buffer, ct) =>
+		{
+			ResetValueList();
+			return 0;
+		});
+		state.Environment["resetadders"] = new LuaFunction(async (context, buffer, ct) =>
+		{
+			ResetAdders();
+			return 0;
+		});
+		state.Environment["selecttargets"] = new LuaFunction(async (context, buffer, ct) =>
+		{
+			var table = new LuaTable();
+			GetTargetModelList(context.GetArgument(0).Read<string>())
+				.ToArray()
+				.Select((unit, i) => (i + 1, $"inst{unit.InstanceID}"))
+				.ForEach(x =>
+				{
+					table[x.Item1] = x.Item2;
+				});
+			buffer.Span[0] = table;
+			return 1;
+		});
 	}
 	
 	public static BattleUnitModel_Abnormality AsAbnormalityModel(BattleUnitModel targetModel)
