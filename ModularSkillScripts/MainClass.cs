@@ -9,7 +9,7 @@ using Il2CppSystem.Text.RegularExpressions;
 using ModularSkillScripts.Acquirer;
 using ModularSkillScripts.Consequence;
 using Random = System.Random;
-
+using Il2CppSystem.IO;
 //using Antlr4.Runtime;
 //using Antlr4.Runtime.Tree;
 //using ModsaLang;
