@@ -218,7 +218,7 @@ public class MainClass : BasePlugin
 		acquirerDict["coinrerolled"] = new AcquirerCoinRerolled();
 		acquirerDict["stageextraslot"] = new AcquirerStageExtraSlot();
 		acquirerDict["getbloodfeast"] = new AcquirerGetBloodfeast();
-  	acquirerDict["isunbreakable"] = new AcquirerIsUnbreakable();
+  		acquirerDict["isunbreakable"] = new AcquirerIsUnbreakable();
 		acquirerDict["isusableinduel"] = new AcquirerIsUsableInDuel();
 	}
 
