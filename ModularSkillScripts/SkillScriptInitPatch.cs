@@ -1906,18 +1906,6 @@ public class SkillScriptInitPatch
 			var skillModel = new SkillModel(skill, model.Level, model.SyncLevel);
 			skillModel.Init(); // needed to get noticed by modular skill timing?
 			
-			// enact on skill scripts
-			long skillmodel_intlong = skillModel.Pointer.ToInt64();
-			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
-			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				modsa.Enact(model, skillModel, null, null, MainClass.timingDict["ChangeMotion"], BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modsa.modsa_motionDetail == null) continue;
-				motiondetail = modsa.modsa_motionDetail.Detail;
-				__instance._currentMotiondetail = motiondetail;
-				index = modsa.modsa_motionDetail.Index;
-				modsa.modsa_motionDetail = null;
-			}
-			
 			// enact on coin scripts
 			var coin = skillModel.CoinList.GetLastElement();
 			if (coinIdx >= 0 && coinIdx < skillModel.CoinList.Count)
