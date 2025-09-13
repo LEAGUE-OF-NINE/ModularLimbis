@@ -1888,21 +1888,25 @@ public class SkillScriptInitPatch
 		var log = __instance._battleUnitView.CurrentActionLog?._systemLog;
 		if (log == null) return;
 		
+		if (__instance._battleUnitView._currentDuelViewer != null || __instance._battleUnitView.CurrentActionLog == null)
+			return;
+		
 		foreach (var behavior in log.GetAllBehaviourLog_Start())
 		{
 			var actor = log.GetCharacterInfo(behavior._instanceID); //get actor
-			if (behavior._instanceID != actor.instanceID || __instance._battleUnitView._instanceID != actor.instanceID)
-				continue;
 
 			var skillID = behavior._skillID;
 			var skillViewer = __instance._battleUnitView.GetSkillViewer(skillID);
-			if (skillViewer == null) continue;
+			if (skillViewer == null) return;
 			var coinIdx = skillViewer.CurCoinLogIndex;
 			var model = __instance._battleUnitView._unitModel;
 
 			var skillModel = skillViewer.CurrentSkillModel;
-			if (skillModel == null) continue;
-			
+			if (skillModel == null) return;
+		
+			if (behavior._instanceID != actor.instanceID || __instance._battleUnitView._instanceID != actor.instanceID)
+				continue;
+
 			// enact on coin scripts
 			var coin = skillModel.CoinList.GetLastElement();
 			if (coinIdx >= 0 && coinIdx < skillModel.CoinList.Count)
@@ -1915,12 +1919,10 @@ public class SkillScriptInitPatch
 				modca.Enact(model, skillModel, null, null, MainClass.timingDict["ChangeMotion"], BATTLE_EVENT_TIMING.NONE);
 				if (modca.modsa_motionDetail == null) continue;
 				motiondetail = modca.modsa_motionDetail.Detail;
-				__instance._currentMotiondetail = motiondetail;
 				index = modca.modsa_motionDetail.Index;
 				modca.modsa_motionDetail = null;
 			}
 		}
 	}
-
 	
 }
