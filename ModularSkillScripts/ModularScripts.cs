@@ -279,15 +279,11 @@ public class ModularSA : Il2CppSystem.Object
 		{
 			var state = LuaState.Create();
 			InitializeLuaState(state);
-			var result = Task.Run(async () =>
-			{
-				MainClass.Logg.LogInfo($"Executing Lua Script in task: {modsa_luaScript.Name}...");
-				var buffer = ArrayPool<LuaValue>.Shared.Rent(1024);
-				return await state.RunAsync(modsa_luaScript.Content, buffer);
-			});
 			try
 			{
-				MainClass.Logg.LogInfo($"Lua Script executed successfully: {result.Result}");
+				var buffer = ArrayPool<LuaValue>.Shared.Rent(1024);
+				int result = state.RunAsync(modsa_luaScript.Content, buffer).GetAwaiter().GetResult();
+				MainClass.Logg.LogInfo($"Lua Script executed successfully: {result}");
 			}
 			catch (AggregateException ex)
 			{
@@ -851,23 +847,25 @@ public class ModularSA : Il2CppSystem.Object
 	
 	private LuaFunction LuaConsequence(String name)
 	{
-		return new LuaFunction(async (context, buffer, ct) =>
+		return new LuaFunction((context, buffer, ct) =>
 		{
 			var args = LuaToConsequenceArgs(context, name);
 			var circledSection = String.Join(",", args);
+			MainClass.Logg.LogInfo($"Lua -> Modular: {name}({circledSection})");
 			MainClass.consequenceDict[name].ExecuteConsequence(this, $"{name}(${circledSection})", circledSection, args);
-			return 0;
+			return ValueTask.FromResult(0);
 		});
 	}
 	
 	private LuaFunction LuaAcquirer(String name)
 	{
-		return new LuaFunction(async (context, buffer, ct) =>
+		return new LuaFunction((context, buffer, ct) =>
 		{
 			var args = LuaToConsequenceArgs(context, name);
 			var circledSection = String.Join(",", args);
+			MainClass.Logg.LogInfo($"Lua -> Modular: {name}({circledSection})");
 			buffer.Span[0] = MainClass.acquirerDict[name].ExecuteAcquirer(this, $"{name}(${circledSection})", circledSection, args);
-			return 1;
+			return ValueTask.FromResult(1);
 		});
 	}
 
