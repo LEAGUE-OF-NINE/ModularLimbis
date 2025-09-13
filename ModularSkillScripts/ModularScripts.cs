@@ -41,6 +41,14 @@ public class DataMod : Il2CppSystem.Object
 	public int dataValue = 0;
 }
 
+public record struct LuaUnitDataKey
+{
+	public long unitPtr_intlong;
+	public string dataID;
+	
+	public static System.Collections.Generic.Dictionary<LuaUnitDataKey, LuaValue> LuaUnitValues = new();
+}
+
 public class ModularSA : Il2CppSystem.Object
 {
 	public ModularSA(IntPtr ptr) : base(ptr) { }
@@ -888,17 +896,17 @@ public class ModularSA : Il2CppSystem.Object
 		state.OpenStringLibrary();
 		state.OpenTableLibrary();
 	
-		state.Environment["clearvalues"] = new LuaFunction(async (context, buffer, ct) =>
+		state.Environment["clearvalues"] = new LuaFunction((context, buffer, ct) =>
 		{
 			ResetValueList();
-			return 0;
+			return ValueTask.FromResult(0);
 		});
-		state.Environment["resetadders"] = new LuaFunction(async (context, buffer, ct) =>
+		state.Environment["resetadders"] = new LuaFunction((context, buffer, ct) =>
 		{
 			ResetAdders();
-			return 0;
+			return ValueTask.FromResult(0);
 		});
-		state.Environment["selecttargets"] = new LuaFunction(async (context, buffer, ct) =>
+		state.Environment["selecttargets"] = new LuaFunction((context, buffer, ct) =>
 		{
 			var table = new LuaTable();
 			GetTargetModelList(context.GetArgument(0).Read<string>())
@@ -909,7 +917,34 @@ public class ModularSA : Il2CppSystem.Object
 					table[x.Item1] = x.Item2;
 				});
 			buffer.Span[0] = table;
-			return 1;
+			return ValueTask.FromResult(1);
+		});
+		state.Environment["setldata"] = new LuaFunction((context, buffer, ct) =>
+		{
+			var target = GetTargetModel(context.GetArgument(0).Read<string>());
+			if (target == null) return ValueTask.FromResult(0);
+			var key = context.GetArgument(1).Read<string>();
+			var value = context.GetArgument(2);
+			var dataKey = new LuaUnitDataKey
+			{
+				unitPtr_intlong = target.Pointer.ToInt64(),
+				dataID = key
+			};
+			LuaUnitDataKey.LuaUnitValues[dataKey] = value;
+			return ValueTask.FromResult(0);
+		});
+		state.Environment["getldata"] = new LuaFunction((context, buffer, ct) =>
+		{
+			var target = GetTargetModel(context.GetArgument(0).Read<string>());
+			if (target == null) return ValueTask.FromResult(0);
+			var key = context.GetArgument(1).Read<string>();
+			var dataKey = new LuaUnitDataKey
+			{
+				unitPtr_intlong = target.Pointer.ToInt64(),
+				dataID = key
+			};
+			buffer.Span[0] = LuaUnitDataKey.LuaUnitValues.TryGetValue(dataKey, out var value) ? value : LuaValue.Nil;
+			return ValueTask.FromResult(1);
 		});
 	}
 	
