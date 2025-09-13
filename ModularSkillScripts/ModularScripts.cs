@@ -92,6 +92,7 @@ public class ModularSA : Il2CppSystem.Object
 		modsa_loopTarget = null;
 		modsa_loopString = "";
 		modsa_luaScript = null;
+		modsa_luaScriptMain = null;
 	}
 
 	public int activationTiming = 0;
@@ -121,6 +122,7 @@ public class ModularSA : Il2CppSystem.Object
 	public BattleUnitModel modsa_loopTarget = null;
 	public string modsa_loopString = "";
 	public LuaScript modsa_luaScript = null;
+	public string modsa_luaScriptMain = null;
 
 	public void ResetAdders()
 	{
@@ -291,9 +293,24 @@ public class ModularSA : Il2CppSystem.Object
 			{
 				var buffer = ArrayPool<LuaValue>.Shared.Rent(1024);
 				int result = state.RunAsync(modsa_luaScript.Content, buffer).GetAwaiter().GetResult();
+				if (!String.IsNullOrWhiteSpace(modsa_luaScriptMain))
+				{
+					if (!state.Environment.TryGetValue(modsa_luaScriptMain, out var mainVal))
+					{
+						throw new LuaException("LUA main function not found: " + modsa_luaScriptMain);
+					}
+					LuaFunction mainFunction;
+					if (!mainVal.TryRead(out mainFunction))
+					{
+						throw new LuaException("LUA main is not a function: " + modsa_luaScriptMain);
+					}
+
+					MainClass.Logg.LogInfo($"Invoking Lua main function: {modsa_luaScriptMain}");
+					mainFunction.InvokeAsync(state, []).GetAwaiter().GetResult();
+				}
 				MainClass.Logg.LogInfo($"Lua Script executed successfully: {result}");
 			}
-			catch (AggregateException ex)
+			catch (Exception ex)
 			{
 				MainClass.Logg.LogError($"Lua Script execution failed: {ex.Message}: {ex.StackTrace}");
 			}
@@ -729,6 +746,11 @@ public class ModularSA : Il2CppSystem.Object
 					return;
 				}
 				modsa_loopString = batch.Remove(0, 5);
+			}
+			else if (batch.StartsWith("LUAMAIN:", StringComparison.OrdinalIgnoreCase))
+			{
+				var luaMainName = batch.Remove(0, 8);
+				modsa_luaScriptMain = luaMainName;
 			}
 			else if (batch.Equals("RESETWHENUSE", StringComparison.OrdinalIgnoreCase)) resetWhenUse = true;
 			else if (batch.Equals("CLEARVALUES", StringComparison.OrdinalIgnoreCase)) clearValues = true;
