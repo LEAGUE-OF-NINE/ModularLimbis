@@ -218,6 +218,7 @@ public class MainClass : BasePlugin
 		acquirerDict["coinrerolled"] = new AcquirerCoinRerolled();
 		acquirerDict["stageextraslot"] = new AcquirerStageExtraSlot();
 		acquirerDict["getbloodfeast"] = new AcquirerGetBloodfeast();
+  		acquirerDict["isunbreakable"] = new AcquirerIsUnbreakable();
 	}
 
 	public static System.Collections.Generic.List<BattleUnitModel> ShuffleUnits(
