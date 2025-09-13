@@ -1916,7 +1916,6 @@ public class SkillScriptInitPatch
 				__instance._currentMotiondetail = motiondetail;
 				index = modsa.modsa_motionDetail.Index;
 				modsa.modsa_motionDetail = null;
-				break;
 			}
 			
 			// enact on coin scripts
@@ -1934,7 +1933,6 @@ public class SkillScriptInitPatch
 				__instance._currentMotiondetail = motiondetail;
 				index = modca.modsa_motionDetail.Index;
 				modca.modsa_motionDetail = null;
-				break;
 			}
 		}
 	}
