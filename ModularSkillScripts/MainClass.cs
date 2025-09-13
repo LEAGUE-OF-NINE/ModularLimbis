@@ -65,6 +65,7 @@ public class MainClass : BasePlugin
 		timingStringList.Add("StartVisualCoinToss"); // 38
 		timingStringList.Add("StartVisualSkillUse"); // 39
 		timingStringList.Add("WhenGained"); // 40
+		timingStringList.Add("ChangeMotion"); // 41
 
 		Il2CppArrayBase<string> timingStringArray = timingStringList.ToArray();
 		int count = timingStringArray.Count;

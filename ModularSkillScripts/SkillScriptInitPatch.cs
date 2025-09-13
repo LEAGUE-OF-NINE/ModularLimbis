@@ -4,6 +4,8 @@ using Dungeon;
 using HarmonyLib;
 using Il2CppSystem.Collections;
 using Il2CppSystem.Collections.Generic;
+using SD;
+using Utils;
 using static MirrorDungeonSelectThemeUIPanel.UIResources;
 
 namespace ModularSkillScripts;
@@ -1879,4 +1881,48 @@ public class SkillScriptInitPatch
 		}
 	}
 
+	[HarmonyPatch(typeof(CharacterAppearance), nameof(CharacterAppearance.ChangeMotion))]
+	[HarmonyPrefix]
+	private static void ChangeMotion(CharacterAppearance __instance, ref MOTION_DETAIL motiondetail, ref int index)
+	{
+		var log = __instance._battleUnitView.CurrentActionLog?._systemLog;
+		if (log == null) return;
+		foreach (var behavior in log.GetAllBehaviourLog_Start())
+		{
+			var actor = log.GetCharacterInfo(behavior._instanceID); //get actor
+			if (behavior._instanceID != actor.instanceID || __instance._battleUnitView._instanceID != actor.instanceID)
+				continue;
+
+			var skillID = behavior._skillID;
+			var skillViewer = __instance._battleUnitView.GetSkillViewer(skillID);
+			if (skillViewer == null) continue;
+			var coinIdx = skillViewer.CurCoinLogIndex;
+			var model = __instance._battleUnitView._unitModel;
+
+			var skill = Singleton<StaticDataManager>.Instance._skillList.GetData(skillID);
+			var skillModel = new SkillModel(skill, model.Level, model.SyncLevel);
+			skillModel.Init(); // needed to get noticed by modular skill timing?
+			
+			// enact on skill scripts
+			long skillmodel_intlong = skillModel.Pointer.ToInt64();
+			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+				modsa.Enact(model, skillModel, null, null, MainClass.timingDict["StartVisualSkillUse"], BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+			
+			// enact on coin scripts
+			var coin = skillModel.CoinList.GetLastElement();
+			if (coinIdx >= 0 && coinIdx < skillModel.CoinList.Count)
+				coin = skillModel.CoinList.ToArray()[coinIdx];
+			long coinmodel_intlong = coin.Pointer.ToInt64();
+			foreach (ModularSA modca in modca_list)
+			{
+				if (coinmodel_intlong != modca.ptr_intlong) continue;
+				modca.modsa_coinModel = coin;
+				modca.Enact(model, skillModel, null, null, MainClass.timingDict["ChangeMotion"], BATTLE_EVENT_TIMING.NONE);
+			}
+		}
+	}
+
+	
 }
