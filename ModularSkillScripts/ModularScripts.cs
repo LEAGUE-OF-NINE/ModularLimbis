@@ -93,6 +93,7 @@ public class ModularSA : Il2CppSystem.Object
 		modsa_loopString = "";
 		modsa_luaScript = null;
 		modsa_luaScriptMain = null;
+		modsa_motionDetail = MOTION_DETAIL.Default;
 	}
 
 	public int activationTiming = 0;
@@ -123,6 +124,7 @@ public class ModularSA : Il2CppSystem.Object
 	public string modsa_loopString = "";
 	public LuaScript modsa_luaScript = null;
 	public string modsa_luaScriptMain = null;
+	public MOTION_DETAIL modsa_motionDetail = MOTION_DETAIL.Default;
 
 	public void ResetAdders()
 	{

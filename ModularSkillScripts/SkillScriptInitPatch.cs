@@ -1887,6 +1887,9 @@ public class SkillScriptInitPatch
 	{
 		var log = __instance._battleUnitView.CurrentActionLog?._systemLog;
 		if (log == null) return;
+
+		var prevModelDetail = __instance._currentMotiondetail;
+		
 		foreach (var behavior in log.GetAllBehaviourLog_Start())
 		{
 			var actor = log.GetCharacterInfo(behavior._instanceID); //get actor
@@ -1908,6 +1911,10 @@ public class SkillScriptInitPatch
 			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				modsa.Enact(model, skillModel, null, null, MainClass.timingDict["StartVisualSkillUse"], BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modsa.modsa_motionDetail == MOTION_DETAIL.Default) continue;
+				motiondetail = modsa.modsa_motionDetail;
+				__instance._currentMotiondetail = motiondetail;
+				modsa.modsa_motionDetail = MOTION_DETAIL.Default;
 			}
 			
 			// enact on coin scripts
@@ -1920,6 +1927,10 @@ public class SkillScriptInitPatch
 				if (coinmodel_intlong != modca.ptr_intlong) continue;
 				modca.modsa_coinModel = coin;
 				modca.Enact(model, skillModel, null, null, MainClass.timingDict["ChangeMotion"], BATTLE_EVENT_TIMING.NONE);
+				if (modca.modsa_motionDetail == MOTION_DETAIL.Default) continue;
+				motiondetail = modca.modsa_motionDetail;
+				__instance._currentMotiondetail = motiondetail;
+				modca.modsa_motionDetail = MOTION_DETAIL.Default;
 			}
 		}
 	}
