@@ -1887,8 +1887,6 @@ public class SkillScriptInitPatch
 	{
 		var log = __instance._battleUnitView.CurrentActionLog?._systemLog;
 		if (log == null) return;
-
-		var prevModelDetail = __instance._currentMotiondetail;
 		
 		foreach (var behavior in log.GetAllBehaviourLog_Start())
 		{
@@ -1902,9 +1900,8 @@ public class SkillScriptInitPatch
 			var coinIdx = skillViewer.CurCoinLogIndex;
 			var model = __instance._battleUnitView._unitModel;
 
-			var skill = Singleton<StaticDataManager>.Instance._skillList.GetData(skillID);
-			var skillModel = new SkillModel(skill, model.Level, model.SyncLevel);
-			skillModel.Init(); // needed to get noticed by modular skill timing?
+			var skillModel = skillViewer.CurrentSkillModel;
+			if (skillModel == null) continue;
 			
 			// enact on coin scripts
 			var coin = skillModel.CoinList.GetLastElement();
