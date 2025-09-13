@@ -9,6 +9,7 @@ using IntPtr = System.IntPtr;
 using Lethe.Patches;
 using Lua;
 using Lua.Standard;
+using ModularSkillScripts.Consequence;
 using SharpCompress;
 using Regex = System.Text.RegularExpressions.Regex;
 using RegexOptions = System.Text.RegularExpressions.RegexOptions;
@@ -93,7 +94,7 @@ public class ModularSA : Il2CppSystem.Object
 		modsa_loopString = "";
 		modsa_luaScript = null;
 		modsa_luaScriptMain = null;
-		modsa_motionDetail = MOTION_DETAIL.Default;
+		modsa_motionDetail = null;
 	}
 
 	public int activationTiming = 0;
@@ -124,7 +125,7 @@ public class ModularSA : Il2CppSystem.Object
 	public string modsa_loopString = "";
 	public LuaScript modsa_luaScript = null;
 	public string modsa_luaScriptMain = null;
-	public MOTION_DETAIL modsa_motionDetail = MOTION_DETAIL.Default;
+	public ConsequenceChangeMotion.MotionDetail modsa_motionDetail = null;
 
 	public void ResetAdders()
 	{

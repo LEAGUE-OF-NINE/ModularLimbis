@@ -1910,11 +1910,13 @@ public class SkillScriptInitPatch
 			long skillmodel_intlong = skillModel.Pointer.ToInt64();
 			if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				modsa.Enact(model, skillModel, null, null, MainClass.timingDict["StartVisualSkillUse"], BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modsa.modsa_motionDetail == MOTION_DETAIL.Default) continue;
-				motiondetail = modsa.modsa_motionDetail;
+				modsa.Enact(model, skillModel, null, null, MainClass.timingDict["ChangeMotion"], BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modsa.modsa_motionDetail == null) continue;
+				motiondetail = modsa.modsa_motionDetail.Detail;
 				__instance._currentMotiondetail = motiondetail;
-				modsa.modsa_motionDetail = MOTION_DETAIL.Default;
+				index = modsa.modsa_motionDetail.Index;
+				modsa.modsa_motionDetail = null;
+				break;
 			}
 			
 			// enact on coin scripts
@@ -1927,10 +1929,12 @@ public class SkillScriptInitPatch
 				if (coinmodel_intlong != modca.ptr_intlong) continue;
 				modca.modsa_coinModel = coin;
 				modca.Enact(model, skillModel, null, null, MainClass.timingDict["ChangeMotion"], BATTLE_EVENT_TIMING.NONE);
-				if (modca.modsa_motionDetail == MOTION_DETAIL.Default) continue;
-				motiondetail = modca.modsa_motionDetail;
+				if (modca.modsa_motionDetail == null) continue;
+				motiondetail = modca.modsa_motionDetail.Detail;
 				__instance._currentMotiondetail = motiondetail;
-				modca.modsa_motionDetail = MOTION_DETAIL.Default;
+				index = modca.modsa_motionDetail.Index;
+				modca.modsa_motionDetail = null;
+				break;
 			}
 		}
 	}
