@@ -866,7 +866,7 @@ public class ModularSA : Il2CppSystem.Object
 			args[i] = value.Type switch
 			{
 				LuaValueType.Boolean => value.Read<bool>() ? "1" : "0",
-				LuaValueType.Number => Math.Truncate(value.Read<double>()).ToString(CultureInfo.InvariantCulture),
+				LuaValueType.Number => ((int) value.Read<double>()).ToString(CultureInfo.InvariantCulture),
 				LuaValueType.String => value.Read<string>(),
 				_ => throw new LuaException(
 					$"Unsupported Lua argument type when calling {name}: {value.Type}")
