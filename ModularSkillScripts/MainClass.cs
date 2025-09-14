@@ -90,6 +90,7 @@ public class MainClass : BasePlugin
 		harmony.PatchAll(typeof(UniquePatches));
 		harmony.PatchAll(typeof(LogoPlayerPatches));
 		harmony.PatchAll(typeof(ReloadPatches));
+		harmony.PatchAll(typeof(AssistDefensePatch));
 		if (fakepowerEnabled) harmony.PatchAll(typeof(FakePowerPatches));
 		RegisterConsequences();
 		RegisterAcquirers();
