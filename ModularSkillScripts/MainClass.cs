@@ -65,6 +65,7 @@ public class MainClass : BasePlugin
 		timingStringList.Add("StartVisualCoinToss"); // 38
 		timingStringList.Add("StartVisualSkillUse"); // 39
 		timingStringList.Add("WhenGained"); // 40
+		timingStringList.Add("ChangeMotion"); // 41
 
 		Il2CppArrayBase<string> timingStringArray = timingStringList.ToArray();
 		int count = timingStringArray.Count;
@@ -160,6 +161,7 @@ public class MainClass : BasePlugin
 		consequenceDict["makeunbreakable"] = new ConsequenceMakeUnbreakable();
 		consequenceDict["bloodfeast"] = new ConsequenceBloodfeast();
 		consequenceDict["critchance"] = new ConsequenceCritChance();
+		consequenceDict["changemotion"] = new ConsequenceChangeMotion();
 	}
 
 	private static void RegisterAcquirers()
