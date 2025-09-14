@@ -8,7 +8,7 @@ public class AssistDefensePatch
 {
 	[HarmonyPatch(typeof(BattleActionModel), nameof(BattleActionModel.CallTargetDefenseActionsByAttack))]
 	[HarmonyPrefix]
-	private static void CallTargetDefenseActionsByAttack(
+	private static bool CallTargetDefenseActionsByAttack(
 		BattleActionModel __instance,
 		BattleRunLog runLog,
 		DEFENSE_TYPE type,
@@ -19,20 +19,23 @@ public class AssistDefensePatch
 		BattleUnitModel specificTarget,
 		bool mainTargetExclusive)
 	{
-		if (type != DEFENSE_TYPE.GUARD) return;
+		if (type != DEFENSE_TYPE.GUARD) return true;
 		// print out everything
 		MainClass.Logg.LogInfo(
 			$"__instance: {__instance}, runLog: {runLog}, type: {type}, isDuelExpected: {isDuelExpected}, canDuel: {canDuel}, timing: {timing}, oneCoinLog: {oneCoinLog}, specificTarget: {specificTarget}, mainTargetExclusive: {mainTargetExclusive}");
 		var target = __instance.GetMainTarget();
-
-		if (target.Faction == UNIT_FACTION.ENEMY) return;
-		var allies = BattleObjectManager.Instance.GetAliveList(false, target.Faction);
-		var ally = allies.GetFirstElement();
-		if (ally == null) return;
-
-		MainClass.Logg.LogInfo("Redirecting defense to ally");
-		const int assistDefenseSkillId = 1010803;
-		SpawnSkill(ally, __instance, assistDefenseSkillId);
+		
+		if (target.Faction == UNIT_FACTION.ENEMY) return true;
+		var ally = BattleObjectManager.Instance.GetAliveList(false, UNIT_FACTION.PLAYER).GetFirstElement();
+		if (ally == null || ally == target) return true;
+		
+		var targetName = target._unitDataModel._name.Replace("\n", " ");
+		var allyName = ally._unitDataModel._name.Replace("\n", " ");
+		var attackerName = __instance._model._unitDataModel._name.Replace("\n", " ");
+		
+		MainClass.Logg.LogInfo($"Redirecting attack to {targetName} from {attackerName} to ally - {allyName}");
+		SpawnSkill(target, __instance, 1030201);
+		return false;
 	}
 
 	private static void SpawnSkill(BattleUnitModel defender, BattleActionModel attackAction, int skillID)
@@ -52,16 +55,6 @@ public class AssistDefensePatch
 		battleActionModel._targetDataDetail.ReadyOriginTargeting(battleActionModel);
 		defender.CutInDefenseActionForcely(battleActionModel, true);
 		battleActionModel.ChangeMainTargetSinAction(attackAction._sinAction, attackAction, true);
-		attackAction.ChangeMainTargetSinAction(battleActionModel._sinAction, battleActionModel, true);
-		
-		var attackActionTargets = new List<SinActionModel>();
-		attackActionTargets.Add(attackAction._sinAction);
-		battleActionModel.SetTarget(attackActionTargets, true);
-		var defenderTargets = new List<SinActionModel>();
-		defenderTargets.Add(battleActionModel._sinAction);
-		attackAction.SetTarget(defenderTargets, true);
-		
-		defender.AddAction(battleActionModel);
 
 		//change skill and sinModel?
 		battleActionModel._skill = new SkillModel(Singleton<StaticDataManager>.Instance._skillList.GetData(skillID),
@@ -76,7 +69,6 @@ public class AssistDefensePatch
 			}
 		};
 		sinModel._skillId = skillID;
-
 
 		//add BattleSkillViewer
 		var skillViewer = new BattleSkillViewer(defenderUnitView, skillID.ToString(), battleActionModel._skill);
