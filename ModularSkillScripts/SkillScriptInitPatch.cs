@@ -1885,6 +1885,9 @@ public class SkillScriptInitPatch
 	[HarmonyPrefix]
 	private static void ChangeMotion(CharacterAppearance __instance, ref MOTION_DETAIL motiondetail, ref int index)
 	{
+		if (motiondetail != MOTION_DETAIL.Parrying && motiondetail.ToString()[0] != 'S')
+			return;
+		
 		var log = __instance._battleUnitView.CurrentActionLog?._systemLog;
 		if (log == null) return;
 		
@@ -1920,6 +1923,7 @@ public class SkillScriptInitPatch
 				if (modca.modsa_motionDetail == null) continue;
 				motiondetail = modca.modsa_motionDetail.Detail;
 				index = modca.modsa_motionDetail.Index;
+				__instance._currentMotiondetail = modca.modsa_motionDetail.Detail;
 				modca.modsa_motionDetail = null;
 			}
 		}
