@@ -1,5 +1,6 @@
 using System;
 using System.Buffers;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Il2CppInterop.Runtime.Injection;
@@ -868,7 +869,7 @@ public class ModularSA : Il2CppSystem.Object
 			args[i] = value.Type switch
 			{
 				LuaValueType.Boolean => value.Read<bool>() ? "1" : "0",
-				LuaValueType.Number => value.Read<int>().ToString(),
+				LuaValueType.Number => ((int) value.Read<double>()).ToString(CultureInfo.InvariantCulture),
 				LuaValueType.String => value.Read<string>(),
 				_ => throw new LuaException(
 					$"Unsupported Lua argument type when calling {name}: {value.Type}")
