@@ -220,8 +220,9 @@ public class MainClass : BasePlugin
 		acquirerDict["coinrerolled"] = new AcquirerCoinRerolled();
 		acquirerDict["stageextraslot"] = new AcquirerStageExtraSlot();
 		acquirerDict["getbloodfeast"] = new AcquirerGetBloodfeast();
-  		acquirerDict["isunbreakable"] = new AcquirerIsUnbreakable();
+  	acquirerDict["isunbreakable"] = new AcquirerIsUnbreakable();
 		acquirerDict["isusableinduel"] = new AcquirerIsUsableInDuel();
+		acquirerDict["sameunit"] = new AcquirerSameUnit();
 	}
 
 	public static System.Collections.Generic.List<BattleUnitModel> ShuffleUnits(
@@ -244,8 +245,10 @@ public class MainClass : BasePlugin
 	public static readonly System.Collections.Generic.Dictionary<string, int> timingDict = new();
 	public static readonly System.Collections.Generic.Dictionary<string, IModularConsequence> consequenceDict = new();
 	public static readonly System.Collections.Generic.Dictionary<string, IModularAcquirer> acquirerDict = new();
-
+	public static System.Collections.Generic.List<SupporterPassiveModel> supporterPassiveList = new System.Collections.Generic.List<SupporterPassiveModel>();
+	public static System.Collections.Generic.List<SupporterPassiveModel> activeSupporterPassiveList = new System.Collections.Generic.List<SupporterPassiveModel>();
 	public static bool fakepowerEnabled = true;
+	public static bool SupportPasInit = false;
 
 	public static Random rng = new();
 
