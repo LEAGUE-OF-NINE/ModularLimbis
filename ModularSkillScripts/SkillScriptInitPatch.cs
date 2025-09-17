@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using BepInEx.Unity.IL2CPP.UnityEngine;
 using Dungeon;
 using HarmonyLib;
@@ -1201,17 +1202,75 @@ public class SkillScriptInitPatch
 		}
 	}
 
-
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnStartBehaviour))]
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_OnStartBehaviour(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance) {
 		int actevent = MainClass.timingDict["OnStartBehaviour"];
 		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
-		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-			modsa.Enact(action.Model, __instance, action, null, actevent, timing);
+		if (modsaDict.TryGetValue(skillmodel_intlong, out var modsaList))
+		{
+			foreach (ModularSA modsa in modsaList) {
+				modsa.Enact(action.Model, __instance, action, null, actevent, timing);
+			}
 		}
+		
+		// Test assist defense
+		if (timing != BATTLE_EVENT_TIMING.ON_START_BEHAVIOUR) return;
+		MainClass.Logg.LogInfo($"Checking for assist: {action.Model.Faction}");
+		if (action.Model.Faction == UNIT_FACTION.PLAYER) return;
+		var ally = BattleObjectManager.Instance.GetAliveList(false, UNIT_FACTION.PLAYER)
+			.ToArray()
+			.First(x => x != action.GetMainTarget());
+		MainClass.Logg.LogInfo($"Defender is {ally?.GetName() ?? "null"}");
+		if (ally == null) return;
+		var attackerName = action.Model.GetName().Replace("\n", " ");
+		var allyName = ally.GetName().Replace("\n", " ");
+		var targetName = action.GetMainTarget().GetName().Replace("\n", " ");
+		MainClass.Logg.LogInfo($"Redirecting attack from {attackerName} to {allyName} to protect {targetName}");
+		SpawnSkill(ally, action, 1030201);
 	}
+	public static void SpawnSkill(BattleUnitModel defender, BattleActionModel attackAction, int skillID)
+	{
+		//temporary action
+		// var model = defender;
+		var actionSlot = defender._actionSlotDetail;
+		var sinActionModel = actionSlot.CreateSinActionModel(true);
+		actionSlot.AddSinActionModelToSlot(sinActionModel);
+
+		var defenderUnitView = SingletonBehavior<BattleObjectManager>.Instance.GetView(defender);
+		var defenderUnitModel = defender._unitDataModel;
+
+		//funny action stuff
+		var sinModel = new UnitSinModel(skillID, defender, sinActionModel, false);
+		var defendAction = new BattleActionModel(sinModel, defender, sinActionModel, -1);
+		defendAction._targetDataDetail.ReadyOriginTargeting(attackAction);
+		attackAction._targetDataDetail.ReadyOriginTargeting(defendAction);
+		attackAction.ChangeMainTargetSinAction(sinActionModel, defendAction, true);
+		defender.CutInDefenseActionForcely(defendAction);
+		Singleton<BattleActionModelManager>.Instance.RemoveDuel(attackAction);
+		Singleton<BattleActionModelManager>.Instance.AddDuel(defendAction, attackAction);BuffAbility_SupportProtect
+			
+			
+
+		//change skill and sinModel?
+		defendAction._skill = new SkillModel(Singleton<StaticDataManager>.Instance._skillList.GetData(skillID),
+			defenderUnitModel.Level, defenderUnitModel.SyncLevel)
+		{
+			_skillData =
+			{
+				_defenseType = (int)DEFENSE_TYPE.COUNTER,
+				canDuel = true,
+				_targetType = (int)SKILL_TARGET_TYPE.FRONT,
+				_skillMotion = (int)MOTION_DETAIL.S3
+			}
+		};
+		sinModel._skillId = skillID;
+
+		//add BattleSkillViewer
+		var skillViewer = new BattleSkillViewer(defenderUnitView, skillID.ToString(), defendAction._skill);
+		defenderUnitView._battleSkillViewers.TryAdd(skillID.ToString(), skillViewer);
+	}
+	
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.BeforeBehaviour))]
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_BeforeBehaviour(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance) {
