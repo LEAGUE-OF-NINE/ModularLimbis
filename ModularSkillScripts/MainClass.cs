@@ -66,6 +66,8 @@ public class MainClass : BasePlugin
 		timingStringList.Add("StartVisualSkillUse"); // 39
 		timingStringList.Add("WhenGained"); // 40
 		timingStringList.Add("ChangeMotion"); // 41
+		timingStringList.Add("IgnorePanic"); // 42
+		timingStringList.Add("IgnoreBreak"); // 43
 
 		Il2CppArrayBase<string> timingStringArray = timingStringList.ToArray();
 		int count = timingStringArray.Count;
@@ -162,6 +164,8 @@ public class MainClass : BasePlugin
 		consequenceDict["bloodfeast"] = new ConsequenceBloodfeast();
 		consequenceDict["critchance"] = new ConsequenceCritChance();
 		consequenceDict["changemotion"] = new ConsequenceChangeMotion();
+		consequenceDict["ignorepanic"] = new ConsequenceIgnorePanic();
+		consequenceDict["ignorebreak"] = new ConsequenceIgnoreBreak();
 	}
 
 	private static void RegisterAcquirers()
@@ -223,6 +227,9 @@ public class MainClass : BasePlugin
   	acquirerDict["isunbreakable"] = new AcquirerIsUnbreakable();
 		acquirerDict["isusableinduel"] = new AcquirerIsUsableInDuel();
 		acquirerDict["sameunit"] = new AcquirerSameUnit();
+		acquirerDict["skillcanduel"] = new AcquirerSkillCanDuel();
+		acquirerDict["skillteamkill"] = new AcquirerSkillTeamKill();
+		acquirerDict["skillfixedtarget"] = new AcquirerSkillFixed();
 	}
 
 	public static System.Collections.Generic.List<BattleUnitModel> ShuffleUnits(

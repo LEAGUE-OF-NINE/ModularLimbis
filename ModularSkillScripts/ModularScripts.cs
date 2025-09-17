@@ -126,6 +126,7 @@ public class ModularSA : Il2CppSystem.Object
 	public string modsa_loopString = "";
 	public LuaScript modsa_luaScript = null;
 	public string modsa_luaScriptMain = null;
+	public string[] modsa_luaScriptMainArgs = null;
 	public ConsequenceChangeMotion.MotionDetail modsa_motionDetail = null;
 
 	public void ResetAdders()
@@ -173,6 +174,8 @@ public class ModularSA : Il2CppSystem.Object
 	//private bool _onlyClashLose = false;
 
 	public bool immortality = false;
+	public bool ignorepanic = false;
+	public bool ignorebreak = false;
 
 	private bool _fullStop = false;
 	public BATTLE_EVENT_TIMING battleTiming = BATTLE_EVENT_TIMING.NONE;
@@ -310,7 +313,8 @@ public class ModularSA : Il2CppSystem.Object
 					}
 
 					MainClass.Logg.LogInfo($"Invoking Lua main function: {modsa_luaScriptMain}");
-					mainFunction.InvokeAsync(state, []).GetAwaiter().GetResult();
+					LuaValue[] args = GetLuaValueArgs();
+					mainFunction.InvokeAsync(state, args).GetAwaiter().GetResult();
 				}
 				MainClass.Logg.LogInfo($"Lua Script executed successfully: {result}");
 			}
@@ -321,6 +325,41 @@ public class ModularSA : Il2CppSystem.Object
 		}
 		
 		activationCounter += 1;
+	}
+	private LuaValue[] GetLuaValueArgs()
+	{
+		if (modsa_luaScriptMainArgs == null)
+			return Array.Empty<LuaValue>();
+
+		var result = new LuaValue[modsa_luaScriptMainArgs.Length];
+		for (int i = 0; i < modsa_luaScriptMainArgs.Length; i++)
+		{
+			result[i] = ParseLuaValue(modsa_luaScriptMainArgs[i].Trim());
+		}
+		return result;
+	}
+
+
+	private LuaValue ParseLuaValue(string rawstring)
+	{
+		if (string.Equals(rawstring, "nil", StringComparison.OrdinalIgnoreCase) ||
+				string.Equals(rawstring, "null", StringComparison.OrdinalIgnoreCase))
+		{
+			return LuaValue.Nil;
+		}
+
+		if (string.Equals(rawstring, "true", StringComparison.OrdinalIgnoreCase))
+			return new LuaValue(true);
+		if (string.Equals(rawstring, "false", StringComparison.OrdinalIgnoreCase))
+			return new LuaValue(false);
+
+		if (int.TryParse(rawstring, out int intVal))
+			return new LuaValue(intVal);
+		if (double.TryParse(rawstring, out double doubleVal))
+			return new LuaValue(doubleVal);
+		
+		if (rawstring.StartsWith("VALUE_")) return new LuaValue(GetNumFromParamString(rawstring));
+		return new LuaValue(rawstring);
 	}
 
 	private bool CheckIF(string param)
@@ -753,7 +792,14 @@ public class ModularSA : Il2CppSystem.Object
 			}
 			else if (batch.StartsWith("LUAMAIN:", StringComparison.OrdinalIgnoreCase))
 			{
+				modsa_luaScriptMainArgs = null;
 				var luaMainName = batch.Remove(0, 8);
+				string[] sectionArgs = luaMainName.Split(parenthesisSeparator);
+				luaMainName = sectionArgs[0];
+				if (sectionArgs.Length >= 2)
+				{
+					modsa_luaScriptMainArgs = sectionArgs[1].Split(',');
+				}
 				modsa_luaScriptMain = luaMainName;
 			}
 			else if (batch.Equals("RESETWHENUSE", StringComparison.OrdinalIgnoreCase)) resetWhenUse = true;

@@ -832,8 +832,10 @@ public class SkillScriptInitPatch
 	{
 		if (isInstantDeath) return;
 		int actevent = MainClass.timingDict["ImmortalOther"];
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
+			{
 				modpa.immortality = false;
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.modsa_target_list.Clear();
@@ -866,6 +868,85 @@ public class SkillScriptInitPatch
 				modpaList[i].modsa_target_list.Add(checkTarget);
 				modpaList[i].Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 				if (modpaList[i].immortality) __result = true;
+			}
+		}
+	}
+
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.IgnorePanic))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_IgnorePanic(ref bool __result, BattleUnitModel __instance)
+	{
+		int actevent = MainClass.timingDict["IgnorePanic"];
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
+			{
+				modpa.ignorepanic = false;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modpa.ignorepanic) __result = true;
+			}
+		}
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			{
+				modpa.ignorepanic = false;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modpa.ignorepanic) __result = true;
+			}
+		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				modpaList[i].ignorepanic = false;
+				supportPassive._script._owner = __instance;
+				modpaList[i].Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modpaList[i].ignorepanic) __result = true;
+			}
+		}
+	}
+
+
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.IgnoreBreak))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_IgnoreBreak(ref bool __result, BattleUnitModel __instance)
+	{
+		int actevent = MainClass.timingDict["IgnoreBreak"];
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
+			{
+				modpa.ignorebreak = false;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modpa.ignorebreak) __result = true;
+			}
+		}
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			{
+				modpa.ignorebreak = false;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modpa.ignorebreak) __result = true;
+			}
+		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				modpaList[i].ignorebreak = false;
+				supportPassive._script._owner = __instance;
+				modpaList[i].Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modpaList[i].ignorebreak) __result = true;
 			}
 		}
 	}
