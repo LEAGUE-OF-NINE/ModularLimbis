@@ -8,6 +8,7 @@ using Il2CppSystem.Collections.Generic;
 using SD;
 using Utils;
 using static MirrorDungeonSelectThemeUIPanel.UIResources;
+using Environment = Il2CppSystem.Environment;
 
 namespace ModularSkillScripts;
 
@@ -1213,63 +1214,45 @@ public class SkillScriptInitPatch
 				modsa.Enact(action.Model, __instance, action, null, actevent, timing);
 			}
 		}
-		
-		// Test assist defense
-		if (timing != BATTLE_EVENT_TIMING.ON_START_BEHAVIOUR) return;
-		MainClass.Logg.LogInfo($"Checking for assist: {action.Model.Faction}");
-		if (action.Model.Faction == UNIT_FACTION.PLAYER) return;
-		var ally = BattleObjectManager.Instance.GetAliveList(false, UNIT_FACTION.PLAYER)
-			.ToArray()
-			.First(x => x != action.GetMainTarget());
-		MainClass.Logg.LogInfo($"Defender is {ally?.GetName() ?? "null"}");
-		if (ally == null) return;
-		var attackerName = action.Model.GetName().Replace("\n", " ");
-		var allyName = ally.GetName().Replace("\n", " ");
-		var targetName = action.GetMainTarget().GetName().Replace("\n", " ");
-		MainClass.Logg.LogInfo($"Redirecting attack from {attackerName} to {allyName} to protect {targetName}");
-		SpawnSkill(ally, action, 1030201);
 	}
-	public static void SpawnSkill(BattleUnitModel defender, BattleActionModel attackAction, int skillID)
+
+	[HarmonyPatch(typeof(BattleActionModelManager), nameof(BattleActionModelManager.GetDefenseAction))]
+	[HarmonyPostfix]
+	public static void GetDefenseAction(
+    BattleActionModel attackerAction,
+    BattleUnitModel target,
+    DEFENSE_TYPE type,
+    bool isDuelExpected,
+    bool canDuelDefense,
+    BATTLE_EVENT_TIMING timing,
+    ref BattleActionModel result,
+    ref bool __result)
 	{
-		//temporary action
-		// var model = defender;
-		var actionSlot = defender._actionSlotDetail;
-		var sinActionModel = actionSlot.CreateSinActionModel(true);
-		actionSlot.AddSinActionModelToSlot(sinActionModel);
-
-		var defenderUnitView = SingletonBehavior<BattleObjectManager>.Instance.GetView(defender);
-		var defenderUnitModel = defender._unitDataModel;
-
-		//funny action stuff
-		var sinModel = new UnitSinModel(skillID, defender, sinActionModel, false);
-		var defendAction = new BattleActionModel(sinModel, defender, sinActionModel, -1);
-		defendAction._targetDataDetail.ReadyOriginTargeting(attackAction);
-		attackAction._targetDataDetail.ReadyOriginTargeting(defendAction);
-		attackAction.ChangeMainTargetSinAction(sinActionModel, defendAction, true);
-		defender.CutInDefenseActionForcely(defendAction);
-		Singleton<BattleActionModelManager>.Instance.RemoveDuel(attackAction);
-		Singleton<BattleActionModelManager>.Instance.AddDuel(defendAction, attackAction);BuffAbility_SupportProtect
-			
-			
-
-		//change skill and sinModel?
-		defendAction._skill = new SkillModel(Singleton<StaticDataManager>.Instance._skillList.GetData(skillID),
-			defenderUnitModel.Level, defenderUnitModel.SyncLevel)
-		{
-			_skillData =
-			{
-				_defenseType = (int)DEFENSE_TYPE.COUNTER,
-				canDuel = true,
-				_targetType = (int)SKILL_TARGET_TYPE.FRONT,
-				_skillMotion = (int)MOTION_DETAIL.S3
-			}
-		};
-		sinModel._skillId = skillID;
-
-		//add BattleSkillViewer
-		var skillViewer = new BattleSkillViewer(defenderUnitView, skillID.ToString(), defendAction._skill);
-		defenderUnitView._battleSkillViewers.TryAdd(skillID.ToString(), skillViewer);
+		var attackerName = attackerAction?.Model?.GetName()?.Replace("\n", " ");
+		var originTargetName = target?.GetName()?.Replace("\n", " ");
+		var resultActionModelName = result?.Model?.GetName()?.Replace("\n", " ") + ": " + result?.Skill?.GetSkillName();
+		MainClass.Logg.LogInfo($"GetDefenseAction called for {originTargetName} to defend from {attackerName}, defenseType: {type}, isDuelExpected: {isDuelExpected}, canDuelDefense: {canDuelDefense}, timing: {timing}, action: ({resultActionModelName}), hasAction: {__result}");
 	}
+
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetSupportiveDefenseSkillID))]
+	[HarmonyPrefix]
+	public static bool GetSupportiveDefenseSkillID(
+		BattleUnitModel __instance,
+		BattleUnitModel originTarget,
+		BattleActionModel attackerAction,
+		DEFENSE_TYPE defenseType,
+		BATTLE_EVENT_TIMING timing,
+		ref int __result)
+	{
+		var defenderName = __instance.GetName()?.Replace("\n", " ");
+		var originTargetName = originTarget?.GetName()?.Replace("\n", " ");
+		var attackerName = attackerAction?.Model?.GetName()?.Replace("\n", " ");
+		MainClass.Logg.LogInfo($"GetSupportiveDefenseSkillID called for {defenderName} to defend {originTargetName} from {attackerName}, defenseType: {defenseType}, timing: {timing}");
+		// TODO: Implement custom supportive defense skill logic here
+		__result = 1021206;
+		return false;
+	}
+
 	
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.BeforeBehaviour))]
 	[HarmonyPostfix]
