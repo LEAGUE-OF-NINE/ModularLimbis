@@ -1217,24 +1217,6 @@ public class SkillScriptInitPatch
 		}
 	}
 
-	[HarmonyPatch(typeof(BattleActionModelManager), nameof(BattleActionModelManager.GetDefenseAction))]
-	[HarmonyPostfix]
-	public static void GetDefenseAction(
-    BattleActionModel attackerAction,
-    BattleUnitModel target,
-    DEFENSE_TYPE type,
-    bool isDuelExpected,
-    bool canDuelDefense,
-    BATTLE_EVENT_TIMING timing,
-    ref BattleActionModel result,
-    ref bool __result)
-	{
-		var attackerName = attackerAction?.Model?.GetName()?.Replace("\n", " ");
-		var originTargetName = target?.GetName()?.Replace("\n", " ");
-		var resultActionModelName = result?.Model?.GetName()?.Replace("\n", " ") + ": " + result?.Skill?.GetSkillName();
-		MainClass.Logg.LogInfo($"GetDefenseAction called for {originTargetName} to defend from {attackerName}, defenseType: {type}, isDuelExpected: {isDuelExpected}, canDuelDefense: {canDuelDefense}, timing: {timing}, action: ({resultActionModelName}), hasAction: {__result}");
-	}
-
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetSupportiveDefenseSkillID))]
 	[HarmonyPrefix]
 	public static bool GetSupportiveDefenseSkillID(
@@ -1248,11 +1230,14 @@ public class SkillScriptInitPatch
 		if (originTarget == null)
 			return true;
 		int skillId = ConsequenceAssistDefense.GetAssistDefenseSkillId(__instance.InstanceID, originTarget.InstanceID);
-		if (skillId < 0)
-			return true;
 		var defenderName = __instance.GetName()?.Replace("\n", " ");
 		var originTargetName = originTarget.GetName()?.Replace("\n", " ");
 		var attackerName = attackerAction?.Model?.GetName()?.Replace("\n", " ");
+		if (skillId < 0)
+		{
+			MainClass.Logg.LogInfo($"No assist defense found for {defenderName} to defend {originTargetName} from {attackerName}, defenseType: {defenseType}, timing: {timing}");
+			return true;
+		}
 		MainClass.Logg.LogInfo($"Assist defense called for {defenderName} to defend {originTargetName} from {attackerName}, defenseType: {defenseType}, timing: {timing}");
 		__result = skillId;
 		return false;
