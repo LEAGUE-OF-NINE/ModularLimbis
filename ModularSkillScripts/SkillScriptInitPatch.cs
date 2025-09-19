@@ -5,6 +5,7 @@ using Dungeon;
 using HarmonyLib;
 using Il2CppSystem.Collections;
 using Il2CppSystem.Collections.Generic;
+using ModularSkillScripts.Consequence;
 using SD;
 using Utils;
 using static MirrorDungeonSelectThemeUIPanel.UIResources;
@@ -1244,15 +1245,25 @@ public class SkillScriptInitPatch
 		BATTLE_EVENT_TIMING timing,
 		ref int __result)
 	{
+		if (originTarget == null)
+			return true;
+		int skillId = ConsequenceAssistDefense.GetAssistDefenseSkillId(__instance.InstanceID, originTarget.InstanceID);
+		if (skillId < 0)
+			return true;
 		var defenderName = __instance.GetName()?.Replace("\n", " ");
-		var originTargetName = originTarget?.GetName()?.Replace("\n", " ");
+		var originTargetName = originTarget.GetName()?.Replace("\n", " ");
 		var attackerName = attackerAction?.Model?.GetName()?.Replace("\n", " ");
-		MainClass.Logg.LogInfo($"GetSupportiveDefenseSkillID called for {defenderName} to defend {originTargetName} from {attackerName}, defenseType: {defenseType}, timing: {timing}");
-		// TODO: Implement custom supportive defense skill logic here
-		__result = 1021206;
+		MainClass.Logg.LogInfo($"Assist defense called for {defenderName} to defend {originTargetName} from {attackerName}, defenseType: {defenseType}, timing: {timing}");
+		__result = skillId;
 		return false;
 	}
-
+	
+	[HarmonyPatch(typeof(BattleObjectManager), nameof(BattleObjectManager.OnRoundEnd))]
+	[HarmonyPostfix]
+	public static void BattleObjectManager_OnRoundEnd_Postfix()
+	{
+		ConsequenceAssistDefense.ClearAssistDefenseEntries();
+	}
 	
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.BeforeBehaviour))]
 	[HarmonyPostfix]
