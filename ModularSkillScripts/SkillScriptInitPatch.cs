@@ -5,6 +5,8 @@ using Il2CppSystem.Collections.Generic;
 using ModularSkillScripts.Consequence;
 using SD;
 using Utils;
+using static BattleUI.Abnormality.AbnormalityPartSkills;
+using static MirrorDungeonSelectThemeUIPanel.UIResources;
 
 namespace ModularSkillScripts;
 
@@ -29,6 +31,17 @@ public class SkillScriptInitPatch
 				if (resetWhenUse && modpa.resetWhenUse) modpa.ResetAdders(); // on-demand power adder reset (used for passives)
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(unitModel, skillModel_inst, selfAction, oppoAction, acteventint, timing);
+			}
+		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				if (resetWhenUse && modpaList[i].resetWhenUse) modpaList[i].ResetAdders();
+				supportPassive._script._owner = unitModel;
+				modpaList[i].Enact(unitModel, skillModel_inst, selfAction, oppoAction, acteventint, timing);
 			}
 		}
 	}
@@ -245,7 +258,9 @@ public class SkillScriptInitPatch
 			value.Clear();
 		}
 		modbaDict.Clear();
-
+		MainClass.supporterPassiveList.Clear();
+		MainClass.activeSupporterPassiveList.Clear();
+		MainClass.SupportPasInit = false;
 		modca_list.Clear();
 		unitMod_list.Clear();
 		skillPtrsRoundStart.Clear();
@@ -309,7 +324,12 @@ public class SkillScriptInitPatch
 		}
 		return new List<ModularSA>();
 	}
-
+	public static List<ModularSA> GetAllModpaFromPasmodelSupport(SupporterPassiveModel supporterPassiveModel)
+	{
+		long ptr_intlong = supporterPassiveModel.Pointer.ToInt64();
+		if (modpaDict.ContainsKey(ptr_intlong)) return modpaDict[ptr_intlong];
+		return new List<ModularSA>();
+	}
 	private static List<ModularSA> GetAllModbaFromBuffModel(BuffModel buffModel)
 	{
 		long ptr_intlong = buffModel.Pointer.ToInt64();
@@ -495,6 +515,17 @@ public class SkillScriptInitPatch
 				modpa.Enact(action.Model, action.Skill, action, null, actevent, BATTLE_EVENT_TIMING.NONE);
 			}
 		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				if (Input.GetKeyInt(KeyCode.LeftControl)) MainClass.Logg.LogInfo("Found modpassive - OnBeforeDefense: " + modpaList[i].passiveID);
+				supportPassive._script._owner = action.Model;
+				modpaList[i].Enact(action.Model, action.Skill, action, null, actevent, BATTLE_EVENT_TIMING.NONE);
+			}
+		}
 	}
 
 	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnDie))]
@@ -556,6 +587,42 @@ public class SkillScriptInitPatch
 		}
 	}
 
+	[HarmonyPatch(typeof(SupporterPassiveModel), nameof(SupporterPassiveModel.OnDieOtherUnit))]
+	[HarmonyPostfix]
+	public static void Postfix_OnDieOtherUnit(BattleUnitModel killer, BattleUnitModel dead, BATTLE_EVENT_TIMING timing, DAMAGE_SOURCE_TYPE dmgSrcType, BUFF_UNIQUE_KEYWORD keyword)
+	{
+		int actevent_OnDie = MainClass.timingDict["OnDie"];
+		int actevent_OnOtherDie = MainClass.timingDict["OnOtherDie"];
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				modpaList[i].modsa_target_list.Clear();
+				modpaList[i].modsa_target_list.Add(dead);
+				supportPassive._script._owner = killer;
+				modpaList[i].Enact(killer, null, null, null, actevent_OnDie, timing);
+			}
+		}
+		// onotherdie
+		BattleObjectManager battleObjManager_inst = SingletonBehavior<BattleObjectManager>.Instance;
+		foreach (BattleUnitModel unit in battleObjManager_inst.GetAliveListExceptSelf(dead, false, false))
+		{
+
+			foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+			{
+				List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+				for (int i = 0; i < modpaList.Count; i++)
+				{
+					modpaList[i].modsa_target_list.Clear();
+					modpaList[i].modsa_target_list.Add(dead);
+					supportPassive._script._owner = killer;
+					modpaList[i].Enact(unit, null, null, null, actevent_OnOtherDie, timing);
+				}
+			}
+		}
+	}
 	[HarmonyPatch(typeof(BattleUnitModel_Abnormality), nameof(BattleUnitModel_Abnormality.GetActionSlotAdder))]
 	[HarmonyPostfix]
 	private static void Postfix_BattleUnitModel_Abnormality_GetActionSlotAdder(ref int __result, BattleUnitModel_Abnormality __instance)
@@ -611,12 +678,14 @@ public class SkillScriptInitPatch
 		BattleObjectManager battleObjManager_inst = SingletonBehavior<BattleObjectManager>.Instance;
 		foreach (BattleUnitModel unit in battleObjManager_inst.GetAliveListExceptSelf(brokeUnit, false, false))
 		{
-			foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList) {
+			foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList)
+			{
 				if (!passiveModel.CheckActiveCondition()) continue;
 				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
 				if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
 
-				foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
+				foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
+				{
 					modpa.modsa_passiveModel = passiveModel;
 					modpa.modsa_target_list.Clear();
 					modpa.modsa_target_list.Add(brokeUnit);
@@ -638,8 +707,34 @@ public class SkillScriptInitPatch
 				}
 			}
 		}
-	}
+		// Support Passive
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				supportPassive._script._owner = brokeUnit;
+				modpaList[i].Enact(brokeUnit, null, null, null, actevent_OnBreak, timing);
+			}
+		}
+		// onotherbreak
+		foreach (BattleUnitModel unit in battleObjManager_inst.GetAliveListExceptSelf(brokeUnit, false, false))
+		{
 
+			foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+			{
+				List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+				for (int i = 0; i < modpaList.Count; i++)
+				{
+					modpaList[i].modsa_target_list.Clear();
+					modpaList[i].modsa_target_list.Add(brokeUnit);
+					supportPassive._script._owner = unit;
+					modpaList[i].Enact(unit, null, null, null, actevent_OnOtherBreak, timing);
+				}
+			}
+		}
+	}
 
 	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnVibrationExplosionOtherUnit))]
 	[HarmonyPostfix]
@@ -674,6 +769,18 @@ public class SkillScriptInitPatch
 				modpa.Enact(__instance._owner, null, null, null, actevent, timing);
 			}
 		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				modpaList[i].modsa_target_list.Clear();
+				modpaList[i].modsa_target_list.Add(explodedUnit);
+				supportPassive._script._owner = __instance._owner;
+				modpaList[i].Enact(__instance._owner, null, null, null, actevent, timing);
+			}
+		}	
 	}
 
 	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnDiscardSin))]
@@ -705,6 +812,18 @@ public class SkillScriptInitPatch
 				if (modpa.immortality) __result = true;
 			}
 		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				modpaList[i].immortality = false;
+				supportPassive._script._owner = __instance;
+				modpaList[i].Enact(__instance, null, null, null, actevent, timing);
+				if (modpaList[i].immortality) __result = true;
+			}
+		}
 	}
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.CheckImmortalOtherUnit), new Type[] { typeof(BattleUnitModel), typeof(int), typeof(bool), typeof(BUFF_UNIQUE_KEYWORD) })]
 	[HarmonyPostfix]
@@ -712,8 +831,10 @@ public class SkillScriptInitPatch
 	{
 		if (isInstantDeath) return;
 		int actevent = MainClass.timingDict["ImmortalOther"];
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
+			{
 				modpa.immortality = false;
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.modsa_target_list.Clear();
@@ -722,14 +843,109 @@ public class SkillScriptInitPatch
 				if (modpa.immortality) __result = true;
 			}
 		}
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			{
 				modpa.immortality = false;
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(checkTarget);
 				modpa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 				if (modpa.immortality) __result = true;
+			}
+		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				modpaList[i].immortality = false;
+				supportPassive._script._owner = __instance;
+				modpaList[i].modsa_target_list.Clear();
+				modpaList[i].modsa_target_list.Add(checkTarget);
+				modpaList[i].Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modpaList[i].immortality) __result = true;
+			}
+		}
+	}
+
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.IgnorePanic))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_IgnorePanic(ref bool __result, BattleUnitModel __instance)
+	{
+		int actevent = MainClass.timingDict["IgnorePanic"];
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
+			{
+				modpa.ignorepanic = false;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modpa.ignorepanic) __result = true;
+			}
+		}
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			{
+				modpa.ignorepanic = false;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modpa.ignorepanic) __result = true;
+			}
+		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				modpaList[i].ignorepanic = false;
+				supportPassive._script._owner = __instance;
+				modpaList[i].Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modpaList[i].ignorepanic) __result = true;
+			}
+		}
+	}
+
+
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.IgnoreBreak))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_IgnoreBreak(ref bool __result, BattleUnitModel __instance)
+	{
+		int actevent = MainClass.timingDict["IgnoreBreak"];
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
+			{
+				modpa.ignorebreak = false;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modpa.ignorebreak) __result = true;
+			}
+		}
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			{
+				modpa.ignorebreak = false;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modpa.ignorebreak) __result = true;
+			}
+		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				modpaList[i].ignorebreak = false;
+				supportPassive._script._owner = __instance;
+				modpaList[i].Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modpaList[i].ignorebreak) __result = true;
 			}
 		}
 	}
@@ -762,10 +978,23 @@ public class SkillScriptInitPatch
 			}
 		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			{
 				if (modpa.activationTiming == actevent_FakePower) continue;
 				int power = modpa.coinScaleAdder;
+				if (power != 0) __result += power;
+			}
+		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				if (modpaList[i].activationTiming == actevent_FakePower) continue;
+				int power = modpaList[i].coinScaleAdder;
 				if (power != 0) __result += power;
 			}
 		}
@@ -793,10 +1022,24 @@ public class SkillScriptInitPatch
 			}
 		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			{
 				if (modpa.activationTiming == actevent_FakePower) continue;
 				int power = modpa.skillPowerAdder;
+				if (power != 0) MainClass.Logg.LogInfo("Found modpa - base power adder: ");
+				__result += power;
+			}
+		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				if (modpaList[i].activationTiming == actevent_FakePower) continue;
+				int power = modpaList[i].skillPowerAdder;
 				if (power != 0) MainClass.Logg.LogInfo("Found modpa - base power adder: ");
 				__result += power;
 			}
@@ -841,10 +1084,24 @@ public class SkillScriptInitPatch
 			}
 		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			{
 				if (modpa.activationTiming == actevent_FakePower) continue;
 				int power = modpa.skillPowerResultAdder;
+				if (power != 0) MainClass.Logg.LogInfo("Found modpa - final power adder: ");
+				__result += power;
+			}
+		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				if (modpaList[i].activationTiming == actevent_FakePower) continue;
+				int power = modpaList[i].skillPowerResultAdder;
 				if (power != 0) MainClass.Logg.LogInfo("Found modpa - final power adder: ");
 				__result += power;
 			}
@@ -874,10 +1131,24 @@ public class SkillScriptInitPatch
 			}
 		}
 
-		foreach (PassiveModel passiveModel in actorAction.Model._passiveDetail.EgoPassiveList) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
+		foreach (PassiveModel passiveModel in actorAction.Model._passiveDetail.EgoPassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			{
 				if (modpa.activationTiming == actevent_FakePower) continue;
 				int power = modpa.parryingResultAdder;
+				if (power != 0) MainClass.Logg.LogInfo("Found modpa - clash power adder: " + power);
+				__result += power;
+			}
+		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				if (modpaList[i].activationTiming == actevent_FakePower) continue;
+				int power = modpaList[i].parryingResultAdder;
 				if (power != 0) MainClass.Logg.LogInfo("Found modpa - clash power adder: " + power);
 				__result += power;
 			}
@@ -910,10 +1181,22 @@ public class SkillScriptInitPatch
 			}
 		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			{
 				if (modpa.activationTiming == actevent_FakePower) continue;
 				__result += modpa.critAdder / 100f;
+			}
+		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				if (modpaList[i].activationTiming == actevent_FakePower) continue;
+				__result += modpaList[i].critAdder / 100f;
 			}
 		}
 	}
@@ -952,10 +1235,23 @@ public class SkillScriptInitPatch
 			}
 		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			{
 				if (modpa.activationTiming == actevent_FakePower) continue;
 				int power = modpa.atkDmgAdder;
+				if (power != 0) __result += power;
+			}
+		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				if (modpaList[i].activationTiming == actevent_FakePower) continue;
+				int power = modpaList[i].atkDmgAdder;
 				if (power != 0) __result += power;
 			}
 		}
@@ -991,10 +1287,23 @@ public class SkillScriptInitPatch
 			}
 		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			{
 				if (modpa.activationTiming == actevent_FakePower) continue;
 				int power = modpa.atkMultAdder;
+				if (power != 0) __result += power * 0.01f;
+			}
+		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				if (modpaList[i].activationTiming == actevent_FakePower) continue;
+				int power = modpaList[i].atkMultAdder;
 				if (power != 0) __result += power * 0.01f;
 			}
 		}
@@ -1040,6 +1349,16 @@ public class SkillScriptInitPatch
 			{
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(unit, __instance, action, null, actevent, timing);
+			}
+		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				supportPassive._script._owner = unit;
+				modpaList[i].Enact(unit, __instance, action, null, actevent, timing);
 			}
 		}
 	}
@@ -1127,6 +1446,16 @@ public class SkillScriptInitPatch
 			{
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(ownerAction.Model, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				supportPassive._script._owner = ownerAction.Model;
+				modpaList[i].Enact(ownerAction.Model, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 	}
@@ -1577,7 +1906,22 @@ public class SkillScriptInitPatch
 				}
 			}
 		}
-
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				modpaList[i].lastFinalDmg = realDmg;
+				modpaList[i].lastHpDmg = hpDamage;
+				modpaList[i].wasCrit = isCritical;
+				modpaList[i].modsa_coinModel = coin;
+				supportPassive._script._owner = attacker;
+				modpaList[i].modsa_target_list.Clear();
+				modpaList[i].modsa_target_list.Add(__instance);
+				modpaList[i].Enact(attacker, action.Skill, action, null, actevent_OSA, timing);
+			}
+		}
 		foreach (BuffModel buffModel in __instance._buffDetail.GetActivatedBuffModelAll()) {
 			foreach (ModularSA modba in GetAllModbaFromBuffModel(buffModel)) {
 				modba.lastFinalDmg = realDmg;
@@ -1616,8 +1960,22 @@ public class SkillScriptInitPatch
 				modpa.Enact(attacker, action.Skill, action, null, actevent_WH, timing);
 			}
 		}
-
-
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				modpaList[i].lastFinalDmg = realDmg;
+				modpaList[i].lastHpDmg = hpDamage;
+				modpaList[i].wasCrit = isCritical;
+				modpaList[i].modsa_coinModel = coin;
+				supportPassive._script._owner = attacker; 
+				modpaList[i].modsa_target_list.Clear();
+				modpaList[i].modsa_target_list.Add(__instance);
+				modpaList[i].Enact(attacker, action.Skill, action, null, actevent_WH, timing);
+			}
+		}
 	}
 
 
@@ -1659,7 +2017,18 @@ public class SkillScriptInitPatch
 				modpa.Enact(__instance.Model, __instance.Skill, __instance, null, actevent_BSA, timing);
 			}
 		}
-
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				modpaList[i].wasCrit = isCritical;
+				modpaList[i].modsa_coinModel = coin;
+				supportPassive._script._owner = __instance.Model;
+				modpaList[i].Enact(__instance.Model, __instance.Skill, __instance, null, actevent_BSA, timing);
+			}
+		}
 		foreach (PassiveModel passiveModel in target._passiveDetail.PassiveList) {
 			if (!passiveModel.CheckActiveCondition()) continue;
 			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
@@ -1700,6 +2069,18 @@ public class SkillScriptInitPatch
 				modpa.modsa_coinModel = coin;
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(__instance.Model, __instance.Skill, __instance, null, actevent_BWH, timing);
+			}
+		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				modpaList[i].wasCrit = isCritical;
+				modpaList[i].modsa_coinModel = coin;
+				supportPassive._script._owner = __instance.Model;
+				modpaList[i].Enact(__instance.Model, __instance.Skill, __instance, null, actevent_BWH, timing);
 			}
 		}
 	}
@@ -1769,6 +2150,16 @@ public class SkillScriptInitPatch
 				modpa.Enact(__instance, skill, actionOrNull, null, actevent, timing);
 			}
 		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				supportPassive._script._owner = __instance;
+				modpaList[i].Enact(__instance, skill, actionOrNull, null, actevent, timing);
+			}
+		}
 	}
 
 	/*
@@ -1819,6 +2210,18 @@ public class SkillScriptInitPatch
 				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(__instance);
 				modpa.Enact(action.Model, action.Skill, action, null, actevent, timing);
+			}
+		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				supportPassive._script._owner = action.Model;
+				modpaList[i].modsa_target_list.Clear();
+				modpaList[i].modsa_target_list.Add(__instance);
+				modpaList[i].Enact(action.Model, action.Skill, action, null, actevent, timing);
 			}
 		}
 	}
@@ -1874,6 +2277,17 @@ public class SkillScriptInitPatch
 				modpa.modsa_coinModel = coin;
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(__instance, action.Skill, action, null, actevent, timing);
+			}
+		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			for (int i = 0; i < modpaList.Count; i++)
+			{
+				supportPassive._script._owner = __instance;
+				modpaList[i].modsa_coinModel = coin;
+				modpaList[i].Enact(__instance, action.Skill, action, null, actevent, timing);
 			}
 		}
 	}

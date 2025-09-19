@@ -66,6 +66,8 @@ public class MainClass : BasePlugin
 		timingStringList.Add("StartVisualSkillUse"); // 39
 		timingStringList.Add("WhenGained"); // 40
 		timingStringList.Add("ChangeMotion"); // 41
+		timingStringList.Add("IgnorePanic"); // 42
+		timingStringList.Add("IgnoreBreak"); // 43
 
 		Il2CppArrayBase<string> timingStringArray = timingStringList.ToArray();
 		int count = timingStringArray.Count;
@@ -163,6 +165,8 @@ public class MainClass : BasePlugin
 		consequenceDict["critchance"] = new ConsequenceCritChance();
 		consequenceDict["changemotion"] = new ConsequenceChangeMotion();
 		consequenceDict["assistdefense"] = new ConsequenceAssistDefense();
+		consequenceDict["ignorepanic"] = new ConsequenceIgnorePanic();
+		consequenceDict["ignorebreak"] = new ConsequenceIgnoreBreak();
 	}
 
 	private static void RegisterAcquirers()
@@ -221,8 +225,12 @@ public class MainClass : BasePlugin
 		acquirerDict["coinrerolled"] = new AcquirerCoinRerolled();
 		acquirerDict["stageextraslot"] = new AcquirerStageExtraSlot();
 		acquirerDict["getbloodfeast"] = new AcquirerGetBloodfeast();
-  		acquirerDict["isunbreakable"] = new AcquirerIsUnbreakable();
+  	acquirerDict["isunbreakable"] = new AcquirerIsUnbreakable();
 		acquirerDict["isusableinduel"] = new AcquirerIsUsableInDuel();
+		acquirerDict["sameunit"] = new AcquirerSameUnit();
+		acquirerDict["skillcanduel"] = new AcquirerSkillCanDuel();
+		acquirerDict["skillteamkill"] = new AcquirerSkillTeamKill();
+		acquirerDict["skillfixedtarget"] = new AcquirerSkillFixed();
 	}
 
 	public static System.Collections.Generic.List<BattleUnitModel> ShuffleUnits(
@@ -245,8 +253,10 @@ public class MainClass : BasePlugin
 	public static readonly System.Collections.Generic.Dictionary<string, int> timingDict = new();
 	public static readonly System.Collections.Generic.Dictionary<string, IModularConsequence> consequenceDict = new();
 	public static readonly System.Collections.Generic.Dictionary<string, IModularAcquirer> acquirerDict = new();
-
+	public static System.Collections.Generic.List<SupporterPassiveModel> supporterPassiveList = new System.Collections.Generic.List<SupporterPassiveModel>();
+	public static System.Collections.Generic.List<SupporterPassiveModel> activeSupporterPassiveList = new System.Collections.Generic.List<SupporterPassiveModel>();
 	public static bool fakepowerEnabled = true;
+	public static bool SupportPasInit = false;
 
 	public static Random rng = new();
 
@@ -257,7 +267,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false;
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.0.0";
+	public const string VERSION = "4.1.0";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
