@@ -1,9 +1,8 @@
 using System;
 using BepInEx.Unity.IL2CPP.UnityEngine;
-using Dungeon;
 using HarmonyLib;
-using Il2CppSystem.Collections;
 using Il2CppSystem.Collections.Generic;
+using ModularSkillScripts.Consequence;
 using SD;
 using Utils;
 using static BattleUI.Abnormality.AbnormalityPartSkills;
@@ -1529,17 +1528,52 @@ public class SkillScriptInitPatch
 		}
 	}
 
-
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnStartBehaviour))]
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_OnStartBehaviour(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance) {
 		int actevent = MainClass.timingDict["OnStartBehaviour"];
 		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
-		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-			modsa.Enact(action.Model, __instance, action, null, actevent, timing);
+		if (modsaDict.TryGetValue(skillmodel_intlong, out var modsaList))
+		{
+			foreach (ModularSA modsa in modsaList) {
+				modsa.Enact(action.Model, __instance, action, null, actevent, timing);
+			}
 		}
 	}
+
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetSupportiveDefenseSkillID))]
+	[HarmonyPrefix]
+	public static bool GetSupportiveDefenseSkillID(
+		BattleUnitModel __instance,
+		BattleUnitModel originTarget,
+		BattleActionModel attackerAction,
+		DEFENSE_TYPE defenseType,
+		BATTLE_EVENT_TIMING timing,
+		ref int __result)
+	{
+		if (originTarget == null)
+			return true;
+		int skillId = ConsequenceAssistDefense.GetAssistDefenseSkillId(__instance.InstanceID, originTarget.InstanceID);
+		var defenderName = __instance.GetName()?.Replace("\n", " ");
+		var originTargetName = originTarget.GetName()?.Replace("\n", " ");
+		var attackerName = attackerAction?.Model?.GetName()?.Replace("\n", " ");
+		if (skillId < 0)
+		{
+			MainClass.Logg.LogInfo($"No assist defense found for {defenderName} to defend {originTargetName} from {attackerName}, defenseType: {defenseType}, timing: {timing}");
+			return true;
+		}
+		MainClass.Logg.LogInfo($"Assist defense called for {defenderName} to defend {originTargetName} from {attackerName}, defenseType: {defenseType}, timing: {timing}");
+		__result = skillId;
+		return false;
+	}
+	
+	[HarmonyPatch(typeof(BattleObjectManager), nameof(BattleObjectManager.OnRoundEnd))]
+	[HarmonyPostfix]
+	public static void BattleObjectManager_OnRoundEnd_Postfix()
+	{
+		ConsequenceAssistDefense.ClearAssistDefenseEntries();
+	}
+	
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.BeforeBehaviour))]
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_BeforeBehaviour(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance) {
