@@ -167,6 +167,7 @@ public class MainClass : BasePlugin
 		consequenceDict["assistdefense"] = new ConsequenceAssistDefense();
 		consequenceDict["ignorepanic"] = new ConsequenceIgnorePanic();
 		consequenceDict["ignorebreak"] = new ConsequenceIgnoreBreak();
+		consequenceDict["skillslotremove"] = new ConsequenceSkillSlotRemove();
 	}
 
 	private static void RegisterAcquirers()
