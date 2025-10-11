@@ -12,15 +12,17 @@ public class LuaFunctionListFiles : IModularLuaFunction
 	{
 		try
 		{
-			var dirPath = context.GetArgument(0).Read<string>();
-
-			// Security check: ensure the directory path is within the plugin directory
-			var fullPath = Path.GetFullPath(dirPath);
+			var relativeDirPath = context.GetArgument(0).Read<string>();
 			var pluginPath = MainClass.pluginPath.FullName;
 
+			// Combine plugin path with the relative directory path
+			var fullPath = Path.Combine(pluginPath, relativeDirPath);
+
+			// Normalize the path and ensure it's still within plugin directory (security check)
+			fullPath = Path.GetFullPath(fullPath);
 			if (!fullPath.StartsWith(pluginPath, StringComparison.OrdinalIgnoreCase))
 			{
-				MainClass.Logg.LogError($"Security violation: Directory path '{dirPath}' is outside plugin directory '{pluginPath}'");
+				MainClass.Logg.LogError($"Security violation: Directory path '{relativeDirPath}' resolves outside plugin directory");
 				buffer[0] = LuaValue.Nil;
 				return ValueTask.FromResult(1);
 			}
@@ -28,7 +30,7 @@ public class LuaFunctionListFiles : IModularLuaFunction
 			// Check if directory exists
 			if (!Directory.Exists(fullPath))
 			{
-				MainClass.Logg.LogWarning($"Directory not found: '{fullPath}'");
+				MainClass.Logg.LogWarning($"Directory not found: '{relativeDirPath}' (resolved to '{fullPath}')");
 				buffer[0] = LuaValue.Nil;
 				return ValueTask.FromResult(1);
 			}
@@ -39,7 +41,7 @@ public class LuaFunctionListFiles : IModularLuaFunction
 
 			for (int i = 0; i < files.Length; i++)
 			{
-				// Return relative paths from the plugin directory for security
+				// Return relative paths from the plugin directory
 				var relativePath = Path.GetRelativePath(pluginPath, files[i]);
 				table[i + 1] = relativePath;
 			}

@@ -12,15 +12,17 @@ public class LuaFunctionReadFile : IModularLuaFunction
 	{
 		try
 		{
-			var filePath = context.GetArgument(0).Read<string>();
-
-			// Security check: ensure the file path is within the plugin directory
-			var fullPath = Path.GetFullPath(filePath);
+			var relativePath = context.GetArgument(0).Read<string>();
 			var pluginPath = MainClass.pluginPath.FullName;
 
+			// Combine plugin path with the relative path
+			var fullPath = Path.Combine(pluginPath, relativePath);
+
+			// Normalize the path and ensure it's still within plugin directory (security check)
+			fullPath = Path.GetFullPath(fullPath);
 			if (!fullPath.StartsWith(pluginPath, StringComparison.OrdinalIgnoreCase))
 			{
-				MainClass.Logg.LogError($"Security violation: File path '{filePath}' is outside plugin directory '{pluginPath}'");
+				MainClass.Logg.LogError($"Security violation: File path '{relativePath}' resolves outside plugin directory");
 				buffer[0] = LuaValue.Nil;
 				return ValueTask.FromResult(1);
 			}
@@ -28,7 +30,7 @@ public class LuaFunctionReadFile : IModularLuaFunction
 			// Check if file exists
 			if (!File.Exists(fullPath))
 			{
-				MainClass.Logg.LogWarning($"File not found: '{fullPath}'");
+				MainClass.Logg.LogWarning($"File not found: '{relativePath}' (resolved to '{fullPath}')");
 				buffer[0] = LuaValue.Nil;
 				return ValueTask.FromResult(1);
 			}
