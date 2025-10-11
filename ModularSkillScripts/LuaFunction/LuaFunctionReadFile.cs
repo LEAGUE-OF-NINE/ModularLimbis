@@ -15,8 +15,8 @@ public class LuaFunctionReadFile : IModularLuaFunction
 			var relativePath = context.GetArgument(0).Read<string>();
 			var pluginPath = MainClass.pluginPath.FullName;
 
-			// Combine plugin path with the relative path
-			var fullPath = Path.Combine(pluginPath, relativePath);
+			// Join plugin path with the relative path (safer than Combine)
+			var fullPath = Path.Join(pluginPath, relativePath);
 
 			// Normalize the path and ensure it's still within plugin directory (security check)
 			fullPath = Path.GetFullPath(fullPath);
