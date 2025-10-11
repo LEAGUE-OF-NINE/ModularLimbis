@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using BepInEx;
 using Lua;
 
 namespace ModularSkillScripts.LuaFunction;
@@ -13,7 +14,7 @@ public class LuaFunctionReadFile : IModularLuaFunction
 		try
 		{
 			var relativePath = context.GetArgument(0).Read<string>();
-			var pluginPath = MainClass.pluginPath.FullName;
+			var pluginPath = Paths.PluginPath;
 
 			// Join plugin path with the relative path (safer than Combine)
 			var fullPath = Path.Join(pluginPath, relativePath);
