@@ -234,6 +234,15 @@ public class MainClass : BasePlugin
 		acquirerDict["skillcanduel"] = new AcquirerSkillCanDuel();
 		acquirerDict["skillteamkill"] = new AcquirerSkillTeamKill();
 		acquirerDict["skillfixedtarget"] = new AcquirerSkillFixed();
+
+		// Register Lua functions
+		luaFunctionDict["clearvalues"] = new ModularSkillScripts.LuaFunction.LuaFunctionClearValues();
+		luaFunctionDict["resetadders"] = new ModularSkillScripts.LuaFunction.LuaFunctionResetAdders();
+		luaFunctionDict["selecttargets"] = new ModularSkillScripts.LuaFunction.LuaFunctionSelectTargets();
+		luaFunctionDict["setldata"] = new ModularSkillScripts.LuaFunction.LuaFunctionSetLData();
+		luaFunctionDict["getldata"] = new ModularSkillScripts.LuaFunction.LuaFunctionGetLData();
+		luaFunctionDict["readfile"] = new ModularSkillScripts.LuaFunction.LuaFunctionReadFile();
+		luaFunctionDict["listfiles"] = new ModularSkillScripts.LuaFunction.LuaFunctionListFiles();
 	}
 
 	public static System.Collections.Generic.List<BattleUnitModel> ShuffleUnits(
@@ -256,6 +265,7 @@ public class MainClass : BasePlugin
 	public static readonly System.Collections.Generic.Dictionary<string, int> timingDict = new();
 	public static readonly System.Collections.Generic.Dictionary<string, IModularConsequence> consequenceDict = new();
 	public static readonly System.Collections.Generic.Dictionary<string, IModularAcquirer> acquirerDict = new();
+	public static readonly System.Collections.Generic.Dictionary<string, ModularSkillScripts.LuaFunction.IModularLuaFunction> luaFunctionDict = new();
 	public static System.Collections.Generic.List<SupporterPassiveModel> supporterPassiveList = new System.Collections.Generic.List<SupporterPassiveModel>();
 	public static System.Collections.Generic.List<SupporterPassiveModel> activeSupporterPassiveList = new System.Collections.Generic.List<SupporterPassiveModel>();
 	public static bool fakepowerEnabled = true;

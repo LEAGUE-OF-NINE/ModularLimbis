@@ -1,6 +1,7 @@
 using System;
 using System.Buffers;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Il2CppInterop.Runtime.Injection;
@@ -306,7 +307,7 @@ public class ModularSA : Il2CppSystem.Object
 					{
 						throw new LuaException("LUA main function not found: " + modsa_luaScriptMain);
 					}
-					LuaFunction mainFunction;
+					Lua.LuaFunction mainFunction;
 					if (!mainVal.TryRead(out mainFunction))
 					{
 						throw new LuaException("LUA main is not a function: " + modsa_luaScriptMain);
@@ -925,9 +926,9 @@ public class ModularSA : Il2CppSystem.Object
 		return args;
 	}
 	
-	private LuaFunction LuaConsequence(String name)
+	private Lua.LuaFunction LuaConsequence(String name)
 	{
-		return new LuaFunction((context, buffer, ct) =>
+		return new Lua.LuaFunction((context, buffer, ct) =>
 		{
 			var args = LuaToConsequenceArgs(context, name);
 			var circledSection = String.Join(",", args);
@@ -937,9 +938,9 @@ public class ModularSA : Il2CppSystem.Object
 		});
 	}
 	
-	private LuaFunction LuaAcquirer(String name)
+	private Lua.LuaFunction LuaAcquirer(String name)
 	{
-		return new LuaFunction((context, buffer, ct) =>
+		return new Lua.LuaFunction((context, buffer, ct) =>
 		{
 			var args = LuaToConsequenceArgs(context, name);
 			var circledSection = String.Join(",", args);
@@ -968,56 +969,16 @@ public class ModularSA : Il2CppSystem.Object
 		state.OpenStringLibrary();
 		state.OpenTableLibrary();
 	
-		state.Environment["clearvalues"] = new LuaFunction((context, buffer, ct) =>
+		// Register Lua functions from the dictionary
+		foreach (var kvp in MainClass.luaFunctionDict)
 		{
-			ResetValueList();
-			return ValueTask.FromResult(0);
-		});
-		state.Environment["resetadders"] = new LuaFunction((context, buffer, ct) =>
-		{
-			ResetAdders();
-			return ValueTask.FromResult(0);
-		});
-		state.Environment["selecttargets"] = new LuaFunction((context, buffer, ct) =>
-		{
-			var table = new LuaTable();
-			GetTargetModelList(context.GetArgument(0).Read<string>())
-				.ToArray()
-				.Select((unit, i) => (i + 1, $"inst{unit.InstanceID}"))
-				.ForEach(x =>
-				{
-					table[x.Item1] = x.Item2;
-				});
-			buffer.Span[0] = table;
-			return ValueTask.FromResult(1);
-		});
-		state.Environment["setldata"] = new LuaFunction((context, buffer, ct) =>
-		{
-			var target = GetTargetModel(context.GetArgument(0).Read<string>());
-			if (target == null) return ValueTask.FromResult(0);
-			var key = context.GetArgument(1).Read<string>();
-			var value = context.GetArgument(2);
-			var dataKey = new LuaUnitDataKey
+			var functionName = kvp.Key;
+			var luaFunction = kvp.Value;
+			state.Environment[functionName] = new Lua.LuaFunction((context, buffer, ct) =>
 			{
-				unitPtr_intlong = target.Pointer.ToInt64(),
-				dataID = key
-			};
-			LuaUnitDataKey.LuaUnitValues[dataKey] = value;
-			return ValueTask.FromResult(0);
-		});
-		state.Environment["getldata"] = new LuaFunction((context, buffer, ct) =>
-		{
-			var target = GetTargetModel(context.GetArgument(0).Read<string>());
-			if (target == null) return ValueTask.FromResult(0);
-			var key = context.GetArgument(1).Read<string>();
-			var dataKey = new LuaUnitDataKey
-			{
-				unitPtr_intlong = target.Pointer.ToInt64(),
-				dataID = key
-			};
-			buffer.Span[0] = LuaUnitDataKey.LuaUnitValues.TryGetValue(dataKey, out var value) ? value : LuaValue.Nil;
-			return ValueTask.FromResult(1);
-		});
+				return luaFunction.ExecuteLuaFunction(this, context, buffer.Span, ct);
+			});
+		}
 	}
 	
 	public static BattleUnitModel_Abnormality AsAbnormalityModel(BattleUnitModel targetModel)
