@@ -643,15 +643,14 @@ public class SkillScriptInitPatch
 		}
 	}
 
-	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnBreak))]
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnBreak))]
 	[HarmonyPostfix]
-	private static void Postfix_PassiveDetail_OnBreak(BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
+	private static void Postfix_PassiveDetail_OnBreak(BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
 	{
 		int actevent_OnBreak = MainClass.timingDict["OnBreak"];
 		int actevent_OnOtherBreak = MainClass.timingDict["OnOtherBreak"];
-		BattleUnitModel brokeUnit = __instance._owner;
-
-		foreach (PassiveModel passiveModel in __instance.PassiveList) {
+		BattleUnitModel brokeUnit = __instance;
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList) {
 			if (!passiveModel.CheckActiveCondition()) continue;
 			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
 			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
@@ -661,7 +660,7 @@ public class SkillScriptInitPatch
 				modpa.Enact(brokeUnit, null, null, null, actevent_OnBreak, timing);
 			}
 		}
-		foreach (PassiveModel passiveModel in __instance.EgoPassiveList)
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList)
 		{
 			if (!passiveModel.CheckActiveCondition()) continue;
 			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
