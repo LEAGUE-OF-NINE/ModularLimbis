@@ -1,3 +1,5 @@
+using ModularSkillScripts.Patches;
+
 namespace ModularSkillScripts.Consequence;
 
 public class ConsequenceSetData : IModularConsequence

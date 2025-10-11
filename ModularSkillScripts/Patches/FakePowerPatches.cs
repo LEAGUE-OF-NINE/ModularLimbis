@@ -1,7 +1,7 @@
 using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
 
-namespace ModularSkillScripts;
+namespace ModularSkillScripts.Patches;
 
 class FakePowerPatches
 {

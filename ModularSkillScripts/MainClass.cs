@@ -10,6 +10,7 @@ using ModularSkillScripts.Acquirer;
 using ModularSkillScripts.Consequence;
 using Random = System.Random;
 using Il2CppSystem.IO;
+using ModularSkillScripts.Patches;
 //using Antlr4.Runtime;
 //using Antlr4.Runtime.Tree;
 //using ModsaLang;

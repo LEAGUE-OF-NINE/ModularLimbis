@@ -1,3 +1,5 @@
+using ModularSkillScripts.Patches;
+
 namespace ModularSkillScripts.Acquirer;
 
 public class AcquirerStageExtraSlot : IModularAcquirer

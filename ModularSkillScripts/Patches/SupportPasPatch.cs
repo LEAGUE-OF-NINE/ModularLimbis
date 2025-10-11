@@ -1,10 +1,9 @@
 using Il2CppSystem.Collections.Generic;
 using Lethe.Patches;
-using ModularSkillScripts;
 using UnityEngine;
 using Utils;
 
-namespace ModularSkillScripts
+namespace ModularSkillScripts.Patches
 {
 	public static class SupportPasPatch
 	{
@@ -33,7 +32,7 @@ namespace ModularSkillScripts
 			{
 				supporterUnits.Add(supportUnitModel);
 			}
-			supporterUnits.GetDistinctElements<SupportUnitModel>();
+			supporterUnits.GetDistinctElements();
 
 			for (int i = 0; i < supporterUnits.Count; i++)
 			{

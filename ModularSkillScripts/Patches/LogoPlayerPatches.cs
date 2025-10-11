@@ -1,7 +1,7 @@
 using BattleUI.Operation;
 using HarmonyLib;
 
-namespace ModularSkillScripts;
+namespace ModularSkillScripts.Patches;
 
 internal class LogoPlayerPatches
 {

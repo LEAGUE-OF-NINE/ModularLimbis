@@ -8,7 +8,7 @@ using Lua.CodeAnalysis.Syntax;
 using Lua.Runtime;
 using MainUI;
 
-namespace ModularSkillScripts;
+namespace ModularSkillScripts.Patches;
 
 public class ReloadPatches
 {
@@ -33,7 +33,7 @@ public class ReloadPatches
 					continue;
 				}
 				var content = File.ReadAllText(luaPath);
-				if (String.IsNullOrWhiteSpace(content))
+				if (string.IsNullOrWhiteSpace(content))
 				{
 					MainClass.Logg.LogWarning($"Modular Lua Script '{name}' in '{luaPath}' is empty. Skipping.");
 					continue;
