@@ -170,6 +170,7 @@ public class MainClass : BasePlugin
 		consequenceDict["ignorebreak"] = new ConsequenceIgnoreBreak();
 		consequenceDict["skillslotremove"] = new ConsequenceSkillSlotRemove();
 		consequenceDict["changeaffinity"] = new ConsequenceChangeAffinity();
+		consequenceDict["winstage"] = new ConsequenceWinStage();
 	}
 
 	private static void RegisterAcquirers()
