@@ -277,7 +277,14 @@ public class ModularSA : Il2CppSystem.Object
 		if (modsa_luaScript == null)
 		{
 			// normal non-lua execution
-			List<BattleUnitModel> loopTarget_list = modsa_target_list;
+			List<BattleUnitModel> loopTarget_list = new();
+			if (modsa_target_list.Count > 0)
+			{
+				foreach (BattleUnitModel unit in modsa_target_list)
+				{
+					loopTarget_list.Add(unit);
+				}
+			}
 			if (modsa_loopString.Any()) loopTarget_list = GetTargetModelList(modsa_loopString);
 			else if (loopTarget_list.Count < 1) loopTarget_list.Add(GetTargetModel("MainTarget"));
 			foreach (BattleUnitModel unit in loopTarget_list) {

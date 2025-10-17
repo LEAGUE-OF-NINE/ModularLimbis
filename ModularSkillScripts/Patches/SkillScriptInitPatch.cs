@@ -131,6 +131,55 @@ public class SkillScriptInitPatch
 			modpaDict[ptr].Add(modpa);
 		}
 	}
+
+	[HarmonyPatch(typeof(EgoPassiveModel), nameof(EgoPassiveModel.Init))]
+	[HarmonyPrefix]
+	private static void Prefix_EgoPassiveModel_Init(BattleUnitModel owner, PassiveModel __instance)
+	{
+		if (__instance._script != null) return;
+
+		bool isModular = false;
+		List<string> requireIDList = __instance.ClassInfo.requireIDList;
+		for (int i = 0; i < requireIDList.Count; i++)
+		{
+			string param = requireIDList.ToArray()[i];
+			if (param.StartsWith("Modular/")) { isModular = true; break; }
+		}
+
+		if (isModular)
+		{
+			EgoPassiveAbility pa = new EgoPassiveAbility();
+			pa.Init(owner, __instance.ClassInfo.attributeResonanceCondition, __instance.ClassInfo.attributeStockCondition, __instance.ClassInfo.controlValueList);
+			__instance._script = pa;
+		}
+	}
+
+	[HarmonyPatch(typeof(EgoPassiveModel), nameof(EgoPassiveModel.Init))]
+	[HarmonyPostfix]
+	private static void Postfix_EgoPassiveModel_Init(BattleUnitModel owner, PassiveModel __instance)
+	{
+		List<string> requireIDList = __instance.ClassInfo.requireIDList;
+		for (int i = 0; i < requireIDList.Count; i++)
+		{
+			string param = requireIDList.ToArray()[i];
+			if (!param.StartsWith("Modular/")) continue;
+
+			long ptr = __instance.Pointer.ToInt64();
+
+			var modpa = new ModularSA();
+			modpa.originalString = param;
+			modpa.ptr_intlong = ptr;
+			modpa.passiveID = __instance.ClassInfo.ID;
+			modpa.abilityMode = 2; // 2 means passive
+			modpa.modsa_unitModel = owner;
+			MainClass.Logg.LogInfo("EgoPassiveModel init: " + param);
+
+			modpa.SetupModular(param.Remove(0, 8));
+			if (!modpaDict.ContainsKey(ptr)) modpaDict.Add(ptr, new List<ModularSA>());
+			modpaDict[ptr].Add(modpa);
+		}
+	}
+
 	/*
 	[HarmonyPatch(typeof(EgoPassiveModel), nameof(EgoPassiveModel.Init))]
 	[HarmonyPrefix]

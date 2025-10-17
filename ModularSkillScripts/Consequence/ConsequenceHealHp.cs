@@ -19,7 +19,7 @@ public class ConsequenceHealHp : IModularConsequence
 			int finalAmount = amount;
 			if (percentageheal) finalAmount = targetModel.MaxHp * finalAmount / 100;
 			if (finalAmount < 0)
-				targetModel.TakeAbsHpDamage(null, finalAmount * -1, out _, out _, modular.battleTiming, DAMAGE_SOURCE_TYPE.NONE);
+				targetModel.TakeAbsHpDamage(null, finalAmount * -1, out _, out _, modular.battleTiming, DAMAGE_SOURCE_TYPE.SKILL);
 			else
 			{
 				switch (modular.abilityMode)

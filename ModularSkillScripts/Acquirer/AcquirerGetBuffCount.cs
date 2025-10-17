@@ -8,5 +8,6 @@ public class AcquirerGetBuffCount : IModularAcquirer
 		var type = circles[1];
 		if (targetModel == null) return -1;
 		return type == "neg" ? targetModel.GetNegativeBuffCount() : targetModel.GetPositiveBuffCount();
+
 	}
 }
