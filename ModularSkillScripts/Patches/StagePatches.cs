@@ -60,7 +60,7 @@ internal class StagePatches
 			List<ModularSA> value = SkillScriptInitPatch.modsaDict[key];
 			foreach (ModularSA modsa in value)
 			{
-				int deathTime = 5;
+				int deathTime = 10;
 				if (modsa.modsa_skillModel != null && modsa.modsa_skillModel.IsEgoSkill()) deathTime = 2;
 				if (modsa.interactionTimer < deathTime && !modsa.markedForDeath) {
 					modsa.interactionTimer += 1;
