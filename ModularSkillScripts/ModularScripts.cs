@@ -15,6 +15,7 @@ using ModularSkillScripts.Consequence;
 using SharpCompress;
 using Regex = System.Text.RegularExpressions.Regex;
 using RegexOptions = System.Text.RegularExpressions.RegexOptions;
+using System.Text.Json;
 
 namespace ModularSkillScripts;
 
@@ -48,8 +49,92 @@ public record struct LuaUnitDataKey
 {
 	public long unitPtr_intlong;
 	public string dataID;
-	
+
 	public static System.Collections.Generic.Dictionary<LuaUnitDataKey, LuaValue> LuaUnitValues = new();
+}
+
+public static class Decode
+
+{
+    public static LuaValue decode(string strjson)
+    {
+        var jsonElem = convert(JsonDocument.Parse(strjson).RootElement);
+        return jsonElem;
+    }
+    private static LuaValue convert(JsonElement raw)
+    {
+        switch (raw.ValueKind)
+        {
+            default:
+                return LuaValue.Nil;
+
+            case JsonValueKind.String:
+                return raw.GetString();
+            case JsonValueKind.Number:
+                if (raw.TryGetInt64(out var longV)) return longV;
+                return raw.GetDouble();
+
+            case JsonValueKind.Object:
+                var newTable = new LuaTable();
+                foreach (var value in raw.EnumerateObject())
+                {
+                    newTable[value.Name] = convert(value.Value);
+                }
+                return newTable;
+
+            case JsonValueKind.Array:
+                var newTable1 = new LuaTable();
+                int startIndex = 1;
+                foreach (var value in raw.EnumerateArray())
+                {
+                    newTable1[startIndex++] = convert(value);
+                }
+                return newTable1;
+
+            case JsonValueKind.True:
+                return true;
+            case JsonValueKind.False:
+                return false;
+            case JsonValueKind.Null:
+                return LuaValue.Nil;
+        }
+    }
+}
+
+public class GlobalLuaValues
+{
+	private static GlobalLuaValues _instance;
+
+	public static GlobalLuaValues Instance
+	{
+		get
+		{
+			if (_instance == null)
+				_instance = new GlobalLuaValues();
+			return _instance;
+		}
+	}
+
+	private GlobalLuaValues() { }
+	public System.Collections.Generic.Dictionary<string, LuaValue> gvars = new System.Collections.Generic.Dictionary<string, LuaValue>();
+
+	public void SetGlobalValue(string key, LuaValue newVal)
+	{
+		if (key == null) return;
+		gvars[key] = newVal;
+	}
+
+	public LuaValue GetGlobalValue(string key)
+	{
+		if (key == null || !gvars.TryGetValue(key, out LuaValue value))
+			return LuaValue.Nil;
+		return value;
+	}
+
+	public void ClearAllValue()
+	{
+		gvars = new System.Collections.Generic.Dictionary<string, LuaValue>();
+	}
 }
 
 public class ModularSA : Il2CppSystem.Object
@@ -195,8 +280,9 @@ public class ModularSA : Il2CppSystem.Object
 		modsa_selfAction = selfAction;
 		modsa_oppoAction = oppoAction;
 		battleTiming = timing;
-			
-		if (modsa_selfAction != null) {
+
+		if (modsa_selfAction != null)
+		{
 			if (modsa_skillModel == null) modsa_skillModel = modsa_selfAction.Skill;
 			if (modsa_unitModel == null) modsa_unitModel = modsa_selfAction.Model;
 		}
@@ -287,7 +373,8 @@ public class ModularSA : Il2CppSystem.Object
 			}
 			if (modsa_loopString.Any()) loopTarget_list = GetTargetModelList(modsa_loopString);
 			else if (loopTarget_list.Count < 1) loopTarget_list.Add(GetTargetModel("MainTarget"));
-			foreach (BattleUnitModel unit in loopTarget_list) {
+			foreach (BattleUnitModel unit in loopTarget_list)
+			{
 				modsa_loopTarget = unit;
 				_fullStop = false;
 				for (int i = 0; i < batch_list.Count; i++)
@@ -331,7 +418,7 @@ public class ModularSA : Il2CppSystem.Object
 				MainClass.Logg.LogError($"Lua Script execution failed: {ex.Message}: {ex.StackTrace}");
 			}
 		}
-		
+
 		activationCounter += 1;
 	}
 	private LuaValue[] GetLuaValueArgs()
@@ -365,7 +452,7 @@ public class ModularSA : Il2CppSystem.Object
 			return new LuaValue(intVal);
 		if (double.TryParse(rawstring, out double doubleVal))
 			return new LuaValue(doubleVal);
-		
+
 		if (rawstring.StartsWith("VALUE_")) return new LuaValue(GetNumFromParamString(rawstring));
 		return new LuaValue(rawstring);
 	}
@@ -385,11 +472,12 @@ public class ModularSA : Il2CppSystem.Object
 		int idx = 0;
 		if (mode == -1) mode = 0;
 		else idx++;
-		
+
 		char[] ifSeparator = new char[] { '<', '>', '=' };
 		bool success = false;
 		bool success_first = false;
-		for (int i = idx; i < circles.Length; i++) {
+		for (int i = idx; i < circles.Length; i++)
+		{
 			string circle_string = circles[i];
 			var symbols = Regex.Matches(circle_string, "(<|>|=)", RegexOptions.IgnoreCase, System.TimeSpan.FromMinutes(1));
 			string[] parameters = circle_string.Split(ifSeparator);
@@ -404,13 +492,19 @@ public class ModularSA : Il2CppSystem.Object
 			else if (symbol == ">") success = firstValue > secondValue;
 			else if (symbol == "=") success = firstValue == secondValue;
 
-			if (mode == 0) {
+			if (mode == 0)
+			{
 				if (!success) break;
-			} else if (mode == 1) {
+			}
+			else if (mode == 1)
+			{
 				if (success) break;
-			} else {
+			}
+			else
+			{
 				if (i == idx) success_first = success;
-				else {
+				else
+				{
 					success = success_first == success;
 					if (!success) break;
 				}
@@ -431,9 +525,10 @@ public class ModularSA : Il2CppSystem.Object
 		bool acquire = param[0] == 'G';
 		if (acquire) param = param.Remove(0, 1);
 		if (param.Last() == ')') param = param.Remove(param.Length - 1);
-		
+
 		if (math) value = DoMath(param);
-		else if (param.StartsWith("VALUE_")) {
+		else if (param.StartsWith("VALUE_"))
+		{
 			int value_idx = 0;
 			int.TryParse(param[6].ToString(), out value_idx);
 			value = valueList[value_idx];
@@ -446,7 +541,7 @@ public class ModularSA : Il2CppSystem.Object
 			value = AcquireValue(param);
 		}
 		else int.TryParse(param, out value);
-		
+
 		if (negative) value *= -1;
 		return value;
 	}
@@ -463,68 +558,82 @@ public class ModularSA : Il2CppSystem.Object
 		SinManager sinManager_inst = Singleton<SinManager>.Instance;
 		BattleObjectManager battleObjectManager = sinManager_inst._battleObjectManager;
 
-		switch (param) {
+		switch (param)
+		{
 			case "Null": return unitList;
-			case "Self": {
-				unitList.Add(modsa_unitModel);
-				return unitList;
-			}
-			case "SelfCore": {
-				BattleUnitModel_Abnormality_Part part = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
-				if (part != null) unitList.Add(part.Abnormality);
-				else unitList.Add(modsa_unitModel);
+			case "Self":
+				{
+					unitList.Add(modsa_unitModel);
+					return unitList;
+				}
+			case "SelfCore":
+				{
+					BattleUnitModel_Abnormality_Part part = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
+					if (part != null) unitList.Add(part.Abnormality);
+					else unitList.Add(modsa_unitModel);
 
-				return unitList;
-			}
-			case "Target": {
-				if (modsa_loopTarget != null) unitList.Add(modsa_loopTarget);
-				return unitList;
-			}
-			case "TargetCore": {
-				BattleUnitModel_Abnormality_Part part = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality_Part>();
-				if (part != null) unitList.Add(part.Abnormality);
-				else unitList.Add(modsa_loopTarget);
-				return unitList;
-			}
-			case "MainTarget": {
-				if (modsa_selfAction == null) { unitList.Add(null); return unitList; }
-				TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
-				unitList.Add(targetDataSet.GetMainTarget());
-				return unitList;
-			}
-			case "EveryTarget": {
-				TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
-				unitList.Add(targetDataSet.GetMainTarget());
-				foreach (SinActionModel sinActionModel in targetDataSet.GetSubTargetSinActionList()) {
-					BattleUnitModel model = sinActionModel.UnitModel;
-					if (!unitList.Contains(model)) unitList.Add(sinActionModel.UnitModel);
+					return unitList;
 				}
-				return unitList;
-			}
-			case "SubTarget": {
-				TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
-				foreach (SinActionModel sinActionModel in targetDataSet.GetSubTargetSinActionList()) {
-					BattleUnitModel model = sinActionModel.UnitModel;
-					if (!unitList.Contains(model)) unitList.Add(sinActionModel.UnitModel);
+			case "Target":
+				{
+					if (modsa_loopTarget != null) unitList.Add(modsa_loopTarget);
+					return unitList;
 				}
-				return unitList;
-			}
+			case "TargetCore":
+				{
+					BattleUnitModel_Abnormality_Part part = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality_Part>();
+					if (part != null) unitList.Add(part.Abnormality);
+					else unitList.Add(modsa_loopTarget);
+					return unitList;
+				}
+			case "MainTarget":
+				{
+					if (modsa_selfAction == null) { unitList.Add(null); return unitList; }
+					TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
+					unitList.Add(targetDataSet.GetMainTarget());
+					return unitList;
+				}
+			case "EveryTarget":
+				{
+					TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
+					unitList.Add(targetDataSet.GetMainTarget());
+					foreach (SinActionModel sinActionModel in targetDataSet.GetSubTargetSinActionList())
+					{
+						BattleUnitModel model = sinActionModel.UnitModel;
+						if (!unitList.Contains(model)) unitList.Add(sinActionModel.UnitModel);
+					}
+					return unitList;
+				}
+			case "SubTarget":
+				{
+					TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
+					foreach (SinActionModel sinActionModel in targetDataSet.GetSubTargetSinActionList())
+					{
+						BattleUnitModel model = sinActionModel.UnitModel;
+						if (!unitList.Contains(model)) unitList.Add(sinActionModel.UnitModel);
+					}
+					return unitList;
+				}
 			case "All":
 				return battleObjectManager.GetModelList();
 		}
 
-		if (param.StartsWith("id")) {
+		if (param.StartsWith("id"))
+		{
 			string id_string = param.Remove(0, 2);
 			int id = GetNumFromParamString(id_string);
-			foreach (BattleUnitModel unit in battleObjectManager.GetModelList()) {
+			foreach (BattleUnitModel unit in battleObjectManager.GetModelList())
+			{
 				if (unit.GetUnitID() == id) unitList.Add(unit);
 			}
 			return unitList;
 		}
-		if (param.StartsWith("inst")) {
+		if (param.StartsWith("inst"))
+		{
 			string id_string = param.Remove(0, 4);
 			int id = GetNumFromParamString(id_string);
-			foreach (BattleUnitModel unit in battleObjectManager.GetModelList()) {
+			foreach (BattleUnitModel unit in battleObjectManager.GetModelList())
+			{
 				if (unit.InstanceID == id) unitList.Add(unit);
 			}
 			return unitList;
@@ -583,32 +692,36 @@ public class ModularSA : Il2CppSystem.Object
 		else
 		{
 			System.Collections.Generic.List<BattleUnitModel> list = GetCustomTargetingList(battleObjectManager, param, thisFaction, enemyFaction);
-				
+
 			int num = 1;
-			if (param.Contains("VALUE_")) {
+			if (param.Contains("VALUE_"))
+			{
 				string[] circles = param.Split('$');
 				string numstring = circles[0].Substring(circles[0].Length - 7);
 				num = GetNumFromParamString(numstring);
 			}
-			else {
+			else
+			{
 				string text = Regex.Replace(param, "\\D", "");
 				if (text.Length > 0) num = int.Parse(text);
 			}
-				
+
 			num = Math.Min(num, list.Count);
-			if (num > 0) {
+			if (num > 0)
+			{
 				for (int i = 0; i < num; i++) unitList.Add(list.ToArray()[i]);
 			}
 		}
 
 		return unitList;
 	}
-	
-	private System.Collections.Generic.List<BattleUnitModel> GetCustomTargetingList(BattleObjectManager battleObjectManager, string param, UNIT_FACTION thisFaction, UNIT_FACTION enemyFaction) {
+
+	private System.Collections.Generic.List<BattleUnitModel> GetCustomTargetingList(BattleObjectManager battleObjectManager, string param, UNIT_FACTION thisFaction, UNIT_FACTION enemyFaction)
+	{
 		System.Collections.Generic.List<BattleUnitModel> list = new System.Collections.Generic.List<BattleUnitModel>();
 		UNIT_FACTION filterFaction = UNIT_FACTION.NONE;
 		bool filterKeyword = param.Contains("$");
-			
+
 		bool noCores = param.Contains("NoCores");
 		bool noParts = param.Contains("NoParts");
 
@@ -616,30 +729,36 @@ public class ModularSA : Il2CppSystem.Object
 
 		if (param.Contains("Enemy")) filterFaction = enemyFaction;
 		else if (param.Contains("Ally")) filterFaction = thisFaction;
-			
-		if (filterKeyword) {
+
+		if (filterKeyword)
+		{
 			string[] circles = param.Split('$');
 			param = circles[0];
 			BUFF_UNIQUE_KEYWORD bufKeyword = CustomBuffs.ParseBuffUniqueKeyword(circles[1]);
-				
+
 			foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(bufKeyword, 0, assistance, filterFaction)) list.Add(unit);
 		}
-		else {
+		else
+		{
 			if (noCores) foreach (BattleUnitModel unit in battleObjectManager.GetAliveListExceptAbnormalitySelf(filterFaction, assistance)) list.Add(unit);
 			else if (noParts) foreach (BattleUnitModel unit in battleObjectManager.GetAliveListExceptAbnormalityPart(filterFaction, assistance)) list.Add(unit);
 			else foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(assistance, filterFaction)) list.Add(unit);
 		}
 
-		if (param.Contains("AbnoOnly")) {
+		if (param.Contains("AbnoOnly"))
+		{
 			System.Collections.Generic.List<BattleUnitModel> goodones = new();
-			foreach (BattleUnitModel unit in list) {
+			foreach (BattleUnitModel unit in list)
+			{
 				if (unit.IsAbnormalityOrPart) goodones.Add(unit);
 			}
 			list = goodones;
 		}
-		else if (param.Contains("NoAbnos")) {
+		else if (param.Contains("NoAbnos"))
+		{
 			System.Collections.Generic.List<BattleUnitModel> goodones = new();
-			foreach (BattleUnitModel unit in list) {
+			foreach (BattleUnitModel unit in list)
+			{
 				if (!unit.IsAbnormalityOrPart) goodones.Add(unit);
 			}
 			list = goodones;
@@ -647,11 +766,11 @@ public class ModularSA : Il2CppSystem.Object
 
 		if (param.Contains("ExceptSelf")) list.Remove(modsa_unitModel);
 		if (param.Contains("ExceptTarget")) list.Remove(modsa_loopTarget);
-			
+
 		if (param.Contains("Random")) list = MainClass.ShuffleUnits(list);
 		else if (param.Contains("Deploy")) list.Sort((x, y) => x.PARTICIPATE_ORDER.CompareTo(y.PARTICIPATE_ORDER));
 		else if (param.Contains("Reversedeploy")) list.Sort((x, y) => y.PARTICIPATE_ORDER.CompareTo(x.PARTICIPATE_ORDER));
-			
+
 		if (param.StartsWith("Slowest")) list.Sort((x, y) => x.GetOriginSpeedForCompare().CompareTo(y.GetOriginSpeedForCompare()));
 		else if (param.StartsWith("Fastest")) list.Sort((x, y) => y.GetOriginSpeedForCompare().CompareTo(x.GetOriginSpeedForCompare()));
 		else if (param.StartsWith("HighestHPRatio")) list.Sort((x, y) => y.GetHpRatio().CompareTo(x.GetHpRatio()));
@@ -665,31 +784,36 @@ public class ModularSA : Il2CppSystem.Object
 
 		return list;
 	}
-		
+
 	public BattleUnitModel GetTargetModel(string param)
 	{
-		switch (param) {
+		switch (param)
+		{
 			case "Null": return null;
 			case "Self": return modsa_unitModel;
-			case "SelfCore": {
-				BattleUnitModel_Abnormality_Part part = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
-				if (part != null) return part.Abnormality;
-				else return modsa_unitModel;
-			}
+			case "SelfCore":
+				{
+					BattleUnitModel_Abnormality_Part part = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
+					if (part != null) return part.Abnormality;
+					else return modsa_unitModel;
+				}
 			case "Target": return modsa_loopTarget;
-			case "TargetCore": {
-				BattleUnitModel_Abnormality_Part part = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality_Part>();
-				if (part != null) return part.Abnormality;
-				else return modsa_loopTarget;
-			}
-			case "MainTarget": {
-				if (modsa_selfAction == null) return null;
-				TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
-				return targetDataSet.GetMainTarget();
-			}
+			case "TargetCore":
+				{
+					BattleUnitModel_Abnormality_Part part = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality_Part>();
+					if (part != null) return part.Abnormality;
+					else return modsa_loopTarget;
+				}
+			case "MainTarget":
+				{
+					if (modsa_selfAction == null) return null;
+					TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
+					return targetDataSet.GetMainTarget();
+				}
 		}
-		
-		if (param.StartsWith("id")) {
+
+		if (param.StartsWith("id"))
+		{
 			SinManager sinManager_inst = Singleton<SinManager>.Instance;
 			BattleObjectManager battleObjectManager = sinManager_inst._battleObjectManager;
 			string id_string = param.Remove(0, 2);
@@ -704,16 +828,18 @@ public class ModularSA : Il2CppSystem.Object
 			string id_string = param.Remove(0, 4);
 			int id = GetNumFromParamString(id_string);
 
-			foreach (BattleUnitModel unit in battleObjectManager.GetModelList()) {
+			foreach (BattleUnitModel unit in battleObjectManager.GetModelList())
+			{
 				if (unit.InstanceID == id) return unit;
 			}
 			return null;
 		}
-		else if (param.StartsWith("adj")) {
+		else if (param.StartsWith("adj"))
+		{
 			BattleObjectManager battleObjectManager_inst = SingletonBehavior<BattleObjectManager>.Instance;
 			if (battleObjectManager_inst == null) return null;
 			BattleUnitModel foundUnit = null;
-				
+
 			string side_string = param.Remove(0, 3);
 			if (side_string == "Left")
 			{
@@ -727,11 +853,12 @@ public class ModularSA : Il2CppSystem.Object
 			}
 			return foundUnit;
 		}
-		else {
+		else
+		{
 			BattleObjectManager battleObjectManager_inst = SingletonBehavior<BattleObjectManager>.Instance;
 			if (battleObjectManager_inst == null) return null;
 			BattleUnitModel foundUnit = null;
-				
+
 			UNIT_FACTION thisFaction = modsa_unitModel.Faction;
 			UNIT_FACTION enemyFaction = thisFaction == UNIT_FACTION.PLAYER ? UNIT_FACTION.ENEMY : UNIT_FACTION.PLAYER;
 
@@ -748,23 +875,26 @@ public class ModularSA : Il2CppSystem.Object
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 		ModsaLangParser parser = new ModsaLangParser(tokenStream);
 		ModsaLangParser.ProgramContext tree = parser.program();*/
-			
+
 		instructions = MainClass.sWhitespace.Replace(instructions, "");
 		string[] batches = instructions.Split('/');
 		bool luaFound = false;
 
-		for (int i = 0; i < batches.Length; i++) {
+		for (int i = 0; i < batches.Length; i++)
+		{
 			string batch = batches[i];
 			if (MainClass.logEnabled) MainClass.Logg.LogInfo("batch " + i.ToString() + ": " + batch);
-			if (batch.StartsWith("TIMING:")) {
+			if (batch.StartsWith("TIMING:"))
+			{
 				string timingArg = batch.Remove(0, 7);
 				string[] circles = timingArg.Split(parenthesisSeparator);
 				string circle_0 = circles[0];
 				if (MainClass.timingDict.ContainsKey(circle_0)) activationTiming = MainClass.timingDict[circle_0];
-					
-				if (circles.Length > 1) {
+
+				if (circles.Length > 1)
+				{
 					string hitArgs = circles[1];
-					if (hitArgs.Contains("Head"))  _onlyHeads = true;
+					if (hitArgs.Contains("Head")) _onlyHeads = true;
 					else if (hitArgs.Contains("Tail")) _onlyTails = true;
 
 					if (hitArgs.Contains("NoCrit")) _onlyNonCrit = true;
@@ -820,10 +950,12 @@ public class ModularSA : Il2CppSystem.Object
 			else batch_list.Add(batch);
 		}
 	}
-		
-	private void ProcessBatch(string batch) {
+
+	private void ProcessBatch(string batch)
+	{
 		string[] batchArgs = batch.Split(':');
-		for (int i = 0; i < batchArgs.Length; i++) {
+		for (int i = 0; i < batchArgs.Length; i++)
+		{
 			if (MainClass.logEnabled) MainClass.Logg.LogInfo("batchArgs " + i.ToString() + ": " + batchArgs[i]);
 			if (batchArgs[i].StartsWith("STOPIF") || batchArgs[i].StartsWith("CONTINUEIF"))
 			{
@@ -836,7 +968,8 @@ public class ModularSA : Il2CppSystem.Object
 			}
 			else if (batchArgs[i].StartsWith("IFNOT")) { if (CheckIF(batchArgs[i])) break; else continue; }
 			else if (batchArgs[i].StartsWith("IF")) { if (!CheckIF(batchArgs[i])) break; else continue; }
-			else if (batchArgs[i].StartsWith("VALUE_")) {
+			else if (batchArgs[i].StartsWith("VALUE_"))
+			{
 				string numChar = batchArgs[i][6].ToString();
 				int valueidx = 0;
 				int.TryParse(numChar, out valueidx);
@@ -849,7 +982,8 @@ public class ModularSA : Il2CppSystem.Object
 		}
 	}
 
-	private void Consequence(string section) {
+	private void Consequence(string section)
+	{
 		string[] sectionArgs = section.Split(parenthesisSeparator);
 		string mEth = sectionArgs[0];
 		string circledSection = "";
@@ -865,13 +999,15 @@ public class ModularSA : Il2CppSystem.Object
 		}
 	}
 
-	public int DoMath(string s) {
+	public int DoMath(string s)
+	{
 		var symbols = MainClass.mathsymbolRegex.Matches(s);
 		string[] parameters = s.Split(MainClass.mathSeparator);
 		string firstParam = parameters[0];
 		double finalValue = GetNumFromParamString(firstParam);
 
-		for (int i = 0; i < symbols.Count; i++) {
+		for (int i = 0; i < symbols.Count; i++)
+		{
 			string param = parameters[i + 1];
 			string symbol_string = symbols[i].Value;
 			char symbol = symbol_string[0];
@@ -892,7 +1028,7 @@ public class ModularSA : Il2CppSystem.Object
 
 		return (int)finalValue;
 	}
-	
+
 	private int AcquireValue(string section)
 	{
 		if (MainClass.logEnabled) MainClass.Logg.LogInfo("AcquireValue " + section);
@@ -909,7 +1045,7 @@ public class ModularSA : Il2CppSystem.Object
 		{
 			return acquirer.ExecuteAcquirer(this, section, circledSection, circles);
 		}
-		
+
 		MainClass.Logg.LogInfo("Invalid Getter: " + methodology);
 		return -1;
 	}
@@ -923,7 +1059,7 @@ public class ModularSA : Il2CppSystem.Object
 			args[i] = value.Type switch
 			{
 				LuaValueType.Boolean => value.Read<bool>() ? "1" : "0",
-				LuaValueType.Number => ((int) value.Read<double>()).ToString(CultureInfo.InvariantCulture),
+				LuaValueType.Number => ((int)value.Read<double>()).ToString(CultureInfo.InvariantCulture),
 				LuaValueType.String => value.Read<string>(),
 				_ => throw new LuaException(
 					$"Unsupported Lua argument type when calling {name}: {value.Type}")
@@ -932,7 +1068,7 @@ public class ModularSA : Il2CppSystem.Object
 
 		return args;
 	}
-	
+
 	private Lua.LuaFunction LuaConsequence(String name)
 	{
 		return new Lua.LuaFunction((context, buffer, ct) =>
@@ -944,7 +1080,7 @@ public class ModularSA : Il2CppSystem.Object
 			return ValueTask.FromResult(0);
 		});
 	}
-	
+
 	private Lua.LuaFunction LuaAcquirer(String name)
 	{
 		return new Lua.LuaFunction((context, buffer, ct) =>
@@ -968,14 +1104,14 @@ public class ModularSA : Il2CppSystem.Object
 		{
 			state.Environment[key] = LuaAcquirer(key);
 		}
-	
+
 		state.OpenBasicLibrary();
 		state.OpenBitwiseLibrary();
 		state.OpenMathLibrary();
 		state.OpenModuleLibrary();
 		state.OpenStringLibrary();
 		state.OpenTableLibrary();
-	
+
 		// Register Lua functions from the dictionary
 		foreach (var kvp in MainClass.luaFunctionDict)
 		{
@@ -987,13 +1123,13 @@ public class ModularSA : Il2CppSystem.Object
 			});
 		}
 	}
-	
+
 	public static BattleUnitModel_Abnormality AsAbnormalityModel(BattleUnitModel targetModel)
 	{
 		var abnoPart = targetModel.TryCast<BattleUnitModel_Abnormality_Part>();
 		return abnoPart != null ? abnoPart.Abnormality : targetModel.TryCast<BattleUnitModel_Abnormality>();
 	}
-		
+
 }
 
 /// <summary>
