@@ -171,11 +171,6 @@ public class MainClass : BasePlugin
 		consequenceDict["skillslotremove"] = new ConsequenceSkillSlotRemove();
 		consequenceDict["changeaffinity"] = new ConsequenceChangeAffinity();
 		consequenceDict["winstage"] = new ConsequenceWinStage();
-		consequenceDict["ovwatkres"] = new ConsequenceOverwriteAtkResist();
-		consequenceDict["ovwsinatk"] = new ConsequenceOverwriteSinResist();
-		consequenceDict["refreshspeed"] = new ConsequenceRefreshSpeed();
-		consequenceDict["deactivebreak"] = new ConsequenceDeactiveBreak();
-		consequenceDict["defcorrection"] = new ConsequenceDefCorrection();
 	}
 
 	private static void RegisterAcquirers()
@@ -240,10 +235,6 @@ public class MainClass : BasePlugin
 		acquirerDict["skillcanduel"] = new AcquirerSkillCanDuel();
 		acquirerDict["skillteamkill"] = new AcquirerSkillTeamKill();
 		acquirerDict["skillfixedtarget"] = new AcquirerSkillFixed();
-		acquirerDict["coinoperator"] = new AcquirerCoinOperator();
-		acquirerDict["bufftype"] = new AcquirerBuffType();
-		acquirerDict["getatkres"] = new AcquirerGetAtkResSinner();
-		acquirerDict["getsinres"] = new AcquirerGetSinResSinner();
 
 		// Register Lua functions
 		luaFunctionDict["clearvalues"] = new ModularSkillScripts.LuaFunction.LuaFunctionClearValues();
@@ -253,12 +244,6 @@ public class MainClass : BasePlugin
 		luaFunctionDict["getldata"] = new ModularSkillScripts.LuaFunction.LuaFunctionGetLData();
 		luaFunctionDict["readfile"] = new ModularSkillScripts.LuaFunction.LuaFunctionReadFile();
 		luaFunctionDict["listfiles"] = new ModularSkillScripts.LuaFunction.LuaFunctionListFiles();
-		luaFunctionDict["jsontolua"] = new ModularSkillScripts.LuaFunction.LuaFunctionJsonToLua();
-		luaFunctionDict["listdirectories"] = new ModularSkillScripts.LuaFunction.LuaFunctionListDirectories();
-		luaFunctionDict["listbuffs"] = new ModularSkillScripts.LuaFunction.LuaFunctionListBuffs();
-		luaFunctionDict["setgdata"] = new ModularSkillScripts.LuaFunction.LuaFunctionSetGData();
-		luaFunctionDict["getgdata"] = new ModularSkillScripts.LuaFunction.LuaFunctionGetGData();
-		luaFunctionDict["clearallgdata"] = new ModularSkillScripts.LuaFunction.LuaFunctionClearAllGData();
 	}
 
 	public static System.Collections.Generic.List<BattleUnitModel> ShuffleUnits(
