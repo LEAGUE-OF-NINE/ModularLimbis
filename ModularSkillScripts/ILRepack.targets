@@ -11,7 +11,7 @@
 			DebugInfo="true"
 			LibraryPath="$(LimbusCompanyFolder)\BepInEx\core\"
 			InputAssemblies="@(InputAssemblies)"
-			OutputFile="$(LimbusCompanyFolder)\BepInEx\plugins\$(AssemblyName).dll"
+			OutputFile="$()\BepInEx\plugins\$(AssemblyName).dll"
 			Parallel="true"
 			TargetKind="SameAsPrimaryAssembly"
 		/>
