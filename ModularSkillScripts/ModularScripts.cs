@@ -1111,6 +1111,3 @@ public interface IModularAcquirer
     /// <returns>The value which this value getter evalutes to</returns>
     int ExecuteAcquirer(ModularSA modular, string section, string circledSection, string[] circles);
 }
-    /// <returns>The value which this value getter evalutes to</returns>
-    int ExecuteAcquirer(ModularSA modular, string section, string circledSection, string[] circles);
-}
