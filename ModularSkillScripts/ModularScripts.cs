@@ -887,6 +887,8 @@ public class ModularSA : Il2CppSystem.Object
 				case '!': finalValue = Math.Min(finalValue, amount); break;
 				case '¡': finalValue = Math.Max(finalValue, amount); break;
 				case '?': finalValue %= amount; break;
+				case '~': finalValue = Math.Sqrt(amount); break;
+				case '`': finalValue = Math.Abs(amount); break;
 			}
 		}
 
