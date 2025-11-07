@@ -15,6 +15,7 @@ using ModularSkillScripts.Consequence;
 using SharpCompress;
 using Regex = System.Text.RegularExpressions.Regex;
 using RegexOptions = System.Text.RegularExpressions.RegexOptions;
+using System.Text.Json;
 
 namespace ModularSkillScripts;
 
@@ -48,8 +49,92 @@ public record struct LuaUnitDataKey
 {
 	public long unitPtr_intlong;
 	public string dataID;
-	
+
 	public static System.Collections.Generic.Dictionary<LuaUnitDataKey, LuaValue> LuaUnitValues = new();
+}
+
+public static class Decode
+
+{
+    public static LuaValue decode(string strjson)
+    {
+        var jsonElem = convert(JsonDocument.Parse(strjson).RootElement);
+        return jsonElem;
+    }
+    private static LuaValue convert(JsonElement raw)
+    {
+        switch (raw.ValueKind)
+        {
+            default:
+                return LuaValue.Nil;
+
+            case JsonValueKind.String:
+                return raw.GetString();
+            case JsonValueKind.Number:
+                if (raw.TryGetInt64(out var longV)) return longV;
+                return raw.GetDouble();
+
+            case JsonValueKind.Object:
+                var newTable = new LuaTable();
+                foreach (var value in raw.EnumerateObject())
+                {
+                    newTable[value.Name] = convert(value.Value);
+                }
+                return newTable;
+
+            case JsonValueKind.Array:
+                var newTable1 = new LuaTable();
+                int startIndex = 1;
+                foreach (var value in raw.EnumerateArray())
+                {
+                    newTable1[startIndex++] = convert(value);
+                }
+                return newTable1;
+
+            case JsonValueKind.True:
+                return true;
+            case JsonValueKind.False:
+                return false;
+            case JsonValueKind.Null:
+                return LuaValue.Nil;
+        }
+    }
+}
+
+public class GlobalLuaValues
+{
+	private static GlobalLuaValues _instance;
+
+	public static GlobalLuaValues Instance
+	{
+		get
+		{
+			if (_instance == null)
+				_instance = new GlobalLuaValues();
+			return _instance;
+		}
+	}
+
+	private GlobalLuaValues() { }
+	public System.Collections.Generic.Dictionary<string, LuaValue> gvars = new System.Collections.Generic.Dictionary<string, LuaValue>();
+
+	public void SetGlobalValue(string key, LuaValue newVal)
+	{
+		if (key == null) return;
+		gvars[key] = newVal;
+	}
+
+	public LuaValue GetGlobalValue(string key)
+	{
+		if (key == null || !gvars.TryGetValue(key, out LuaValue value))
+			return LuaValue.Nil;
+		return value;
+	}
+
+	public void ClearAllValue()
+	{
+		gvars = new System.Collections.Generic.Dictionary<string, LuaValue>();
+	}
 }
 
 public class ModularSA : Il2CppSystem.Object
