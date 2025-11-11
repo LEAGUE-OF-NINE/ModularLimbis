@@ -176,6 +176,7 @@ public class MainClass : BasePlugin
 		consequenceDict["refreshspeed"] = new ConsequenceRefreshSpeed();
 		consequenceDict["deactivebreak"] = new ConsequenceDeactiveBreak();
 		consequenceDict["defcorrection"] = new ConsequenceDefCorrection();
+		consequenceDict["bufcategory"] = new ConsequenceBuffCategory();
 	}
 
 	private static void RegisterAcquirers()
@@ -244,6 +245,7 @@ public class MainClass : BasePlugin
 		acquirerDict["bufftype"] = new AcquirerBuffType();
 		acquirerDict["getatkres"] = new AcquirerGetAtkResSinner();
 		acquirerDict["getsinres"] = new AcquirerGetSinResSinner();
+		acquirerDict["useddefaction"] = new AcquirerUsedDefenseActionThisTurn();
 
 		// Register Lua functions
 		luaFunctionDict["clearvalues"] = new ModularSkillScripts.LuaFunction.LuaFunctionClearValues();
