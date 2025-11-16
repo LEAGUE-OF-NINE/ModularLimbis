@@ -69,6 +69,7 @@ public class MainClass : BasePlugin
 		timingStringList.Add("ChangeMotion"); // 41
 		timingStringList.Add("IgnorePanic"); // 42
 		timingStringList.Add("IgnoreBreak"); // 43
+		timingStringList.Add("OnRetreat");
 
 		Il2CppArrayBase<string> timingStringArray = timingStringList.ToArray();
 		int count = timingStringArray.Count;

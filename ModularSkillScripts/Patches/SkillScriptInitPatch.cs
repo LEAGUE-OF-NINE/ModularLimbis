@@ -999,6 +999,13 @@ public class SkillScriptInitPatch
 	}
 
 
+	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnRetreat))]
+	[HarmonyPostfix]
+	private static void Postfix_PassiveDetail_OnRetreat(BattleUnitModel triggerUnit, BUFF_UNIQUE_KEYWORD retreatKeyword, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
+	{
+		copypastesolution(__instance._owner, null, null, null, "OnRetreat", timing, __instance);
+	}
+
 	// PASSIVES END
 	// PASSIVES END
 	// PASSIVES END
