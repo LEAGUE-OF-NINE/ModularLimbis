@@ -16,6 +16,7 @@ using SharpCompress;
 using Regex = System.Text.RegularExpressions.Regex;
 using RegexOptions = System.Text.RegularExpressions.RegexOptions;
 using System.Text.Json;
+using BepInEx.Unity.IL2CPP.UnityEngine;
 
 namespace ModularSkillScripts;
 
@@ -182,6 +183,8 @@ public class ModularSA : Il2CppSystem.Object
 		modsa_luaScript = null;
 		modsa_luaScriptMain = null;
 		modsa_motionDetail = null;
+
+		SpecialKey = KeyCode.LeftControl;
 	}
 
 	public int activationTiming = 0;
@@ -262,6 +265,8 @@ public class ModularSA : Il2CppSystem.Object
 	public bool immortality = false;
 	public bool ignorepanic = false;
 	public bool ignorebreak = false;
+
+	public KeyCode SpecialKey = KeyCode.LeftControl;
 
 	private bool _fullStop = false;
 	public BATTLE_EVENT_TIMING battleTiming = BATTLE_EVENT_TIMING.NONE;
@@ -857,6 +862,17 @@ public class ModularSA : Il2CppSystem.Object
 
 					//if (hitArgs.Contains("Win")) _onlyClashWin = true;
 					//else if (hitArgs.Contains("Lose")) _onlyClashLose = true;
+
+					if (!Enum.TryParse(hitArgs, true, out KeyCode parsedKey))
+					{
+						parsedKey = KeyCode.LeftControl;
+					}
+					SpecialKey = parsedKey;
+					MainClass.Logg.LogInfo("Parsed key and set to SpecialKey: " + hitArgs);
+				}
+				if (circle_0 == "SpecialAction")
+				{
+					MainClass.Logg.LogInfo("SpecialAction with no parsed key, default to LeftControl");
 				}
 			}
 			else if (batch.StartsWith("LUA:", StringComparison.OrdinalIgnoreCase))

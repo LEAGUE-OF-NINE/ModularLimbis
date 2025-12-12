@@ -11,18 +11,22 @@ internal class UniquePatches
 	[HarmonyPrefix]
 	private static bool Postfix_NewOperationController_EquipDefense(bool equiped, SinActionModel sinAction)
 	{
-		if (!Input.GetKeyInt(KeyCode.LeftControl)) return true;
-
+		//if (!Input.GetKeyInt(KeyCode.LeftControl)) return true;
+		MainClass.Logg.LogInfo("Ran EquipDefense");
 		BattleUnitModel unit = sinAction.actionSlot.Owner;
 		if (!unit.IsActionable()) return true;
 		int actevent = MainClass.timingDict["SpecialAction"];
+		bool returnval = true;
 		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList) {
 			if (!passiveModel.CheckActiveCondition()) continue;
 			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
 			if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
 					
 			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong]) {
-				MainClass.Logg.LogInfo("Found modpassive - SPECIAL: " + modpa.passiveID);
+				if (!Input.GetKeyInt(modpa.SpecialKey)) continue;
+				MainClass.Logg.LogInfo("FoundS modpassive - SPECIAL: " + modpa.passiveID);
+				MainClass.Logg.LogInfo("Triggered Key: " + modpa.SpecialKey.ToString());
+				returnval = false;
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(passiveModel.Owner, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
@@ -35,12 +39,15 @@ internal class UniquePatches
 
 			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong])
 			{
-				MainClass.Logg.LogInfo("Found modpassive - SPECIAL: " + modpa.passiveID);
+				if (!Input.GetKeyInt(modpa.SpecialKey)) continue;
+				returnval = false;
+				MainClass.Logg.LogInfo("FoundS modpassive - SPECIAL: " + modpa.passiveID);
+				MainClass.Logg.LogInfo("Triggered Key: " + modpa.SpecialKey.ToString());
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(passiveModel.Owner, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
-
+		if (returnval) return true;
 		//MainClass.Logg.LogInfo("1");
 		//BattleUnitViewManager viewManager = SingletonBehavior<BattleUnitViewManager>.Instance;
 		//MainClass.Logg.LogInfo("2");
@@ -60,7 +67,7 @@ internal class UniquePatches
 		foreach (BattleUnitView unitView in objManager.GetAliveViewList()) {
 			unitView.RefreshAppearanceRenderer(true);
 		}
-
+		MainClass.Logg.LogInfo("EquipDefense over");
 		return false;
 	}
 }
