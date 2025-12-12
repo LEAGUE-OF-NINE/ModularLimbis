@@ -299,7 +299,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false;
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.3.0";
+	public const string VERSION = "4.3.6";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
