@@ -70,6 +70,7 @@ public class MainClass : BasePlugin
 		timingStringList.Add("IgnorePanic"); // 42
 		timingStringList.Add("IgnoreBreak"); // 43
 		timingStringList.Add("OnRetreat");
+		timingStringList.Add("OnGainBuff"); // 45
 
 		Il2CppArrayBase<string> timingStringArray = timingStringList.ToArray();
 		int count = timingStringArray.Count;
@@ -94,6 +95,7 @@ public class MainClass : BasePlugin
 		harmony.PatchAll(typeof(UniquePatches));
 		harmony.PatchAll(typeof(LogoPlayerPatches));
 		harmony.PatchAll(typeof(ReloadPatches));
+		harmony.PatchAll(typeof(OnGainBuffPatches));
 		if (fakepowerEnabled) harmony.PatchAll(typeof(FakePowerPatches));
 		RegisterConsequences();
 		RegisterAcquirers();
@@ -247,6 +249,11 @@ public class MainClass : BasePlugin
 		acquirerDict["getatkres"] = new AcquirerGetAtkResSinner();
 		acquirerDict["getsinres"] = new AcquirerGetSinResSinner();
 		acquirerDict["useddefaction"] = new AcquirerUsedDefenseActionThisTurn();
+		acquirerDict["unitfaction"] = new AcquirerUnitFaction();
+		acquirerDict["gbstack"] = new AcquirerGainBuffStack();
+		acquirerDict["gbturn"] = new AcquirerGainBuffTurn();
+		acquirerDict["gbactiveround"] = new AcquirerGainBuffActiveRound();
+		acquirerDict["gbsource"] = new AcquirerGainBuffSource();
 
 		// Register Lua functions
 		luaFunctionDict["clearvalues"] = new ModularSkillScripts.LuaFunction.LuaFunctionClearValues();
@@ -262,6 +269,7 @@ public class MainClass : BasePlugin
 		luaFunctionDict["setgdata"] = new ModularSkillScripts.LuaFunction.LuaFunctionSetGData();
 		luaFunctionDict["getgdata"] = new ModularSkillScripts.LuaFunction.LuaFunctionGetGData();
 		luaFunctionDict["clearallgdata"] = new ModularSkillScripts.LuaFunction.LuaFunctionClearAllGData();
+		luaFunctionDict["gbkeyword"] = new ModularSkillScripts.LuaFunction.LuaFunctionGainBuffKeyword();
 	}
 
 	public static System.Collections.Generic.List<BattleUnitModel> ShuffleUnits(
@@ -287,6 +295,7 @@ public class MainClass : BasePlugin
 	public static readonly System.Collections.Generic.Dictionary<string, ModularSkillScripts.LuaFunction.IModularLuaFunction> luaFunctionDict = new();
 	public static System.Collections.Generic.List<SupporterPassiveModel> supporterPassiveList = new System.Collections.Generic.List<SupporterPassiveModel>();
 	public static System.Collections.Generic.List<SupporterPassiveModel> activeSupporterPassiveList = new System.Collections.Generic.List<SupporterPassiveModel>();
+	public static System.Collections.Generic.Dictionary<long, BUFF_UNIQUE_KEYWORD> keywordTriggerDict = new System.Collections.Generic.Dictionary<long, BUFF_UNIQUE_KEYWORD>();
 	public static bool fakepowerEnabled = true;
 	public static bool SupportPasInit = false;
 

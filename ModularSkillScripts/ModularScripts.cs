@@ -185,6 +185,13 @@ public class ModularSA : Il2CppSystem.Object
 		modsa_motionDetail = null;
 
 		SpecialKey = KeyCode.LeftControl;
+
+		keywordTrigger = BUFF_UNIQUE_KEYWORD.None;
+		gainbuff_keyword = BUFF_UNIQUE_KEYWORD.None;
+		gainbuff_stack = 0;
+		gainbuff_turn = 0;
+		gainbuff_activeRound = 0;
+		gainbuff_source = ABILITY_SOURCE_TYPE.NONE;
 	}
 
 	public int activationTiming = 0;
@@ -267,6 +274,12 @@ public class ModularSA : Il2CppSystem.Object
 	public bool ignorebreak = false;
 
 	public KeyCode SpecialKey = KeyCode.LeftControl;
+	public BUFF_UNIQUE_KEYWORD keywordTrigger = BUFF_UNIQUE_KEYWORD.None;
+	public BUFF_UNIQUE_KEYWORD gainbuff_keyword = BUFF_UNIQUE_KEYWORD.None;
+    public int gainbuff_stack = 0;
+    public int gainbuff_turn = 0;
+    public int gainbuff_activeRound = 0;
+	public ABILITY_SOURCE_TYPE gainbuff_source = ABILITY_SOURCE_TYPE.NONE;
 
 	private bool _fullStop = false;
 	public BATTLE_EVENT_TIMING battleTiming = BATTLE_EVENT_TIMING.NONE;
