@@ -295,7 +295,6 @@ public class MainClass : BasePlugin
 	public static readonly System.Collections.Generic.Dictionary<string, ModularSkillScripts.LuaFunction.IModularLuaFunction> luaFunctionDict = new();
 	public static System.Collections.Generic.List<SupporterPassiveModel> supporterPassiveList = new System.Collections.Generic.List<SupporterPassiveModel>();
 	public static System.Collections.Generic.List<SupporterPassiveModel> activeSupporterPassiveList = new System.Collections.Generic.List<SupporterPassiveModel>();
-	public static System.Collections.Generic.Dictionary<long, BUFF_UNIQUE_KEYWORD> keywordTriggerDict = new System.Collections.Generic.Dictionary<long, BUFF_UNIQUE_KEYWORD>();
 	public static bool fakepowerEnabled = true;
 	public static bool SupportPasInit = false;
 
