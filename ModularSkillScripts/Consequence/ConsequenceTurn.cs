@@ -27,6 +27,6 @@ public class ConsequenceTurn : IModularConsequence
 		);
 
 		}
-		else modular.modsa_buffModel.LoseTurn(modular.modsa_unitModel, modular.battleTiming, adder * -1);
+		else modular.modsa_buffModel.LoseTurn(modular.modsa_unitModel, modular.battleTiming, out _, adder * -1);
 	}
 }

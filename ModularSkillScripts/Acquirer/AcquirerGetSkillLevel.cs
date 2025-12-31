@@ -8,7 +8,7 @@ public class AcquirerGetSkillLevel : IModularAcquirer
 		BattleActionModel action = modular.modsa_selfAction;
 		if (circles[0] == "Target") action = modular.modsa_oppoAction;
 		if (action == null) return -1;
-		var offenseLevel = unit.GetSkillLevel(action.Skill, out _, out _);
+		var offenseLevel = unit.GetSkillLevel(action.Skill, null, out _, out _);
 		return offenseLevel;
 	}
 }
