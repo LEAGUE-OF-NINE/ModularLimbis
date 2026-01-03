@@ -180,6 +180,7 @@ public class MainClass : BasePlugin
 		consequenceDict["deactivebreak"] = new ConsequenceDeactiveBreak();
 		consequenceDict["defcorrection"] = new ConsequenceDefCorrection();
 		consequenceDict["bufcategory"] = new ConsequenceBuffCategory();
+		consequenceDict["destroybuff"] = new ConsequenceDestroyBuff();
 	}
 
 	private static void RegisterAcquirers()
