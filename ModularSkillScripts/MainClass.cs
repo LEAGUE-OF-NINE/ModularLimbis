@@ -175,7 +175,7 @@ public class MainClass : BasePlugin
 		consequenceDict["changeaffinity"] = new ConsequenceChangeAffinity();
 		consequenceDict["winstage"] = new ConsequenceWinStage();
 		consequenceDict["ovwatkres"] = new ConsequenceOverwriteAtkResist();
-		consequenceDict["ovwsinatk"] = new ConsequenceOverwriteSinResist();
+		consequenceDict["ovwsinres"] = new ConsequenceOverwriteSinResist();
 		consequenceDict["refreshspeed"] = new ConsequenceRefreshSpeed();
 		consequenceDict["deactivebreak"] = new ConsequenceDeactiveBreak();
 		consequenceDict["defcorrection"] = new ConsequenceDefCorrection();
