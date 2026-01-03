@@ -254,6 +254,7 @@ public class MainClass : BasePlugin
 		acquirerDict["gbturn"] = new AcquirerGainBuffTurn();
 		acquirerDict["gbactiveround"] = new AcquirerGainBuffActiveRound();
 		acquirerDict["gbsource"] = new AcquirerGainBuffSource();
+		acquirerDict["chainstatus"] = new AcquirerChainStatus();
 
 		// Register Lua functions
 		luaFunctionDict["clearvalues"] = new ModularSkillScripts.LuaFunction.LuaFunctionClearValues();
