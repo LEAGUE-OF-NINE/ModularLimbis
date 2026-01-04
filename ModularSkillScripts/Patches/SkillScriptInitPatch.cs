@@ -2048,6 +2048,8 @@ public class SkillScriptInitPatch
 			//modca.wasClash = isWinDuel.HasValue;
 			//if (modca.wasClash) modca.wasWin = isWinDuel.Value;
 			modca.modsa_coinModel = coin;
+			modca.modsa_target_list.Clear();
+			modca.modsa_target_list.Add(target);
 			modca.Enact(__instance.Model, __instance.Skill, __instance, null, actevent_BSA, timing);
 		}
 
@@ -2056,6 +2058,8 @@ public class SkillScriptInitPatch
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 				modsa.wasCrit = isCritical;
 				modsa.modsa_coinModel = coin;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(target);
 				modsa.Enact(__instance.Model, __instance.Skill, __instance, null, actevent_BSA, timing);
 			}
 		}
@@ -2069,6 +2073,8 @@ public class SkillScriptInitPatch
 				modpa.wasCrit = isCritical;
 				modpa.modsa_coinModel = coin;
 				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_target_list.Clear();
+				modpa.modsa_target_list.Add(target);
 				modpa.Enact(__instance.Model, __instance.Skill, __instance, null, actevent_BSA, timing);
 			}
 		}
@@ -2081,6 +2087,8 @@ public class SkillScriptInitPatch
 				modpaList[i].wasCrit = isCritical;
 				modpaList[i].modsa_coinModel = coin;
 				supportPassive._script._owner = __instance.Model;
+				modpaList[i].modsa_target_list.Clear();
+				modpaList[i].modsa_target_list.Add(target);
 				modpaList[i].Enact(__instance.Model, __instance.Skill, __instance, null, actevent_BSA, timing);
 			}
 		}
@@ -2093,6 +2101,8 @@ public class SkillScriptInitPatch
 				modpa.wasCrit = isCritical;
 				modpa.modsa_coinModel = coin;
 				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_target_list.Clear();
+				modpa.modsa_target_list.Add(target);
 				modpa.Enact(__instance.Model, __instance.Skill, __instance, null, actevent_BWH, timing);
 			}
 		}
@@ -2108,6 +2118,8 @@ public class SkillScriptInitPatch
 				modpa.wasCrit = isCritical;
 				modpa.modsa_coinModel = coin;
 				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_target_list.Clear();
+				modpa.modsa_target_list.Add(target);
 				modpa.Enact(__instance.Model, __instance.Skill, __instance, null, actevent_BSA, timing);
 			}
 		}
@@ -2123,6 +2135,8 @@ public class SkillScriptInitPatch
 				modpa.wasCrit = isCritical;
 				modpa.modsa_coinModel = coin;
 				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_target_list.Clear();
+				modpa.modsa_target_list.Add(target);
 				modpa.Enact(__instance.Model, __instance.Skill, __instance, null, actevent_BWH, timing);
 			}
 		}
@@ -2135,6 +2149,8 @@ public class SkillScriptInitPatch
 				modpaList[i].wasCrit = isCritical;
 				modpaList[i].modsa_coinModel = coin;
 				supportPassive._script._owner = __instance.Model;
+				modpaList[i].modsa_target_list.Clear();
+				modpaList[i].modsa_target_list.Add(target);
 				modpaList[i].Enact(__instance.Model, __instance.Skill, __instance, null, actevent_BWH, timing);
 			}
 		}
