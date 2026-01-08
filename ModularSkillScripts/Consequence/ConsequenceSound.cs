@@ -31,7 +31,8 @@ public class ConsequenceSound : IModularConsequence
 			{
 				var unitID = modular.modsa_unitModel._unitDataModel.ClassInfo.id;
 				MainClass.Logg.LogWarning($"playing sound \"{circles[1]}\" for {unitID}");
-				VoiceGenerator.PlayMultiVoice(unitID, circles[1]);
+				// Passing null BattleUnitView is probably fine, if not we can modify later
+				VoiceGenerator.PlayMultiVoice(unitID, circles[1], null);
 				break;
 			}
 			case "announcer"
