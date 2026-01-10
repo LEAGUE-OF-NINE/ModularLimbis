@@ -23,7 +23,7 @@ internal class UniquePatches
 		while(buf_i < buflist.Count){
 			BuffModel buf = buflist[buf_i];
 			buf_i += 1;
-			foreach (ModularSA modba in GetAllModbaFromBuffModel(buf))
+			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
 			{
 				if (!Input.GetKeyInt(modba.SpecialKey)) continue;
 				MainClass.Logg.LogInfo("Found bufpassive - SPECIAL");

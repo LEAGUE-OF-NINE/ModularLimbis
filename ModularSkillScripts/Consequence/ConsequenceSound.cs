@@ -1,5 +1,6 @@
 using FMOD;
 using FMODUnity;
+using UnityEngine;
 
 namespace ModularSkillScripts.Consequence;
 
@@ -23,10 +24,7 @@ public class ConsequenceSound : IModularConsequence
 			case "sfx":
 			{
 				GUID parsed_guid = GUID.Parse(guid);
-				Vector3 sound_pos = default;
-				float vol = 1F;
-				if (circles.Length >= 3) vol = 0.01f * modular.GetNumFromParamString(circles[2]);
-				SoundGenerator._soundManager.PlayOnShot(parsed_guid, sound_pos, vol);
+				SoundGenerator._soundManager.PlayOnShot(parsed_guid);
 				MainClass.Logg.LogWarning($"activating sfx consequence with parsed guid: {parsed_guid}");
 				break;
 			}
