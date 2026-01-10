@@ -379,7 +379,7 @@ public class SkillScriptInitPatch
 		if (modpaDict.ContainsKey(ptr_intlong)) return modpaDict[ptr_intlong];
 		return new List<ModularSA>();
 	}
-	private static List<ModularSA> GetAllModbaFromBuffModel(BuffModel buffModel)
+	public static List<ModularSA> GetAllModbaFromBuffModel(BuffModel buffModel)
 	{
 		long ptr_intlong = buffModel.Pointer.ToInt64();
 		if (modbaDict.ContainsKey(ptr_intlong)) return modbaDict[ptr_intlong];

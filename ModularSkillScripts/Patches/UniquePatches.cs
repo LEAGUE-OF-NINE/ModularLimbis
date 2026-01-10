@@ -17,18 +17,37 @@ internal class UniquePatches
 		if (!unit.IsActionable()) return true;
 		int actevent = MainClass.timingDict["SpecialAction"];
 		bool returnval = true;
+
+		List<BuffModel> buflist = unit.GetActivatedBuffModels();
+		int buf_i = 0;
+		while(buf_i < buflist.Count){
+			BuffModel buf = buflist[buf_i];
+			buf_i += 1;
+			foreach (ModularSA modba in GetAllModbaFromBuffModel(buf))
+			{
+				if (!Input.GetKeyInt(modba.SpecialKey)) continue;
+				MainClass.Logg.LogInfo("Found bufpassive - SPECIAL");
+				MainClass.Logg.LogInfo("Triggered Key: " + modba.SpecialKey.ToString());
+				returnval = false;
+				modba.modsa_buffModel = buf;
+				modba.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+
+		}
+
+
 		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList) {
 			if (!passiveModel.CheckActiveCondition()) continue;
 			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
 			if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
-					
+
 			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong]) {
 				if (!Input.GetKeyInt(modpa.SpecialKey)) continue;
 				MainClass.Logg.LogInfo("FoundS modpassive - SPECIAL: " + modpa.passiveID);
 				MainClass.Logg.LogInfo("Triggered Key: " + modpa.SpecialKey.ToString());
 				returnval = false;
 				modpa.modsa_passiveModel = passiveModel;
-				modpa.Enact(passiveModel.Owner, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				modpa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 		foreach (PassiveModel passiveModel in unit._passiveDetail.EgoPassiveList)
@@ -44,7 +63,7 @@ internal class UniquePatches
 				MainClass.Logg.LogInfo("FoundS modpassive - SPECIAL: " + modpa.passiveID);
 				MainClass.Logg.LogInfo("Triggered Key: " + modpa.SpecialKey.ToString());
 				modpa.modsa_passiveModel = passiveModel;
-				modpa.Enact(passiveModel.Owner, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				modpa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 		if (returnval) return true;

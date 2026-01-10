@@ -23,7 +23,10 @@ public class ConsequenceSound : IModularConsequence
 			case "sfx":
 			{
 				GUID parsed_guid = GUID.Parse(guid);
-				SoundGenerator._soundManager.PlayOnShot(parsed_guid);
+				Vector3 sound_pos = default;
+				float vol = 1F;
+				if (circles.Length >= 3) vol = 0.01f * modular.GetNumFromParamString(circles[2]);
+				SoundGenerator._soundManager.PlayOnShot(parsed_guid, sound_pos, vol);
 				MainClass.Logg.LogWarning($"activating sfx consequence with parsed guid: {parsed_guid}");
 				break;
 			}
@@ -31,7 +34,8 @@ public class ConsequenceSound : IModularConsequence
 			{
 				var unitID = modular.modsa_unitModel._unitDataModel.ClassInfo.id;
 				MainClass.Logg.LogWarning($"playing sound \"{circles[1]}\" for {unitID}");
-				VoiceGenerator.PlayMultiVoice(unitID, circles[1]);
+				// Passing null BattleUnitView is probably fine, if not we can modify later
+				VoiceGenerator.PlayMultiVoice(unitID, circles[1], null);
 				break;
 			}
 			case "announcer"
