@@ -185,9 +185,9 @@ public class MainClass : BasePlugin
 
 	private static void RegisterAcquirers()
 	{
- 		acquirerDict["getskilllevel"] = new AcquirerGetSkillLevel();
- 		acquirerDict["getcharacterid"] = new AcquirerGetCharacterID();
- 		acquirerDict["getlevel"] = new AcquirerGetLevel();
+		acquirerDict["getskilllevel"] = new AcquirerGetSkillLevel();
+		acquirerDict["getcharacterid"] = new AcquirerGetCharacterID();
+		acquirerDict["getlevel"] = new AcquirerGetLevel();
 		acquirerDict["math"] = new AcquirerMath();
 		acquirerDict["mpcheck"] = new AcquirerMpCheck();
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();
@@ -239,7 +239,7 @@ public class MainClass : BasePlugin
 		acquirerDict["coinrerolled"] = new AcquirerCoinRerolled();
 		acquirerDict["stageextraslot"] = new AcquirerStageExtraSlot();
 		acquirerDict["getbloodfeast"] = new AcquirerGetBloodfeast();
-  	acquirerDict["isunbreakable"] = new AcquirerIsUnbreakable();
+		acquirerDict["isunbreakable"] = new AcquirerIsUnbreakable();
 		acquirerDict["isusableinduel"] = new AcquirerIsUsableInDuel();
 		acquirerDict["sameunit"] = new AcquirerSameUnit();
 		acquirerDict["skillcanduel"] = new AcquirerSkillCanDuel();
@@ -281,10 +281,11 @@ public class MainClass : BasePlugin
 		while (n > 1)
 		{
 			n--;
-			int k = MainClass.rng.Next(n + 1);
-			BattleUnitModel value = list.ToArray()[k];
-			list.ToArray()[k] = list.ToArray()[n];
-			list.ToArray()[n] = value;
+			int k = MainClass.rng.Next(n + 1); // 0 to X Exclusive upper bound
+			if (k == n) continue; // No change to list
+			BattleUnitModel hold_value = list[k];
+			list[k] = list[n];
+			list[n] = hold_value;
 		}
 
 		return list;
@@ -309,11 +310,11 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false;
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.4.0";
+	public const string VERSION = "4.4.1";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
 	public static ManualLogSource Logg;
- 	public static DirectoryInfo pluginPath = Directory.CreateDirectory(Path.Combine(Paths.PluginPath, "Lethe", "ModTemplate", "modular_lua"));
+	public static DirectoryInfo pluginPath = Directory.CreateDirectory(Path.Combine(Paths.PluginPath, "Lethe", "ModTemplate", "modular_lua"));
 }
 
