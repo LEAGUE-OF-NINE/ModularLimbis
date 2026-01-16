@@ -20,7 +20,8 @@ internal class UniquePatches
 
 		List<BuffModel> buflist = unit.GetActivatedBuffModels();
 		int buf_i = 0;
-		while(buf_i < buflist.Count){
+		while (buf_i < buflist.Count)
+		{
 			BuffModel buf = buflist[buf_i];
 			buf_i += 1;
 			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
@@ -35,13 +36,33 @@ internal class UniquePatches
 
 		}
 
+		if (sinAction.currentSelectSin != null && sinAction.currentSelectSin.GetSkill() != null)
+		{
+			UnitSinModel sinModel = sinAction.currentSelectSin;
+			BattleActionModel action = sinModel.GetBattleActionModel();
+			SkillModel skill = sinModel.GetSkill();
+			long skillmodel_intlong = skill.Pointer.ToInt64();
+			if (SkillScriptInitPatch.modsaDict.ContainsKey(skillmodel_intlong))
+			{
+				foreach (ModularSA modsa in SkillScriptInitPatch.modsaDict[skillmodel_intlong])
+				{
+					if (!Input.GetKeyInt(modsa.SpecialKey)) continue;
+					returnval = false;
+					modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING); // normal code
+				}
+			}
+		}
 
-		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList) {
+
+
+		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList)
+		{
 			if (!passiveModel.CheckActiveCondition()) continue;
 			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
 			if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
 
-			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong]) {
+			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong])
+			{
 				if (!Input.GetKeyInt(modpa.SpecialKey)) continue;
 				MainClass.Logg.LogInfo("FoundS modpassive - SPECIAL: " + modpa.passiveID);
 				MainClass.Logg.LogInfo("Triggered Key: " + modpa.SpecialKey.ToString());
@@ -83,7 +104,8 @@ internal class UniquePatches
 		objManager.OnRoundStart_View_AfterChoice();
 		objManager.UpdateViewState(false, false);
 
-		foreach (BattleUnitView unitView in objManager.GetAliveViewList()) {
+		foreach (BattleUnitView unitView in objManager.GetAliveViewList())
+		{
 			unitView.RefreshAppearanceRenderer(true);
 		}
 		MainClass.Logg.LogInfo("EquipDefense over");
