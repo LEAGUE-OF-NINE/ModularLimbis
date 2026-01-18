@@ -365,7 +365,7 @@ public class SkillScriptInitPatch
 		}
 	}
 
-	private static List<ModularSA> GetAllModpaFromPasmodel(PassiveModel passiveModel, bool checkActive = true)
+	public static List<ModularSA> GetAllModpaFromPasmodel(PassiveModel passiveModel, bool checkActive = true)
 	{
 		if (!checkActive || passiveModel.CheckActiveCondition()) {
 			long ptr_intlong = passiveModel.Pointer.ToInt64();
@@ -466,6 +466,12 @@ public class SkillScriptInitPatch
 	{
 		copypastesolution(__instance._owner, null, null, null, "StartBattle", timing, __instance);
 	}
+	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnStageStart))]
+	[HarmonyPostfix]
+	private static void Postfix_PassiveDetail_OnStageStart(BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
+	{
+		copypastesolution(__instance._owner, null, null, null, "EncounterStart", timing, __instance);
+	}
 
 
 	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnBattleEnd))]
@@ -501,6 +507,18 @@ public class SkillScriptInitPatch
 	private static void Postfix_PassiveDetail_OnLoseDuel(BattleActionModel selfAction, BattleActionModel oppoAction, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
 		copypastesolution(__instance._owner, selfAction.Skill, selfAction, oppoAction, "DefeatDuel", timing, __instance); ;
+	}
+	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnWinParrying))]
+	[HarmonyPostfix]
+	private static void Postfix_PassiveDetail_OnWinParrying(BattleActionModel selfAction, BattleActionModel oppoAction, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
+	{
+		copypastesolution(__instance._owner, selfAction.Skill, selfAction, oppoAction, "WinParrying", timing, __instance);
+	}
+	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnLoseParrying))]
+	[HarmonyPostfix]
+	private static void Postfix_PassiveDetail_OnLoseParryingl(BattleActionModel selfAction, BattleActionModel oppoAction, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
+	{
+		copypastesolution(__instance._owner, selfAction.Skill, selfAction, oppoAction, "DefeatParrying", timing, __instance); ;
 	}
 
 
@@ -1556,8 +1574,33 @@ public class SkillScriptInitPatch
 		int actevent = MainClass.timingDict["DefeatDuel"];
 		long skillmodel_intlong = __instance.Pointer.ToInt64();
 		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
-		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+		foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
+		{
 			modsa.Enact(selfAction.Model, __instance, selfAction, oppoAction, actevent, timing);
+		}
+	}
+	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnWinParrying))]
+	[HarmonyPostfix]
+	private static void Postfix_SkillModel_OnWinParrying(BattleActionModel selfAction, BattleActionModel oppoAction, SkillModel __instance)
+	{
+		int actevent = MainClass.timingDict["WinParrying"];
+		long skillmodel_intlong = __instance.Pointer.ToInt64();
+		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+		foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
+		{
+			modsa.Enact(selfAction.Model, __instance, selfAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+		}
+	}
+	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnLoseParrying))]
+	[HarmonyPostfix]
+	private static void Postfix_SkillModel_OnLoseParrying(BattleActionModel selfAction, BattleActionModel oppoAction, SkillModel __instance)
+	{
+		int actevent = MainClass.timingDict["DefeatParrying"];
+		long skillmodel_intlong = __instance.Pointer.ToInt64();
+		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+		foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
+		{
+			modsa.Enact(selfAction.Model, __instance, selfAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 	}
 
@@ -1688,6 +1731,18 @@ public class SkillScriptInitPatch
 		}
 	}
 
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnStageStart))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_OnStageStart(BattleUnitModel unit, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	{
+		int actevent = MainClass.timingDict["EncounterStart"];
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance))
+		{
+			modba.modsa_buffModel = __instance;
+			modba.Enact(unit, null, null, null, actevent, timing);
+		}
+	}
+
 
 	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnRoundEnd))]
 	[HarmonyPostfix]
@@ -1747,7 +1802,30 @@ public class SkillScriptInitPatch
 	private static void Postfix_BuffModel_OnLoseDuel(BattleActionModel ownerAction, BattleActionModel opponentAction, BATTLE_EVENT_TIMING timing, BuffModel __instance)
 	{
 		int actevent = MainClass.timingDict["DefeatDuel"];
-		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance))
+		{
+			modba.modsa_buffModel = __instance;
+			modba.Enact(ownerAction.Model, ownerAction.Skill, ownerAction, opponentAction, actevent, timing);
+		}
+	}
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnWinParrying))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_OnWinParrying(BattleActionModel ownerAction, BattleActionModel opponentAction, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	{
+		int actevent = MainClass.timingDict["WinParrying"];
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance))
+		{
+			modba.modsa_buffModel = __instance;
+			modba.Enact(ownerAction.Model, ownerAction.Skill, ownerAction, opponentAction, actevent, timing);
+		}
+	}
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnLoseParrying))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_OnLoseParrying(BattleActionModel ownerAction, BattleActionModel opponentAction, BATTLE_EVENT_TIMING timing, BuffModel __instance)
+	{
+		int actevent = MainClass.timingDict["DefeatParrying"];
+		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance))
+		{
 			modba.modsa_buffModel = __instance;
 			modba.Enact(ownerAction.Model, ownerAction.Skill, ownerAction, opponentAction, actevent, timing);
 		}

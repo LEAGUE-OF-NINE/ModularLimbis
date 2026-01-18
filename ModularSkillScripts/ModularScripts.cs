@@ -303,14 +303,14 @@ public class ModularSA : Il2CppSystem.Object
 			if (modsa_skillModel == null) modsa_skillModel = modsa_selfAction.Skill;
 			if (modsa_unitModel == null) modsa_unitModel = modsa_selfAction.Model;
 		}
-		if (MainClass.logEnabled) MainClass.Logg.LogInfo("activation good");
+		MainClass.Logg.LogInfo("activation good");
 
 		if (activationTiming == 1) markedForDeath = true;
 		if (activationTiming == MainClass.timingDict["OSA"] || activationTiming == MainClass.timingDict["BSA"])
 		{
 			if (modsa_coinModel == null)
 			{
-				if (MainClass.logEnabled) MainClass.Logg.LogInfo("succeed attack, null coin, report bug please");
+				MainClass.Logg.LogInfo("succeed attack, null coin, report bug please");
 				return;
 			}
 
@@ -333,7 +333,7 @@ public class ModularSA : Il2CppSystem.Object
 
 		if (abilityMode == 2)
 		{
-			if (MainClass.logEnabled) if (MainClass.logEnabled) MainClass.Logg.LogInfo("hijacking dummy passive");
+			MainClass.Logg.LogInfo("hijacking dummy passive");
 			foreach (PassiveModel otherPassive in modsa_unitModel.UnitDataModel.PassiveList)
 			{
 				if (otherPassive._script == null) continue;
@@ -342,7 +342,7 @@ public class ModularSA : Il2CppSystem.Object
 			}
 			if (dummyPassiveAbility == null)
 			{
-				if (MainClass.logEnabled) MainClass.Logg.LogInfo("creating dummy passive");
+				MainClass.Logg.LogInfo("creating dummy passive");
 				PassiveAbility pa = new PassiveAbility();
 				pa.Init(modsa_unitModel, new List<PassiveConditionStaticData> { }, new List<PassiveConditionStaticData> { }, new List<int>());
 				dummyPassiveAbility = pa;
@@ -353,7 +353,7 @@ public class ModularSA : Il2CppSystem.Object
 			if (modsa_skillModel.SkillAbilityList.Count > 0) dummySkillAbility = modsa_skillModel.SkillAbilityList.ToArray()[0];
 			if (dummySkillAbility == null)
 			{
-				if (MainClass.logEnabled) MainClass.Logg.LogInfo("creating dummy skillability");
+				MainClass.Logg.LogInfo("creating dummy skillability");
 				SkillAbility_Empty sa = new SkillAbility_Empty();
 				sa._skillModel = modsa_skillModel;
 				sa._index = 0;
@@ -366,7 +366,7 @@ public class ModularSA : Il2CppSystem.Object
 			if (modsa_coinModel.CoinAbilityList.Count > 0) dummyCoinAbility = modsa_coinModel.CoinAbilityList.ToArray()[0];
 			if (dummyCoinAbility == null)
 			{
-				if (MainClass.logEnabled) MainClass.Logg.LogInfo("creating dummy coinability");
+				MainClass.Logg.LogInfo("creating dummy coinability");
 				CoinAbility_Empty ca = new CoinAbility_Empty();
 				ca._coin = modsa_coinModel;
 				ca._index = modsa_coinModel._originCoinIndex;
@@ -397,7 +397,7 @@ public class ModularSA : Il2CppSystem.Object
 				{
 					if (_fullStop) break;
 					string batch = batch_list.ToArray()[i];
-					if (MainClass.logEnabled) MainClass.Logg.LogInfo("batch " + i.ToString() + ": " + batch);
+					MainClass.Logg.LogInfo("batch " + i.ToString() + ": " + batch);
 					ProcessBatch(batch);
 				}
 			}
@@ -763,8 +763,10 @@ public class ModularSA : Il2CppSystem.Object
 		else if (param.StartsWith("LowestHP")) list.Sort((x, y) => x.Hp.CompareTo(y.Hp));
 		else if (param.StartsWith("HighestMaxHP")) list.Sort((x, y) => y.MaxHp.CompareTo(x.MaxHp));
 		else if (param.StartsWith("LowestMaxHP")) list.Sort((x, y) => x.MaxHp.CompareTo(y.MaxHp));
-		else if (param.StartsWith("HighestMP")) list.Sort((x, y) => y.Mp.CompareTo(x.Mp));
-		else if (param.StartsWith("LowestMP")) list.Sort((x, y) => x.Mp.CompareTo(y.Mp));
+		else if (param.StartsWith("HighestSP")) list.Sort((x, y) => y.Mp.CompareTo(x.Mp));
+		else if (param.StartsWith("LowestSP")) list.Sort((x, y) => x.Mp.CompareTo(y.Mp));
+		else if (param.StartsWith("HighestMP")) list.Sort((x, y) => y.Mp.CompareTo(x.Mp)); // legacy
+		else if (param.StartsWith("LowestMP")) list.Sort((x, y) => x.Mp.CompareTo(y.Mp)); // legacy
 
 		return list;
 	}
@@ -858,7 +860,7 @@ public class ModularSA : Il2CppSystem.Object
 
 		for (int i = 0; i < batches.Length; i++) {
 			string batch = batches[i];
-			if (MainClass.logEnabled) MainClass.Logg.LogInfo("batch " + i.ToString() + ": " + batch);
+			MainClass.Logg.LogInfo("batch " + i.ToString() + ": " + batch);
 			if (batch.StartsWith("TIMING:")) {
 				string timingArg = batch.Remove(0, 7);
 				string[] circles = timingArg.Split(parenthesisSeparator);
@@ -945,7 +947,7 @@ public class ModularSA : Il2CppSystem.Object
 	private void ProcessBatch(string batch) {
 		string[] batchArgs = batch.Split(':');
 		for (int i = 0; i < batchArgs.Length; i++) {
-			if (MainClass.logEnabled) MainClass.Logg.LogInfo("batchArgs " + i.ToString() + ": " + batchArgs[i]);
+			MainClass.Logg.LogInfo("batchArgs " + i.ToString() + ": " + batchArgs[i]);
 			if (batchArgs[i].StartsWith("STOPIF") || batchArgs[i].StartsWith("CONTINUEIF"))
 			{
 				if (!CheckIF(batchArgs[i]))
@@ -997,7 +999,7 @@ public class ModularSA : Il2CppSystem.Object
 			string symbol_string = symbols[i].Value;
 			char symbol = symbol_string[0];
 			int amount = GetNumFromParamString(param);
-			if (MainClass.logEnabled) MainClass.Logg.LogInfo("mathparam " + param + " | mathsymbol " + symbol);
+			MainClass.Logg.LogInfo("mathparam " + param + " | mathsymbol " + symbol);
 
 			switch (symbol)
 			{
@@ -1016,7 +1018,7 @@ public class ModularSA : Il2CppSystem.Object
 	
 	private int AcquireValue(string section)
 	{
-		if (MainClass.logEnabled) MainClass.Logg.LogInfo("AcquireValue " + section);
+		MainClass.Logg.LogInfo("AcquireValue " + section);
 		string[] sectionArgs = section.Split(parenthesisSeparator);
 
 		if (char.IsNumber(section.Last())) return GetNumFromParamString(sectionArgs[0]);
