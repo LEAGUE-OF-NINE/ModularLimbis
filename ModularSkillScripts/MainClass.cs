@@ -398,6 +398,7 @@ public class MainClass : BasePlugin
 	public static readonly char[] mathSeparator = new[] { '-', '+', '*', '%', '!', '¡', '?' };
 
 	public static ConfigEntry<bool> EnableLogging;
+	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
 	public const string VERSION = "4.4.1";
