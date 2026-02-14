@@ -6,17 +6,20 @@ public class ConsequencePassiveAdd : IModularConsequence
 	{
 		var modelList = modular.GetTargetModelList(circles[0]);
 		int id = modular.GetNumFromParamString(circles[1]);
-		bool duplicateOrNot = modular.GetBoolFromParamString(circles[2]);
-		if (duplicateOrNot)
+
+		// opt_3 = Tell users to add 'nodupe' as a third, optional argument. Otherwise, leave empty.
+		// Default is 'yesdupe'.
+		bool dupe = true;
+		if (circles.Length >= 3)
 		{
-			foreach (var item in modelList) 
-			{ 
-				if (item.HasPassive(id))
-				{
-					return;
-				}
-			}
+			string dupe_string = circles[2];
+			dupe = dupe_string == "yesdupe";
 		}
-		foreach (BattleUnitModel targetModel in modelList) targetModel.AddPassive(id);
+
+		foreach (BattleUnitModel targetModel in modelList)
+		{
+			if (!dupe && targetModel.HasPassive(id)) continue;
+			targetModel.AddPassive(id);
+		}
 	}
 }
