@@ -344,7 +344,7 @@ public class MainClass : BasePlugin
 		luaFunctionDict["getgdata"] = new ModularSkillScripts.LuaFunction.LuaFunctionGetGData();
 		luaFunctionDict["clearallgdata"] = new ModularSkillScripts.LuaFunction.LuaFunctionClearAllGData();
 		luaFunctionDict["gbkeyword"] = new ModularSkillScripts.LuaFunction.LuaFunctionGainBuffKeyword();
-		luaFunctionDict["addResource"] = new ModularSkillScripts.LuaFunction.LuaFunctionAddResource();
+		luaFunctionDict["addresource"] = new ModularSkillScripts.LuaFunction.LuaFunctionAddResource();
 	}
 
 	public static System.Collections.Generic.List<BattleUnitModel> ShuffleUnits(
