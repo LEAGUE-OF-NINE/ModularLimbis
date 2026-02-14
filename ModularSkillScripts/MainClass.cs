@@ -283,6 +283,7 @@ public class MainClass : BasePlugin
 		acquirerDict["gbsource"] = new AcquirerGainBuffSource();
 		acquirerDict["getchainstatus"] = new AcquirerChainStatus();
 		acquirerDict["getsinsindashboard"] = new AcquirerSinsInDashboard();
+		acquirerDict["haspassive"] = new AcquirerHasPassive();
 
 		// legacy acquirers
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();
@@ -343,6 +344,7 @@ public class MainClass : BasePlugin
 		luaFunctionDict["getgdata"] = new ModularSkillScripts.LuaFunction.LuaFunctionGetGData();
 		luaFunctionDict["clearallgdata"] = new ModularSkillScripts.LuaFunction.LuaFunctionClearAllGData();
 		luaFunctionDict["gbkeyword"] = new ModularSkillScripts.LuaFunction.LuaFunctionGainBuffKeyword();
+		luaFunctionDict["addResource"] = new ModularSkillScripts.LuaFunction.LuaFunctionAddResource();
 	}
 
 	public static System.Collections.Generic.List<BattleUnitModel> ShuffleUnits(
