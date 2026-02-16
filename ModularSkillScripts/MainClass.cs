@@ -75,6 +75,7 @@ public class MainClass : BasePlugin
 		timingStringList.Add("EncounterStart"); // 46
 		timingStringList.Add("WinParrying"); // 47
 		timingStringList.Add("DefeatParrying"); // 48
+		timingStringList.Add("ChangeTakeDamage"); // 49
 
 		Il2CppArrayBase<string> timingStringArray = timingStringList.ToArray();
 		int count = timingStringArray.Count;
@@ -199,6 +200,7 @@ public class MainClass : BasePlugin
 		consequenceDict["defcorrection"] = new ConsequenceDefCorrection();
 		consequenceDict["buffcategory"] = new ConsequenceBuffCategory();
 		consequenceDict["destroybuff"] = new ConsequenceDestroyBuff();
+		consequenceDict["setdmgtaken"] = new ConsequenceSetChangeDamageTaken();
 
 		// legacy consequences
 		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
@@ -403,7 +405,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.4.1";
+	public const string VERSION = "4.6.0";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 

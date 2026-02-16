@@ -273,6 +273,9 @@ public class ModularSA : Il2CppSystem.Object
 	public bool ignorepanic = false;
 	public bool ignorebreak = false;
 
+	public bool ischangedamagetaken = false;
+	public int changedamagetaken = 0;
+
 	public KeyCode SpecialKey = KeyCode.LeftControl;
 	public BUFF_UNIQUE_KEYWORD keywordTrigger = BUFF_UNIQUE_KEYWORD.None;
 	public BUFF_UNIQUE_KEYWORD gainbuff_keyword = BUFF_UNIQUE_KEYWORD.None;

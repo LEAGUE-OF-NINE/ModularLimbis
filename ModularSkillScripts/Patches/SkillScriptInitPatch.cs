@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using BepInEx.Unity.IL2CPP.UnityEngine;
 using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
@@ -854,6 +855,52 @@ public class SkillScriptInitPatch
 	private static void Postfix_PassiveDetail_OnDiscardSin(UnitSinModel sin, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
 		copypastesolution(__instance._owner, sin.GetSkill(), sin._currentAction, null, "OnDiscard", timing, __instance);
+	}
+
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.ChangeTakeDamage))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_ChangeTakeDamage(
+		BattleActionModel attackActionOrNull,
+		CoinModel coinOrNull,
+		int resultDmg,
+		DAMAGE_SOURCE_TYPE dmgSrcType,
+		BUFF_UNIQUE_KEYWORD keyword,
+		BATTLE_EVENT_TIMING timing,
+		BattleUnitModel __instance,
+		ref int __result)
+	{
+		int finalDmgChange = resultDmg;
+		int actevent_ChangeTakeDamage = MainClass.timingDict["ChangeTakeDamage"];
+
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			{
+				//if (modpa.activationTiming != actevent_ChangeTakeDamage) continue;
+				modpa.ischangedamagetaken = false;
+				modpa.changedamagetaken = 0;
+				modpa.lastFinalDmg = resultDmg;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance, null, null, null, actevent_ChangeTakeDamage, timing);
+				if (modpa.ischangedamagetaken) finalDmgChange = modpa.changedamagetaken;
+			}
+		}
+
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList)
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			{
+				//if (modpa.activationTiming != actevent_ChangeTakeDamage) continue;
+				modpa.ischangedamagetaken = false;
+				modpa.changedamagetaken = 0;
+				modpa.lastFinalDmg = resultDmg;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance, null, null, null, actevent_ChangeTakeDamage, timing);
+				if (modpa.ischangedamagetaken) finalDmgChange = modpa.changedamagetaken;
+			}
+		}
+
+		if (finalDmgChange != resultDmg) __result = finalDmgChange;
 	}
 
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.CheckImmortal))]
