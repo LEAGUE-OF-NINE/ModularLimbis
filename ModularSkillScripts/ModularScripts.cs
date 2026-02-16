@@ -595,6 +595,27 @@ public class ModularSA : Il2CppSystem.Object
 
 					return unitList;
 				}
+			case "SelfParts":
+				{
+		
+					BattleUnitModel_Abnormality_Part part = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
+					BattleUnitModel_Abnormality isLikeAnAbno = null;
+					if (part != null) isLikeAnAbno = part.Abnormality;
+					else 
+					{
+						isLikeAnAbno = modsa_unitModel.TryCast<BattleUnitModel_Abnormality>();
+					};
+
+					if (isLikeAnAbno == null) return unitList;
+
+					var LikeListOfAbnoParts = isLikeAnAbno._partList;
+					foreach (var partOfAbno in  LikeListOfAbnoParts)
+					{
+						unitList.Add(partOfAbno);
+					}
+
+					return unitList;
+				}
 			case "Target":
 				{
 					if (modsa_loopTarget != null) unitList.Add(modsa_loopTarget);
