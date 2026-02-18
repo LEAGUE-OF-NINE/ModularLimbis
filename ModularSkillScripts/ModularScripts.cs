@@ -187,11 +187,14 @@ public class ModularSA : Il2CppSystem.Object
 		SpecialKey = KeyCode.LeftControl;
 
 		keywordTrigger = BUFF_UNIQUE_KEYWORD.None;
-		gainbuff_keyword = BUFF_UNIQUE_KEYWORD.None;
 		gainbuff_stack = 0;
 		gainbuff_turn = 0;
 		gainbuff_activeRound = 0;
 		gainbuff_source = ABILITY_SOURCE_TYPE.NONE;
+
+		changedamage_source = DAMAGE_SOURCE_TYPE.NONE;
+
+		sinbuffmult = 100;
 	}
 
 	public int activationTiming = 0;
@@ -278,11 +281,14 @@ public class ModularSA : Il2CppSystem.Object
 
 	public KeyCode SpecialKey = KeyCode.LeftControl;
 	public BUFF_UNIQUE_KEYWORD keywordTrigger = BUFF_UNIQUE_KEYWORD.None;
-	public BUFF_UNIQUE_KEYWORD gainbuff_keyword = BUFF_UNIQUE_KEYWORD.None;
 	public int gainbuff_stack = 0;
 	public int gainbuff_turn = 0;
 	public int gainbuff_activeRound = 0;
 	public ABILITY_SOURCE_TYPE gainbuff_source = ABILITY_SOURCE_TYPE.NONE;
+
+	public DAMAGE_SOURCE_TYPE changedamage_source = DAMAGE_SOURCE_TYPE.NONE;
+
+	public int sinbuffmult = 100;
 
 	private bool _fullStop = false;
 	public BATTLE_EVENT_TIMING battleTiming = BATTLE_EVENT_TIMING.NONE;
@@ -979,14 +985,18 @@ public class ModularSA : Il2CppSystem.Object
 					SpecialKey = parsedKey;
 					MainClass.Logg.LogInfo("Parsed key and set to SpecialKey: " + hitArgs);
 				}
-				if (circle_0 == "SpecialAction")
+				else if (circle_0 == "SpecialAction")
 				{
 					MainClass.Logg.LogInfo("SpecialAction with no parsed key, default to LeftControl");
 				}
-				if (circle_0 == "OnGainBuff")
+				else if (circle_0 == "OnGainBuff")
 				{
 					MainClass.Logg.LogInfo("OnGainBuff with no parsed keyword, default to None");
 				}
+				//else if (circle_0 == "ChangeTakeDamage")
+				//{
+				//	MainClass.Logg.LogInfo("ChangeTakeDamage with no parsed keyword, default to None");
+				//}
 			}
 			else if (batch.StartsWith("LUA:", StringComparison.OrdinalIgnoreCase))
 			{
