@@ -76,6 +76,8 @@ public class MainClass : BasePlugin
 		timingStringList.Add("WinParrying"); // 47
 		timingStringList.Add("DefeatParrying"); // 48
 		timingStringList.Add("ChangeTakeDamage"); // 49
+		//timingStringList.Add("ChangeSinBuffDamage"); // 50
+		timingStringList.Add("DelayedStart"); // HBMBACMAB
 
 		Il2CppArrayBase<string> timingStringArray = timingStringList.ToArray();
 		int count = timingStringArray.Count;
@@ -107,6 +109,8 @@ public class MainClass : BasePlugin
 		ClassInjector.RegisterTypeInIl2Cpp<DataMod>();
 		ClassInjector.RegisterTypeInIl2Cpp<ModUnitData>();
 		ClassInjector.RegisterTypeInIl2Cpp<ModularSA>();
+		ClassInjector.RegisterTypeInIl2Cpp<SkillScriptInitPatch.CoroutineRunner>();
+
 		//ClassInjector.RegisterTypeInIl2Cpp<ModularSA.BattleUnitComparer>();
 		harmony.PatchAll(typeof(SkillScriptInitPatch));
 		harmony.PatchAll(typeof(StagePatches));
@@ -287,7 +291,8 @@ public class MainClass : BasePlugin
 		acquirerDict["getchainstatus"] = new AcquirerChainStatus();
 		acquirerDict["getsinsindashboard"] = new AcquirerSinsInDashboard();
 		acquirerDict["haspassive"] = new AcquirerHasPassive();
-
+		acquirerDict["ctdsource"] = new AcquirerChangeDamageSource();    
+		
 		// legacy acquirers
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();
 		acquirerDict["mpcheck"] = new AcquirerMpCheck();

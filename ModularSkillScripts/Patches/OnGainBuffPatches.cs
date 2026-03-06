@@ -33,7 +33,6 @@ internal class OnGainBuffPatches
 					MainClass.Logg.LogInfo("Triggered Keyword: " + trigger);
 					noSkip = false;
 					modpa.modsa_passiveModel = passiveModel;
-					modpa.gainbuff_keyword = keyword;
 					modpa.gainbuff_stack = stack;
 					modpa.gainbuff_turn = turn;
 					modpa.gainbuff_activeRound = activeRound;
@@ -62,7 +61,6 @@ internal class OnGainBuffPatches
 					noSkip = false;
 
 					modpa.modsa_passiveModel = passiveModel;
-					modpa.gainbuff_keyword = keyword;
 					modpa.gainbuff_stack = stack;
 					modpa.gainbuff_turn = turn;
 					modpa.gainbuff_activeRound = activeRound;

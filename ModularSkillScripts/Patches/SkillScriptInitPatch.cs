@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using BepInEx.Unity.IL2CPP.UnityEngine;
+using BepInEx.Unity.IL2CPP.Utils.Collections;
 using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
 using ModularSkillScripts.Consequence;
@@ -427,12 +428,68 @@ public class SkillScriptInitPatch
 			}
 		}
 	}
+	//Context: hidden timing, won't be in the edocs, someone needed an even more delayed afterslots once so i did some serious bum activity and coroutined that shit
+	private static System.Collections.IEnumerator IAmABum()
+	{
+		yield return new UnityEngine.WaitForEndOfFrame();
+		yield return null;
+		foreach (KeyValuePair<int, BattleObjectManager.BattleUnit> allUnit in SingletonBehavior<BattleObjectManager>.Instance._allUnitDictionary)
+		{
+			PassiveDetail __instance = allUnit.Value?.Model._passiveDetail;
+			foreach (long key in modpaDict.Keys)
+			{
+				List<ModularSA> value = modpaDict[key];
+				foreach (ModularSA modular in value) modular.ResetAdders();
+			}
+			copypastesolution(__instance._owner, null, null, null, "DelayedStart", BATTLE_EVENT_TIMING.ALL_TIMING, __instance);
+
+			foreach (SinActionModel sinAction in __instance._owner.GetSinActionList())
+			{
+				foreach (UnitSinModel sinModel in sinAction.currentSinList)
+				{
+					SkillModel skillModel = sinModel.GetSkill();
+					if (skillModel == null) continue;
+					long skillmodel_intlong = skillModel.Pointer.ToInt64();
+
+					if (!modsaDict.ContainsKey(skillmodel_intlong)) continue;
+					foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
+					{
+						//MainClass.Logg.LogInfo("Found modsa - RoundStart");
+						modsa.Enact(__instance._owner, skillModel, null, null, MainClass.timingDict["DelayedStart"], BATTLE_EVENT_TIMING.ALL_TIMING);
+					}
+				}
+			}
+		}
+	}
+
+public class CoroutineRunner : UnityEngine.MonoBehaviour
+{
+	public CoroutineRunner(IntPtr ptr) : base(ptr) { }
+
+	private static CoroutineRunner _instance;
+
+	public static CoroutineRunner Instance
+	{
+		get
+		{
+			if (_instance == null)
+			{
+				var go = new UnityEngine.GameObject("ImABumLowkirkenuinely");
+				UnityEngine.Object.DontDestroyOnLoad(go);
+				_instance = go.AddComponent<CoroutineRunner>();
+			}
+			return _instance;
+		}
+	}
+}
+
 
 	[HarmonyPatch(typeof(StageController), nameof(StageController.StartRoundAfterAbnormalityChoice_Init))]
 	[HarmonyPostfix]
 	private static void Postfix_StageController_StartRoundAfterAbnormalityChoice_Init()
 	{
-		foreach (KeyValuePair<int, BattleObjectManager.BattleUnit> allUnit in SingletonBehavior<BattleObjectManager>.Instance._allUnitDictionary)
+		CoroutineRunner.Instance.StartCoroutine(IAmABum().WrapToIl2Cpp());
+			foreach (KeyValuePair<int, BattleObjectManager.BattleUnit> allUnit in SingletonBehavior<BattleObjectManager>.Instance._allUnitDictionary)
 		{
 			PassiveDetail __instance = allUnit.Value?.Model._passiveDetail;
 			foreach (long key in modpaDict.Keys)
@@ -847,7 +904,7 @@ public class SkillScriptInitPatch
 				supportPassive._script._owner = __instance._owner;
 				modpaList[i].Enact(__instance._owner, null, null, null, actevent, timing);
 			}
-		}	
+		}
 	}
 
 	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnDiscardSin))]
@@ -877,10 +934,14 @@ public class SkillScriptInitPatch
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
 			{
 				//if (modpa.activationTiming != actevent_ChangeTakeDamage) continue;
+				//BUFF_UNIQUE_KEYWORD trigger = modpa.keywordTrigger;
+				//if ((trigger != BUFF_UNIQUE_KEYWORD.None) && (trigger != keyword))
+				//	continue;
 				modpa.ischangedamagetaken = false;
 				modpa.changedamagetaken = 0;
 				modpa.lastFinalDmg = resultDmg;
 				modpa.modsa_passiveModel = passiveModel;
+				modpa.changedamage_source = dmgSrcType;
 				modpa.Enact(__instance, null, null, null, actevent_ChangeTakeDamage, timing);
 				if (modpa.ischangedamagetaken) finalDmgChange = modpa.changedamagetaken;
 			}
@@ -891,10 +952,14 @@ public class SkillScriptInitPatch
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
 			{
 				//if (modpa.activationTiming != actevent_ChangeTakeDamage) continue;
+				//BUFF_UNIQUE_KEYWORD trigger = modpa.keywordTrigger;
+				//if ((trigger != BUFF_UNIQUE_KEYWORD.None) && (trigger != keyword))
+				//	continue;
 				modpa.ischangedamagetaken = false;
 				modpa.changedamagetaken = 0;
 				modpa.lastFinalDmg = resultDmg;
 				modpa.modsa_passiveModel = passiveModel;
+				modpa.changedamage_source = dmgSrcType;
 				modpa.Enact(__instance, null, null, null, actevent_ChangeTakeDamage, timing);
 				if (modpa.ischangedamagetaken) finalDmgChange = modpa.changedamagetaken;
 			}
@@ -902,6 +967,45 @@ public class SkillScriptInitPatch
 
 		if (finalDmgChange != resultDmg) __result = finalDmgChange;
 	}
+
+	//[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetSinBuffDamageMultiplier))]
+	//[HarmonyPostfix]
+	//private static void Postfix_BattleUnitModel_GetSinBuffDamageMultiplier(
+	//	BUFF_UNIQUE_KEYWORD keyword,
+	//	BattleUnitModel __instance,
+	//	ref float __result)
+	//{
+	//	int actevent_ChangeSinBuffDamage = MainClass.timingDict["ChangeSinBuffDamage"];
+
+	//	foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList)
+	//	{
+	//		foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+	//		{
+	//			//if (modpa.activationTiming != actevent_ChangeTakeDamage) continue;
+	//			//BUFF_UNIQUE_KEYWORD trigger = modpa.keywordTrigger;
+	//			//if ((trigger != BUFF_UNIQUE_KEYWORD.None) && (trigger != keyword))
+	//			//	continue;
+	//			modpa.modsa_passiveModel = passiveModel;
+	//			modpa.Enact(__instance, null, null, null, actevent_ChangeSinBuffDamage, BATTLE_EVENT_TIMING.ALL_TIMING);
+	//			__result *= modpa.sinbuffmult / 100;
+	//		}
+	//	}
+
+	//	foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList)
+	//	{
+	//		foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+	//		{
+	//			//if (modpa.activationTiming != actevent_ChangeTakeDamage) continue;
+	//			//BUFF_UNIQUE_KEYWORD trigger = modpa.keywordTrigger;
+	//			//if ((trigger != BUFF_UNIQUE_KEYWORD.None) && (trigger != keyword))
+	//			//	continue;
+	//			modpa.modsa_passiveModel = passiveModel;
+	//			modpa.Enact(__instance, null, null, null, actevent_ChangeSinBuffDamage, BATTLE_EVENT_TIMING.ALL_TIMING);
+	//			__result *= modpa.sinbuffmult / 100;
+	//		}
+	//	}
+	//}
+
 
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.CheckImmortal))]
 	[HarmonyPostfix]
