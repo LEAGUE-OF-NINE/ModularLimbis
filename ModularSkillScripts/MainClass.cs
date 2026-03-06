@@ -201,6 +201,7 @@ public class MainClass : BasePlugin
 		consequenceDict["buffcategory"] = new ConsequenceBuffCategory();
 		consequenceDict["destroybuff"] = new ConsequenceDestroyBuff();
 		consequenceDict["setdmgtaken"] = new ConsequenceSetChangeDamageTaken();
+		consequenceDict["skillhide"] = new ConsequenceSkillHide();
 
 		// legacy consequences
 		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
