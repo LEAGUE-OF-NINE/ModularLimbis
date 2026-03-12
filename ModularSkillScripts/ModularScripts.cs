@@ -1,22 +1,23 @@
-using System;
-using System.Buffers;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+using AsmResolver.Collections;
+using BepInEx.Unity.IL2CPP.UnityEngine;
 using Il2CppInterop.Runtime.Injection;
 using Il2CppSystem.Collections.Generic;
-using static BattleActionModel.TargetDataDetail;
-using IntPtr = System.IntPtr;
 using Lethe.Patches;
 using Lua;
 using Lua.Standard;
 using ModularSkillScripts.Consequence;
 using SharpCompress;
+using System;
+using System.Buffers;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
+using static BattleActionModel.TargetDataDetail;
+using IntPtr = System.IntPtr;
 using Regex = System.Text.RegularExpressions.Regex;
 using RegexOptions = System.Text.RegularExpressions.RegexOptions;
-using System.Text.Json;
-using BepInEx.Unity.IL2CPP.UnityEngine;
 
 namespace ModularSkillScripts;
 
@@ -170,6 +171,8 @@ public class ModularSA : Il2CppSystem.Object
 		modsa_oppoAction = null;
 		modsa_target_list.Clear();
 
+		modsa_victimModel = null;
+		modsa_killerModel = null;
 		modsa_unitModel = null;
 		modsa_skillModel = null;
 		modsa_passiveModel = null;
@@ -213,6 +216,9 @@ public class ModularSA : Il2CppSystem.Object
 	public int passiveID = 0; // 0 means skill, 1 means coin, 2 means passive
 	public long ptr_intlong;
 
+
+	public BattleUnitModel modsa_victimModel = null;
+	public BattleUnitModel modsa_killerModel = null;
 	public BattleUnitModel modsa_unitModel = null;
 	public SkillModel modsa_skillModel = null;
 	public PassiveModel modsa_passiveModel = null;
@@ -684,6 +690,16 @@ public class ModularSA : Il2CppSystem.Object
 					}
 					return unitList;
 				}
+			case "Victim":
+				{
+					unitList.Add(modsa_victimModel);
+					return unitList;
+				}
+			case "Killer":
+				{
+					unitList.Add(modsa_killerModel);
+					return unitList;
+				}
 			case "All":
 				return battleObjectManager.GetModelList();
 		}
@@ -881,6 +897,14 @@ public class ModularSA : Il2CppSystem.Object
 					if (modsa_selfAction == null) return null;
 					TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
 					return targetDataSet.GetMainTarget();
+				}
+			case "Victim":
+				{
+					return modsa_victimModel;
+				}
+			case "Killer":
+				{
+					return modsa_killerModel;
 				}
 		}
 

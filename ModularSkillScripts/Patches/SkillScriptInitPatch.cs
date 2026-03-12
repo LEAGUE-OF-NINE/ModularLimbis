@@ -429,6 +429,7 @@ public class SkillScriptInitPatch
 		}
 	}
 	//Context: hidden timing, won't be in the edocs, someone needed an even more delayed afterslots once so i did some serious bum activity and coroutined that shit
+	// Froggo this is cinema.
 	private static System.Collections.IEnumerator IAmABum()
 	{
 		yield return new UnityEngine.WaitForEndOfFrame();
@@ -670,6 +671,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(killer);
+				modpa.modsa_killerModel = killer;
+				modpa.modsa_victimModel = deadUnit;
+
 				modpa.Enact(deadUnit, null, null, actionOrNull, actevent_OnDie, timing);
 			}
 		}
@@ -684,6 +688,8 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(killer);
+				modpa.modsa_killerModel = killer;
+				modpa.modsa_victimModel = deadUnit;
 				modpa.Enact(deadUnit, null, null, actionOrNull, actevent_OnDie, timing);
 			}
 		}
@@ -697,6 +703,8 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 					modpa.modsa_passiveModel = passiveModel;
 					modpa.modsa_target_list.Clear();
 					modpa.modsa_target_list.Add(deadUnit);
+					modpa.modsa_killerModel = killer;
+					modpa.modsa_victimModel = deadUnit;
 					modpa.Enact(unit, null, null, actionOrNull, actevent_OnOtherDie, timing);
 				}
 			}
@@ -706,6 +714,8 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 					modpa.modsa_passiveModel = passiveModel;
 					modpa.modsa_target_list.Clear();
 					modpa.modsa_target_list.Add(deadUnit);
+					modpa.modsa_killerModel = killer;
+					modpa.modsa_victimModel = deadUnit;
 					modpa.Enact(unit, null, null, actionOrNull, actevent_OnOtherDie, timing);
 				}
 			}
@@ -2424,6 +2434,8 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		long skillmodel_intlong = skill.Pointer.ToInt64();
 		if (modsaDict.ContainsKey(skillmodel_intlong)) {
 			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+				modsa.modsa_victimModel = target;
+				modsa.modsa_killerModel = __instance;
 				modsa.Enact(__instance, skill, actionOrNull, null, actevent, timing);
 			}
 		}
@@ -2435,6 +2447,8 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 
 			foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
 				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_victimModel = target;
+				modpa.modsa_killerModel = __instance;
 				modpa.Enact(__instance, skill, actionOrNull, null, actevent, timing);
 			}
 		}
@@ -2447,6 +2461,8 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
 			{
 				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_victimModel = target;
+				modpa.modsa_killerModel = __instance;
 				modpa.Enact(__instance, skill, actionOrNull, null, actevent, timing);
 			}
 		}
