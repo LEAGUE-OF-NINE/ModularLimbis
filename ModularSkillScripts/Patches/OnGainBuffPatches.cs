@@ -37,7 +37,7 @@ internal class OnGainBuffPatches
 					modpa.gainbuff_turn = turn;
 					modpa.gainbuff_activeRound = activeRound;
 					modpa.gainbuff_source = srcType;
-					modpa.Enact(__instance, null, null, null, actevent, timing);
+					modpa.Enact(__instance, null, null, actionOrNull, actevent, timing);
 				}
 			}
 
@@ -65,7 +65,7 @@ internal class OnGainBuffPatches
 					modpa.gainbuff_turn = turn;
 					modpa.gainbuff_activeRound = activeRound;
 					modpa.gainbuff_source = srcType;
-					modpa.Enact(__instance, null, null, null, actevent, timing);
+					modpa.Enact(__instance, null, null, actionOrNull, actevent, timing);
 				}
 			}
 		}

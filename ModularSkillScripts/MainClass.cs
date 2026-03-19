@@ -207,6 +207,12 @@ public class MainClass : BasePlugin
 		consequenceDict["destroybuff"] = new ConsequenceDestroyBuff();
 		consequenceDict["setdmgtaken"] = new ConsequenceSetChangeDamageTaken();
 		consequenceDict["skillhide"] = new ConsequenceSkillHide();
+		consequenceDict["lbreak"] = new ConsequenceBreak();
+		consequenceDict["removecoin"] = new ConsequenceRemoveCoin();
+		consequenceDict["setlevel"] = new ConsequenceSetLevel();
+		consequenceDict["setmaxhp"] = new ConsequenceSetMaxHp();
+		consequenceDict["changesp"] = new ConsequenceChangeSp();
+		//consequenceDict["sinbuffmult"] = new ConsequenceSinBuffMult();
 
 		// legacy consequences
 		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
@@ -335,8 +341,12 @@ public class MainClass : BasePlugin
 		acquirerDict["useddefaction"] = new AcquirerUsedDefenseActionThisTurn();
 		acquirerDict["unitfaction"] = new AcquirerUnitFaction();
 		acquirerDict["chainstatus"] = new AcquirerChainStatus();
-
-
+		acquirerDict["getopposkillid"] = new AcquirerGetOpponentSkillId();
+		acquirerDict["getcurrentpower"] = new AcquirerGetCurrentPower();
+		acquirerDict["getdefaultmaxhp"] = new AcquirerGetDefaultMaxHp();
+		acquirerDict["gethpincrement"] = new AcquirerGetHpIncrementByLevel();
+		acquirerDict["diduseskilllastturn"] = new AcquirerDidUseSkillLastTurn();
+		acquirerDict["isactionable"] = new AcquirerIsActionable();
 
 		// Register Lua functions
 		luaFunctionDict["clearvalues"] = new ModularSkillScripts.LuaFunction.LuaFunctionClearValues();
@@ -354,6 +364,9 @@ public class MainClass : BasePlugin
 		luaFunctionDict["clearallgdata"] = new ModularSkillScripts.LuaFunction.LuaFunctionClearAllGData();
 		luaFunctionDict["gbkeyword"] = new ModularSkillScripts.LuaFunction.LuaFunctionGainBuffKeyword();
 		luaFunctionDict["addresource"] = new ModularSkillScripts.LuaFunction.LuaFunctionAddResource();
+		luaFunctionDict["getcurrentmapid"] = new ModularSkillScripts.LuaFunction.LuaFunctionGetCurrentMapID();
+		luaFunctionDict["getappearanceid"] = new ModularSkillScripts.LuaFunction.LuaFunctionGetAppearanceID();
+		luaFunctionDict["listbreakvalues"] = new ModularSkillScripts.LuaFunction.LuaFunctionListBreakSectionValue();
 	}
 
 	public static System.Collections.Generic.List<BattleUnitModel> ShuffleUnits(
