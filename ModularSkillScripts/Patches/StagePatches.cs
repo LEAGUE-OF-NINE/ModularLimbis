@@ -15,26 +15,27 @@ internal class StagePatches
 	[HarmonyPrefix]
 	private static void Prefix_StageModel_Init(StageStaticData stageinfo, StageModel __instance)
 	{
+		MainClass.CheckLoggingBoolean();
 		SkillScriptInitPatch.ResetAllModsa();
 
 		extraSlot = 0;
 		instantslot = false;
 		doubleslotterIDList.Clear();
 		forceSlotGain = false;
-		MainClass.Logg.LogInfo("Prefix_StageModel_Init");
+		MainClass.LogModular("Prefix_StageModel_Init");
 
 		List<string> stageScriptList = stageinfo.stageScriptList;
 		foreach (string stageScript_string in stageScriptList)
 		{
-			MainClass.Logg.LogInfo("Looping stage scriptnames: " + stageScript_string);
+			MainClass.LogModular("Looping stage scriptnames: " + stageScript_string);
 			if (!stageScript_string.StartsWith("Modular/")) continue;
-			MainClass.Logg.LogInfo("Found Modular/");
+			MainClass.LogModular("Found Modular/");
 			string instruction = stageScript_string.Remove(0, 8);
 			string[] batches = instruction.Split('/');
 
 			foreach (string batch in batches)
 			{
-				MainClass.Logg.LogInfo("Batches loop: " + batch);
+				MainClass.LogModular("Batches loop: " + batch);
 				if (batch.StartsWith("extraslot:")) int.TryParse(batch.Remove(0, 10), out extraSlot);
 				else if (batch == "instantslot") instantslot = true;
 				else if (batch == "forceslotgain") forceSlotGain = true;
@@ -48,7 +49,7 @@ internal class StagePatches
 	private static void Postfix_StageController_StartRound(StageController __instance)
 	{
 		int round = __instance.GetCurrentRound();
-		MainClass.Logg.LogInfo("Postfix_StageController_StartRound | Round: " + round);
+		MainClass.LogModular("Postfix_StageController_StartRound | Round: " + round);
 
 		int amount_before = SkillScriptInitPatch.modsaDict.Count;
 		int duplicate_bad = 0;
@@ -80,8 +81,8 @@ internal class StagePatches
 		}
 		int amount_after = SkillScriptInitPatch.modsaDict.Count;
 				
-		MainClass.Logg.LogInfo("Modsa cleanup before: " + amount_before + " - after: " + amount_after);
-		MainClass.Logg.LogInfo("Modsa EGO removed: " + duplicate_bad + " - EGO kept: " + duplicate_good);
+		MainClass.LogModular("Modsa cleanup before: " + amount_before + " - after: " + amount_after);
+		MainClass.LogModular("Modsa EGO removed: " + duplicate_bad + " - EGO kept: " + duplicate_good);
 			
 
 		SinManager sinManager_inst = Singleton<SinManager>.Instance;
@@ -115,13 +116,13 @@ internal class StagePatches
 		bool isRailway = stageModel.StageType == STAGE_TYPE.RAILWAY_DUNGEON;
 		if (isRailway || forceSlotGain)
 		{
-			MainClass.Logg.LogInfo("forceSlotGain");
+			MainClass.LogModular("forceSlotGain");
 			if (isRailway) MainClass.Logg.LogInfo("IS RAILWAY_DUNGEON");
 
 			//List<SinActionModel> sinAction_list = sinManager_inst.GetActionListByFaction(UNIT_FACTION.PLAYER);
 			int sinAction_count = 0;
 			foreach (BattleUnitModel unitModel in playerUnit_list) sinAction_count += unitModel._actionSlotDetail.GetSinActionList().Count;
-			MainClass.Logg.LogInfo("current player slot count:" + sinAction_count);
+			MainClass.LogModular("current player slot count:" + sinAction_count);
 				
 			int slot_max = stageModel.GetStageMaxSlotCount();
 			int multislot_max = (int)Math.Ceiling((double)slot_max / stageModel.ClassInfo.ParticipantInfo.Max);
@@ -155,20 +156,20 @@ internal class StagePatches
 	private static void Postfix_StageController_StartStage(StageController __instance)
 	{
 		int round = __instance.GetCurrentRound();
-		MainClass.Logg.LogInfo("Postfix_StageController_StartStage | Round: " + round);
+		MainClass.LogModular("Postfix_StageController_StartStage | Round: " + round);
 		SinManager sinManager_inst = Singleton<SinManager>.Instance;
 			
 		if (instantslot) {
-			MainClass.Logg.LogInfo("InstantSlot");
+			MainClass.LogModular("InstantSlot");
 			StageModel stageModel = __instance.StageModel;
 			if (stageModel == null) {
-				MainClass.Logg.LogInfo("null stagemodel");
+				MainClass.LogModular("null stagemodel");
 				return;
 			}
 
 			StageStaticData stageData = stageModel.ClassInfo;
 			for (int i = 0; i < stageData.ParticipantInfo.Max; i++) {
-				MainClass.Logg.LogInfo("gave slot i: " + i);
+				MainClass.LogModular("gave slot i: " + i);
 				sinManager_inst.CheckAddSinActionmodel(stageModel.StageType != STAGE_TYPE.STORY_DUNGEON, UNIT_FACTION.PLAYER);
 			}
 		}
@@ -179,7 +180,7 @@ internal class StagePatches
 	//[HarmonyPostfix]
 	//private static void Postfix_StageScriptBase_GetStageMaxParticipantCount(ref Il2CppSystem.Nullable<int> __result, StageScriptBase __instance)
 	//{
-	//	MainClass.Logg.LogInfo("Postfix_GetStageMaxParticipantCount, doubleslot: " + doubleslot);
+	//	MainClass.LogModular("Postfix_GetStageMaxParticipantCount, doubleslot: " + doubleslot);
 	//	if (doubleslot)
 	//	{
 	//		StageController stageController_inst = Singleton<StageController>.Instance;
@@ -206,11 +207,11 @@ internal class StagePatches
 			}
 		}
 
-		MainClass.Logg.LogInfo("Postfix_GetStageMaxParticipantCount, slotadder: " + slotAdder);
+		MainClass.LogModular("Postfix_GetStageMaxParticipantCount, slotadder: " + slotAdder);
 		if (slotAdder > 0) {
 			StageStaticData stageData = __instance.ClassInfo;
 			__result = Math.Min(stageData.ParticipantInfo.Max + slotAdder, 12);
-			MainClass.Logg.LogInfo("ParticipantCountResult: " + __result);
+			MainClass.LogModular("ParticipantCountResult: " + __result);
 		}
 	}
 
@@ -229,7 +230,7 @@ internal class StagePatches
 	//			if (unitModel != null && !unitModel.IsDead()) slotAdder += 1;
 	//		}
 	//	}
-	//	MainClass.Logg.LogInfo("CanAddNewSinActionModelForAlly, slotadder: " + slotAdder);
+	//	MainClass.LogModular("CanAddNewSinActionModelForAlly, slotadder: " + slotAdder);
 	//	if (slotAdder > 0) __result = false;
 	//}
 

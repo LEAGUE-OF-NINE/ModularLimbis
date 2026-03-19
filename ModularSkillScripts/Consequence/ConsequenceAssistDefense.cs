@@ -25,19 +25,19 @@ public class ConsequenceAssistDefense : IModularConsequence
 	
 	public static void ClearAssistDefenseEntries()
 	{
-		MainClass.Logg.LogInfo($"Clearing {AssistDefenseEntries.Count} assist defense entries");
+		MainClass.LogModular($"Clearing {AssistDefenseEntries.Count} assist defense entries");
 		AssistDefenseEntries.Clear();
 	}
 	
 	public static int GetAssistDefenseSkillId(int protectorInstanceId, int protectedInstanceId)
 	{
-		MainClass.Logg.LogInfo("================================");
-		MainClass.Logg.LogInfo($"GetAssistDefenseSkillId: protectorInstanceId={protectorInstanceId}, protectedInstanceId={protectedInstanceId}");
+		MainClass.LogModular("================================");
+		MainClass.LogModular($"GetAssistDefenseSkillId: protectorInstanceId={protectorInstanceId}, protectedInstanceId={protectedInstanceId}");
 		foreach (var assistDefenseEntry in AssistDefenseEntries)
 		{
-			MainClass.Logg.LogInfo($"  Entry: protectorInstanceId={assistDefenseEntry.Key}, skillId={assistDefenseEntry.Value}");
+			MainClass.LogModular($"  Entry: protectorInstanceId={assistDefenseEntry.Key}, skillId={assistDefenseEntry.Value}");
 		}
-		MainClass.Logg.LogInfo("================================");
+		MainClass.LogModular("================================");
 		return AssistDefenseEntries.GetValueOrDefault(new AssistDefenseEntry(protectorInstanceId, protectedInstanceId), -1);
 	}
 	

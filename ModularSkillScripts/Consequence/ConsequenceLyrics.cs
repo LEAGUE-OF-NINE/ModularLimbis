@@ -20,19 +20,19 @@ public class ConsequenceLyrics : IModularConsequence
 		var num = Util.RandomRangeInclusive(0, 2);
 		const string lyricsObjectName = "ModularUpperDialog";
 		var pool = SingletonBehavior<BattleEffectManager>.Instance.EffectPool;
-		MainClass.Logg.LogInfo($"Checking for {lyricsObjectName}");
+		MainClass.LogModular($"Checking for {lyricsObjectName}");
 		if (!pool.GetComponentsInChildren<Transform>().Any(child => child.name.Contains(lyricsObjectName)))
 		{
-			MainClass.Logg.LogInfo($"Could not find {lyricsObjectName}! Making one");
+			MainClass.LogModular($"Could not find {lyricsObjectName}! Making one");
 			var lyricsObject = Resources.Load<GameObject>("Prefab/Battle/Effect/Tmp/BattleLyricsController");
 			lyricsObject.name = lyricsObjectName;
 			pool.AddObject(lyricsObject);
 		}
 
-		MainClass.Logg.LogInfo($"Spawning lyrics");
+		MainClass.LogModular($"Spawning lyrics");
 		var obj = SingletonBehavior<BattleEffectManager>.Instance.EffectPool.Get(lyricsObjectName);
 		obj.GetComponent<BattleLyricsContoller>().StartCoroutine(lyricsCoroutine(obj, line_played, num));
-		MainClass.Logg.LogInfo($"Lyrics: {line_played}");
+		MainClass.LogModular($"Lyrics: {line_played}");
 	}
 	
 	private static IEnumerator lyricsCoroutine(GameObject obj, string linePlayed, int num)

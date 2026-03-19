@@ -19,7 +19,7 @@ public class ConsequencePattern : IModularConsequence
 		//List<BattlePattern> battlePattern_list = pattern._patternList;
 
 		int pickedPattern_idx = modular.GetNumFromParamString(circles[0]);
-		MainClass.Logg.LogInfo("pickedPattern_idx: " + pickedPattern_idx);
+		MainClass.LogModular("pickedPattern_idx: " + pickedPattern_idx);
 		pattern.currPatternIdx = pickedPattern_idx;
 		//int slotCount = -1;
 		//bool randomize = false;

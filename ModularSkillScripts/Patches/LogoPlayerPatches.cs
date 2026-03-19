@@ -10,8 +10,8 @@ internal class LogoPlayerPatches
 	[HarmonyPrefix]
 	private static void Prefix_NewOperationController_EquipDefense()
 	{
-		MainClass.Logg.LogInfo($"{MainClass.consequenceDict.Count} consequences registered: {string.Join(", ", MainClass.consequenceDict.Keys)}");
-		MainClass.Logg.LogInfo($"{MainClass.acquirerDict.Count} acquirers registered: {string.Join(", ", MainClass.acquirerDict.Keys)}");
+		MainClass.LogModular($"{MainClass.consequenceDict.Count} consequences registered: {string.Join(", ", MainClass.consequenceDict.Keys)}");
+		MainClass.LogModular($"{MainClass.acquirerDict.Count} acquirers registered: {string.Join(", ", MainClass.acquirerDict.Keys)}");
 	}
 	
 }

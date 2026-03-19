@@ -153,7 +153,7 @@ public class AcquirerSinsInDashboard : IModularAcquirer
 			return (int)lowestSin;
 		}
 
-		MainClass.Logg.LogInfo(result);
+		MainClass.LogModular(result);
 		return result;
 	}
 }

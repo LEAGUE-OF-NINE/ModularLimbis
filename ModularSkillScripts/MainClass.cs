@@ -118,7 +118,8 @@ public class MainClass : BasePlugin
 		harmony.PatchAll(typeof(LogoPlayerPatches));
 		harmony.PatchAll(typeof(ReloadPatches));
 		harmony.PatchAll(typeof(OnGainBuffPatches));
-		harmony.PatchAll(typeof(LogPatches));
+		// We don't do this bullshit
+		//harmony.PatchAll(typeof(LogPatches));
 		if (fakepowerEnabled) harmony.PatchAll(typeof(FakePowerPatches));
 		RegisterConsequences();
 		RegisterAcquirers();
@@ -388,7 +389,14 @@ public class MainClass : BasePlugin
 		return max;
 	}
 
-
+	public static void CheckLoggingBoolean()
+	{
+		logEnabled = EnableLogging.Value;
+	}
+	public static void LogModular(object thing)
+	{
+		if (logEnabled) Logg.LogInfo(thing);
+	}
 
 
 	//public static ModsaEvaluator modsaEval = null;
@@ -411,7 +419,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.6.3";
+	public const string VERSION = "4.6.5";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 

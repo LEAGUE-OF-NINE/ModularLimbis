@@ -12,7 +12,7 @@ internal class UniquePatches
 	private static bool Postfix_NewOperationController_EquipDefense(bool equiped, SinActionModel sinAction)
 	{
 		//if (!Input.GetKeyInt(KeyCode.LeftControl)) return true;
-		MainClass.Logg.LogInfo("Ran EquipDefense");
+		MainClass.LogModular("Ran EquipDefense");
 		BattleUnitModel unit = sinAction.actionSlot.Owner;
 		if (!unit.IsActionable()) return true;
 		int actevent = MainClass.timingDict["SpecialAction"];
@@ -27,8 +27,8 @@ internal class UniquePatches
 			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
 			{
 				if (!Input.GetKeyInt(modba.SpecialKey)) continue;
-				MainClass.Logg.LogInfo("Found bufpassive - SPECIAL");
-				MainClass.Logg.LogInfo("Triggered Key: " + modba.SpecialKey.ToString());
+				MainClass.LogModular("Found bufpassive - SPECIAL");
+				MainClass.LogModular("Triggered Key: " + modba.SpecialKey.ToString());
 				returnval = false;
 				modba.modsa_buffModel = buf;
 				modba.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
@@ -64,8 +64,8 @@ internal class UniquePatches
 			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong])
 			{
 				if (!Input.GetKeyInt(modpa.SpecialKey)) continue;
-				MainClass.Logg.LogInfo("FoundS modpassive - SPECIAL: " + modpa.passiveID);
-				MainClass.Logg.LogInfo("Triggered Key: " + modpa.SpecialKey.ToString());
+				MainClass.LogModular("FoundS modpassive - SPECIAL: " + modpa.passiveID);
+				MainClass.LogModular("Triggered Key: " + modpa.SpecialKey.ToString());
 				returnval = false;
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
@@ -81,8 +81,8 @@ internal class UniquePatches
 			{
 				if (!Input.GetKeyInt(modpa.SpecialKey)) continue;
 				returnval = false;
-				MainClass.Logg.LogInfo("FoundS modpassive - SPECIAL: " + modpa.passiveID);
-				MainClass.Logg.LogInfo("Triggered Key: " + modpa.SpecialKey.ToString());
+				MainClass.LogModular("FoundS modpassive - SPECIAL: " + modpa.passiveID);
+				MainClass.LogModular("Triggered Key: " + modpa.SpecialKey.ToString());
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
@@ -93,9 +93,9 @@ internal class UniquePatches
 		//MainClass.Logg.LogInfo("2");
 		//foreach (BattleUnitView unitView in viewManager._unitViewList)
 		//{
-		//	MainClass.Logg.LogInfo("3");
+		//	MainClass.LogModular("3");
 		//	unitView.RefreshState(unitView.unitModel);
-		//	MainClass.Logg.LogInfo("4");
+		//	MainClass.LogModular("4");
 		//	unitView.RefreshEffects();
 		//}
 
@@ -108,7 +108,7 @@ internal class UniquePatches
 		{
 			unitView.RefreshAppearanceRenderer(true);
 		}
-		MainClass.Logg.LogInfo("EquipDefense over");
+		MainClass.LogModular("EquipDefense over");
 		return false;
 	}
 }

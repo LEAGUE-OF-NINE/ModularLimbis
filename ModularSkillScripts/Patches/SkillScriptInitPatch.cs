@@ -66,7 +66,7 @@ public class SkillScriptInitPatch
 				foreach (ModularSA existingModsa in modsaDict[ptr]) {
 					if (existingModsa.originalString != abilityScriptname) continue;
 					existsAlready = true;
-					MainClass.Logg.LogInfo(ptr + ": exists already " + abilityScriptname);
+					MainClass.LogModular(ptr + ": exists already " + abilityScriptname);
 					existingModsa.ResetValueList();
 					existingModsa.ResetAdders();
 					existingModsa.modsa_skillModel = __instance;
@@ -126,7 +126,7 @@ public class SkillScriptInitPatch
 			modpa.passiveID = __instance.ClassInfo.ID;
 			modpa.abilityMode = 2; // 2 means passive
 			modpa.modsa_unitModel = owner;
-			MainClass.Logg.LogInfo("modPassiveAbility init: " + param);
+			MainClass.LogModular("modPassiveAbility init: " + param);
 
 			modpa.SetupModular(param.Remove(0, 8));
 			if (!modpaDict.ContainsKey(ptr)) modpaDict.Add(ptr, new List<ModularSA>());
@@ -174,7 +174,7 @@ public class SkillScriptInitPatch
 			modpa.passiveID = __instance.ClassInfo.ID;
 			modpa.abilityMode = 2; // 2 means passive
 			modpa.modsa_unitModel = owner;
-			MainClass.Logg.LogInfo("EgoPassiveModel init: " + param);
+			MainClass.LogModular("EgoPassiveModel init: " + param);
 
 			modpa.SetupModular(param.Remove(0, 8));
 			if (!modpaDict.ContainsKey(ptr)) modpaDict.Add(ptr, new List<ModularSA>());
@@ -209,7 +209,7 @@ public class SkillScriptInitPatch
 			}
 			modca_list.Clear();
 			modca_list = goodones;
-			MainClass.Logg.LogInfo("Refreshed ModcaList");
+			MainClass.LogModular("Refreshed ModcaList");
 		}
 
 		List<AbilityData> abilityData_list = __instance.ClassInfo.abilityScriptList;
@@ -226,7 +226,7 @@ public class SkillScriptInitPatch
 				if (existingModca.ptr_intlong == ptr && existingModca.originalString == abilityScriptname)
 				{
 					existsAlready = true;
-					MainClass.Logg.LogInfo(ptr + ": exists already " + abilityScriptname);
+					MainClass.LogModular(ptr + ": exists already " + abilityScriptname);
 					existingModca.ResetValueList();
 					existingModca.ResetAdders();
 					break;
@@ -238,7 +238,7 @@ public class SkillScriptInitPatch
 			modca.originalString = abilityScriptname;
 			modca.ptr_intlong = ptr;
 			modca.abilityMode = 1; // 1 means coin
-			MainClass.Logg.LogInfo("modCoinAbility init: " + abilityScriptname);
+			MainClass.LogModular("modCoinAbility init: " + abilityScriptname);
 			modca.SetupModular(abilityScriptname.Remove(0, 8));
 			modca_list.Add(modca);
 		}
@@ -1818,10 +1818,10 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		var attackerName = attackerAction?.Model?.GetName()?.Replace("\n", " ");
 		if (skillId < 0)
 		{
-			MainClass.Logg.LogInfo($"No assist defense found for {defenderName} to defend {originTargetName} from {attackerName}, defenseType: {defenseType}, timing: {timing}");
+			MainClass.LogModular($"No assist defense found for {defenderName} to defend {originTargetName} from {attackerName}, defenseType: {defenseType}, timing: {timing}");
 			return true;
 		}
-		MainClass.Logg.LogInfo($"Assist defense called for {defenderName} to defend {originTargetName} from {attackerName}, defenseType: {defenseType}, timing: {timing}");
+		MainClass.LogModular($"Assist defense called for {defenderName} to defend {originTargetName} from {attackerName}, defenseType: {defenseType}, timing: {timing}");
 		__result = skillId;
 		return false;
 	}
@@ -2119,7 +2119,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	private static void Postfix_BattleUnitModel_OnGiveHpDamage(BattleUnitModel target, BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
 	{
-		MainClass.Logg.LogInfo(" OnGiveHpDamage ");
+		MainClass.LogModular(" OnGiveHpDamage ");
 	}*/
 
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnTakeAttackDamage))]
@@ -2611,18 +2611,29 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 
 	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.OpenSkillInfoUI))]
 	[HarmonyPrefix]
-	private static void OpenSkillInfoUI(BattleUnitView __instance, int skillID)
+	private static void OpenSkillInfoUI(BattleUnitView __instance)
 	{
-		var skillData = Singleton<StaticDataManager>.Instance._skillList.GetData(skillID);
-		var model = __instance._unitModel.UnitDataModel;
-		MainClass.Logg.LogInfo($"Coin toss, skill = {skillID}, model level = {model.Level}, model sync level = {model.SyncLevel}");
+		BattleSkillViewer currentSkillViewer = __instance.GetCurrentSkillViewer();
+		if (currentSkillViewer == null)
+		{
+			MainClass.LogModular("StartVisualCoinToss currentSkillViewer is Null");
+			return;
+		}
 		
-		var skillModel = new SkillModel(skillData, model.Level, model.SyncLevel);
-		skillModel.Init(); // needed to get noticed by modular skill timing?
-		long skillmodel_intlong = skillModel.Pointer.ToInt64();
+		BattleUnitModel unit = currentSkillViewer.GetModel();
+		SkillModel skill = currentSkillViewer.GetSkillModel();
+		MainClass.LogModular($"StartVisualCoinToss, skill = {skill.GetID()}");
+		
+		//var skillData_fromStatic = Singleton<StaticDataManager>.Instance._skillList.GetData(skillID);
+		//var model = __instance._unitModel.UnitDataModel;
+		//MainClass.LogModular($"Coin toss, skill = {skillID}, model level = {model.Level}, model sync level = {model.SyncLevel}");
+		//var skillModel = new SkillModel(skillData_fromStatic, model.Level, model.SyncLevel);
+		//skillModel.Init(); needed to get noticed by modular skill timing?
+		
+		long skillmodel_intlong = skill.Pointer.ToInt64();
 		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-			modsa.Enact(__instance._unitModel, skillModel, null, null, MainClass.timingDict["StartVisualCoinToss"], BATTLE_EVENT_TIMING.ALL_TIMING);
+			modsa.Enact(unit, skill, null, null, MainClass.timingDict["StartVisualCoinToss"], BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 	}
 
@@ -2630,17 +2641,28 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPrefix]
 	private static void StartBehaviourAction(BattleUnitView __instance)
 	{
-		var skillID = __instance.GetCurrentSkillViewer().curSkillID;
-		var skillData = Singleton<StaticDataManager>.Instance._skillList.GetData(skillID);
-		var model = __instance._unitModel.UnitDataModel;
-		MainClass.Logg.LogInfo($"SBA, skill = {skillID}, model level = {model.Level}, model sync level = {model.SyncLevel}");
+		BattleSkillViewer currentSkillViewer = __instance.GetCurrentSkillViewer();
+		if (currentSkillViewer == null)
+		{
+			MainClass.LogModular("StartVisualCoinToss currentSkillViewer is Null");
+			return;
+		}
 		
-		var skillModel = new SkillModel(skillData, model.Level, model.SyncLevel);
-		skillModel.Init(); // needed to get noticed by modular skill timing?
-		long skillmodel_intlong = skillModel.Pointer.ToInt64();
+		BattleUnitModel unit = currentSkillViewer.GetModel();
+		SkillModel skill = currentSkillViewer.GetSkillModel();
+		MainClass.LogModular($"StartVisualSkillUse, skill = {skill.GetID()}");
+		
+		//var skillID = __instance.GetCurrentSkillViewer().curSkillID;
+		//var skillData = Singleton<StaticDataManager>.Instance._skillList.GetData(skillID);
+		//var model = __instance._unitModel.UnitDataModel;
+		//MainClass.LogModular($"SBA, skill = {skillID}, model level = {model.Level}, model sync level = {model.SyncLevel}");
+		//var skillModel = new SkillModel(skillData, model.Level, model.SyncLevel);
+		//skillModel.Init(); // needed to get noticed by modular skill timing?
+		
+		long skillmodel_intlong = skill.Pointer.ToInt64();
 		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-			modsa.Enact(__instance._unitModel, skillModel, null, null, MainClass.timingDict["StartVisualSkillUse"], BATTLE_EVENT_TIMING.ALL_TIMING);
+			modsa.Enact(unit, skill, null, null, MainClass.timingDict["StartVisualSkillUse"], BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 	}
 

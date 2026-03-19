@@ -9,7 +9,7 @@ public class AcquirerGetPattern : IModularAcquirer
 		PatternScript_Abnormality pattern = ModularSA.AsAbnormalityModel(targetModel)?.PatternScript;
 		if (pattern == null) return -1;
 		int pattern_idx = pattern.currPatternIdx;
-		MainClass.Logg.LogInfo("getpattern pattern_idx: " + pattern_idx);
+		MainClass.LogModular("getpattern pattern_idx: " + pattern_idx);
 		return pattern.currPatternIdx;
 	}
 }

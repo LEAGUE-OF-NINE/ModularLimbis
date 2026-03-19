@@ -7,13 +7,13 @@ public class ConsequenceLog : IModularConsequence
 		switch (circles.Length)
 		{
 			case 0:
-				MainClass.Logg.LogInfo("ModularLog");
+				MainClass.LogModular("ModularLog");
 				break;
 			case 1:
-				MainClass.Logg.LogInfo("ModularLog " + circles[0]);
+				MainClass.LogModular("ModularLog " + circles[0]);
 				break;
 			default:
-				MainClass.Logg.LogInfo("ModularLog " + circles[0] + ": " + modular.GetNumFromParamString(circles[1]));
+				MainClass.LogModular("ModularLog " + circles[0] + ": " + modular.GetNumFromParamString(circles[1]));
 				break;
 		}
 	}

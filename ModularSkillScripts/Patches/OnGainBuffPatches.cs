@@ -29,8 +29,8 @@ internal class OnGainBuffPatches
 					BUFF_UNIQUE_KEYWORD trigger = modpa.keywordTrigger;
 					if ((trigger != BUFF_UNIQUE_KEYWORD.None) && (trigger != keyword))
 						continue;
-					MainClass.Logg.LogInfo("Founds modpassive - GainBuff timing: " + modpa.passiveID);
-					MainClass.Logg.LogInfo("Triggered Keyword: " + trigger);
+					MainClass.LogModular("Founds modpassive - GainBuff timing: " + modpa.passiveID);
+					MainClass.LogModular("Triggered Keyword: " + trigger);
 					noSkip = false;
 					modpa.modsa_passiveModel = passiveModel;
 					modpa.gainbuff_stack = stack;
@@ -55,8 +55,8 @@ internal class OnGainBuffPatches
 					if ((trigger != BUFF_UNIQUE_KEYWORD.None) && (trigger != keyword))
 						continue;
 
-					MainClass.Logg.LogInfo("Founds modpassive - GainBuff timing: " + modpa.passiveID);
-					MainClass.Logg.LogInfo("Triggered Keyword: " + trigger);
+					MainClass.LogModular("Founds modpassive - GainBuff timing: " + modpa.passiveID);
+					MainClass.LogModular("Triggered Keyword: " + trigger);
 
 					noSkip = false;
 

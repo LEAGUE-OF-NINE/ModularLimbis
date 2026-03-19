@@ -18,7 +18,7 @@ public class ReloadPatches
 	private static void PostMainUILoad()
 	{
 		LuaScript.loadedScripts.Clear();
-		MainClass.Logg.LogInfo("PostMainUILoad - Reloading Modular Lua Scripts");
+		MainClass.LogModular("PostMainUILoad - Reloading Modular Lua Scripts");
 		foreach (var modPath in Directory.GetDirectories(LetheMain.modsPath.FullPath))
 		{
 			var expectedPath = Path.Combine(modPath, "modular_lua");
@@ -44,7 +44,7 @@ public class ReloadPatches
 					var syntaxTree = LuaSyntaxTree.Parse(content, name);
 					var script = LuaCompiler.Default.Compile(syntaxTree, name);
 					LuaScript.loadedScripts[name] = new LuaScript { Body = content, Content = script, Name = name };
-					MainClass.Logg.LogInfo($"Loaded Modular Lua Script '{name}' from '{luaPath}'.");
+					MainClass.LogModular($"Loaded Modular Lua Script '{name}' from '{luaPath}'.");
 				}
 				catch (Exception ex)
 				{

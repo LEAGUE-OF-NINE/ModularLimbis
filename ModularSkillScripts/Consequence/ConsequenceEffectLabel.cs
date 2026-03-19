@@ -9,7 +9,7 @@ public class ConsequenceEffectLabel : IModularConsequence
 		int circle_amount = circles.Length;
 		if (circle_amount < 4)
 		{
-			MainClass.Logg.LogInfo("Consequence Fail: effectlabel (Less than 4 arguments)");
+			MainClass.LogModular("Consequence Fail: effectlabel (Less than 4 arguments)");
 			return;
 		}
 

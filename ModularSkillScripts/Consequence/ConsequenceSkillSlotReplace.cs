@@ -6,7 +6,7 @@ public class ConsequenceSkillSlotReplace : IModularConsequence
 	{
 		if (modular.modsa_unitModel == null)
 		{
-			MainClass.Logg.LogInfo("skillslotreplace Self == null");
+			MainClass.LogModular("skillslotreplace Self == null");
 			return;
 		}
 
@@ -35,7 +35,7 @@ public class ConsequenceSkillSlotReplace : IModularConsequence
 			int slot = modular.GetNumFromParamString(circles[0]);
 			if (slot >= sinActionList.Count || slot < 0)
 			{
-				MainClass.Logg.LogInfo("skillslotreplace invalid slot");
+				MainClass.LogModular("skillslotreplace invalid slot");
 				return;
 			}
 

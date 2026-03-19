@@ -27,7 +27,7 @@ public class ConsequenceUpperText : IModularConsequence
 	
 	private static IEnumerator upperTextCoroutine(OutterGradiantEffectController controller, Color32 color32, string linePlayed)
 	{
-		MainClass.Logg.LogInfo($"Upper text color: {color32}");
+		MainClass.LogModular($"Upper text color: {color32}");
 		const float waitTime = 2;
 		var text = controller._dialogText_Upper;
 		text.m_faceColor = color32;

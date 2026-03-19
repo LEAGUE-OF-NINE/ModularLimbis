@@ -1,4 +1,3 @@
-using AsmResolver.Collections;
 using BepInEx.Unity.IL2CPP.UnityEngine;
 using Il2CppInterop.Runtime.Injection;
 using Il2CppSystem.Collections.Generic;
@@ -6,18 +5,20 @@ using Lethe.Patches;
 using Lua;
 using Lua.Standard;
 using ModularSkillScripts.Consequence;
-using SharpCompress;
 using System;
 using System.Buffers;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Utils;
 using static BattleActionModel.TargetDataDetail;
 using IntPtr = System.IntPtr;
 using Regex = System.Text.RegularExpressions.Regex;
 using RegexOptions = System.Text.RegularExpressions.RegexOptions;
+// ReSharper disable UseObjectOrCollectionInitializer
+// ReSharper disable RedundantDefaultMemberInitializer
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace ModularSkillScripts;
 
@@ -149,9 +150,9 @@ public class ModularSA : Il2CppSystem.Object
 	}
 
 	public string originalString = "";
-	public char[] parenthesisSeparator = new char[] { '(', ')' };
+	public readonly char[] parenthesisSeparator = ['(', ')'];
 
-	public int[] valueList = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	public int[] valueList = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 	public void ResetValueList()
 	{
 		activationCounter = 0;
@@ -204,11 +205,11 @@ public class ModularSA : Il2CppSystem.Object
 	public bool resetWhenUse = false;
 	public bool clearValues = false;
 
-	private List<string> batch_list = new List<string>();
+	private List<string> batch_list = new();
 
 	public BattleActionModel modsa_selfAction = null;
 	public BattleActionModel modsa_oppoAction = null;
-	public List<BattleUnitModel> modsa_target_list = new List<BattleUnitModel>();
+	public List<BattleUnitModel> modsa_target_list = new();
 
 	public int interactionTimer = 0;
 	public bool markedForDeath = false;
@@ -319,14 +320,13 @@ public class ModularSA : Il2CppSystem.Object
 			if (modsa_skillModel == null) modsa_skillModel = modsa_selfAction.Skill;
 			if (modsa_unitModel == null) modsa_unitModel = modsa_selfAction.Model;
 		}
-		if (MainClass.logEnabled) MainClass.Logg.LogInfo("activation good");
 
 		if (activationTiming == 1) markedForDeath = true;
 		if (activationTiming == MainClass.timingDict["OSA"] || activationTiming == MainClass.timingDict["BSA"])
 		{
 			if (modsa_coinModel == null)
 			{
-				if (MainClass.logEnabled) MainClass.Logg.LogInfo("succeed attack, null coin, report bug please");
+				MainClass.LogModular("succeed attack, null coin, report bug please");
 				return;
 			}
 
@@ -349,7 +349,7 @@ public class ModularSA : Il2CppSystem.Object
 
 		if (abilityMode == 2)
 		{
-			if (MainClass.logEnabled) MainClass.Logg.LogInfo("hijacking dummy passive");
+			MainClass.LogModular("hijacking dummy passive");
 			foreach (PassiveModel otherPassive in modsa_unitModel.UnitDataModel.PassiveList)
 			{
 				if (otherPassive._script == null) continue;
@@ -358,9 +358,9 @@ public class ModularSA : Il2CppSystem.Object
 			}
 			if (dummyPassiveAbility == null)
 			{
-				if (MainClass.logEnabled) MainClass.Logg.LogInfo("creating dummy passive");
-				PassiveAbility pa = new PassiveAbility();
-				pa.Init(modsa_unitModel, new List<PassiveConditionStaticData> { }, new List<PassiveConditionStaticData> { }, new List<int>());
+				MainClass.LogModular("creating dummy passive");
+				PassiveAbility pa = new();
+				pa.Init(modsa_unitModel, new List<PassiveConditionStaticData>(), new List<PassiveConditionStaticData>(), new List<int>());
 				dummyPassiveAbility = pa;
 			}
 		}
@@ -369,8 +369,8 @@ public class ModularSA : Il2CppSystem.Object
 			if (modsa_skillModel.SkillAbilityList.Count > 0) dummySkillAbility = modsa_skillModel.SkillAbilityList.ToArray()[0];
 			if (dummySkillAbility == null)
 			{
-				if (MainClass.logEnabled) MainClass.Logg.LogInfo("creating dummy skillability");
-				SkillAbility_Empty sa = new SkillAbility_Empty();
+				MainClass.LogModular("creating dummy skillability");
+				SkillAbility_Empty sa = new();
 				sa._skillModel = modsa_skillModel;
 				sa._index = 0;
 				dummySkillAbility = sa;
@@ -382,8 +382,8 @@ public class ModularSA : Il2CppSystem.Object
 			if (modsa_coinModel.CoinAbilityList.Count > 0) dummyCoinAbility = modsa_coinModel.CoinAbilityList.ToArray()[0];
 			if (dummyCoinAbility == null)
 			{
-				if (MainClass.logEnabled) MainClass.Logg.LogInfo("creating dummy coinability");
-				CoinAbility_Empty ca = new CoinAbility_Empty();
+				MainClass.LogModular("creating dummy coinability");
+				CoinAbility_Empty ca = new();
 				ca._coin = modsa_coinModel;
 				ca._index = modsa_coinModel._originCoinIndex;
 				dummyCoinAbility = ca;
@@ -396,14 +396,7 @@ public class ModularSA : Il2CppSystem.Object
 		if (modsa_luaScript == null)
 		{
 			// normal non-lua execution
-			List<BattleUnitModel> loopTarget_list = new();
-			if (modsa_target_list.Count > 0)
-			{
-				foreach (BattleUnitModel unit in modsa_target_list)
-				{
-					loopTarget_list.Add(unit);
-				}
-			}
+			List<BattleUnitModel> loopTarget_list = modsa_target_list.CopyList();
 			if (modsa_loopString.Any()) loopTarget_list = GetTargetModelList(modsa_loopString);
 			else if (loopTarget_list.Count < 1) loopTarget_list.Add(GetTargetModel("MainTarget"));
 			foreach (BattleUnitModel unit in loopTarget_list)
@@ -414,7 +407,6 @@ public class ModularSA : Il2CppSystem.Object
 				{
 					if (_fullStop) break;
 					string batch = batch_list.ToArray()[i];
-					if (MainClass.logEnabled) MainClass.Logg.LogInfo("batch " + i.ToString() + ": " + batch);
 					ProcessBatch(batch);
 				}
 			}
@@ -440,11 +432,11 @@ public class ModularSA : Il2CppSystem.Object
 						throw new LuaException("LUA main is not a function: " + modsa_luaScriptMain);
 					}
 
-					MainClass.Logg.LogInfo($"Invoking Lua main function: {modsa_luaScriptMain}");
+					MainClass.LogModular($"Invoking Lua main function: {modsa_luaScriptMain}");
 					LuaValue[] args = GetLuaValueArgs();
 					mainFunction.InvokeAsync(state, args).GetAwaiter().GetResult();
 				}
-				MainClass.Logg.LogInfo($"Lua Script executed successfully: {result}");
+				MainClass.LogModular($"Lua Script executed successfully: {result}");
 			}
 			catch (Exception ex)
 			{
@@ -470,8 +462,9 @@ public class ModularSA : Il2CppSystem.Object
 
 	private LuaValue ParseLuaValue(string rawstring)
 	{
-		if (string.Equals(rawstring, "nil", StringComparison.OrdinalIgnoreCase) ||
-				string.Equals(rawstring, "null", StringComparison.OrdinalIgnoreCase))
+		if (rawstring == null || 
+		    string.Equals(rawstring, "nil", StringComparison.OrdinalIgnoreCase) || 
+		    string.Equals(rawstring, "null", StringComparison.OrdinalIgnoreCase))
 		{
 			return LuaValue.Nil;
 		}
@@ -506,13 +499,13 @@ public class ModularSA : Il2CppSystem.Object
 		if (mode == -1) mode = 0;
 		else idx++;
 
-		char[] ifSeparator = new char[] { '<', '>', '=' };
+		char[] ifSeparator = ['<', '>', '='];
 		bool success = false;
 		bool success_first = false;
 		for (int i = idx; i < circles.Length; i++)
 		{
 			string circle_string = circles[i];
-			var symbols = Regex.Matches(circle_string, "(<|>|=)", RegexOptions.IgnoreCase, System.TimeSpan.FromMinutes(1));
+			var symbols = Regex.Matches(circle_string, "(<|>|=)", RegexOptions.IgnoreCase, TimeSpan.FromMinutes(1));
 			string[] parameters = circle_string.Split(ifSeparator);
 			string firstParam = parameters[0];
 			string secondParam = parameters[1];
@@ -543,7 +536,7 @@ public class ModularSA : Il2CppSystem.Object
 				}
 			}
 		}
-		MainClass.Logg.LogInfo("ifsuccess: " + param + " | " + success);
+		MainClass.LogModular("ifsuccess: " + param + " | " + success);
 		return success;
 	}
 
@@ -587,7 +580,7 @@ public class ModularSA : Il2CppSystem.Object
 
 	public List<BattleUnitModel> GetTargetModelList(string param)
 	{
-		List<BattleUnitModel> unitList = new List<BattleUnitModel>();
+		List<BattleUnitModel> unitList = new List<BattleUnitModel>(8);
 		SinManager sinManager_inst = Singleton<SinManager>.Instance;
 		BattleObjectManager battleObjectManager = sinManager_inst._battleObjectManager;
 
@@ -749,7 +742,6 @@ public class ModularSA : Il2CppSystem.Object
 			{
 				if (unit is BattleUnitModel_Abnormality || !unit.IsAbnormalityOrPart) unitList.Add(unit);
 			}
-			return unitList;
 		}
 		else if (param == "EveryAbnoCoreAlly")
 		{
@@ -757,7 +749,6 @@ public class ModularSA : Il2CppSystem.Object
 			{
 				if (unit is BattleUnitModel_Abnormality) unitList.Add(unit);
 			}
-			return unitList;
 		}
 		else if (param == "EveryCoreEnemy")
 		{
@@ -765,7 +756,6 @@ public class ModularSA : Il2CppSystem.Object
 			{
 				if (unit is BattleUnitModel_Abnormality || !unit.IsAbnormalityOrPart) unitList.Add(unit);
 			}
-			return unitList;
 		}
 		else if (param == "EveryAbnoCoreEnemy")
 		{
@@ -773,7 +763,6 @@ public class ModularSA : Il2CppSystem.Object
 			{
 				if (unit is BattleUnitModel_Abnormality) unitList.Add(unit);
 			}
-			return unitList;
 		}
 		else
 		{
@@ -833,7 +822,7 @@ public class ModularSA : Il2CppSystem.Object
 
 		if (param.Contains("AbnoOnly"))
 		{
-			System.Collections.Generic.List<BattleUnitModel> goodones = new();
+			System.Collections.Generic.List<BattleUnitModel> goodones = new(list.Capacity);
 			foreach (BattleUnitModel unit in list)
 			{
 				if (unit.IsAbnormalityOrPart) goodones.Add(unit);
@@ -842,7 +831,7 @@ public class ModularSA : Il2CppSystem.Object
 		}
 		else if (param.Contains("NoAbnos"))
 		{
-			System.Collections.Generic.List<BattleUnitModel> goodones = new();
+			System.Collections.Generic.List<BattleUnitModel> goodones = new(list.Capacity);
 			foreach (BattleUnitModel unit in list)
 			{
 				if (!unit.IsAbnormalityOrPart) goodones.Add(unit);
@@ -979,7 +968,6 @@ public class ModularSA : Il2CppSystem.Object
 		for (int i = 0; i < batches.Length; i++)
 		{
 			string batch = batches[i];
-			if (MainClass.logEnabled) MainClass.Logg.LogInfo("batch " + i.ToString() + ": " + batch);
 			if (batch.StartsWith("TIMING:"))
 			{
 				string timingArg = batch.Remove(0, 7);
@@ -1001,25 +989,25 @@ public class ModularSA : Il2CppSystem.Object
 					BUFF_UNIQUE_KEYWORD parsedKeyword = CustomBuffs.ParseBuffUniqueKeyword(hitArgs);
 					if (parsedKeyword.ToString() != hitArgs) parsedKeyword = BUFF_UNIQUE_KEYWORD.None;
 					keywordTrigger = parsedKeyword;
-					MainClass.Logg.LogInfo("Parsed buff keyword and set to keywordTrigger: " + hitArgs);
+					MainClass.LogModular("Parsed buff keyword and set to keywordTrigger: " + hitArgs);
 					if (!Enum.TryParse(hitArgs, true, out KeyCode parsedKey))
 					{
 						parsedKey = KeyCode.LeftControl;
 					}
 					SpecialKey = parsedKey;
-					MainClass.Logg.LogInfo("Parsed key and set to SpecialKey: " + hitArgs);
+					MainClass.LogModular("Parsed key and set to SpecialKey: " + hitArgs);
 				}
 				else if (circle_0 == "SpecialAction")
 				{
-					MainClass.Logg.LogInfo("SpecialAction with no parsed key, default to LeftControl");
+					MainClass.LogModular("SpecialAction with no parsed key, default to LeftControl");
 				}
 				else if (circle_0 == "OnGainBuff")
 				{
-					MainClass.Logg.LogInfo("OnGainBuff with no parsed keyword, default to None");
+					MainClass.LogModular("OnGainBuff with no parsed keyword, default to None");
 				}
 				//else if (circle_0 == "ChangeTakeDamage")
 				//{
-				//	MainClass.Logg.LogInfo("ChangeTakeDamage with no parsed keyword, default to None");
+				//	MainClass.LogModular("ChangeTakeDamage with no parsed keyword, default to None");
 				//}
 			}
 			else if (batch.StartsWith("LUA:", StringComparison.OrdinalIgnoreCase))
@@ -1074,7 +1062,6 @@ public class ModularSA : Il2CppSystem.Object
 		string[] batchArgs = batch.Split(':');
 		for (int i = 0; i < batchArgs.Length; i++)
 		{
-			if (MainClass.logEnabled) MainClass.Logg.LogInfo("batchArgs " + i.ToString() + ": " + batchArgs[i]);
 			if (batchArgs[i].StartsWith("STOPIF") || batchArgs[i].StartsWith("CONTINUEIF"))
 			{
 				if (!CheckIF(batchArgs[i]))
@@ -1113,7 +1100,7 @@ public class ModularSA : Il2CppSystem.Object
 		}
 		else
 		{
-			MainClass.Logg.LogInfo("Invalid Consequence: " + mEth);
+			MainClass.LogModular("Invalid Consequence: " + mEth);
 		}
 	}
 
@@ -1130,7 +1117,6 @@ public class ModularSA : Il2CppSystem.Object
 			string symbol_string = symbols[i].Value;
 			char symbol = symbol_string[0];
 			int amount = GetNumFromParamString(param);
-			if (MainClass.logEnabled) MainClass.Logg.LogInfo("mathparam " + param + " | mathsymbol " + symbol);
 
 			switch (symbol)
 			{
@@ -1149,7 +1135,6 @@ public class ModularSA : Il2CppSystem.Object
 
 	private int AcquireValue(string section)
 	{
-		if (MainClass.logEnabled) MainClass.Logg.LogInfo("AcquireValue " + section);
 		string[] sectionArgs = section.Split(parenthesisSeparator);
 
 		if (char.IsNumber(section.Last())) return GetNumFromParamString(sectionArgs[0]);
@@ -1164,7 +1149,7 @@ public class ModularSA : Il2CppSystem.Object
 			return acquirer.ExecuteAcquirer(this, section, circledSection, circles);
 		}
 
-		MainClass.Logg.LogInfo("Invalid Getter: " + methodology);
+		MainClass.LogModular("Invalid Getter: " + methodology);
 		return -1;
 	}
 
@@ -1193,7 +1178,7 @@ public class ModularSA : Il2CppSystem.Object
 		{
 			var args = LuaToConsequenceArgs(context, name);
 			var circledSection = String.Join(",", args);
-			MainClass.Logg.LogInfo($"Lua -> Modular: {name}({circledSection})");
+			MainClass.LogModular($"Lua -> Modular: {name}({circledSection})");
 			MainClass.consequenceDict[name].ExecuteConsequence(this, $"{name}(${circledSection})", circledSection, args);
 			return ValueTask.FromResult(0);
 		});
@@ -1205,7 +1190,7 @@ public class ModularSA : Il2CppSystem.Object
 		{
 			var args = LuaToConsequenceArgs(context, name);
 			var circledSection = String.Join(",", args);
-			MainClass.Logg.LogInfo($"Lua -> Modular: {name}({circledSection})");
+			MainClass.LogModular($"Lua -> Modular: {name}({circledSection})");
 			buffer.Span[0] = MainClass.acquirerDict[name].ExecuteAcquirer(this, $"{name}(${circledSection})", circledSection, args);
 			return ValueTask.FromResult(1);
 		});
