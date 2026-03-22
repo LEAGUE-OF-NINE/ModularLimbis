@@ -47,12 +47,12 @@ public class ConsequenceGiveSkillScript : IModularConsequence
 					
 				List<AbilityData> abilityData_list = skill_self.GetSkillAbilityScript();
 				string abilityScriptname = abilityData_list[index].ScriptName;
-				abilityScriptname = "Modular/TIMING:" + abilityScriptname;
+				string fullscript = "Modular/TIMING:" + abilityScriptname;
 					
 				long ptr = skill.Pointer.ToInt64();
 					
 				var modsa = new ModularSA();
-				modsa.originalString = abilityScriptname;
+				modsa.originalString = fullscript;
 				modsa.modsa_skillModel = skill;
 				modsa.ptr_intlong = ptr;
 
