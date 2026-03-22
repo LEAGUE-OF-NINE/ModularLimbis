@@ -2487,11 +2487,23 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnStartEnemyAttack))]
 	[HarmonyPostfix]
-	private static void Postfix_BattleUnitModel_OnEndEnemttack(BattleActionModel action, BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
+	private static void Postfix_BattleUnitModel_OnStartEnemyAttack(BattleActionModel action, BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
 	{
 		int actevent = MainClass.timingDict["EnemyBeforeAttack"];
 		BattleUnitModel attacker = action.Model;
 		SkillModel skill = action.Skill;
+		
+		foreach (BuffModel buffModel in __instance._buffDetail.GetActivatedBuffModelAll())
+		{
+			foreach (ModularSA modba in GetAllModbaFromBuffModel(buffModel))
+			{
+				modba.modsa_buffModel = buffModel;
+				modba.modsa_target_list.Clear();
+				modba.modsa_target_list.Add(__instance);
+				modba.Enact(__instance, skill, action, null, actevent, timing);
+			}
+		}
+		
 		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
 			{
@@ -2510,6 +2522,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modpa.Enact(attacker, skill, action, null, actevent, timing);
 			}
 		}
+		
 	}
 	
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnEndEnemyAttack))]
@@ -2519,6 +2532,18 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		int actevent = MainClass.timingDict["EnemyEndSkill"];
 		BattleUnitModel attacker = action.Model;
 		SkillModel skill = action.Skill;
+		
+		foreach (BuffModel buffModel in __instance._buffDetail.GetActivatedBuffModelAll())
+		{
+			foreach (ModularSA modba in GetAllModbaFromBuffModel(buffModel))
+			{
+				modba.modsa_buffModel = buffModel;
+				modba.modsa_target_list.Clear();
+				modba.modsa_target_list.Add(__instance);
+				modba.Enact(__instance, skill, action, null, actevent, timing);
+			}
+		}
+		
 		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
 			{
