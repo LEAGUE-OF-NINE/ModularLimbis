@@ -214,6 +214,12 @@ public class MainClass : BasePlugin
 		consequenceDict["setlevel"] = new ConsequenceSetLevel();
 		consequenceDict["setmaxhp"] = new ConsequenceSetMaxHp();
 		consequenceDict["changesp"] = new ConsequenceChangeSp();
+		consequenceDict["adddefaultskillbyid"] = new ConsequenceAddDefaultSkillByID();
+		consequenceDict["addskilltopool"] = new ConsequenceAddSkillToPool();
+		consequenceDict["dropskill"] = new ConsequenceDropSkill();
+		consequenceDict["giveskillscript"] = new ConsequenceGiveSkillScript();
+		consequenceDict["appearancelocalscale"] = new ConsequenceAppearanceLocalScale();
+		consequenceDict["appearancelocaleuler"] = new ConsequenceAppearanceLocalEuler();
 		//consequenceDict["sinbuffmult"] = new ConsequenceSinBuffMult();
 
 		// legacy consequences
