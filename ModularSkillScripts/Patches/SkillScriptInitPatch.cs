@@ -26,12 +26,12 @@ public class SkillScriptInitPatch
 				modpa.Enact(unitModel, skillModel_inst, selfAction, oppoAction, acteventint, timing);
 			}
 		}
-		foreach (PassiveModel passiveModel in __instance.EgoPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in __instance.EgoPassiveList)
 		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
 				if (resetWhenUse && modpa.resetWhenUse) modpa.ResetAdders(); // on-demand power adder reset (used for passives)
-				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.Enact(unitModel, skillModel_inst, selfAction, oppoAction, acteventint, timing);
 			}
 		}
@@ -625,16 +625,16 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modpa.Enact(action.Model, action.Skill, action, null, actevent, BATTLE_EVENT_TIMING.NONE);
 			}
 		}
-		foreach (PassiveModel passiveModel in __instance.EgoPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in __instance.EgoPassiveList)
 		{
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+			if (!egoPassiveModel.CheckActiveCondition()) continue;
+			long passiveModel_intlong = egoPassiveModel.Pointer.ToInt64();
 			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
 
 			foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
 			{
 				if (Input.GetKeyInt(KeyCode.LeftControl)) MainClass.Logg.LogInfo("Found modpassive - OnBeforeDefense: " + modpa.passiveID);
-				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.Enact(action.Model, action.Skill, action, null, actevent, BATTLE_EVENT_TIMING.NONE);
 			}
 		}
@@ -674,15 +674,15 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modpa.Enact(deadUnit, null, null, actionOrNull, actevent_OnDie, timing);
 			}
 		}
-		foreach (PassiveModel passiveModel in __instance.EgoPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in __instance.EgoPassiveList)
 		{
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+			if (!egoPassiveModel.CheckActiveCondition()) continue;
+			long passiveModel_intlong = egoPassiveModel.Pointer.ToInt64();
 			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
 
 			foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
 			{
-				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(killer);
 				modpa.modsa_killerModel = killer;
@@ -695,7 +695,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		BattleObjectManager battleObjManager_inst = SingletonBehavior<BattleObjectManager>.Instance;
 		foreach (BattleUnitModel unit in battleObjManager_inst.GetAliveListExceptSelf(deadUnit, false, false))
 		{
-			foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList) {
+			foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList.CopyList()) {
 				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 					modpa.modsa_passiveModel = passiveModel;
 					modpa.modsa_target_list.Clear();
@@ -706,9 +706,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				}
 			}
 
-			foreach (PassiveModel passiveModel in unit._passiveDetail.EgoPassiveList) {
-				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
-					modpa.modsa_passiveModel = passiveModel;
+			foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail.EgoPassiveList.CopyList()) {
+				foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+					modpa.modsa_passiveModel = egoPassiveModel;
 					modpa.modsa_target_list.Clear();
 					modpa.modsa_target_list.Add(deadUnit);
 					modpa.modsa_killerModel = killer;
@@ -759,17 +759,17 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	private static void Postfix_BattleUnitModel_Abnormality_GetActionSlotAdder(ref int __result, BattleUnitModel_Abnormality __instance)
 	{
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList)
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
 		{
 			if (!passiveModel.CheckActiveCondition()) continue;
 			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
 			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
 			foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) __result += modpa.slotAdder;
 		}
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
 		{
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+			if (!egoPassiveModel.CheckActiveCondition()) continue;
+			long passiveModel_intlong = egoPassiveModel.Pointer.ToInt64();
 			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
 			foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) __result += modpa.slotAdder;
 		}
@@ -782,7 +782,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		int actevent_OnBreak = MainClass.timingDict["OnBreak"];
 		int actevent_OnOtherBreak = MainClass.timingDict["OnOtherBreak"];
 		BattleUnitModel brokeUnit = __instance;
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList) {
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
 			if (!passiveModel.CheckActiveCondition()) continue;
 			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
 			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
@@ -792,15 +792,15 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modpa.Enact(brokeUnit, null, null, null, actevent_OnBreak, timing);
 			}
 		}
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
 		{
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+			if (!egoPassiveModel.CheckActiveCondition()) continue;
+			long passiveModel_intlong = egoPassiveModel.Pointer.ToInt64();
 			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
 
 			foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
 			{
-				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.Enact(brokeUnit, null, null, null, actevent_OnBreak, timing);
 			}
 		}
@@ -809,7 +809,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		BattleObjectManager battleObjManager_inst = SingletonBehavior<BattleObjectManager>.Instance;
 		foreach (BattleUnitModel unit in battleObjManager_inst.GetAliveListExceptSelf(brokeUnit, false, false))
 		{
-			foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList)
+			foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList.CopyList())
 			{
 				if (!passiveModel.CheckActiveCondition()) continue;
 				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
@@ -823,15 +823,15 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 					modpa.Enact(unit, null, null, null, actevent_OnOtherBreak, timing);
 				}
 			}
-			foreach (PassiveModel passiveModel in unit._passiveDetail.EgoPassiveList)
+			foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail.EgoPassiveList.CopyList())
 			{
-				if (!passiveModel.CheckActiveCondition()) continue;
-				long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+				if (!egoPassiveModel.CheckActiveCondition()) continue;
+				long passiveModel_intlong = egoPassiveModel.Pointer.ToInt64();
 				if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
 
 				foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
 				{
-					modpa.modsa_passiveModel = passiveModel;
+					modpa.modsa_passiveModel = egoPassiveModel;
 					modpa.modsa_target_list.Clear();
 					modpa.modsa_target_list.Add(brokeUnit);
 					modpa.Enact(unit, null, null, null, actevent_OnOtherBreak, timing);
@@ -886,15 +886,15 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modpa.Enact(__instance._owner, null, null, null, actevent, timing);
 			}
 		}
-		foreach (PassiveModel passiveModel in __instance.EgoPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in __instance.EgoPassiveList)
 		{
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+			if (!egoPassiveModel.CheckActiveCondition()) continue;
+			long passiveModel_intlong = egoPassiveModel.Pointer.ToInt64();
 			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
 
 			foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
 			{
-				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(explodedUnit);
 				modpa.Enact(__instance._owner, null, null, null, actevent, timing);
@@ -936,7 +936,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		int finalDmgChange = resultDmg;
 		int actevent_ChangeTakeDamage = MainClass.timingDict["ChangeTakeDamage"];
 
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList)
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
 			{
@@ -954,9 +954,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
 		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
 				//if (modpa.activationTiming != actevent_ChangeTakeDamage) continue;
 				//BUFF_UNIQUE_KEYWORD trigger = modpa.keywordTrigger;
@@ -965,7 +965,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modpa.ischangedamagetaken = false;
 				modpa.changedamagetaken = 0;
 				modpa.lastFinalDmg = resultDmg;
-				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.changedamage_source = dmgSrcType;
 				modpa.Enact(__instance, null, null, null, actevent_ChangeTakeDamage, timing);
 				if (modpa.ischangedamagetaken) finalDmgChange = modpa.changedamagetaken;
@@ -984,7 +984,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	//{
 	//	int actevent_ChangeSinBuffDamage = MainClass.timingDict["ChangeSinBuffDamage"];
 
-	//	foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList)
+	//	foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
 	//	{
 	//		foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
 	//		{
@@ -998,7 +998,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	//		}
 	//	}
 
-	//	foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList)
+	//	foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
 	//	{
 	//		foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
 	//		{
@@ -1020,7 +1020,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	{
 		if (isInstantDeath) return;
 		int actevent = MainClass.timingDict["Immortal"];
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList) {
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 				modpa.immortality = false;
 				modpa.modsa_passiveModel = passiveModel;
@@ -1028,10 +1028,10 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				if (modpa.immortality) __result = true;
 			}
 		}
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList()) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
 				modpa.immortality = false;
-				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.Enact(__instance, null, null, null, actevent, timing);
 				if (modpa.immortality) __result = true;
 			}
@@ -1055,7 +1055,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	{
 		if (isInstantDeath) return;
 		int actevent = MainClass.timingDict["ImmortalOther"];
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList)
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
 			{
@@ -1067,12 +1067,12 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				if (modpa.immortality) __result = true;
 			}
 		}
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
 		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
 				modpa.immortality = false;
-				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(checkTarget);
 				modpa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
@@ -1100,7 +1100,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	private static void Postfix_BattleUnitModel_IgnorePanic(ref bool __result, BattleUnitModel __instance)
 	{
 		int actevent = MainClass.timingDict["IgnorePanic"];
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList)
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
 			{
@@ -1110,12 +1110,12 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				if (modpa.ignorepanic) __result = true;
 			}
 		}
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
 		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
 				modpa.ignorepanic = false;
-				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 				if (modpa.ignorepanic) __result = true;
 			}
@@ -1140,7 +1140,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	private static void Postfix_BattleUnitModel_IgnoreBreak(ref bool __result, BattleUnitModel __instance)
 	{
 		int actevent = MainClass.timingDict["IgnoreBreak"];
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList)
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
 			{
@@ -1150,12 +1150,12 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				if (modpa.ignorebreak) __result = true;
 			}
 		}
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
 		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
 				modpa.ignorebreak = false;
-				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 				if (modpa.ignorebreak) __result = true;
 			}
@@ -1201,7 +1201,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList) {
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList.CopyList()) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 				if (modpa.activationTiming == actevent_FakePower) continue;
 				int power = modpa.coinScaleAdder;
@@ -1209,7 +1209,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList)
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
 			{
@@ -1244,7 +1244,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList) {
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList.CopyList()) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 				if (modpa.activationTiming == actevent_FakePower) continue;
 				int power = modpa.skillPowerAdder;
@@ -1253,7 +1253,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList)
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
 			{
@@ -1300,7 +1300,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList) {
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList.CopyList()) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 				if (modpa.activationTiming == actevent_FakePower) continue;
 				int power = modpa.skillPowerResultAdder;
@@ -1309,7 +1309,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList)
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
 			{
@@ -1347,7 +1347,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (PassiveModel passiveModel in actorAction.Model._passiveDetail.PassiveList) {
+		foreach (PassiveModel passiveModel in actorAction.Model._passiveDetail.PassiveList.CopyList()) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 				if (modpa.activationTiming == actevent_FakePower) continue;
 				int power = modpa.parryingResultAdder;
@@ -1356,9 +1356,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (PassiveModel passiveModel in actorAction.Model._passiveDetail.EgoPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in actorAction.Model._passiveDetail.EgoPassiveList.CopyList())
 		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
 				if (modpa.activationTiming == actevent_FakePower) continue;
 				int power = modpa.parryingResultAdder;
@@ -1398,14 +1398,14 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			__result += modca.critAdder / 100f;
 		}
 		
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList) {
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList.CopyList()) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 				if (modpa.activationTiming == actevent_FakePower) continue;
 				__result += modpa.critAdder / 100f;
 			}
 		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList)
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
 			{
@@ -1447,7 +1447,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			if (power != 0) __result += power;
 		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList) {
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList.CopyList()) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 				if (modpa.activationTiming == actevent_FakePower) continue;
 				int power = modpa.atkDmgAdder;
@@ -1455,7 +1455,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (EgoPassiveModel egoPassiveModel in action.Model._passiveDetail.EgoPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in action.Model._passiveDetail.EgoPassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
@@ -1498,7 +1498,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			if (power != 0) __result += power * 0.01f;
 		}
 		
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList) {
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList.CopyList()) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 				if (modpa.activationTiming == actevent_FakePower) continue;
 				int power = modpa.atkMultAdder;
@@ -1506,7 +1506,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList)
+		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
 			{
@@ -1554,7 +1554,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList)
+		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
 			{
@@ -1562,11 +1562,11 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modpa.Enact(unit, __instance, action, null, actevent, timing);
 			}
 		}
-		foreach (PassiveModel passiveModel in unit._passiveDetail.EgoPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail.EgoPassiveList.CopyList())
 		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
-				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.Enact(unit, __instance, action, null, actevent, timing);
 			}
 		}
@@ -1645,7 +1645,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (PassiveModel passiveModel in ownerAction.Model._passiveDetail.PassiveList) {
+		foreach (PassiveModel passiveModel in ownerAction.Model._passiveDetail.PassiveList.CopyList()) {
 			if (!passiveModel.CheckActiveCondition()) continue;
 			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
 			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
@@ -1655,7 +1655,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modpa.Enact(ownerAction.Model, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
-		foreach (PassiveModel passiveModel in ownerAction.Model._passiveDetail.EgoPassiveList)
+		foreach (PassiveModel passiveModel in ownerAction.Model._passiveDetail.EgoPassiveList.CopyList())
 		{
 			if (!passiveModel.CheckActiveCondition()) continue;
 			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
@@ -2158,7 +2158,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				}
 			}
 
-			foreach (PassiveModel passiveModel in attacker._passiveDetail.PassiveList) {
+			foreach (PassiveModel passiveModel in attacker._passiveDetail.PassiveList.CopyList()) {
 				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 					modpa.lastFinalDmg = realDmg;
 					modpa.lastHpDmg = hpDamage;
@@ -2170,13 +2170,13 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 					modpa.Enact(attacker, action.Skill, action, null, actevent_OSA, timing);
 				}
 			}
-			foreach (PassiveModel passiveModel in attacker._passiveDetail.EgoPassiveList) {
-				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
+			foreach (EgoPassiveModel egoPassiveModel in attacker._passiveDetail.EgoPassiveList.CopyList()) {
+				foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
 					modpa.lastFinalDmg = realDmg;
 					modpa.lastHpDmg = hpDamage;
 					modpa.wasCrit = isCritical;
 					modpa.modsa_coinModel = coin;
-					modpa.modsa_passiveModel = passiveModel;
+					modpa.modsa_passiveModel = egoPassiveModel;
 					modpa.modsa_target_list.Clear();
 					modpa.modsa_target_list.Add(__instance);
 					modpa.Enact(attacker, action.Skill, action, null, actevent_OSA, timing);
@@ -2212,7 +2212,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList) {
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 				modpa.lastFinalDmg = realDmg;
 				modpa.lastHpDmg = hpDamage;
@@ -2225,13 +2225,13 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false)) {
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList()) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
 				modpa.lastFinalDmg = realDmg;
 				modpa.lastHpDmg = hpDamage;
 				modpa.wasCrit = isCritical;
 				modpa.modsa_coinModel = coin;
-				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(__instance);
 				modpa.Enact(attacker, action.Skill, action, null, actevent_WH, timing);
@@ -2291,7 +2291,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			modca_i++;
 		}*/
 
-		foreach (PassiveModel passiveModel in __instance.Model._passiveDetail.PassiveList) {
+		foreach (PassiveModel passiveModel in __instance.Model._passiveDetail.PassiveList.CopyList()) {
 			if (!passiveModel.CheckActiveCondition()) continue;
 			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
 			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
@@ -2319,7 +2319,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modpaList[i].Enact(__instance.Model, skill, __instance, null, actevent_BSA, timing);
 			}
 		}
-		foreach (PassiveModel passiveModel in target._passiveDetail.PassiveList) {
+		foreach (PassiveModel passiveModel in target._passiveDetail.PassiveList.CopyList()) {
 			if (!passiveModel.CheckActiveCondition()) continue;
 			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
 			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
@@ -2334,7 +2334,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (EgoPassiveModel egoPassiveModel in __instance.Model._passiveDetail.EgoPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in __instance.Model._passiveDetail.EgoPassiveList.CopyList())
 		{
 			if (!egoPassiveModel.CheckActiveCondition()) continue;
 			long passiveModel_intlong = egoPassiveModel.Pointer.ToInt64();
@@ -2351,7 +2351,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (EgoPassiveModel egoPassiveModel in target._passiveDetail.EgoPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in target._passiveDetail.EgoPassiveList.CopyList())
 		{
 			if (!egoPassiveModel.CheckActiveCondition()) continue;
 			long passiveModel_intlong = egoPassiveModel.Pointer.ToInt64();
@@ -2428,7 +2428,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList) {
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
 			if (!passiveModel.CheckActiveCondition()) continue;
 			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
 			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
@@ -2440,15 +2440,15 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modpa.Enact(__instance, skill, actionOrNull, null, actevent, timing);
 			}
 		}
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
 		{
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+			if (!egoPassiveModel.CheckActiveCondition()) continue;
+			long passiveModel_intlong = egoPassiveModel.Pointer.ToInt64();
 			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
 
 			foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
 			{
-				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.modsa_victimModel = target;
 				modpa.modsa_killerModel = __instance;
 				modpa.Enact(__instance, skill, actionOrNull, null, actevent, timing);
@@ -2472,7 +2472,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	private static void Prefix_BattleUnitModel_OnZeroHp(BattleUnitModel __instance)
 	{
 		int actevent = MainClass.timingDict["OnZeroHP"];
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList) {
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
 			if (!passiveModel.CheckActiveCondition()) continue;
 			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
 			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
@@ -2485,51 +2485,70 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	}
 	*/
 
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnStartEnemyAttack))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_OnEndEnemttack(BattleActionModel action, BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
+	{
+		int actevent = MainClass.timingDict["EnemyBeforeAttack"];
+		BattleUnitModel attacker = action.Model;
+		SkillModel skill = action.Skill;
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
+			{
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_target_list.Clear();
+				modpa.modsa_target_list.Add(__instance);
+				modpa.Enact(attacker, skill, action, null, actevent, timing);
+			}
+		}
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList()) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
+			{
+				modpa.modsa_passiveModel = egoPassiveModel;
+				modpa.modsa_target_list.Clear();
+				modpa.modsa_target_list.Add(__instance);
+				modpa.Enact(attacker, skill, action, null, actevent, timing);
+			}
+		}
+	}
+	
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnEndEnemyAttack))]
 	[HarmonyPostfix]
 	private static void Postfix_BattleUnitModel_OnEndEnemyAttack(BattleActionModel action, BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
 	{
 		int actevent = MainClass.timingDict["EnemyEndSkill"];
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList) {
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
-				modpa.modsa_passiveModel = passiveModel;
-				modpa.modsa_target_list.Clear();
-				modpa.modsa_target_list.Add(__instance);
-				modpa.Enact(action.Model, action.Skill, action, null, actevent, timing);
-			}
-		}
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.EgoPassiveList)
-		{
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
+		BattleUnitModel attacker = action.Model;
+		SkillModel skill = action.Skill;
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
 			{
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(__instance);
-				modpa.Enact(action.Model, action.Skill, action, null, actevent, timing);
+				modpa.Enact(attacker, skill, action, null, actevent, timing);
+			}
+		}
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList()) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
+			{
+				modpa.modsa_passiveModel = egoPassiveModel;
+				modpa.modsa_target_list.Clear();
+				modpa.modsa_target_list.Add(__instance);
+				modpa.Enact(attacker, skill, action, null, actevent, timing);
 			}
 		}
 		SupportPasPatch.SupportPassiveInit(modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
-		{
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList) {
 			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
+			foreach (ModularSA modpa in modpaList)
 			{
 				supportPassive._script._owner = action.Model;
-				modpaList[i].modsa_target_list.Clear();
-				modpaList[i].modsa_target_list.Add(__instance);
-				modpaList[i].Enact(action.Model, action.Skill, action, null, actevent, timing);
+				modpa.modsa_target_list.Clear();
+				modpa.modsa_target_list.Add(__instance);
+				modpa.Enact(attacker, skill, action, null, actevent, timing);
 			}
 		}
 	}
-
 
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnStartCoin))]
 	[HarmonyPostfix]
@@ -2559,7 +2578,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList)
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
 			{
@@ -2568,7 +2587,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modpa.Enact(__instance, skill, action, null, actevent, timing);
 			}
 		}
-		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
@@ -2589,7 +2608,73 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 	}
-	// end
+	
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnRollOneCoin_AfterAttack))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_OnCoinAfterAttack(BattleActionModel action, CoinModel coin, int value, BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
+	{
+		int actevent = MainClass.timingDict["OnCoinAfterAttack"];
+		SkillModel skill = action.Skill;
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill))
+		{
+			modsa.modsa_coinModel = coin;
+			modsa.lastFinalDmg = value;
+			modsa.Enact(__instance, skill, action, null, actevent, timing);
+		}
+		
+		foreach (ModularSA modca in GetAllModcaFromCoinModel(coin)) {
+			modca.modsa_coinModel = coin;
+			modca.lastFinalDmg = value;
+			modca.Enact(__instance, skill, action, null, actevent, timing);
+		}
+
+		foreach (BuffModel buffModel in __instance._buffDetail.GetActivatedBuffModelAll())
+		{
+			foreach (ModularSA modba in GetAllModbaFromBuffModel(buffModel))
+			{
+				modba.modsa_coinModel = coin;
+				modba.modsa_buffModel = buffModel;
+				modba.lastFinalDmg = value;
+				modba.Enact(__instance, skill, action, null, actevent, timing);
+			}
+		}
+
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
+			{
+				modpa.modsa_coinModel = coin;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.lastFinalDmg = value;
+				modpa.Enact(__instance, skill, action, null, actevent, timing);
+			}
+		}
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
+			{
+				modpa.modsa_coinModel = coin;
+				modpa.modsa_passiveModel = egoPassiveModel;
+				modpa.lastFinalDmg = value;
+				modpa.Enact(__instance, skill, action, null, actevent, timing);
+			}
+		}
+		
+		/*
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		{
+			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
+			foreach (ModularSA modpa in modpaList)
+			{
+				supportPassive._script._owner = __instance;
+				modpa.modsa_coinModel = coin;
+				modpa.lastFinalDmg = value;
+				modpa.Enact(__instance, skill, action, null, actevent, timing);
+			}
+		}*/
+	}
 
 	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.OpenSkillInfoUI))]
 	[HarmonyPrefix]

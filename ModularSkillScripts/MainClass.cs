@@ -76,7 +76,9 @@ public class MainClass : BasePlugin
 		timingStringList.Add("WinParrying"); // 47
 		timingStringList.Add("DefeatParrying"); // 48
 		timingStringList.Add("ChangeTakeDamage"); // 49
-		//timingStringList.Add("ChangeSinBuffDamage"); // 50
+		timingStringList.Add("OnCoinAfterAttack");
+		timingStringList.Add("EnemyBeforeAttack");
+		//timingStringList.Add("ChangeSinBuffDamage");
 		timingStringList.Add("DelayedStart"); // HBMBACMAB
 
 		Il2CppArrayBase<string> timingStringArray = timingStringList.ToArray();
@@ -432,7 +434,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.6.6";
+	public const string VERSION = "4.6.7";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
