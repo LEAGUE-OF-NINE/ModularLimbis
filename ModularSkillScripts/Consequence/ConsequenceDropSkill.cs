@@ -9,13 +9,13 @@ public class ConsequenceDropSkill : IModularConsequence
 		BattleActionModel action = modular.modsa_selfAction;
 		if (action != null)
 		{
-			action.SinAction.ReplaceReadySkillAtoB(skillID);
-			return;
+			if (circles.Length < 2) action.SinAction.ReplaceReadySkillAtoB(skillID);
+			else
+			{
+				int slotID = modular.GetNumFromParamString(circles[1]);
+				unit.ReplaceReadySkillAtoB(skillID, -1, slotID);
+			}
 		}
-
-		if (circles.Length < 2) return;
 		//unit.AddNewSinActionModelWithSkill(skillID);
-		int slotID = modular.GetNumFromParamString(circles[1]);
-		unit.ReplaceReadySkillAtoB(skillID, -1, slotID);
 	} // END ExecuteConsequence
 } // END IModularConsequence
