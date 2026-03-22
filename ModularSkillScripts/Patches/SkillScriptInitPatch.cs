@@ -2485,6 +2485,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	}
 	*/
 
+	/*
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnStartEnemyAttack))]
 	[HarmonyPostfix]
 	private static void Postfix_BattleUnitModel_OnStartEnemyAttack(BattleActionModel opponentAction, BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
@@ -2523,7 +2524,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 		
-	}
+	}*/
 	
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnEndEnemyAttack))]
 	[HarmonyPostfix]
