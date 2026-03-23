@@ -6,16 +6,28 @@ public class ConsequenceSetData : IModularConsequence
 {
 	public void ExecuteConsequence(ModularSA modular, string section, string circledSection, string[] circles)
 	{
-		var modelList = modular.GetTargetModelList(circles[0]);
-		if (modelList.Count < 1) return;
-
-		int dataID = modular.GetNumFromParamString(circles[1]);
-		int dataValue = modular.GetNumFromParamString(circles[2]);
-
-		foreach (BattleUnitModel targetModel in modelList)
+		string circle_0 = circles[0];
+		if (circle_0 == "Encounter")
 		{
-			long targetPtr_intlong = targetModel.Pointer.ToInt64();
-			SkillScriptInitPatch.SetModUnitData(targetPtr_intlong, dataID, dataValue);
+			int dataID = modular.GetNumFromParamString(circles[1]);
+			int dataValue = modular.GetNumFromParamString(circles[2]);
+			SkillScriptInitPatch.SetModUnitData(0, dataID, dataValue);
 		}
+		else
+		{
+			var modelList = modular.GetTargetModelList(circles[0]);
+			if (modelList.Count < 1) return;
+
+			int dataID = modular.GetNumFromParamString(circles[1]);
+			int dataValue = modular.GetNumFromParamString(circles[2]);
+
+			foreach (BattleUnitModel targetModel in modelList)
+			{
+				long targetPtr_intlong = targetModel.Pointer.ToInt64();
+				SkillScriptInitPatch.SetModUnitData(targetPtr_intlong, dataID, dataValue);
+			}
+		}
+		
+		
 	}
 }
