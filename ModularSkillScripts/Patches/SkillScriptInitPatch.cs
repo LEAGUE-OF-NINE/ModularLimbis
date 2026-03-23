@@ -1040,12 +1040,12 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
 		{
 			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
+			foreach (ModularSA modpa in modpaList)
 			{
-				modpaList[i].immortality = false;
+				modpa.immortality = false;
 				supportPassive._script._owner = __instance;
-				modpaList[i].Enact(__instance, null, null, null, actevent, timing);
-				if (modpaList[i].immortality) __result = true;
+				modpa.Enact(__instance, null, null, null, actevent, timing);
+				if (modpa.immortality) __result = true;
 			}
 		}
 	}
