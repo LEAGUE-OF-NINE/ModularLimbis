@@ -220,6 +220,7 @@ public class MainClass : BasePlugin
 		consequenceDict["giveskillscript"] = new ConsequenceGiveSkillScript();
 		consequenceDict["appearancelocalscale"] = new ConsequenceAppearanceLocalScale();
 		consequenceDict["appearancelocaleuler"] = new ConsequenceAppearanceLocalEuler();
+		consequenceDict["bonusdmgbybuff"] = new ConsequenceBonusDmgByBuff();
 		//consequenceDict["sinbuffmult"] = new ConsequenceSinBuffMult();
 
 		// legacy consequences
@@ -440,7 +441,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.6.7";
+	public const string VERSION = "4.6.8";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
