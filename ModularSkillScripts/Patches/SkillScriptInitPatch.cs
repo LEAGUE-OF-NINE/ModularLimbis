@@ -2029,12 +2029,14 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	private static void Postfix_BuffModel_OnVibrationExplosion(BattleUnitModel unit, BattleUnitModel giverOrNull, BattleActionModel actionOrNull, ABILITY_SOURCE_TYPE abilitySrc, BATTLE_EVENT_TIMING timing, BuffModel __instance)
 	{
 		int actevent = MainClass.timingDict["OnBurst"];
+		SkillModel skillOrNull = null;
+		if (actionOrNull != null) skillOrNull = actionOrNull.Skill;
 		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance))
 		{
 			modba.modsa_target_list.Clear();
 			modba.modsa_target_list.Add(giverOrNull);
 			modba.modsa_buffModel = __instance;
-			modba.Enact(unit, actionOrNull.Skill, actionOrNull, null, actevent, timing);
+			modba.Enact(unit, skillOrNull, actionOrNull, null, actevent, timing);
 		}
 	}
 
