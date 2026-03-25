@@ -349,20 +349,31 @@ public class ModularSA : Il2CppSystem.Object
 
 		if (abilityMode == 2)
 		{
-			MainClass.LogModular("hijacking dummy passive");
-			foreach (PassiveModel otherPassive in modsa_unitModel.UnitDataModel.PassiveList)
-			{
-				if (otherPassive._script == null) continue;
-				dummyPassiveAbility = otherPassive._script;
-				break;
-			}
 			if (dummyPassiveAbility == null)
 			{
-				MainClass.LogModular("creating dummy passive");
+				MainClass.LogModular("Hijacking dummy passive");
+				if (modsa_unitModel._passiveDetail.PassiveList.Count < 1)
+				{
+					const int placeholderPassiveId = 9012602;
+					modsa_unitModel.AddPassive(placeholderPassiveId);
+					MainClass.LogModular("Unit passive count = 0. Adding passive " + placeholderPassiveId);
+				}
+				foreach (PassiveModel otherPassive in modsa_unitModel._passiveDetail.PassiveList)
+				{
+					if (otherPassive._script == null) continue;
+					dummyPassiveAbility = otherPassive._script;
+					break;
+				}
+			}
+			
+			if (dummyPassiveAbility == null)
+			{
+				MainClass.LogModular("Creating dummy passive Ability Script with no Parent PassiveModel (last resort)");
 				PassiveAbility pa = new();
 				pa.Init(modsa_unitModel, new List<PassiveConditionStaticData>(), new List<PassiveConditionStaticData>(), new List<int>());
 				dummyPassiveAbility = pa;
 			}
+			
 		}
 		else
 		{

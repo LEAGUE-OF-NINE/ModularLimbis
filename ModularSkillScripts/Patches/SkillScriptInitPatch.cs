@@ -102,9 +102,9 @@ public class SkillScriptInitPatch
 
 		if (isModular)
 		{
-			PassiveAbility pa = new PassiveAbility();
-			pa.Init(owner, __instance.ClassInfo.attributeResonanceCondition, __instance.ClassInfo.attributeStockCondition, __instance.ClassInfo.controlValueList);
+			PassiveAbility pa = new();
 			__instance._script = pa;
+			pa.Init(owner, __instance.ClassInfo.attributeResonanceCondition, __instance.ClassInfo.attributeStockCondition, __instance.ClassInfo.controlValueList);
 		}
 	}
 
@@ -150,9 +150,9 @@ public class SkillScriptInitPatch
 
 		if (isModular)
 		{
-			EgoPassiveAbility pa = new EgoPassiveAbility();
-			pa.Init(owner, __instance.ClassInfo.attributeResonanceCondition, __instance.ClassInfo.attributeStockCondition, __instance.ClassInfo.controlValueList);
+			EgoPassiveAbility pa = new();
 			__instance._script = pa;
+			pa.Init(owner, __instance.ClassInfo.attributeResonanceCondition, __instance.ClassInfo.attributeStockCondition, __instance.ClassInfo.controlValueList);
 		}
 	}
 
