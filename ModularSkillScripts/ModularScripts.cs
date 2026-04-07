@@ -255,6 +255,7 @@ public class ModularSA : Il2CppSystem.Object
 	//public int atkWeightAdder = 0;
 	public int slotAdder = 0;
 	public int critAdder = 0;
+	public ATK_BEHAVIOUR atktype = ATK_BEHAVIOUR.ERROR;
 
 	public bool wasCrit = false;
 	public bool wasClash = false;

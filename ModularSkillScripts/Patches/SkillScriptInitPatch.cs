@@ -2761,6 +2761,29 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 	}
 
+	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.TryGetOverwriteAtkBehaviour))]
+	[HarmonyPostfix]
+	public static void TryGetOverwriteAtkBehaviour_Postfix(SkillModel __instance, CoinModel coin, ref ATK_BEHAVIOUR atkBehaviour, ref bool __result)
+	{
+		int actevent_FakePower = MainClass.timingDict["FakePower"];
+		long skillmodel_intlong = __instance.Pointer.ToInt64();
+		if (modsaDict.ContainsKey(skillmodel_intlong))
+		{
+			foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
+			{
+				if (modsa.activationTiming == actevent_FakePower) continue;
+				atkBehaviour = modsa.atktype;
+				__result = true;
+			}
+		}
+		foreach (ModularSA modca in GetAllModcaFromCoinModel(coin))
+		{
+			if (modca.activationTiming == actevent_FakePower) continue;
+			atkBehaviour = modca.atktype;
+			__result = true;
+		}
+	}
+
 	[HarmonyPatch(typeof(CharacterAppearance), nameof(CharacterAppearance.ChangeMotion))]
 	[HarmonyPrefix]
 	private static void ChangeMotion(CharacterAppearance __instance, ref MOTION_DETAIL motiondetail, ref int index)
