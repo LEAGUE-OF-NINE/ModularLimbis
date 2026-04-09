@@ -195,7 +195,7 @@ public class ModularSA : Il2CppSystem.Object
 		gainbuff_turn = 0;
 		gainbuff_activeRound = 0;
 		gainbuff_source = ABILITY_SOURCE_TYPE.NONE;
-
+		atktype = ATK_BEHAVIOUR.NONE;
 		changedamage_source = DAMAGE_SOURCE_TYPE.NONE;
 
 		sinbuffmult = 100;
@@ -255,7 +255,7 @@ public class ModularSA : Il2CppSystem.Object
 	//public int atkWeightAdder = 0;
 	public int slotAdder = 0;
 	public int critAdder = 0;
-	public ATK_BEHAVIOUR atktype = ATK_BEHAVIOUR.ERROR;
+	public ATK_BEHAVIOUR atktype = ATK_BEHAVIOUR.NONE;
 
 	public bool wasCrit = false;
 	public bool wasClash = false;

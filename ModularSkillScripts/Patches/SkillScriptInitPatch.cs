@@ -2761,6 +2761,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 	}
 
+	/*
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.TryGetOverwriteAtkBehaviour))]
 	[HarmonyPostfix]
 	public static void TryGetOverwriteAtkBehaviour_Postfix(SkillModel __instance, CoinModel coin, ref ATK_BEHAVIOUR atkBehaviour, ref bool __result)
@@ -2783,7 +2784,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			__result = true;
 		}
 	}
-
+	*/
 	[HarmonyPatch(typeof(CharacterAppearance), nameof(CharacterAppearance.ChangeMotion))]
 	[HarmonyPrefix]
 	private static void ChangeMotion(CharacterAppearance __instance, ref MOTION_DETAIL motiondetail, ref int index)
