@@ -223,6 +223,7 @@ public class MainClass : BasePlugin
 		consequenceDict["bonusdmgbybuff"] = new ConsequenceBonusDmgByBuff();
 		//consequenceDict["sinbuffmult"] = new ConsequenceSinBuffMult();
 		//consequenceDict["changeatktype"] = new ConsequenceChangeAtkType();
+		consequenceDict["atkweight"] = new ConsequenceAtkWeight();
 
 		// legacy consequences
 		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
