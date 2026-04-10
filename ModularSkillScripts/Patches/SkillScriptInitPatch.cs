@@ -1628,8 +1628,6 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				__result += modpaList[i].atkWeightAdder;
 			}
 		}
-
-		if (__result < 0) __result = 0;
 	}
 
 	//[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetAttackWeight))]
