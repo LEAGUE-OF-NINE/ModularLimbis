@@ -2716,6 +2716,11 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 		
 		BattleUnitModel unit = currentSkillViewer.GetModel();
+		if (unit == null)
+		{
+			MainClass.LogModular("StartVisualCoinToss currentSkillViewer.GetModel() is Null. Switching to BattleUnitView.unitModel");
+			unit = __instance.unitModel;
+		}
 		SkillModel skill = currentSkillViewer.GetSkillModel();
 		MainClass.LogModular($"StartVisualCoinToss, skill = {skill.GetID()}");
 		
@@ -2739,11 +2744,16 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		BattleSkillViewer currentSkillViewer = __instance.GetCurrentSkillViewer();
 		if (currentSkillViewer == null)
 		{
-			MainClass.LogModular("StartVisualCoinToss currentSkillViewer is Null");
+			MainClass.LogModular("StartVisualSkillUse currentSkillViewer is Null");
 			return;
 		}
 		
 		BattleUnitModel unit = currentSkillViewer.GetModel();
+		if (unit == null)
+		{
+			MainClass.LogModular("StartVisualSkillUse currentSkillViewer.GetModel() is Null. Switching to BattleUnitView.unitModel");
+			unit = __instance.unitModel;
+		}
 		SkillModel skill = currentSkillViewer.GetSkillModel();
 		MainClass.LogModular($"StartVisualSkillUse, skill = {skill.GetID()}");
 		
