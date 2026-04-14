@@ -222,7 +222,7 @@ public class MainClass : BasePlugin
 		consequenceDict["appearancelocaleuler"] = new ConsequenceAppearanceLocalEuler();
 		consequenceDict["bonusdmgbybuff"] = new ConsequenceBonusDmgByBuff();
 		//consequenceDict["sinbuffmult"] = new ConsequenceSinBuffMult();
-		//consequenceDict["changeatktype"] = new ConsequenceChangeAtkType();
+		consequenceDict["changeatktype"] = new ConsequenceChangeAtkType();
 
 		// legacy consequences
 		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
