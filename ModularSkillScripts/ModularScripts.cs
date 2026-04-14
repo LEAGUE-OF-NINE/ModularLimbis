@@ -243,7 +243,7 @@ public class ModularSA : Il2CppSystem.Object
 		parryingResultAdder = 0;
 		atkDmgAdder = 0;
 		atkMultAdder = 0;
-		//atkWeightAdder = 0;
+		atkWeightAdder = 0;
 		critAdder = 0;
 	}
 	public int coinScaleAdder = 0;
@@ -252,7 +252,7 @@ public class ModularSA : Il2CppSystem.Object
 	public int parryingResultAdder = 0;
 	public int atkDmgAdder = 0;
 	public int atkMultAdder = 0;
-	//public int atkWeightAdder = 0;
+	public int atkWeightAdder = 0;
 	public int slotAdder = 0;
 	public int critAdder = 0;
 	public ATK_BEHAVIOUR atktype = ATK_BEHAVIOUR.NONE;
