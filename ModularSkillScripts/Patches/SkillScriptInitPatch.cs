@@ -2774,16 +2774,22 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			{
 				if (modsa.activationTiming == actevent_FakePower) continue;
 				ATK_BEHAVIOUR atkType = modsa.atktype;
-				if (atkType != ATK_BEHAVIOUR.ERROR || atkType != ATK_BEHAVIOUR.NONE) atkBehaviour = modsa.atktype;
-				__result = true;
+				if (atkType != ATK_BEHAVIOUR.ERROR || atkType != ATK_BEHAVIOUR.NONE)
+				{
+					atkBehaviour = modsa.atktype;
+					__result = true;
+				}
 			}
 		}
 		foreach (ModularSA modca in GetAllModcaFromCoinModel(coin))
 		{
 			if (modca.activationTiming == actevent_FakePower) continue;
 			ATK_BEHAVIOUR atkType = modca.atktype;
-			if (atkType != ATK_BEHAVIOUR.ERROR || atkType != ATK_BEHAVIOUR.NONE) atkBehaviour = modca.atktype;
-			__result = true;
+			if (atkType != ATK_BEHAVIOUR.ERROR || atkType != ATK_BEHAVIOUR.NONE)
+			{
+				atkBehaviour = modca.atktype;
+				__result = true;
+			}
 		}
 	}
 	
