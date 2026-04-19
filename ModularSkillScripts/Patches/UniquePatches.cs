@@ -5,18 +5,24 @@ using BepInEx.Unity.IL2CPP.UnityEngine;
 
 namespace ModularSkillScripts.Patches;
 
-internal class UniquePatches
+public class UniquePatches
 {
 	[HarmonyPatch(typeof(NewOperationController), nameof(NewOperationController.EquipDefense))]
 	[HarmonyPrefix]
-	private static bool Postfix_NewOperationController_EquipDefense(bool equiped, SinActionModel sinAction)
+	private static bool Postfix_NewOperationController_EquipDefense(SinActionModel sinAction)
 	{
 		//if (!Input.GetKeyInt(KeyCode.LeftControl)) return true;
 		MainClass.LogModular("Ran EquipDefense");
+		bool successSpecial = RunSpecialAction(sinAction);
+		return !successSpecial;
+	}
+	
+	public static bool RunSpecialAction(SinActionModel sinAction)
+	{
 		BattleUnitModel unit = sinAction.actionSlot.Owner;
 		if (!unit.IsActionable()) return true;
 		int actevent = MainClass.timingDict["SpecialAction"];
-		bool returnval = true;
+		bool success = false;
 
 		List<BuffModel> buflist = unit.GetActivatedBuffModels();
 		int buf_i = 0;
@@ -29,11 +35,10 @@ internal class UniquePatches
 				if (!Input.GetKeyInt(modba.SpecialKey)) continue;
 				MainClass.LogModular("Found bufpassive - SPECIAL");
 				MainClass.LogModular("Triggered Key: " + modba.SpecialKey.ToString());
-				returnval = false;
+				success = true;
 				modba.modsa_buffModel = buf;
 				modba.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
-
 		}
 
 		if (sinAction.currentSelectSin != null && sinAction.currentSelectSin.GetSkill() != null)
@@ -47,14 +52,12 @@ internal class UniquePatches
 				foreach (ModularSA modsa in SkillScriptInitPatch.modsaDict[skillmodel_intlong])
 				{
 					if (!Input.GetKeyInt(modsa.SpecialKey)) continue;
-					returnval = false;
+					success = true;
 					modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING); // normal code
 				}
 			}
 		}
-
-
-
+		
 		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList)
 		{
 			if (!passiveModel.CheckActiveCondition()) continue;
@@ -66,39 +69,34 @@ internal class UniquePatches
 				if (!Input.GetKeyInt(modpa.SpecialKey)) continue;
 				MainClass.LogModular("FoundS modpassive - SPECIAL: " + modpa.passiveID);
 				MainClass.LogModular("Triggered Key: " + modpa.SpecialKey.ToString());
-				returnval = false;
+				success = true;
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
-		foreach (PassiveModel passiveModel in unit._passiveDetail.EgoPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail.EgoPassiveList)
 		{
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
+			if (!egoPassiveModel.CheckActiveCondition()) continue;
+			long passiveModel_intlong = egoPassiveModel.Pointer.ToInt64();
 			if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
 
 			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong])
 			{
 				if (!Input.GetKeyInt(modpa.SpecialKey)) continue;
-				returnval = false;
+				success = true;
 				MainClass.LogModular("FoundS modpassive - SPECIAL: " + modpa.passiveID);
 				MainClass.LogModular("Triggered Key: " + modpa.SpecialKey.ToString());
-				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
-		if (returnval) return true;
-		//MainClass.Logg.LogInfo("1");
-		//BattleUnitViewManager viewManager = SingletonBehavior<BattleUnitViewManager>.Instance;
-		//MainClass.Logg.LogInfo("2");
-		//foreach (BattleUnitView unitView in viewManager._unitViewList)
-		//{
-		//	MainClass.LogModular("3");
-		//	unitView.RefreshState(unitView.unitModel);
-		//	MainClass.LogModular("4");
-		//	unitView.RefreshEffects();
-		//}
 
+		if (success) VisualUpdateForSpecial();
+		return success;
+	}
+
+	public static void VisualUpdateForSpecial()
+	{
 		BattleObjectManager objManager = SingletonBehavior<BattleObjectManager>.Instance;
 		objManager.UpdatePassiveState();
 		objManager.OnRoundStart_View_AfterChoice();
@@ -108,7 +106,5 @@ internal class UniquePatches
 		{
 			unitView.RefreshAppearanceRenderer(true);
 		}
-		MainClass.LogModular("EquipDefense over");
-		return false;
 	}
 }
