@@ -14,7 +14,7 @@ namespace ModularSkillScripts.Patches;
 
 public class SkillScriptInitPatch
 {
-	private static void copypastesolution(BattleUnitModel unitModel, SkillModel skillModel_inst, BattleActionModel selfAction, BattleActionModel oppoAction, string actevent, BATTLE_EVENT_TIMING timing, PassiveDetail __instance, bool resetWhenUse = false)
+	public static void copypastesolution(BattleUnitModel unitModel, SkillModel skillModel_inst, BattleActionModel selfAction, BattleActionModel oppoAction, string actevent, BATTLE_EVENT_TIMING timing, PassiveDetail __instance, bool resetWhenUse = false)
 	{
 		int acteventint = MainClass.timingDict[actevent];
 		foreach (PassiveModel passiveModel in __instance.PassiveList)
