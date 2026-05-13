@@ -8,7 +8,9 @@ public class ConsequenceMpDmg : IModularConsequence
 		if (mpAmount == 0) return;
 
 		var modelList = modular.GetTargetModelList(circles[0]);
-
+		BattleUnitModel sourceUnit = modular.modsa_unitModel;
+		if (circles.Length > 2) sourceUnit = modular.GetTargetModel(circles[2]);
+		
 		foreach (BattleUnitModel targetModel in modelList)
 		{
 			int loseAmount = 0;
@@ -18,7 +20,7 @@ public class ConsequenceMpDmg : IModularConsequence
 				{
 					case 2:
 						modular.dummyPassiveAbility.AddTriggeredData_MpHeal(mpAmount, targetModel.InstanceID, modular.battleTiming);
-						targetModel.HealTargetMp(targetModel, mpAmount, ABILITY_SOURCE_TYPE.PASSIVE, modular.battleTiming);
+						sourceUnit.HealTargetMp(targetModel, mpAmount, ABILITY_SOURCE_TYPE.PASSIVE, modular.battleTiming);
 						break;
 					case 1:
 						modular.dummyCoinAbility.AddTriggeredData_MpHeal(mpAmount, targetModel.InstanceID, modular.battleTiming);
@@ -26,7 +28,7 @@ public class ConsequenceMpDmg : IModularConsequence
 						break;
 					default:
 						modular.dummySkillAbility.AddTriggeredData_MpHeal(mpAmount, targetModel.InstanceID, modular.battleTiming);
-						targetModel.HealTargetMp(targetModel, mpAmount, ABILITY_SOURCE_TYPE.SKILL, modular.battleTiming);
+						sourceUnit.HealTargetMp(targetModel, mpAmount, ABILITY_SOURCE_TYPE.SKILL, modular.battleTiming);
 						break;
 				}
 			}
@@ -36,18 +38,18 @@ public class ConsequenceMpDmg : IModularConsequence
 				{
 					case 2:
 						modular.dummyPassiveAbility.AddTriggeredData_MpDamage(mpAmount * -1, targetModel.InstanceID, modular.battleTiming);
-						targetModel.GiveMpDamage(targetModel, mpAmount * -1, modular.battleTiming, DAMAGE_SOURCE_TYPE.PASSIVE, out loseAmount,
-							modular.modsa_selfAction);
+						modular.dummyPassiveAbility.GiveMpDamage(sourceUnit, targetModel, mpAmount * -1, modular.battleTiming,
+							DAMAGE_SOURCE_TYPE.SKILL, out loseAmount, modular.modsa_selfAction);
 						break;
 					case 1:
 						modular.dummyCoinAbility.AddTriggeredData_MpDamage(mpAmount * -1, targetModel.InstanceID, modular.battleTiming);
-						modular.dummyCoinAbility.GiveMpDamage(modular.modsa_unitModel, targetModel, mpAmount * -1, modular.battleTiming,
+						modular.dummyCoinAbility.GiveMpDamage(sourceUnit, targetModel, mpAmount * -1, modular.battleTiming,
 							DAMAGE_SOURCE_TYPE.SKILL, out loseAmount, modular.modsa_selfAction);
 						break;
 					default:
 						modular.dummySkillAbility.AddTriggeredData_MpDamage(mpAmount * -1, targetModel.InstanceID, modular.battleTiming);
-						targetModel.GiveMpDamage(targetModel, mpAmount * -1, modular.battleTiming, DAMAGE_SOURCE_TYPE.SKILL, out loseAmount,
-							modular.modsa_selfAction);
+						modular.dummySkillAbility.GiveMpDamage(sourceUnit, targetModel, mpAmount * -1, modular.battleTiming,
+							DAMAGE_SOURCE_TYPE.SKILL, out loseAmount, modular.modsa_selfAction);
 						break;
 				}
 			}
