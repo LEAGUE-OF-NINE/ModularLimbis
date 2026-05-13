@@ -224,7 +224,7 @@ public class MainClass : BasePlugin
 		//consequenceDict["sinbuffmult"] = new ConsequenceSinBuffMult();
 		consequenceDict["atkweight"] = new ConsequenceAtkWeight();
 		consequenceDict["changeatktype"] = new ConsequenceChangeAtkType();
-
+		consequenceDict["setslotweight"] = new ConsequenceSetSlotWeight();
 		// legacy consequences
 		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
 		consequenceDict["buf"] = new ConsequenceBuf();
@@ -443,7 +443,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.7.3";
+	public const string VERSION = "4.7.4";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
