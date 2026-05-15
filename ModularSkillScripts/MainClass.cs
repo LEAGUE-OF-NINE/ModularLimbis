@@ -310,7 +310,8 @@ public class MainClass : BasePlugin
 		acquirerDict["getchainstatus"] = new AcquirerChainStatus();
 		acquirerDict["getsinsindashboard"] = new AcquirerSinsInDashboard();
 		acquirerDict["haspassive"] = new AcquirerHasPassive();
-		acquirerDict["ctdsource"] = new AcquirerChangeDamageSource();    
+		acquirerDict["ctdsource"] = new AcquirerChangeDamageSource();
+		acquirerDict["countbackup"] = new AcquirerCountBackup();
 		
 		// legacy acquirers
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();
