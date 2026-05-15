@@ -41,7 +41,7 @@ public class ConsequenceSkillSend : IModularConsequence
 		}
 
 		if (skillID < 0) return;
-
+	
 		SinActionModel fromSinAction_new = fromUnit.AddNewSinActionModel();
 		UnitSinModel fromSinModel_new = new UnitSinModel(skillID, fromUnit, fromSinAction_new);
 		BattleActionModel fromAction_new = new BattleActionModel(fromSinModel_new, fromUnit, fromSinAction_new);
