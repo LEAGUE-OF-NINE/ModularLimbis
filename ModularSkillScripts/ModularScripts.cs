@@ -11,6 +11,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Battle;
 using Utils;
 using static BattleActionModel.TargetDataDetail;
 using IntPtr = System.IntPtr;
@@ -600,111 +601,111 @@ public class ModularSA : Il2CppSystem.Object
 		{
 			case "Null": return unitList;
 			case "Self":
-				{
-					unitList.Add(modsa_unitModel);
-					return unitList;
-				}
+			{
+				unitList.Add(modsa_unitModel);
+				return unitList;
+			}
 			case "SelfCore":
-				{
-					BattleUnitModel_Abnormality_Part part = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
-					if (part != null) unitList.Add(part.Abnormality);
-					else unitList.Add(modsa_unitModel);
+			{
+				BattleUnitModel_Abnormality_Part part = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
+				if (part != null) unitList.Add(part.Abnormality);
+				else unitList.Add(modsa_unitModel);
 
-					return unitList;
-				}
+				return unitList;
+			}
 			case "SelfParts":
+			{
+	
+				BattleUnitModel_Abnormality_Part part = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
+				BattleUnitModel_Abnormality isLikeAnAbno = null;
+				if (part != null) isLikeAnAbno = part.Abnormality;
+				else 
 				{
-		
-					BattleUnitModel_Abnormality_Part part = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
-					BattleUnitModel_Abnormality isLikeAnAbno = null;
-					if (part != null) isLikeAnAbno = part.Abnormality;
-					else 
-					{
-						isLikeAnAbno = modsa_unitModel.TryCast<BattleUnitModel_Abnormality>();
-					};
+					isLikeAnAbno = modsa_unitModel.TryCast<BattleUnitModel_Abnormality>();
+				};
 
-					if (isLikeAnAbno == null) return unitList;
+				if (isLikeAnAbno == null) return unitList;
 
-					var LikeListOfAbnoParts = isLikeAnAbno._partList;
-					foreach (var partOfAbno in  LikeListOfAbnoParts)
-					{
-						unitList.Add(partOfAbno);
-					}
-
-					return unitList;
+				var LikeListOfAbnoParts = isLikeAnAbno._partList;
+				foreach (var partOfAbno in  LikeListOfAbnoParts)
+				{
+					unitList.Add(partOfAbno);
 				}
+
+				return unitList;
+			}
 			case "Target":
-				{
-					if (modsa_loopTarget != null) unitList.Add(modsa_loopTarget);
-					return unitList;
-				}
+			{
+				if (modsa_loopTarget != null) unitList.Add(modsa_loopTarget);
+				return unitList;
+			}
 			case "TargetCore":
-				{
-					BattleUnitModel_Abnormality_Part part = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality_Part>();
-					if (part != null) unitList.Add(part.Abnormality);
-					else unitList.Add(modsa_loopTarget);
-					return unitList;
-				}
+			{
+				BattleUnitModel_Abnormality_Part part = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality_Part>();
+				if (part != null) unitList.Add(part.Abnormality);
+				else unitList.Add(modsa_loopTarget);
+				return unitList;
+			}
 			case "TargetParts":
+			{
+
+				BattleUnitModel_Abnormality_Part part = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality_Part>();
+				BattleUnitModel_Abnormality isLikeAnAbno = null;
+				if (part != null) isLikeAnAbno = part.Abnormality;
+				else
 				{
-
-					BattleUnitModel_Abnormality_Part part = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality_Part>();
-					BattleUnitModel_Abnormality isLikeAnAbno = null;
-					if (part != null) isLikeAnAbno = part.Abnormality;
-					else
-					{
-						isLikeAnAbno = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality>();
-					}
-					;
-
-					if (isLikeAnAbno == null) return unitList;
-
-					var LikeListOfAbnoParts = isLikeAnAbno._partList;
-					foreach (var partOfAbno in LikeListOfAbnoParts)
-					{
-						unitList.Add(partOfAbno);
-					}
-
-					return unitList;
+					isLikeAnAbno = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality>();
 				}
+				;
+
+				if (isLikeAnAbno == null) return unitList;
+
+				var LikeListOfAbnoParts = isLikeAnAbno._partList;
+				foreach (var partOfAbno in LikeListOfAbnoParts)
+				{
+					unitList.Add(partOfAbno);
+				}
+
+				return unitList;
+			}
 			case "MainTarget":
-				{
-					if (modsa_selfAction == null) { unitList.Add(null); return unitList; }
-					TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
-					unitList.Add(targetDataSet.GetMainTarget());
-					return unitList;
-				}
+			{
+				if (modsa_selfAction == null) { unitList.Add(null); return unitList; }
+				TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
+				unitList.Add(targetDataSet.GetMainTarget());
+				return unitList;
+			}
 			case "EveryTarget":
+			{
+				TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
+				unitList.Add(targetDataSet.GetMainTarget());
+				foreach (SinActionModel sinActionModel in targetDataSet.GetSubTargetSinActionList())
 				{
-					TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
-					unitList.Add(targetDataSet.GetMainTarget());
-					foreach (SinActionModel sinActionModel in targetDataSet.GetSubTargetSinActionList())
-					{
-						BattleUnitModel model = sinActionModel.UnitModel;
-						if (!unitList.Contains(model)) unitList.Add(sinActionModel.UnitModel);
-					}
-					return unitList;
+					BattleUnitModel model = sinActionModel.UnitModel;
+					if (!unitList.Contains(model)) unitList.Add(sinActionModel.UnitModel);
 				}
+				return unitList;
+			}
 			case "SubTarget":
+			{
+				TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
+				foreach (SinActionModel sinActionModel in targetDataSet.GetSubTargetSinActionList())
 				{
-					TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
-					foreach (SinActionModel sinActionModel in targetDataSet.GetSubTargetSinActionList())
-					{
-						BattleUnitModel model = sinActionModel.UnitModel;
-						if (!unitList.Contains(model)) unitList.Add(sinActionModel.UnitModel);
-					}
-					return unitList;
+					BattleUnitModel model = sinActionModel.UnitModel;
+					if (!unitList.Contains(model)) unitList.Add(sinActionModel.UnitModel);
 				}
+				return unitList;
+			}
 			case "Victim":
-				{
-					unitList.Add(modsa_victimModel);
-					return unitList;
-				}
+			{
+				unitList.Add(modsa_victimModel);
+				return unitList;
+			}
 			case "Killer":
-				{
-					unitList.Add(modsa_killerModel);
-					return unitList;
-				}
+			{
+				unitList.Add(modsa_killerModel);
+				return unitList;
+			}
 			case "All":
 				return battleObjectManager.GetModelList();
 		}
@@ -824,6 +825,33 @@ public class ModularSA : Il2CppSystem.Object
 			BUFF_UNIQUE_KEYWORD bufKeyword = CustomBuffs.ParseBuffUniqueKeyword(circles[1]);
 
 			foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(bufKeyword, 0, assistance, filterFaction)) list.Add(unit);
+		}
+		else if (param.Contains("Deads"))
+		{
+			foreach (BattleUnitModel unit in battleObjectManager.GetModelList(filterFaction, assistance))
+			{
+				if (!unit.IsDead()) continue;
+				/*UNIT_FACTION faction = unit.Faction;
+				if (filterFaction != UNIT_FACTION.NONE)
+				{
+					if (faction != filterFaction) continue;
+				}
+				if (!assistance && unit.IsFactionAlsoNotAssistance(faction)) continue;*/
+				if (noCores && unit.TryCast<BattleUnitModel_Abnormality>() != null) continue;
+				if (noParts && unit.TryCast<BattleUnitModel_Abnormality_Part>() != null) continue;
+				list.Add(unit);
+			}
+		}
+		else if (param.Contains("Retreats"))
+		{
+			foreach (BattleUnitModel unit in battleObjectManager.GetModelList(filterFaction, assistance))
+			{
+				if (unit.IsDead()) continue;
+				if (!unit.IsRetreated()) continue;
+				if (noCores && unit.TryCast<BattleUnitModel_Abnormality>() != null) continue;
+				if (noParts && unit.TryCast<BattleUnitModel_Abnormality_Part>() != null) continue;
+				list.Add(unit);
+			}
 		}
 		else
 		{

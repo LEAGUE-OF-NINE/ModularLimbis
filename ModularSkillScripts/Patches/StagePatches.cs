@@ -43,6 +43,31 @@ internal class StagePatches
 		}
 
 	}
+	
+	[HarmonyPatch(typeof(StageModel), nameof(StageModel.Init))]
+	[HarmonyPostfix]
+	private static void Postfix_StageModel_Init(StageStaticData stageinfo, StageModel __instance)
+	{
+		MainClass.LogModular("Postfix_StageModel_Init");
+		
+		List<string> stageScriptList = stageinfo.stageScriptList;
+		foreach (string stageScript_string in stageScriptList)
+		{
+			if (!stageScript_string.StartsWith("Modular/")) continue;
+			string instruction = stageScript_string.Remove(0, 8);
+			string[] batches = instruction.Split('/');
+			foreach (string batch in batches)
+			{
+				MainClass.LogModular("Batches loop postfix: " + batch);
+				if (batch == "batonyes")
+				{
+					StageController stageController_inst = Singleton<StageController>.Instance;
+					stageController_inst._batonPassManager._isPlayerBatonPassOn = true;
+				}
+			}
+		}
+
+	}
 
 	[HarmonyPatch(typeof(StageController), nameof(StageController.StartRound))]
 	[HarmonyPostfix]
