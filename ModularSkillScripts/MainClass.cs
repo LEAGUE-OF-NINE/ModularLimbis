@@ -231,6 +231,7 @@ public class MainClass : BasePlugin
 		consequenceDict["explosion"] = new ConsequenceExplosion();
 		consequenceDict["surge"] = new ConsequenceSurge();
 		consequenceDict["bufcategory"] = new ConsequenceBuffCategory();
+		consequenceDict["cutinaction"] = new ConsequenceCutInAction();
 
 	}
 
@@ -443,7 +444,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.7.5";
+	public const string VERSION = "4.7.6";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
