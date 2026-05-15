@@ -37,17 +37,14 @@ public class ConsequenceMpDmg : IModularConsequence
 				switch (modular.abilityMode)
 				{
 					case 2:
-						modular.dummyPassiveAbility.AddTriggeredData_MpDamage(mpAmount * -1, targetModel.InstanceID, modular.battleTiming);
 						modular.dummyPassiveAbility.GiveMpDamage(sourceUnit, targetModel, mpAmount * -1, modular.battleTiming,
 							DAMAGE_SOURCE_TYPE.SKILL, out loseAmount, modular.modsa_selfAction);
 						break;
 					case 1:
-						modular.dummyCoinAbility.AddTriggeredData_MpDamage(mpAmount * -1, targetModel.InstanceID, modular.battleTiming);
 						modular.dummyCoinAbility.GiveMpDamage(sourceUnit, targetModel, mpAmount * -1, modular.battleTiming,
 							DAMAGE_SOURCE_TYPE.SKILL, out loseAmount, modular.modsa_selfAction);
 						break;
 					default:
-						modular.dummySkillAbility.AddTriggeredData_MpDamage(mpAmount * -1, targetModel.InstanceID, modular.battleTiming);
 						modular.dummySkillAbility.GiveMpDamage(sourceUnit, targetModel, mpAmount * -1, modular.battleTiming,
 							DAMAGE_SOURCE_TYPE.SKILL, out loseAmount, modular.modsa_selfAction);
 						break;
