@@ -225,10 +225,16 @@ internal class StagePatches
 		if (doubleslotterIDList.Count > 0) {
 			SinManager sinManager_inst = Singleton<SinManager>.Instance;
 			BattleObjectManager _battleObjectManager = sinManager_inst._battleObjectManager;
+
+			bool removedead = false;
+			StageController stageController_inst = Singleton<StageController>.Instance;
+			BatonPassManager batonManager = stageController_inst?._batonPassManager;
+			removedead = batonManager != null && batonManager.IsBatonPassOn(UNIT_FACTION.PLAYER);
+			
 			foreach (int ID in doubleslotterIDList)
 			{
 				BattleUnitModel unitModel = _battleObjectManager.GetModel(ID);
-				if (unitModel != null && !unitModel.IsDead()) slotAdder += 1;
+				if (unitModel != null && (!removedead || !unitModel.IsDead())) slotAdder += 1;
 			}
 		}
 
