@@ -6,7 +6,7 @@ public class AcquirerSkillSlotCount : IModularAcquirer
 	{
 		BattleUnitModel targetModel = modular.GetTargetModel(circles[0]);
 		if (targetModel == null) return -1;
-		if (circles.Length > 1) targetModel.GetPermanentSinActionListCount();
+		if (circles.Length > 1) return targetModel.GetPermanentSinActionListCount();
 		return targetModel.GetSinActionListCount();
 	}
 }
