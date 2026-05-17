@@ -36,7 +36,7 @@ public class AcquirerBufCheck : IModularAcquirer
 			"turn" => turn,
 			"+" => stack + turn,
 			"*" => stack * turn,
-			"consumed" => turnConsumed,
+			"consumed" => turnConsumed, // keep compatibility
 			"turnConsumed" => turnConsumed,
 			"stackConsumed" => stackConsumed,
  			_ => stack
