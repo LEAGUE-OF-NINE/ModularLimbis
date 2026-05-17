@@ -16,6 +16,7 @@ public class AcquirerBufCheck : IModularAcquirer
 		int stack = 0;
 		int turn = 0;
 		int amtConsumed = 0;
+		int stackConsumed = 0;
 		bool usedcheck = circles.Length >= 4;
 		if (usedcheck)
 		{
@@ -26,6 +27,7 @@ public class AcquirerBufCheck : IModularAcquirer
 			stack = bufDetail.GetActivatedBuffStack(buf_keyword, false);
 			turn = bufDetail.GetActivatedBuffTurn(buf_keyword, false);
 			amtConsumed = instance.GetUsedBuffTurn(targetModel.InstanceID, buf_keyword);
+			stackConsumed = instance.GetUsedBuffStack(targetModel.InstanceID, buf_keyword);
 		}
 
 
@@ -35,7 +37,8 @@ public class AcquirerBufCheck : IModularAcquirer
 			"+" => stack + turn,
 			"*" => stack * turn,
 			"consumed" => amtConsumed,
-			_ => stack
+			"stackConsumed" => stackConsumed,
+ 			_ => stack
 		};
 	}
 }
