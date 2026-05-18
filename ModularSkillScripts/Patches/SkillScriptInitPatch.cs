@@ -1630,9 +1630,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 	}
 	
-	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetCriticalDamageRatioAdder))]
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetCriticalDamageRatio))]
 	[HarmonyPostfix]
-	private static void Postfix_BattleUnitModel_GetCriticalDamageRatioAdder(BattleActionModel action, ref float __result, BattleUnitModel __instance)
+	private static void Postfix_BattleUnitModel_GetCriticalDamageRatio(BattleActionModel action, ref float __result, BattleUnitModel __instance)
 	{
 		foreach (BuffModel buf in __instance.GetActivatedBuffModels())
 		{
