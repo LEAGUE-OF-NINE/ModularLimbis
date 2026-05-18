@@ -1629,6 +1629,43 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 	}
+	
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetCriticalDamageRatioAdder))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_GetCriticalDamageRatioAdder(BattleActionModel action, ref float __result, BattleUnitModel __instance)
+	{
+		foreach (BuffModel buf in __instance.GetActivatedBuffModels())
+		{
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buf))
+			{
+				int adder = modsa.critRatioAdder;
+				if (adder != 0) __result += adder * 0.01f;
+			}
+		}
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(action.Skill)) {
+			int adder = modsa.critRatioAdder;
+			if (adder != 0) __result += adder * 0.01f;
+		}
+		
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
+		{
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel))
+			{
+				int adder = modsa.critRatioAdder;
+				if (adder != 0) __result += adder * 0.01f;
+			}
+		}
+
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
+		{
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false))
+			{
+				int adder = modsa.critRatioAdder;
+				if (adder != 0) __result += adder * 0.01f;
+			}
+		}
+	}
 
 	//[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetAttackWeight))]
 	//[HarmonyPostfix]
