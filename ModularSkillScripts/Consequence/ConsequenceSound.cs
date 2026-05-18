@@ -13,12 +13,27 @@ public class ConsequenceSound : IModularConsequence
 		{
 			case "bgm":
 			{
-				GUID parsed_guid = GUID.Parse(guid);
-				BattleSoundGenerator.StopBGM();
-				SoundGenerator._currentBGM = RuntimeManager.CreateInstance(parsed_guid);
-				SingletonBehavior<SoundManager>.Instance.ChangeBGM(SoundGenerator._currentBGM, true);
+				if (BattleSoundGenerator.IsSpecialBGM) return;
+
+				bool stopAddBGM = circles.Length > 2;
+				if (!stopAddBGM)
+				{
+					BattleSoundGenerator.GetCurrentBattleBGM().getDescription(out FMOD.Studio.EventDescription eventDescription);
+					RESULT result = eventDescription.getPath(out string path);
+					if (result == RESULT.OK && path != ("event:/BGM/Battle" + circles[1]))
+					{
+						BattleSoundGenerator.StopBGM();
+						BattleSoundGenerator.SetAddBGMList(circles[1]);
+						BattleSoundGenerator.StartAddBGM(circles[1]);
+					}
+				}
+				else
+				{
+					BattleSoundGenerator.RemoveAddBGMList(circles[1]);
+					BattleSoundGenerator.StartBGM();
+				}
 				MainClass.Logg.LogWarning(
-					$"activating sound bgm consequence with parsed guid: {parsed_guid}, second_param={circles[1]}");
+				$"activating sound bgm consequence: first_param={circles[1]}");
 				break;
 			}
 			case "sfx":
