@@ -246,6 +246,7 @@ public class ModularSA : Il2CppSystem.Object
 		atkMultAdder = 0;
 		atkWeightAdder = 0;
 		critAdder = 0;
+		critRatioAdder = 0;
 	}
 	public int coinScaleAdder = 0;
 	public int skillPowerAdder = 0;
@@ -256,6 +257,7 @@ public class ModularSA : Il2CppSystem.Object
 	public int atkWeightAdder = 0;
 	public int slotAdder = 0;
 	public int critAdder = 0;
+	public int critRatioAdder = 0;
 	public ATK_BEHAVIOUR atktype = ATK_BEHAVIOUR.NONE;
 
 	public bool wasCrit = false;

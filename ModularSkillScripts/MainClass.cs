@@ -193,6 +193,7 @@ public class MainClass : BasePlugin
 		consequenceDict["makeunbreakable"] = new ConsequenceMakeUnbreakable();
 		consequenceDict["bloodfeast"] = new ConsequenceBloodfeast();
 		consequenceDict["critchance"] = new ConsequenceCritChance();
+		consequenceDict["critratio"] = new ConsequenceCritRatio();
 		consequenceDict["changemotion"] = new ConsequenceChangeMotion();
 		consequenceDict["assistdefense"] = new ConsequenceAssistDefense();
 		consequenceDict["ignorepanic"] = new ConsequenceIgnorePanic();
