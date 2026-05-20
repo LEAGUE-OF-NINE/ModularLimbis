@@ -68,12 +68,40 @@ public class ConsequenceSkillSend : IModularConsequence
 			if (targetSinActionList.Contains(targetSinActionData.GetTargetSinAction())) goodones.Add(targetSinActionData);
 		}
 		targetDataSet._subTargetList = goodones;*/
-
+		
+		bool isdef = circles.Length > 3 && circles[3] == "def";
+		int cutin_mode = 0;
+		if (circles.Length > 4)
+		{
+			cutin_mode = circles[4] switch
+			{
+				"userzero" => 0,
+				"userappend" => 1,
+				"globalfirst" => 2,
+				"globallast" => 3,
+				_ => 0
+			};
+		}
+		
 		fromAction_new._targetDataDetail.ReadyOriginTargeting(fromAction_new);
-		if (circles.Length > 3) fromUnit.CutInDefenseActionForcely(fromAction_new, true);
+		if (isdef) fromUnit.CutInDefenseActionForcely(fromAction_new, true);
 		else
 		{
-			fromUnit.CutInAction(fromAction_new);
+			if (cutin_mode <= 1)
+			{
+				BattleActionModelManager.CUT_IN_ACTION_TYPE cutin = BattleActionModelManager.CUT_IN_ACTION_TYPE.ZERO_INDEX;
+				if (cutin_mode == 1) cutin = BattleActionModelManager.CUT_IN_ACTION_TYPE.LAST_APPEND;
+				fromUnit.CutInAction(fromAction_new, fromAction_new.GetSkillTargetType(), cutin);
+			}
+			else
+			{
+				BattleActionModelManager.RESERVE_CUT_IN_ACTION_TYPE cutin = BattleActionModelManager.RESERVE_CUT_IN_ACTION_TYPE.ACT_FIRST;
+				if (cutin_mode == 3) cutin = BattleActionModelManager.RESERVE_CUT_IN_ACTION_TYPE.ACT_LAST;
+				
+				BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
+				actionManager.ReserveToCutInActionUntilStartRunBattle(fromAction_new, cutin);
+			}
+			
 			if (targetSinActionList.Count > 0)
 			{
 				fromAction_new.ChangeMainTargetSinAction(targetSinActionList.ToArray()[0], null, true);
