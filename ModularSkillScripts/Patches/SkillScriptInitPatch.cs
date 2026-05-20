@@ -56,7 +56,7 @@ public class SkillScriptInitPatch
 		List<AbilityData> abilityData_list = __instance.GetSkillAbilityScript();
 		for (int i = 0; i < abilityData_list.Count; i++)
 		{
-			AbilityData abilityData = abilityData_list.ToArray()[i];
+			AbilityData abilityData = abilityData_list[i];
 			string abilityScriptname = abilityData.ScriptName;
 			if (!abilityScriptname.StartsWith("Modular/")) continue;
 			if (!MainClass.fakepowerEnabled && abilityScriptname.Contains("FakePower")) continue;
@@ -203,9 +203,8 @@ public class SkillScriptInitPatch
 		long ptr = __instance.Pointer.ToInt64();
 
 		List<AbilityData> abilityData_list = __instance.ClassInfo.abilityScriptList;
-		for (int i = 0; i < abilityData_list.Count; i++)
+		foreach (AbilityData abilityData in abilityData_list)
 		{
-			AbilityData abilityData = abilityData_list.ToArray()[i];
 			string abilityScriptname = abilityData.ScriptName;
 			if (!abilityScriptname.StartsWith("Modular/")) continue;
 			
@@ -246,7 +245,7 @@ public class SkillScriptInitPatch
 		List<BuffAbilityStaticData> abilityData_list = __instance._buffData.list;
 		for (int i = 0; i < abilityData_list.Count; i++)
 		{
-			BuffAbilityStaticData abilityData = abilityData_list.ToArray()[i];
+			BuffAbilityStaticData abilityData = abilityData_list[i];
 			string abilityScriptname = abilityData.ability;
 			if (!abilityScriptname.StartsWith("Modular/")) continue;
 			if (!MainClass.fakepowerEnabled && abilityScriptname.Contains("FakePower")) continue;
@@ -2925,6 +2924,38 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modca.modsa_motionDetail = null;
 			}
 		}
+	}
+	
+	[HarmonyPatch(typeof(BattleActionModelManager), nameof(BattleActionModelManager.SortActions))]
+	[HarmonyPostfix]
+	public static void Postfix_BattleActionModelManager_SortActions(BattleActionModelManager __instance)
+	{
+		//int actevent = MainClass.timingDict["SortAction"];
+		//List<BattleActionModel> actionList_copy = __instance._actionList.CopyList();
+
+		List<BattleActionModel> rangedList = new();
+		foreach (BattleActionModel action in __instance._actionList)
+		{
+			SkillModel skill = action.Skill;
+			List<AbilityData> abilityData_list = skill.GetSkillAbilityScript();
+			foreach (AbilityData abilityData in abilityData_list)
+			{
+				string abilityScriptname = abilityData.ScriptName;
+				if (abilityScriptname == "ranged")
+				{
+					rangedList.Add(action);
+					break;
+				}
+			}
+		}
+		
+		rangedList.Reverse(); // so that Insert() is in correct order. InsertRange() would be the fix, but I can't get it to work.
+		foreach (BattleActionModel action in rangedList)
+		{
+			__instance._actionList.Remove(action);
+			__instance._actionList.Insert(0, action);
+		}
+		
 	}
 
 }
