@@ -70,37 +70,15 @@ public class ConsequenceSkillSend : IModularConsequence
 		targetDataSet._subTargetList = goodones;*/
 		
 		bool isdef = circles.Length > 3 && circles[3] == "def";
-		int cutin_mode = 0;
-		if (circles.Length > 4)
-		{
-			cutin_mode = circles[4] switch
-			{
-				"userzero" => 0,
-				"userappend" => 1,
-				"globalfirst" => 2,
-				"globallast" => 3,
-				_ => 0
-			};
-		}
+		bool late = circles.Length > 4 && circles[4] == "late";
 		
 		fromAction_new._targetDataDetail.ReadyOriginTargeting(fromAction_new);
 		if (isdef) fromUnit.CutInDefenseActionForcely(fromAction_new, true);
 		else
 		{
-			if (cutin_mode <= 1)
-			{
-				BattleActionModelManager.CUT_IN_ACTION_TYPE cutin = BattleActionModelManager.CUT_IN_ACTION_TYPE.ZERO_INDEX;
-				if (cutin_mode == 1) cutin = BattleActionModelManager.CUT_IN_ACTION_TYPE.LAST_APPEND;
-				fromUnit.CutInAction(fromAction_new, fromAction_new.GetSkillTargetType(), cutin);
-			}
-			else
-			{
-				BattleActionModelManager.RESERVE_CUT_IN_ACTION_TYPE cutin = BattleActionModelManager.RESERVE_CUT_IN_ACTION_TYPE.ACT_FIRST;
-				if (cutin_mode == 3) cutin = BattleActionModelManager.RESERVE_CUT_IN_ACTION_TYPE.ACT_LAST;
-				
-				BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
-				actionManager.ReserveToCutInActionUntilStartRunBattle(fromAction_new, cutin);
-			}
+			BattleActionModelManager.CUT_IN_ACTION_TYPE cutin = BattleActionModelManager.CUT_IN_ACTION_TYPE.ZERO_INDEX;
+			if (late) cutin = BattleActionModelManager.CUT_IN_ACTION_TYPE.LAST_APPEND;
+			fromUnit.CutInAction(fromAction_new, SKILL_TARGET_TYPE.NONE, cutin);
 			
 			if (targetSinActionList.Count > 0)
 			{
