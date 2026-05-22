@@ -233,6 +233,7 @@ public class MainClass : BasePlugin
 		consequenceDict["surge"] = new ConsequenceSurge();
 		consequenceDict["bufcategory"] = new ConsequenceBuffCategory();
 		consequenceDict["cutinaction"] = new ConsequenceCutInAction();
+		consequenceDict["tagforsort"] = new ConsequenceTagForSort();
 
 	}
 

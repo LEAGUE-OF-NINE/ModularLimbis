@@ -2926,6 +2926,10 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 	}
 	
+	// Added to during Combat Start in Consq tagforsort
+	public static List<BattleActionModel> rangedList_modular = new();
+	public static List<BattleActionModel> lateList_modular = new();
+	
 	[HarmonyPatch(typeof(BattleActionModelManager), nameof(BattleActionModelManager.SortActions))]
 	[HarmonyPostfix]
 	public static void Postfix_BattleActionModelManager_SortActions(BattleActionModelManager __instance)
@@ -2934,26 +2938,48 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		//List<BattleActionModel> actionList_copy = __instance._actionList.CopyList();
 
 		List<BattleActionModel> rangedList = new();
+		List<BattleActionModel> lateList = new();
 		foreach (BattleActionModel action in __instance._actionList)
 		{
+			if (rangedList_modular.Contains(action)) {
+				rangedList.Add(action);
+				continue;
+			}
+			if (lateList_modular.Contains(action)) {
+				lateList.Add(action);
+				continue;
+			}
+			
 			SkillModel skill = action.Skill;
 			List<AbilityData> abilityData_list = skill.GetSkillAbilityScript();
 			foreach (AbilityData abilityData in abilityData_list)
 			{
 				string abilityScriptname = abilityData.ScriptName;
-				if (abilityScriptname == "ranged")
-				{
+				if (abilityScriptname == "ranged") {
 					rangedList.Add(action);
+					break;
+				}
+				if (abilityScriptname == "late") {
+					lateList.Add(action);
 					break;
 				}
 			}
 		}
+		
+		rangedList_modular.Clear();
+		lateList_modular.Clear();
 		
 		rangedList.Reverse(); // so that Insert() is in correct order. InsertRange() would be the fix, but I can't get it to work.
 		foreach (BattleActionModel action in rangedList)
 		{
 			__instance._actionList.Remove(action);
 			__instance._actionList.Insert(0, action);
+		}
+		
+		foreach (BattleActionModel action in lateList)
+		{
+			__instance._actionList.Remove(action);
+			__instance._actionList.Add(action);
 		}
 		
 	}
