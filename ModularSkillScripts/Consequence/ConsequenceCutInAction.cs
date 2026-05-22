@@ -13,5 +13,10 @@ public class ConsequenceCutInAction : IModularConsequence
 		if (unit == null) return;
 		unit.CutInAction(action);
 		//action.OnOrderCutInAction(modular.modsa_selfAction);
+
+		BattleActionModelManager battleActManager = Singleton<BattleActionModelManager>.Instance;
+		// Still not done, trying to figure out what to do here.
+		// battleActManager
+		
 	}
 }
