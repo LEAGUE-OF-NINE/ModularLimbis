@@ -7,7 +7,7 @@ class FakePowerPatches
 {
 	[HarmonyPatch(typeof(SkillModelManager), nameof(SkillModelManager.GetExpectedWinRate))]
 	[HarmonyPrefix]
-	private static void Postfix_SkillModelManager_GetExpectedWinRate(BattleActionModel selfAction)
+	private static void Postfix_SkillModelManager_GetExpectedWinRate(BattleActionModel selfAction, BattleActionModel oppoAction)
 	{
 		int actevent_FakePower = MainClass.timingDict["FakePower"];
 		foreach (long key in SkillScriptInitPatch.modpaDict.Keys) {
@@ -22,7 +22,7 @@ class FakePowerPatches
 		if (SkillScriptInitPatch.modsaDict.ContainsKey(skillmodel_intlong)) {
 			foreach (ModularSA modsa in SkillScriptInitPatch.modsaDict[skillmodel_intlong]) {
 				if (skillmodel_intlong != modsa.ptr_intlong) continue;
-				modsa.Enact(selfAction.Model, selfAction.Skill, selfAction, null, actevent_FakePower, BATTLE_EVENT_TIMING.NONE);
+				modsa.Enact(selfAction.Model, selfAction.Skill, selfAction, oppoAction, actevent_FakePower, BATTLE_EVENT_TIMING.NONE);
 			}
 		}
 
@@ -35,7 +35,7 @@ class FakePowerPatches
 			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong])
 			{
 				if (modpa.activationTiming != actevent_FakePower) continue;
-				modpa.Enact(selfAction.Model, selfAction.Skill, selfAction, null, actevent_FakePower, BATTLE_EVENT_TIMING.NONE);
+				modpa.Enact(selfAction.Model, selfAction.Skill, selfAction, oppoAction, actevent_FakePower, BATTLE_EVENT_TIMING.NONE);
 			}
 		}
 		SupportPasPatch.SupportPassiveInit(SkillScriptInitPatch.modpaDict);
@@ -45,7 +45,7 @@ class FakePowerPatches
 			for (int i = 0; i < modpaList.Count; i++)
 			{
 				if (modpaList[i].activationTiming != actevent_FakePower) continue;
-				modpaList[i].Enact(selfAction.Model, selfAction.Skill, selfAction, null, actevent_FakePower, BATTLE_EVENT_TIMING.NONE);
+				modpaList[i].Enact(selfAction.Model, selfAction.Skill, selfAction, oppoAction, actevent_FakePower, BATTLE_EVENT_TIMING.NONE);
 			}
 		}
 	}

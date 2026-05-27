@@ -1,6 +1,4 @@
 using FMOD;
-using FMODUnity;
-using UnityEngine;
 
 namespace ModularSkillScripts.Consequence;
 
@@ -13,7 +11,10 @@ public class ConsequenceSound : IModularConsequence
 		{
 			case "bgm":
 			{
-				if (BattleSoundGenerator.IsSpecialBGM) return;
+				if(BattleSoundGenerator.IsSpecialBGM || StaticDataManager.Instance.FixedBgmStaticDataList.FindData(BattleSoundGenerator.currentBgmlist))
+				{
+					return;
+				}
 
 				bool stopAddBGM = circles.Length > 2;
 				if (!stopAddBGM)
@@ -29,8 +30,10 @@ public class ConsequenceSound : IModularConsequence
 				}
 				else
 				{
+					bool flag = false;
+					if(BattleSoundGenerator._currentAddBGMPath == circles[1]) flag = true;
 					BattleSoundGenerator.RemoveAddBGMList(circles[1]);
-					BattleSoundGenerator.StartBGM();
+					if (flag) BattleSoundGenerator.StartBGM();
 				}
 				MainClass.Logg.LogWarning(
 				$"activating sound bgm consequence: first_param={circles[1]}");
@@ -46,9 +49,10 @@ public class ConsequenceSound : IModularConsequence
 			case "voice":
 			{
 				var unitID = modular.modsa_unitModel._unitDataModel.ClassInfo.id;
+				BattleUnitView battleUnitView = BattleObjectManager.Instance.GetView(modular.modsa_unitModel);
+
 				MainClass.Logg.LogWarning($"playing sound \"{circles[1]}\" for {unitID}");
-				// Passing null BattleUnitView is probably fine, if not we can modify later
-				VoiceGenerator.PlayMultiVoice(unitID, circles[1], null);
+				VoiceGenerator.PlayMultiVoice(unitID, circles[1], battleUnitView);
 				break;
 			}
 			case "announcer"
