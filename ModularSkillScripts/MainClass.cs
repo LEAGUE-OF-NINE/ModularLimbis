@@ -8,6 +8,7 @@ using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem.Text.RegularExpressions;
 using ModularSkillScripts.Acquirer;
 using BepInEx.Configuration;
+using Il2CppSystem;
 using ModularSkillScripts.Consequence;
 using Random = System.Random;
 using Il2CppSystem.IO;
@@ -234,7 +235,7 @@ public class MainClass : BasePlugin
 		consequenceDict["bufcategory"] = new ConsequenceBuffCategory();
 		consequenceDict["cutinaction"] = new ConsequenceCutInAction();
 		consequenceDict["tagforsort"] = new ConsequenceTagForSort();
-
+		consequenceDict["insertskill"] = new ConsequenceInsertSkill();
 	}
 
 	private static void RegisterAcquirers()
@@ -401,6 +402,28 @@ public class MainClass : BasePlugin
 
 		return list;
 	}
+
+	public static UnitSinModel GetSinInUnit(string selection, BattleUnitModel unitOrNull, BattleActionModel actionOrNull, int trySlotID = -1)
+	{
+		SinActionModel sinAction = null;
+		if (trySlotID >= 0)
+		{
+			if (unitOrNull == null) return null;
+				
+			trySlotID = Math.Min(trySlotID, unitOrNull.GetPermanentSinActionListCount());
+			sinAction = unitOrNull.GetSinActionList()[trySlotID];
+		}
+		else if (actionOrNull != null) sinAction = actionOrNull.SinAction;
+		if (sinAction == null) return null;
+
+		UnitSinModel sin = null;
+		if (selection == "replaced") sin = sinAction.GetReplacedSinByDefenseSkill();
+		else if (selection == "ready") sin = sinAction.readySin;
+		else if (selection == "top") sin = sinAction.currentSinList[1];
+		else if (selection == "bottom") sin = sinAction.currentSinList[0];
+		return sin;
+	}
+	
 	public static System.Collections.Generic.KeyValuePair<string, int> GetMaxValue(
 			System.Collections.Generic.Dictionary<string, int> dict)
 	{
@@ -448,7 +471,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.8.0";
+	public const string VERSION = "4.8.1";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
