@@ -316,6 +316,7 @@ public class MainClass : BasePlugin
 		acquirerDict["ctdsource"] = new AcquirerChangeDamageSource();
 		acquirerDict["countbackup"] = new AcquirerCountBackup();
 		acquirerDict["isbackupenabled"] = new AcquirerIsBackupEnabled();
+		acquirerDict["getskillskillslot"] = new AcquirerGetSkillSkillSlot();
 		
 		// legacy acquirers
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();
