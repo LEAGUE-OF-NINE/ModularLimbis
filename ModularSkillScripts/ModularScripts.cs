@@ -1104,18 +1104,18 @@ public class ModularSA : Il2CppSystem.Object
 		string[] batchArgs = batch.Split(':');
 		for (int i = 0; i < batchArgs.Length; i++)
 		{
-			if (batchArgs[i].StartsWith("STOPIF") || batchArgs[i].StartsWith("CONTINUEIF"))
+			if (batchArgs[i].StartsWith("CONTINUEIFNOT"))
 			{
-				if (!CheckIF(batchArgs[i]))
+				if (CheckIF(batchArgs[i]))
 				{
 					_fullStop = true;
 					return;
 				}
 				continue;
 			}
-			else if (batchArgs[i].StartsWith("CONTINUEIFNOT"))
+			else if (batchArgs[i].StartsWith("STOPIF") || batchArgs[i].StartsWith("CONTINUEIF"))
 			{
-				if (CheckIF(batchArgs[i]))
+				if (!CheckIF(batchArgs[i]))
 				{
 					_fullStop = true;
 					return;
