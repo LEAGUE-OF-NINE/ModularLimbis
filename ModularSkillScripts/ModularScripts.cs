@@ -1113,6 +1113,15 @@ public class ModularSA : Il2CppSystem.Object
 				}
 				continue;
 			}
+			else if (batchArgs[i].StartsWith("CONTINUEIFNOT"))
+			{
+				if (CheckIF(batchArgs[i]))
+				{
+					_fullStop = true;
+					return;
+				}
+				continue;
+			}
 			else if (batchArgs[i].StartsWith("IFNOT")) { if (CheckIF(batchArgs[i])) break; else continue; }
 			else if (batchArgs[i].StartsWith("IF")) { if (!CheckIF(batchArgs[i])) break; else continue; }
 			else if (batchArgs[i].StartsWith("VALUE_"))
