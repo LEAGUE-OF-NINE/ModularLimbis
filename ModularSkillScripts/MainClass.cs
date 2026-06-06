@@ -2,17 +2,16 @@ using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using BepInEx.Logging;
 using HarmonyLib;
-using Il2CppSystem.Collections.Generic;
-using Il2CppInterop.Runtime.Injection;
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using Il2CppSystem.Text.RegularExpressions;
-using ModularSkillScripts.Acquirer;
+using System.Collections.Generic;
 using BepInEx.Configuration;
+using Il2CppInterop.Runtime.Injection;
 using Il2CppSystem;
 using ModularSkillScripts.Consequence;
 using Random = System.Random;
 using Il2CppSystem.IO;
+using ModularSkillScripts.Acquirer;
 using ModularSkillScripts.Patches;
+using Il2CppSystem.Text.RegularExpressions;
 //using Antlr4.Runtime;
 //using Antlr4.Runtime.Tree;
 //using ModsaLang;
@@ -26,65 +25,67 @@ public class MainClass : BasePlugin
 	public override void Load()
 	{
 		//modsaEval = new ModsaEvaluator();
-		List<string> timingStringList = new();
-		timingStringList.Add("StartBattle"); // 0
-		timingStringList.Add("WhenUse"); // 1
-		timingStringList.Add("BeforeAttack"); // 2
-		timingStringList.Add("StartDuel"); // 3
-		timingStringList.Add("WinDuel"); // 4
-		timingStringList.Add("DefeatDuel"); // 5
-		timingStringList.Add("EndBattle"); // 6
-		timingStringList.Add("OnSucceedAttack"); // 7
-		timingStringList.Add("WhenHit"); // 8
-		timingStringList.Add("EndSkill"); // 9
-		timingStringList.Add("FakePower"); // 10
-		timingStringList.Add("BeforeDefense"); // 11
-		timingStringList.Add("OnDie"); // 12
-		timingStringList.Add("OnOtherDie"); // 13 
-		timingStringList.Add("DuelClash"); // 14
-		timingStringList.Add("DuelClashAfter"); // 15
-		timingStringList.Add("OnSucceedEvade"); // 16
-		timingStringList.Add("OnDefeatEvade"); // 17
-		timingStringList.Add("OnStartBehaviour"); // 18
-		timingStringList.Add("BeforeBehaviour"); // 19
-		timingStringList.Add("OnEndBehaviour"); // 20
-		timingStringList.Add("EnemyKill"); // 21
-		timingStringList.Add("OnBreak"); // 22
-		timingStringList.Add("OnOtherBreak"); // 23
-		timingStringList.Add("OnDiscard"); // 24
-		timingStringList.Add("OnZeroHP"); // 25
-		timingStringList.Add("EnemyEndSkill"); // 26
-		timingStringList.Add("OnOtherBurst"); // 27
-		timingStringList.Add("BeforeSA"); // 28
-		timingStringList.Add("BeforeWhenHit"); // 29
-		timingStringList.Add("BeforeUse"); // 30
-		timingStringList.Add("Immortal"); // 31
-		timingStringList.Add("ImmortalOther"); // 32
-		timingStringList.Add("SpecialAction"); // 33
-		timingStringList.Add("AfterSlots"); // 34
-		timingStringList.Add("OnCoinToss"); // 35
-		timingStringList.Add("StartBattleSkill"); // 36
-		timingStringList.Add("OnBurst"); // 37
-		timingStringList.Add("StartVisualCoinToss"); // 38
-		timingStringList.Add("StartVisualSkillUse"); // 39
-		timingStringList.Add("WhenGained"); // 40
-		timingStringList.Add("ChangeMotion"); // 41
-		timingStringList.Add("IgnorePanic"); // 42
-		timingStringList.Add("IgnoreBreak"); // 43
-		timingStringList.Add("OnRetreat"); // 44
-		timingStringList.Add("OnGainBuff"); // 45
-		timingStringList.Add("EncounterStart"); // 46
-		timingStringList.Add("WinParrying"); // 47
-		timingStringList.Add("DefeatParrying"); // 48
-		timingStringList.Add("ChangeTakeDamage"); // 49
-		timingStringList.Add("OnCoinAfterAttack");
-		timingStringList.Add("EnemyBeforeAttack");
+		List<string> timingStringList =
+		[
+			"StartBattle", // 0
+			"WhenUse", // 1
+			"BeforeAttack", // 2
+			"StartDuel", // 3
+			"WinDuel", // 4
+			"DefeatDuel", // 5
+			"EndBattle", // 6
+			"OnSucceedAttack", // 7
+			"WhenHit", // 8
+			"EndSkill", // 9
+			"FakePower", // 10
+			"BeforeDefense", // 11
+			"OnDie", // 12
+			"OnOtherDie", // 13 
+			"DuelClash", // 14
+			"DuelClashAfter", // 15
+			"OnSucceedEvade", // 16
+			"OnDefeatEvade", // 17
+			"OnStartBehaviour", // 18
+			"BeforeBehaviour", // 19
+			"OnEndBehaviour", // 20
+			"EnemyKill", // 21
+			"OnBreak", // 22
+			"OnOtherBreak", // 23
+			"OnDiscard", // 24
+			"OnZeroHP", // 25
+			"EnemyEndSkill", // 26
+			"OnOtherBurst", // 27
+			"BeforeSA", // 28
+			"BeforeWhenHit", // 29
+			"BeforeUse", // 30
+			"Immortal", // 31
+			"ImmortalOther", // 32
+			"SpecialAction", // 33
+			"AfterSlots", // 34
+			"OnCoinToss", // 35
+			"StartBattleSkill", // 36
+			"OnBurst", // 37
+			"StartVisualCoinToss", // 38
+			"StartVisualSkillUse", // 39
+			"WhenGained", // 40
+			"ChangeMotion", // 41
+			"IgnorePanic", // 42
+			"IgnoreBreak", // 43
+			"OnRetreat", // 44
+			"OnGainBuff", // 45
+			"EncounterStart", // 46
+			"WinParrying", // 47
+			"DefeatParrying", // 48
+			"ChangeTakeDamage", // 49
+			"OnCoinAfterAttack",
+			"EnemyBeforeAttack",
+			//timingStringList.Add("ChangeSinBuffDamage");
+			"DelayedStart" // HBMBACMAB
+		];
 		//timingStringList.Add("ChangeSinBuffDamage");
-		timingStringList.Add("DelayedStart"); // HBMBACMAB
 
-		Il2CppArrayBase<string> timingStringArray = timingStringList.ToArray();
-		int count = timingStringArray.Count;
-		for (int i = 0; i < count; i++) timingDict.Add(timingStringArray[i], i);
+		int count = timingStringList.Count;
+		for (int i = 0; i < count; i++) timingDict.Add(timingStringList[i], i);
 
 		timingDict.Add("RoundStart", -1);
 		timingDict.Add("OSA", timingDict["OnSucceedAttack"]);
@@ -412,7 +413,7 @@ public class MainClass : BasePlugin
 			if (unitOrNull == null) return null;
 				
 			trySlotID = Math.Min(trySlotID, unitOrNull.GetPermanentSinActionListCount());
-			sinAction = unitOrNull.GetSinActionList()[trySlotID];
+			sinAction = unitOrNull.GetSinActionList().ToArray()[trySlotID];
 		}
 		else if (actionOrNull != null) sinAction = actionOrNull.SinAction;
 		if (sinAction == null) return null;
@@ -420,9 +421,62 @@ public class MainClass : BasePlugin
 		UnitSinModel sin = null;
 		if (selection == "replaced") sin = sinAction.GetReplacedSinByDefenseSkill();
 		else if (selection == "ready") sin = sinAction.readySin;
-		else if (selection == "top") sin = sinAction.currentSinList[1];
-		else if (selection == "bottom") sin = sinAction.currentSinList[0];
+		else if (selection == "top") sin = sinAction.currentSinList.ToArray()[1];
+		else if (selection == "bottom") sin = sinAction.currentSinList.ToArray()[0];
 		return sin;
+	}
+	
+	public static ATTRIBUTE_TYPE SortSinResourceGetEnum(SinManager.EgoStockManager stock_manager, string modestring, UNIT_FACTION faction)
+	{
+		bool mode_greatest = !modestring.Contains("lowest");
+		bool mode_random = modestring.Contains("random");
+		
+		List<ATTRIBUTE_TYPE> sin_list = new([
+			ATTRIBUTE_TYPE.CRIMSON,
+			ATTRIBUTE_TYPE.SCARLET,
+			ATTRIBUTE_TYPE.AMBER,
+			ATTRIBUTE_TYPE.SHAMROCK,
+			ATTRIBUTE_TYPE.AZURE,
+			ATTRIBUTE_TYPE.INDIGO,
+			ATTRIBUTE_TYPE.VIOLET
+		]);
+		
+		if (mode_random) //randomize order
+		{
+			int n = sin_list.Count;
+			while (n > 1)
+			{
+				n--;
+				int k = MainClass.rng.Next(n + 1); // 0 to X Exclusive upper bound
+				if (k == n) continue; // No change to list
+				(sin_list[k], sin_list[n]) = (sin_list[n], sin_list[k]);
+			}
+		}
+
+		int best_stock = mode_greatest ? -999 : 999;
+		ATTRIBUTE_TYPE best_sin = ATTRIBUTE_TYPE.CRIMSON;
+		foreach (ATTRIBUTE_TYPE sin in sin_list)
+		{
+			int stock = stock_manager.GetAttributeStockNumberByAttributeType(faction, sin);
+			if (mode_greatest)
+			{
+				if (stock > best_stock)
+				{
+					best_stock = stock;
+					best_sin = sin;
+				}
+			}
+			else
+			{
+				if (stock < best_stock)
+				{
+					best_stock = stock;
+					best_sin = sin;
+				}
+			}
+		}
+
+		return best_sin;
 	}
 	
 	public static System.Collections.Generic.KeyValuePair<string, int> GetMaxValue(
@@ -472,7 +526,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.8.1";
+	public const string VERSION = "4.8.2";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
