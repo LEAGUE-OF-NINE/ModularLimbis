@@ -272,6 +272,7 @@ public class MainClass : BasePlugin
 		acquirerDict["getallcoinstates"] = new AcquirerAllCoinState();
 		acquirerDict["getresonance"] = new AcquirerResonance();
 		acquirerDict["getresource"] = new AcquirerResource();
+		acquirerDict["resourcegetenum"] = new AcquirerResourceGetEnum();
 		acquirerDict["haskey"] = new AcquirerHasKey();
 		acquirerDict["getskillbase"] = new AcquirerSkillBase();
 		acquirerDict["getskillatkweight"] = new AcquirerSkillAtkWeight();
