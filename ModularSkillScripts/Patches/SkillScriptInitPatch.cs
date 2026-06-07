@@ -947,6 +947,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modba.modsa_buffModel = buf;
 				modba.modsa_coinModel = coinOrNull;
 				modba.Enact(__instance, null, null, attackActionOrNull, actevent_ChangeTakeDamage, timing);
+				if (modba.ischangedamagetaken) finalDmgChange = modba.changedamagetaken;
 			}
 		}
 		
