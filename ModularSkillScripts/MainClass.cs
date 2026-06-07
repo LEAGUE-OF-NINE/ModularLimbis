@@ -12,6 +12,8 @@ using Il2CppSystem.IO;
 using ModularSkillScripts.Acquirer;
 using ModularSkillScripts.Patches;
 using Il2CppSystem.Text.RegularExpressions;
+using StringSplitOptions = System.StringSplitOptions;
+
 //using Antlr4.Runtime;
 //using Antlr4.Runtime.Tree;
 //using ModsaLang;
@@ -429,18 +431,42 @@ public class MainClass : BasePlugin
 	
 	public static ATTRIBUTE_TYPE SortSinResourceGetEnum(SinManager.EgoStockManager stock_manager, string modestring, UNIT_FACTION faction)
 	{
-		bool mode_greatest = !modestring.Contains("lowest");
-		bool mode_random = modestring.Contains("random");
+		bool mode_greatest = false;
+		bool mode_random = false;
+
+		List<ATTRIBUTE_TYPE> sin_list = [];
+		if (modestring.Contains(','))
+		{
+			string[] selections = modestring.Split(',', StringSplitOptions.RemoveEmptyEntries);
+			int selections_count = selections.Length;
+			if (selections_count < 1) return ATTRIBUTE_TYPE.CRIMSON;
+			string selections_0 = selections[0];
+			mode_greatest = !selections_0.Contains("lowest");
+			mode_random = selections_0.Contains("random");
+			
+			for (int i = 1; i < selections_count; i++)
+			{
+				ATTRIBUTE_TYPE sin_temp = ATTRIBUTE_TYPE.NONE;
+				string s = selections[i];
+				Enum.TryParse(s, true, out sin_temp);
+				if (sin_temp != ATTRIBUTE_TYPE.NONE) sin_list.Add(sin_temp);
+			}
+		}
+		else
+		{
+			mode_greatest = !modestring.Contains("lowest");
+			mode_random = modestring.Contains("random");
+			sin_list = [
+				ATTRIBUTE_TYPE.CRIMSON,
+				ATTRIBUTE_TYPE.SCARLET,
+				ATTRIBUTE_TYPE.AMBER,
+				ATTRIBUTE_TYPE.SHAMROCK,
+				ATTRIBUTE_TYPE.AZURE,
+				ATTRIBUTE_TYPE.INDIGO,
+				ATTRIBUTE_TYPE.VIOLET
+			];
+		}
 		
-		List<ATTRIBUTE_TYPE> sin_list = new([
-			ATTRIBUTE_TYPE.CRIMSON,
-			ATTRIBUTE_TYPE.SCARLET,
-			ATTRIBUTE_TYPE.AMBER,
-			ATTRIBUTE_TYPE.SHAMROCK,
-			ATTRIBUTE_TYPE.AZURE,
-			ATTRIBUTE_TYPE.INDIGO,
-			ATTRIBUTE_TYPE.VIOLET
-		]);
 		
 		if (mode_random) //randomize order
 		{
@@ -527,7 +553,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.8.2";
+	public const string VERSION = "4.8.3";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
