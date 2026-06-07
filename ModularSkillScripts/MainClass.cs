@@ -435,9 +435,9 @@ public class MainClass : BasePlugin
 		bool mode_random = false;
 
 		List<ATTRIBUTE_TYPE> sin_list = [];
-		if (modestring.Contains(','))
+		if (modestring.Contains('+'))
 		{
-			string[] selections = modestring.Split(',', StringSplitOptions.RemoveEmptyEntries);
+			string[] selections = modestring.Split('+', StringSplitOptions.RemoveEmptyEntries);
 			int selections_count = selections.Length;
 			if (selections_count < 1) return ATTRIBUTE_TYPE.CRIMSON;
 			string selections_0 = selections[0];
