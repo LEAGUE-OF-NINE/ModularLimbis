@@ -935,20 +935,33 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		int finalDmgChange = resultDmg;
 		int actevent_ChangeTakeDamage = MainClass.timingDict["ChangeTakeDamage"];
 
+		foreach (BuffModel buf in __instance.GetActivatedBuffModels())
+		{
+			foreach (ModularSA modba in GetAllModbaFromBuffModel(buf))
+			{
+				if (modba.activationTiming != actevent_ChangeTakeDamage) continue;
+				modba.ischangedamagetaken = false;
+				modba.changedamagetaken = 0;
+				modba.lastFinalDmg = resultDmg;
+				modba.changedamage_source = dmgSrcType;
+				modba.modsa_buffModel = buf;
+				modba.modsa_coinModel = coinOrNull;
+				modba.Enact(__instance, null, null, attackActionOrNull, actevent_ChangeTakeDamage, timing);
+			}
+		}
+		
 		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
 			{
-				//if (modpa.activationTiming != actevent_ChangeTakeDamage) continue;
-				//BUFF_UNIQUE_KEYWORD trigger = modpa.keywordTrigger;
-				//if ((trigger != BUFF_UNIQUE_KEYWORD.None) && (trigger != keyword))
-				//	continue;
+				if (modpa.activationTiming != actevent_ChangeTakeDamage) continue;
 				modpa.ischangedamagetaken = false;
 				modpa.changedamagetaken = 0;
 				modpa.lastFinalDmg = resultDmg;
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.changedamage_source = dmgSrcType;
-				modpa.Enact(__instance, null, null, null, actevent_ChangeTakeDamage, timing);
+				modpa.modsa_coinModel = coinOrNull;
+				modpa.Enact(__instance, null, null, attackActionOrNull, actevent_ChangeTakeDamage, timing);
 				if (modpa.ischangedamagetaken) finalDmgChange = modpa.changedamagetaken;
 			}
 		}
@@ -957,16 +970,14 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		{
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
-				//if (modpa.activationTiming != actevent_ChangeTakeDamage) continue;
-				//BUFF_UNIQUE_KEYWORD trigger = modpa.keywordTrigger;
-				//if ((trigger != BUFF_UNIQUE_KEYWORD.None) && (trigger != keyword))
-				//	continue;
+				if (modpa.activationTiming != actevent_ChangeTakeDamage) continue;
 				modpa.ischangedamagetaken = false;
 				modpa.changedamagetaken = 0;
 				modpa.lastFinalDmg = resultDmg;
 				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.changedamage_source = dmgSrcType;
-				modpa.Enact(__instance, null, null, null, actevent_ChangeTakeDamage, timing);
+				modpa.modsa_coinModel = coinOrNull;
+				modpa.Enact(__instance, null, null, attackActionOrNull, actevent_ChangeTakeDamage, timing);
 				if (modpa.ischangedamagetaken) finalDmgChange = modpa.changedamagetaken;
 			}
 		}
