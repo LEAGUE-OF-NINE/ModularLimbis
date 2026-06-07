@@ -16,7 +16,7 @@ public class ConsequenceResource : IModularConsequence
 		
 		string circle_0 = circles[0];
 		int instruction_length = circle_0.Length;
-		if (instruction_length <= 2)
+		if (instruction_length <= 2 || circle_0.StartsWith("VAL"))
 		{
 			int sin_as_int = modular.GetNumFromParamString(circle_0);
 			sin = (ATTRIBUTE_TYPE)sin_as_int;
