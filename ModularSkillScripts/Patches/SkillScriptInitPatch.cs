@@ -1994,6 +1994,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	private static void Postfix_BuffModel_OnStartTurnBeforeLog(BattleUnitModel unit, BattleActionModel action, BATTLE_EVENT_TIMING timing, BuffModel __instance) {
 		int actevent = MainClass.timingDict["WhenUse"];
 		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
+			if (modba.resetWhenUse) modba.ResetAdders(); // Reset Adders if for some reason this skill is used again
 			modba.modsa_buffModel = __instance;
 			modba.Enact(unit, action.Skill, action, null, actevent, timing);
 		}
