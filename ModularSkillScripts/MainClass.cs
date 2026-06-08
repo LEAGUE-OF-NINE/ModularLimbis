@@ -96,6 +96,7 @@ public class MainClass : BasePlugin
 		timingDict.Add("BSA", timingDict["BeforeSA"]);
 		timingDict.Add("BWH", timingDict["BeforeWhenHit"]);
 		timingDict.Add("SBS", timingDict["StartBattleSkill"]);
+		timingDict.Add("OnUseBuf", timingDict["OnUseBuff"]);
 
 		// legacy to new stuff translator
 		timingDict.Add("StartBehaviour", timingDict["OnStartBehaviour"]);
