@@ -1193,7 +1193,8 @@ public class ModularSA : Il2CppSystem.Object
 		string methodology = sectionArgs[0];
 		string circledSection = "";
 		if (sectionArgs.Length > 1) circledSection = sectionArgs[1];
-		string[] circles = circledSection.Split(',');
+		string[] circles = [];
+		if (circledSection.Length > 0) circles = circledSection.Split(',');
 
 		if (MainClass.acquirerDict.TryGetValue(methodology, out var acquirer))
 		{
