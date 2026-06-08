@@ -292,8 +292,8 @@ public class MainClass : BasePlugin
 		acquirerDict["iscoinbroken"] = new AcquirerCoinIsBroken();
 		acquirerDict["stack"] = new AcquirerStack();
 		acquirerDict["turn"] = new AcquirerTurn();
-		acquirerDict["onusebufstack"] = new AcquirerStack();
-		acquirerDict["onusebufturn"] = new AcquirerTurn();
+		acquirerDict["onusebufstack"] = new AcquirerStack(1);
+		acquirerDict["onusebufturn"] = new AcquirerTurn(1);
 		acquirerDict["onusebufiskeyword"] = new AcquirerOnUseBufIsKeyword();
 		acquirerDict["isfocused"] = new AcquirerIsFocused();
 		acquirerDict["getunitcount"] = new AcquirerUnitCount();
