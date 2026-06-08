@@ -866,6 +866,51 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 	}
 
+
+	public static BUFF_UNIQUE_KEYWORD onusebuf_keyword = BUFF_UNIQUE_KEYWORD.None;
+	public static int onusebuf_stack = 0;
+	public static int onusebuf_turn = 0;
+	
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnUseBuff))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_RightAfterGetAnyBuffMT(BUFF_UNIQUE_KEYWORD keyword, int stack, int turn, BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
+	{
+		int actevent = MainClass.timingDict["OnUseBuff"];
+
+		onusebuf_keyword = keyword;
+		onusebuf_stack = stack;
+		onusebuf_turn = turn;
+
+		foreach (BuffModel buf in __instance._buffDetail.GetActivatedBuffModelAll())
+		{
+			foreach (ModularSA modba in GetAllModbaFromBuffModel(buf))
+			{
+				if (modba.activationTiming != actevent) continue;
+				modba.modsa_buffModel = buf;
+				modba.Enact(__instance, null, null, null, actevent, timing);
+			}
+		}
+		
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
+			{
+				if (modpa.activationTiming != actevent) continue;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance, null, null, null, actevent, timing);
+			}
+		}
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
+			{
+				if (modpa.activationTiming != actevent) continue;
+				modpa.modsa_passiveModel = egoPassiveModel;
+				modpa.Enact(__instance, null, null, null, actevent, timing);
+			}
+		}
+	}
+
 	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnVibrationExplosionOtherUnit))]
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnVibrationExplosionOtherUnit(BattleUnitModel explodedUnit, BattleUnitModel giverOrNull, BattleActionModel actionOrNull, ABILITY_SOURCE_TYPE abilitySrc, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
@@ -953,7 +998,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		
 		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
 		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
 			{
 				if (modpa.activationTiming != actevent_ChangeTakeDamage) continue;
 				modpa.ischangedamagetaken = false;

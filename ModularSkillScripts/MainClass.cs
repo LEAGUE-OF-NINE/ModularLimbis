@@ -75,10 +75,11 @@ public class MainClass : BasePlugin
 			"IgnoreBreak", // 43
 			"OnRetreat", // 44
 			"OnGainBuff", // 45
-			"EncounterStart", // 46
-			"WinParrying", // 47
-			"DefeatParrying", // 48
-			"ChangeTakeDamage", // 49
+			"OnUseBuff",
+			"EncounterStart",
+			"WinParrying",
+			"DefeatParrying",
+			"ChangeTakeDamage",
 			"OnCoinAfterAttack",
 			"EnemyBeforeAttack",
 			//timingStringList.Add("ChangeSinBuffDamage");
@@ -291,6 +292,9 @@ public class MainClass : BasePlugin
 		acquirerDict["iscoinbroken"] = new AcquirerCoinIsBroken();
 		acquirerDict["stack"] = new AcquirerStack();
 		acquirerDict["turn"] = new AcquirerTurn();
+		acquirerDict["onusebufstack"] = new AcquirerStack();
+		acquirerDict["onusebufturn"] = new AcquirerTurn();
+		acquirerDict["onusebufiskeyword"] = new AcquirerOnUseBufIsKeyword();
 		acquirerDict["isfocused"] = new AcquirerIsFocused();
 		acquirerDict["getunitcount"] = new AcquirerUnitCount();
 		acquirerDict["getbreakcount"] = new AcquirerBreakCount();
@@ -553,7 +557,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.8.3";
+	public const string VERSION = "4.8.4";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
