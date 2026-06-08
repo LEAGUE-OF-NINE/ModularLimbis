@@ -82,7 +82,8 @@ public class MainClass : BasePlugin
 			"OnCoinAfterAttack",
 			"EnemyBeforeAttack",
 			//timingStringList.Add("ChangeSinBuffDamage");
-			"DelayedStart" // HBMBACMAB
+			"DelayedStart", // HBMBACMAB
+			"OnUseBuff"
 		];
 		//timingStringList.Add("ChangeSinBuffDamage");
 
