@@ -76,6 +76,24 @@ internal class StagePatches
 		int round = __instance.GetCurrentRound();
 		MainClass.LogModular("Postfix_StageController_StartRound | Round: " + round);
 
+		SinManager sinManager_inst = Singleton<SinManager>.Instance;
+		BattleObjectManager _battleObjectManager = sinManager_inst._battleObjectManager;
+		StageModel stageModel = __instance.StageModel;
+		
+		StageController stageController_inst = Singleton<StageController>.Instance;
+		BatonPassManager batonManager = stageController_inst?._batonPassManager;
+		bool backupenabled = batonManager != null && batonManager.IsBatonPassOn(UNIT_FACTION.PLAYER);
+		if (!backupenabled)
+		{
+			foreach (BattleUnitModel unit in _battleObjectManager.GetModelList(UNIT_FACTION.PLAYER, false))
+			{
+				if (!unit.IsDead() || unit.IsRetreated()) continue;
+				if (unit.GetSinActionListCount() < 1) continue;
+				unit.DestroyAllSinActionModels();
+				//unit.Retreat(unit, BUFF_UNIQUE_KEYWORD.None, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+		
 		int amount_before = SkillScriptInitPatch.modsaDict.Count;
 		int duplicate_bad = 0;
 		int duplicate_good = 0;
@@ -108,11 +126,6 @@ internal class StagePatches
 				
 		MainClass.LogModular("Modsa cleanup before: " + amount_before + " - after: " + amount_after);
 		MainClass.LogModular("Modsa EGO removed: " + duplicate_bad + " - EGO kept: " + duplicate_good);
-			
-
-		SinManager sinManager_inst = Singleton<SinManager>.Instance;
-		BattleObjectManager _battleObjectManager = sinManager_inst._battleObjectManager;
-		StageModel stageModel = __instance.StageModel;
 
 		List<BattleUnitModel> playerUnit_list = _battleObjectManager.GetAliveList(false, UNIT_FACTION.PLAYER);
 
@@ -226,15 +239,17 @@ internal class StagePatches
 			SinManager sinManager_inst = Singleton<SinManager>.Instance;
 			BattleObjectManager _battleObjectManager = sinManager_inst._battleObjectManager;
 
-			bool removedead = false;
+			// From before nobackup slotremoval
+			/*bool removedead = false;
 			StageController stageController_inst = Singleton<StageController>.Instance;
 			BatonPassManager batonManager = stageController_inst?._batonPassManager;
-			removedead = batonManager != null && batonManager.IsBatonPassOn(UNIT_FACTION.PLAYER);
+			removedead = batonManager != null && batonManager.IsBatonPassOn(UNIT_FACTION.PLAYER);*/
 			
 			foreach (int ID in doubleslotterIDList)
 			{
 				BattleUnitModel unitModel = _battleObjectManager.GetModel(ID);
-				if (unitModel != null && (!removedead || !unitModel.IsDead())) slotAdder += 1;
+				if (unitModel != null && !unitModel.IsDead() && !unitModel.IsRetreated() && unitModel.GetSinActionListCount() > 0) slotAdder += 1;
+				//if (unitModel != null && (!removedead || !unitModel.IsDead())) slotAdder += 1;
 			}
 		}
 
