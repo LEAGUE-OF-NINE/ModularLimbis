@@ -3039,7 +3039,23 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			__instance._actionList.Remove(action);
 			__instance._actionList.Add(action);
 		}
-		
 	}
 
+	[HarmonyPatch(typeof(SinActionModel), nameof(SinActionModel.GetSlotWeight))]
+	[HarmonyPostfix]
+	public static void Postfix_SinActionModel_GetSlotWeight(ref int __result, SinActionModel __instance)
+	{
+		if (__result > 1) return;
+		if (__instance.GetSlotIndex() != 0) return;
+		BattleUnitModel unit = __instance.UnitModel;
+		if (unit == null) return;
+		//if (unit.GetPermanentSinActionListCount() > 1) return;
+		UnitDataModel unitDataModel = unit.UnitDataModel;
+		if (unitDataModel == null) return;
+		
+		List<string> unitKeywordList = unitDataModel.ClassInfo.unitKeywordList;
+		if (!unitKeywordList.Contains("2weight")) return;
+		__result = 2;
+	}
+	
 }
