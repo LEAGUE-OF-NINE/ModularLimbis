@@ -3057,5 +3057,103 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		if (!unitKeywordList.Contains("2weight")) return;
 		__result = 2;
 	}
+
+	/*[HarmonyPatch(typeof(SinActionModel), nameof(SinActionModel.SelectSin), new Type[] { typeof(UnitSinModel)})]
+	[HarmonyPostfix]
+	public static void Postfix_SinActionModel_SelectSinA(UnitSinModel sin, SinActionModel __instance)
+	{
+		MainClass.LogModular("SetTargetAutoBozo_A");
+		Postfix_SinActionModel_SelectSinB(sin, null, __instance);
+	}
+	[HarmonyPatch(typeof(SinActionModel), nameof(SinActionModel.SelectSin), new Type[] { typeof(UnitSinModel), typeof(SinActionModel) })]
+	[HarmonyPostfix]
+	public static void Postfix_SinActionModel_SelectSinB(UnitSinModel sin, SinActionModel targetSinAction,  SinActionModel __instance)*/
+	[HarmonyPatch(typeof(BattleActionModel), nameof(BattleActionModel.SetTarget))]
+	[HarmonyPostfix]
+	public static void Postfix_SinActionModel_SelectSinB(BattleActionModel __instance)
+	{
+		//int errorstep = 1;
+		//MainClass.LogModular("Step "+ errorstep);
+		if (__instance.GetSkillTargetType() != SKILL_TARGET_TYPE.RANDOM) return;
+		if (__instance.Model.Faction != UNIT_FACTION.ENEMY) return;
+
+		foreach (AbilityData abilityData in __instance.Skill.skillData.abilityScriptList)
+		{
+			string abilityScriptname = abilityData.ScriptName;
+			if (abilityScriptname == "slotweight_fill_disable") return;
+		}
+		MainClass.LogModular("Slotweight Fill In against Sinners");
+		/*BattleActionModel action = sin._currentAction;
+		errorstep += 1;
+		MainClass.LogModular("Step "+ errorstep);
+		if (action.GetSkillTargetType() != SKILL_TARGET_TYPE.RANDOM) return;*/
+		//if (__instance.GetSkillTargetType() != SKILL_TARGET_TYPE.RANDOM || overwritedTargetType != SKILL_TARGET_TYPE.NONE)
+		//{
+		//	if (overwritedTargetType != SKILL_TARGET_TYPE.RANDOM) return;
+		//}
+		BattleActionModel.TargetDataDetail targetDataDetail = __instance._targetDataDetail;
+		BattleActionModel.TargetDataDetail.TargetDataSet targetDataSet = targetDataDetail.GetCurrentTargetSet();
+		TargetSinActionData mainTarget = targetDataSet._mainTarget;
+		List<TargetSinActionData> subTargetList = targetDataSet._subTargetList;
+		
+		int subtarget_count = subTargetList.Count;
+		int mainSlotWeight = mainTarget._targetSinAction.GetSlotWeight();
+		int weightdiff = mainSlotWeight - mainTarget._count;
+		if (weightdiff > 0 && subtarget_count > 0)
+		{
+			int i = subTargetList.Count - 1;
+			while (i >= 0 && weightdiff > 0)
+			{
+				TargetSinActionData subtarget = subTargetList[i];
+				i -= 1;
+				int maxdrain = Math.Min(subtarget._count, weightdiff);
+				if (subtarget._count - maxdrain < 1)
+				{
+					mainTarget._count += maxdrain;
+					weightdiff -= maxdrain;
+					subTargetList.Remove(subtarget);
+				}
+				else
+				{
+					mainTarget._count += maxdrain;
+					weightdiff -= maxdrain;
+					subtarget._count -= maxdrain;
+				}
+			}
+		}
+		
+		
+		int i_1 = 0;
+		while (targetDataSet._subTargetList.Count > 0 && targetDataSet._subTargetList.Count > i_1)
+		{
+			TargetSinActionData subtarget_1 = subTargetList[i_1];
+			i_1 += 1;
+			weightdiff = subtarget_1._targetSinAction.GetSlotWeight() - subtarget_1._count;
+			if (weightdiff > 0 && targetDataSet._subTargetList.Count > i_1)
+			{
+				int i_2 = targetDataSet._subTargetList.Count - 1;
+				while (i_2 >= i_1 && weightdiff > 0)
+				{
+					TargetSinActionData subtarget_2 = subTargetList[i_2];
+					i_2 -= 1;
+					int maxdrain = Math.Min(subtarget_2._count, weightdiff);
+					if (subtarget_2._count - maxdrain < 1)
+					{
+						subtarget_1._count += maxdrain;
+						weightdiff -= maxdrain;
+						targetDataSet._subTargetList.Remove(subtarget_2);
+					}
+					else
+					{
+						subtarget_1._count += maxdrain;
+						weightdiff -= maxdrain;
+						subtarget_2._count -= maxdrain;
+					}
+				}
+				
+			}
+		}
+		
+	}
 	
 }
