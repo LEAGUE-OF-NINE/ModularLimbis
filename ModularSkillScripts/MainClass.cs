@@ -82,6 +82,8 @@ public class MainClass : BasePlugin
 			"ChangeTakeDamage",
 			"OnCoinAfterAttack",
 			"EnemyBeforeAttack",
+			"AfterChangeShield",
+			"AfterChangeHP",
 			//timingStringList.Add("ChangeSinBuffDamage");
 			"DelayedStart" // HBMBACMAB
 		];
@@ -558,7 +560,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.8.4";
+	public const string VERSION = "4.8.5";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 

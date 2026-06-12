@@ -1031,6 +1031,116 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		if (finalDmgChange != resultDmg) __result = finalDmgChange;
 	}
 
+
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnAddShield))]
+	[HarmonyPostfix]
+	public static void Postfix_BattleUnitModel_OnAddShield(
+		BATTLE_EVENT_TIMING timing, int value,
+		BattleUnitModel __instance)
+	{
+		BattleUnitModel_OnChangeShield(__instance, value, timing);
+	}
+	
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnReduceShield))]
+	[HarmonyPostfix]
+	public static void Postfix_BattleUnitModel_OnReduceShield(
+		BATTLE_EVENT_TIMING timing,
+		int old,
+		int value,
+		BattleUnitModel attackerOrNull,
+		BattleUnitModel __instance)
+	{
+		int shield_diff = value - old;
+		BattleUnitModel_OnChangeShield(__instance, shield_diff, timing);
+	}
+	
+	public static void BattleUnitModel_OnChangeShield(
+		BattleUnitModel unit, int shield_diff, BATTLE_EVENT_TIMING timing)
+	{
+		int actevent = MainClass.timingDict["AfterChangeShield"];
+		
+		foreach (BuffModel buf in unit.GetActivatedBuffModels())
+		{
+			foreach (ModularSA modba in GetAllModbaFromBuffModel(buf))
+			{
+				if (modba.activationTiming != actevent) continue;
+				modba.valueList[9] = shield_diff;
+				modba.modsa_buffModel = buf;
+				modba.Enact(unit, null, null, null, actevent, timing);
+			}
+		}
+		
+		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList.CopyList())
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
+			{
+				if (modpa.activationTiming != actevent) continue;
+				modpa.valueList[9] = shield_diff;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(unit, null, null, null, actevent, timing);
+			}
+		}
+
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail.EgoPassiveList.CopyList())
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
+			{
+				if (modpa.activationTiming != actevent) continue;
+				modpa.valueList[9] = shield_diff;
+				modpa.modsa_passiveModel = egoPassiveModel;
+				modpa.Enact(unit, null, null, null, actevent, timing);
+			}
+		}
+	}
+
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnChangeHp))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_OnChangeHP(
+		int oldHp,
+		int newHp,
+		DAMAGE_SOURCE_TYPE dmgSrcType,
+		BATTLE_EVENT_TIMING timing,
+		BattleUnitModel attackerOrNull,
+		BattleActionModel actionOrNull,
+		BattleUnitModel __instance)
+	{
+		int actevent = MainClass.timingDict["AfterChangeHP"];
+		int hpdiff = newHp - oldHp;
+		
+		foreach (BuffModel buf in __instance.GetActivatedBuffModels())
+		{
+			foreach (ModularSA modba in GetAllModbaFromBuffModel(buf))
+			{
+				if (modba.activationTiming != actevent) continue;
+				modba.valueList[9] = hpdiff;
+				modba.modsa_buffModel = buf;
+				modba.Enact(__instance, null, null, actionOrNull, actevent, timing);
+			}
+		}
+		
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
+			{
+				if (modpa.activationTiming != actevent) continue;
+				modpa.valueList[9] = hpdiff;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance, null, null, actionOrNull, actevent, timing);
+			}
+		}
+
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
+		{
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
+			{
+				if (modpa.activationTiming != actevent) continue;
+				modpa.valueList[9] = hpdiff;
+				modpa.modsa_passiveModel = egoPassiveModel;
+				modpa.Enact(__instance, null, null, actionOrNull, actevent, timing);
+			}
+		}
+	}
+
 	//[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetSinBuffDamageMultiplier))]
 	//[HarmonyPostfix]
 	//private static void Postfix_BattleUnitModel_GetSinBuffDamageMultiplier(
