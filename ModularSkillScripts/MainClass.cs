@@ -125,7 +125,7 @@ public class MainClass : BasePlugin
 		harmony.PatchAll(typeof(SkillScriptInitPatch));
 		harmony.PatchAll(typeof(StagePatches));
 		harmony.PatchAll(typeof(UniquePatches));
-		harmony.PatchAll(typeof(LogoPlayerPatches));
+		// harmony.PatchAll(typeof(LogoPlayerPatches));
 		harmony.PatchAll(typeof(ReloadPatches));
 		harmony.PatchAll(typeof(OnGainBuffPatches));
 		// We don't do this bullshit
