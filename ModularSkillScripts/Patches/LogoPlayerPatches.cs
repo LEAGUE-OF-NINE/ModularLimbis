@@ -6,7 +6,7 @@ namespace ModularSkillScripts.Patches;
 internal class LogoPlayerPatches
 {
 
-	[HarmonyPatch(typeof(LogoPlayer), nameof(LogoPlayer.Awake))]
+	[HarmonyPatch(typeof(LogoSceneManager), nameof(LogoSceneManager.Awake))]
 	[HarmonyPrefix]
 	private static void Prefix_NewOperationController_EquipDefense()
 	{
