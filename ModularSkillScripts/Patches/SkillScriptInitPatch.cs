@@ -2973,7 +2973,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			unit = __instance.unitModel;
 		}
 		SkillModel skill = currentSkillViewer.GetSkillModel();
-		MainClass.LogModular($"StartVisualCoinToss, skill = {skill.GetID()}");
+		// MainClass.LogModular($"StartVisualCoinToss, skill = {skill.GetID()}");
 		
 		//var skillData_fromStatic = Singleton<StaticDataManager>.Instance._skillList.GetData(skillID);
 		//var model = __instance._unitModel.UnitDataModel;
@@ -3006,7 +3006,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			unit = __instance.unitModel;
 		}
 		SkillModel skill = currentSkillViewer.GetSkillModel();
-		MainClass.LogModular($"StartVisualSkillUse, skill = {skill.GetID()}");
+		//MainClass.LogModular($"StartVisualSkillUse, skill = {skill.GetID()}");
 		
 		//var skillID = __instance.GetCurrentSkillViewer().curSkillID;
 		//var skillData = Singleton<StaticDataManager>.Instance._skillList.GetData(skillID);
