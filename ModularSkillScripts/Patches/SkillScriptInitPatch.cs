@@ -432,27 +432,24 @@ public class SkillScriptInitPatch
 		yield return null;
 		foreach (KeyValuePair<int, BattleObjectManager.BattleUnit> allUnit in SingletonBehavior<BattleObjectManager>.Instance._allUnitDictionary)
 		{
-			PassiveDetail __instance = allUnit.Value?.Model._passiveDetail;
-			foreach (long key in modpaDict.Keys)
-			{
-				List<ModularSA> value = modpaDict[key];
-				foreach (ModularSA modular in value) modular.ResetAdders();
-			}
-			copypastesolution(__instance._owner, null, null, null, "DelayedStart", BATTLE_EVENT_TIMING.ALL_TIMING, __instance);
-
-			foreach (SinActionModel sinAction in __instance._owner.GetSinActionList())
+			PassiveDetail passiveDetail = allUnit.Value?.Model._passiveDetail;
+			if (passiveDetail == null) continue;
+			BattleUnitModel unit = passiveDetail._owner;
+			if (unit == null) continue;
+			
+			copypastesolution(unit, null, null, null, "DelayedStart", BATTLE_EVENT_TIMING.ALL_TIMING, passiveDetail);
+			int actevent = MainClass.timingDict["DelayedStart"];
+			
+			foreach (SinActionModel sinAction in unit.GetSinActionList())
 			{
 				foreach (UnitSinModel sinModel in sinAction.currentSinList)
 				{
 					SkillModel skillModel = sinModel.GetSkill();
 					if (skillModel == null) continue;
-					long skillmodel_intlong = skillModel.Pointer.ToInt64();
 
-					if (!modsaDict.ContainsKey(skillmodel_intlong)) continue;
-					foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
-					{
-						//MainClass.Logg.LogInfo("Found modsa - RoundStart");
-						modsa.Enact(__instance._owner, skillModel, null, null, MainClass.timingDict["DelayedStart"], BATTLE_EVENT_TIMING.ALL_TIMING);
+					foreach (ModularSA modsa in GetAllModsaFromSkillModel(skillModel)) {
+						if (modsa.activationTiming != actevent) continue;
+						modsa.Enact(unit, skillModel, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 					}
 				}
 			}
@@ -488,30 +485,39 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		CoroutineRunner.Instance.StartCoroutine(IAmABum().WrapToIl2Cpp());
 			foreach (KeyValuePair<int, BattleObjectManager.BattleUnit> allUnit in SingletonBehavior<BattleObjectManager>.Instance._allUnitDictionary)
 		{
-			PassiveDetail __instance = allUnit.Value?.Model._passiveDetail;
-			foreach (long key in modpaDict.Keys)
+			PassiveDetail passiveDetail = allUnit.Value?.Model._passiveDetail;
+			if (passiveDetail == null) continue;
+			BattleUnitModel unit = passiveDetail._owner;
+			if (unit == null) continue;
+			
+			int actevent = MainClass.timingDict["AfterSlots"];
+			
+			foreach (BuffModel buf in unit._buffDetail.GetActivatedBuffModelAll())
 			{
-				List<ModularSA> value = modpaDict[key];
-				foreach (ModularSA modular in value) modular.ResetAdders();
+				foreach (ModularSA modba in GetAllModbaFromBuffModel(buf))
+				{
+					if (modba.activationTiming != actevent) continue;
+					modba.modsa_buffModel = buf;
+					modba.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				}
 			}
-			copypastesolution(__instance._owner, null, null, null, "AfterSlots", BATTLE_EVENT_TIMING.ALL_TIMING, __instance);
-
-			foreach (SinActionModel sinAction in __instance._owner.GetSinActionList())
+			
+			copypastesolution(unit, null, null, null, "AfterSlots", BATTLE_EVENT_TIMING.ALL_TIMING, passiveDetail);
+			
+			foreach (SinActionModel sinAction in unit.GetSinActionList())
 			{
 				foreach (UnitSinModel sinModel in sinAction.currentSinList)
 				{
 					SkillModel skillModel = sinModel.GetSkill();
 					if (skillModel == null) continue;
-					long skillmodel_intlong = skillModel.Pointer.ToInt64();
 
-					if (!modsaDict.ContainsKey(skillmodel_intlong)) continue;
-					foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
-					{
-						//MainClass.Logg.LogInfo("Found modsa - RoundStart");
-						modsa.Enact(__instance._owner, skillModel, null, null, MainClass.timingDict["AfterSlots"], BATTLE_EVENT_TIMING.ALL_TIMING);
+					foreach (ModularSA modsa in GetAllModsaFromSkillModel(skillModel)) {
+						if (modsa.activationTiming != actevent) continue;
+						modsa.Enact(unit, skillModel, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 					}
 				}
 			}
+			
 		}
 	}
 
