@@ -312,6 +312,7 @@ public class MainClass : BasePlugin
 		acquirerDict["getskillteamkill"] = new AcquirerSkillTeamKill();
 		acquirerDict["getskillfixedtarget"] = new AcquirerSkillFixed();
 		acquirerDict["getcoinoperator"] = new AcquirerCoinOperator();
+		acquirerDict["coinindex"] = new AcquirerCoinIndex();
 		acquirerDict["getbufftype"] = new AcquirerBuffType();
 		acquirerDict["getatkres"] = new AcquirerGetAtkResSinner();
 		acquirerDict["getsinres"] = new AcquirerGetSinResSinner();
@@ -560,7 +561,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.8.5";
+	public const string VERSION = "4.8.6";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 

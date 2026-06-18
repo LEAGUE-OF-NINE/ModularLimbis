@@ -299,6 +299,7 @@ public class SkillScriptInitPatch
 		MainClass.SupportPasInit = false;
 		unitMod_list.Clear();
 		skillPtrsRoundStart.Clear();
+		//speed_dict.Clear();
 	}
 
 	public static Dictionary<long, List<ModularSA>> modsaDict = new();
@@ -2065,6 +2066,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	public static void BattleObjectManager_OnRoundEnd_Postfix()
 	{
+		//speed_dict.Clear();
 		ConsequenceAssistDefense.ClearAssistDefenseEntries();
 	}
 	
@@ -3156,7 +3158,32 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			__instance._actionList.Add(action);
 		}
 	}
-
+	
+	/*
+	public static Dictionary<SinActionModel_Abnormality_Part, int> speed_dict = new();
+	[HarmonyPatch(typeof(SinActionModel_Abnormality_Part), nameof(SinActionModel_Abnormality_Part.GetCurrentSpeed))]
+	[HarmonyPostfix]
+	public static void Postfix_SinActionModel_GetCurrentSpeed(ref int __result, SinActionModel_Abnormality_Part __instance)
+	{
+		MainClass.LogModular("Postfix_SinActionModel_GetCurrentSpeed");
+		if (speed_dict.ContainsKey(__instance))
+		{
+			__result = speed_dict[__instance];
+			return;
+		}
+	
+		BattleUnitModel unit = __instance.UnitModel;
+		int speedAdder_max = unit.GetMaxSpeedAdder();
+		int speedAdder_min = unit.GetMinSpeedAdder();
+		int speedAdder_gen = unit.GetSpeedAdder();
+		int speed_max = unit.GetSpeedUpperLimit();
+		int speed_min = unit.GetSpeedLowerLimit();
+		MainClass.LogModular(speedAdder_max + " | " + speedAdder_min + " | " + speedAdder_gen + " | " + speed_max + " | " + speed_min);
+		int ult = MainClass.rng.Next(speed_min, speed_max+1);
+		speed_dict[__instance] = ult;
+		__result = ult;
+	}*/
+	
 	[HarmonyPatch(typeof(SinActionModel), nameof(SinActionModel.GetSlotWeight))]
 	[HarmonyPostfix]
 	public static void Postfix_SinActionModel_GetSlotWeight(ref int __result, SinActionModel __instance)
@@ -3174,16 +3201,6 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		__result = 2;
 	}
 
-	/*[HarmonyPatch(typeof(SinActionModel), nameof(SinActionModel.SelectSin), new Type[] { typeof(UnitSinModel)})]
-	[HarmonyPostfix]
-	public static void Postfix_SinActionModel_SelectSinA(UnitSinModel sin, SinActionModel __instance)
-	{
-		MainClass.LogModular("SetTargetAutoBozo_A");
-		Postfix_SinActionModel_SelectSinB(sin, null, __instance);
-	}
-	[HarmonyPatch(typeof(SinActionModel), nameof(SinActionModel.SelectSin), new Type[] { typeof(UnitSinModel), typeof(SinActionModel) })]
-	[HarmonyPostfix]
-	public static void Postfix_SinActionModel_SelectSinB(UnitSinModel sin, SinActionModel targetSinAction,  SinActionModel __instance)*/
 	[HarmonyPatch(typeof(BattleActionModel), nameof(BattleActionModel.SetTarget))]
 	[HarmonyPostfix]
 	public static void Postfix_SinActionModel_SelectSinB(BattleActionModel __instance)
