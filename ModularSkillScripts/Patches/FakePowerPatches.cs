@@ -5,6 +5,41 @@ namespace ModularSkillScripts.Patches;
 
 class FakePowerPatches
 {
+	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnSetExpectedTarget))]
+	[HarmonyPrefix]
+	private static void Postfix_SkillModel_OnSetExpectedTarget(BattleActionModel action, BattleActionModel targetAction, SkillModel __instace)
+	{
+		int actevent = MainClass.timingDict["FakePower"];
+		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(__instace)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.Enact(action.Model, __instace, action, targetAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+		}
+	}
+	
+	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnAddBattleAction))]
+	[HarmonyPrefix]
+	private static void Postfix_SkillModel_OnAddBattleAction(BattleActionModel action, SinActionModel targetSinActionNullable, SkillModel __instace)
+	{
+		BattleActionModel targetAction = null;
+		if (targetSinActionNullable != null) targetAction = targetSinActionNullable.CurrentBattleAction;
+		int actevent = MainClass.timingDict["FakePower"];
+		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(__instace)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.Enact(action.Model, __instace, action, targetAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+		}
+	}
+	
+	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnRemoveBattleAction))]
+	[HarmonyPrefix]
+	private static void Postfix_SkillModel_OnRemoveBattleAction(BattleActionModel action, SkillModel __instace)
+	{
+		int actevent = MainClass.timingDict["FakePower"];
+		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(__instace)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.Enact(action.Model, __instace, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+		}
+	}
+/*
 	[HarmonyPatch(typeof(SkillModelManager), nameof(SkillModelManager.GetExpectedWinRate))]
 	[HarmonyPrefix]
 	private static void Postfix_SkillModelManager_GetExpectedWinRate(BattleActionModel selfAction, BattleActionModel oppoAction)
@@ -17,7 +52,7 @@ class FakePowerPatches
 				modular.ResetAdders();
 			}
 		}
-			
+		SkillAbility_RingFingerFavuismTestEffectOnSetTarget
 		long skillmodel_intlong = selfAction.Skill.Pointer.ToInt64();
 		if (SkillScriptInitPatch.modsaDict.ContainsKey(skillmodel_intlong)) {
 			foreach (ModularSA modsa in SkillScriptInitPatch.modsaDict[skillmodel_intlong]) {
@@ -49,7 +84,7 @@ class FakePowerPatches
 			}
 		}
 	}
-
+*/
 
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetExpectedSkillPowerAdder))]
 	[HarmonyPostfix]
