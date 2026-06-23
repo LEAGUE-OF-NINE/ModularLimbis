@@ -234,17 +234,20 @@ public class MainClass : BasePlugin
 		consequenceDict["atkweight"] = new ConsequenceAtkWeight();
 		consequenceDict["changeatktype"] = new ConsequenceChangeAtkType();
 		consequenceDict["setslotweight"] = new ConsequenceSetSlotWeight();
-		// legacy consequences
-		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
-		consequenceDict["buf"] = new ConsequenceBuf();
-		consequenceDict["explosion"] = new ConsequenceExplosion();
-		consequenceDict["surge"] = new ConsequenceSurge();
 		consequenceDict["bufcategory"] = new ConsequenceBuffCategory();
 		consequenceDict["cutinaction"] = new ConsequenceCutInAction();
 		consequenceDict["tagforsort"] = new ConsequenceTagForSort();
 		consequenceDict["insertskill"] = new ConsequenceInsertSkill();
 		consequenceDict["refreshallslotvisual"] = new ConsequenceRefreshAllSlotVisual();
 		consequenceDict["shine"] = new ConsequenceShine();
+		consequenceDict["dashboardeffect"] = new ConsequenceDashhoardEffect();
+
+
+		// legacy consequences
+		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
+		consequenceDict["buf"] = new ConsequenceBuf();
+		consequenceDict["explosion"] = new ConsequenceExplosion();
+		consequenceDict["surge"] = new ConsequenceSurge();
 	}
 
 	private static void RegisterAcquirers()
@@ -563,7 +566,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.8.8";
+	public const string VERSION = "4.8.9";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
