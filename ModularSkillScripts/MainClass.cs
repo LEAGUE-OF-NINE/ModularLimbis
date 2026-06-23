@@ -244,6 +244,7 @@ public class MainClass : BasePlugin
 		consequenceDict["tagforsort"] = new ConsequenceTagForSort();
 		consequenceDict["insertskill"] = new ConsequenceInsertSkill();
 		consequenceDict["refreshallslotvisual"] = new ConsequenceRefreshAllSlotVisual();
+		consequenceDict["shine"] = new ConsequenceShine();
 	}
 
 	private static void RegisterAcquirers()
