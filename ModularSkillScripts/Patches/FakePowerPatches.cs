@@ -1,5 +1,6 @@
 using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
+using Utils;
 
 namespace ModularSkillScripts.Patches;
 
@@ -14,9 +15,38 @@ class FakePowerPatches
 		SkillModel skill = __instance.Skill;
 		if (unit == null || skill == null) return;
 		
+		foreach (BuffModel buf in unit._buffDetail.GetActivatedBuffModelAll())
+		{
+			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
+			{
+				if (modba.activationTiming != actevent) continue;
+				modba.modsa_buffModel = buf;
+				modba.Enact(unit, skill, __instance, targetAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+		
 		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(skill)) {
 			if (modsa.activationTiming != actevent) continue;
 			modsa.Enact(unit, skill, __instance, targetAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+		}
+		
+		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList.CopyList())
+		{
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel))
+			{
+				if (modpa.activationTiming != actevent) continue;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(unit, skill, __instance, targetAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail.EgoPassiveList.CopyList())
+		{
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false))
+			{
+				if (modpa.activationTiming != actevent) continue;
+				modpa.modsa_passiveModel = egoPassiveModel;
+				modpa.Enact(unit, skill, __instance, targetAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
 		}
 	}
 	
@@ -29,10 +59,41 @@ class FakePowerPatches
 		BattleActionModel action = actorAction?.CurrentBattleAction;
 		SkillModel skill = action?.Skill;
 		if (skill == null) return;
+
+		BattleActionModel tgtact = targetAction?.CurrentBattleAction;
+		
+		foreach (BuffModel buf in __instance._buffDetail.GetActivatedBuffModelAll())
+		{
+			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
+			{
+				if (modba.activationTiming != actevent) continue;
+				modba.modsa_buffModel = buf;
+				modba.Enact(__instance, skill, action, tgtact, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
 		
 		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(skill)) {
 			if (modsa.activationTiming != actevent) continue;
-			modsa.Enact(__instance, skill, action, targetAction?.CurrentBattleAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			modsa.Enact(__instance, skill, action, tgtact, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+		}
+		
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
+		{
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel))
+			{
+				if (modpa.activationTiming != actevent) continue;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance, skill, action, tgtact, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
+		{
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false))
+			{
+				if (modpa.activationTiming != actevent) continue;
+				modpa.modsa_passiveModel = egoPassiveModel;
+				modpa.Enact(__instance, skill, action, tgtact, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
 		}
 	}
 	
@@ -46,9 +107,38 @@ class FakePowerPatches
 		SkillModel skill = action?.Skill;
 		if (skill == null) return;
 		
+		foreach (BuffModel buf in __instance._buffDetail.GetActivatedBuffModelAll())
+		{
+			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
+			{
+				if (modba.activationTiming != actevent) continue;
+				modba.modsa_buffModel = buf;
+				modba.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+		
 		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(skill)) {
 			if (modsa.activationTiming != actevent) continue;
 			modsa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+		}
+		
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
+		{
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel))
+			{
+				if (modpa.activationTiming != actevent) continue;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
+		{
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false))
+			{
+				if (modpa.activationTiming != actevent) continue;
+				modpa.modsa_passiveModel = egoPassiveModel;
+				modpa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
 		}
 	}
 /*
@@ -102,41 +192,57 @@ class FakePowerPatches
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_GetExpectedSkillPowerAdder(BattleActionModel action, ref int __result, SkillModel __instance)
 	{
-		int actevent_FakePower = MainClass.timingDict["FakePower"];
-		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (SkillScriptInitPatch.modsaDict.ContainsKey(skillmodel_intlong)) {
-			foreach (ModularSA modsa in SkillScriptInitPatch.modsaDict[skillmodel_intlong]) {
-				if (modsa.activationTiming != actevent_FakePower) continue;
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
-				int power = modsa.skillPowerAdder;
+		int actevent = MainClass.timingDict["FakePower"];
+		BattleUnitModel unit = action.Model;
+		if (unit == null) return;
+		
+		foreach (BuffModel buf in unit._buffDetail.GetActivatedBuffModelAll())
+		{
+			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
+			{
+				if (modba.activationTiming != actevent) continue;
+				int power = modba.skillPowerAdder;
 				__result += power;
 			}
 		}
+		
+		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(__instance)) {
+			if (modsa.activationTiming != actevent) continue;
+			int power = modsa.skillPowerAdder;
+			__result += power;
+		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList)
+		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList.CopyList())
 		{
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong])
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel))
 			{
-				if (modpa.activationTiming != actevent_FakePower) continue;
+				if (modpa.activationTiming != actevent) continue;
 				int power = modpa.skillPowerAdder;
 				__result += power;
 			}
 		}
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail.EgoPassiveList.CopyList())
+		{
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false))
+			{
+				if (modpa.activationTiming != actevent) continue;
+				int power = modpa.skillPowerAdder;
+				__result += power;
+			}
+		}
+		
+		/* I'm not doing this
 		SupportPasPatch.SupportPassiveInit(SkillScriptInitPatch.modpaDict);
 		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
 		{
 			List<ModularSA> modpaList = SkillScriptInitPatch.GetAllModpaFromPasmodelSupport(supportPassive);
 			for (int i = 0; i < modpaList.Count; i++)
 			{
-				if (modpaList[i].activationTiming != actevent_FakePower) continue;
+				if (modpaList[i].activationTiming != actevent) continue;
 				int power = modpaList[i].skillPowerAdder;
 				__result += power;
 			}
-		}
+		}*/
 	}
 
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetExpectedSkillPowerResultAdder))]
@@ -144,40 +250,41 @@ class FakePowerPatches
 	private static void Postfix_SkillModel_GetExpectedSkillPowerResultAdder(BattleActionModel action, ref int __result,
 		SkillModel __instance)
 	{
-		int actevent_FakePower = MainClass.timingDict["FakePower"];
-		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (SkillScriptInitPatch.modsaDict.ContainsKey(skillmodel_intlong))
+		int actevent = MainClass.timingDict["FakePower"];
+		BattleUnitModel unit = action.Model;
+		if (unit == null) return;
+		
+		foreach (BuffModel buf in unit._buffDetail.GetActivatedBuffModelAll())
 		{
-			foreach (ModularSA modsa in SkillScriptInitPatch.modsaDict[skillmodel_intlong])
+			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
 			{
-				if (modsa.activationTiming != actevent_FakePower) continue;
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
-				int power = modsa.skillPowerResultAdder;
+				if (modba.activationTiming != actevent) continue;
+				int power = modba.skillPowerResultAdder;
 				__result += power;
 			}
 		}
+		
+		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(__instance)) {
+			if (modsa.activationTiming != actevent) continue;
+			int power = modsa.skillPowerResultAdder;
+			__result += power;
+		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList)
+		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList.CopyList())
 		{
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong])
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel))
 			{
-				if (modpa.activationTiming != actevent_FakePower) continue;
+				if (modpa.activationTiming != actevent) continue;
 				int power = modpa.skillPowerResultAdder;
 				__result += power;
 			}
 		}
-		SupportPasPatch.SupportPassiveInit(SkillScriptInitPatch.modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail.EgoPassiveList.CopyList())
 		{
-			List<ModularSA> modpaList = SkillScriptInitPatch.GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
-				if (modpaList[i].activationTiming != actevent_FakePower) continue;
-				int power = modpaList[i].skillPowerResultAdder;
+				if (modpa.activationTiming != actevent) continue;
+				int power = modpa.skillPowerResultAdder;
 				__result += power;
 			}
 		}
@@ -187,40 +294,41 @@ class FakePowerPatches
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_GetExpectedParryingResultAdder(BattleActionModel actorAction, ref int __result, SkillModel __instance)
 	{
-		int actevent_FakePower = MainClass.timingDict["FakePower"];
-		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (SkillScriptInitPatch.modsaDict.ContainsKey(skillmodel_intlong))
+		int actevent = MainClass.timingDict["FakePower"];
+		BattleUnitModel unit = actorAction.Model;
+		if (unit == null) return;
+		
+		foreach (BuffModel buf in unit._buffDetail.GetActivatedBuffModelAll())
 		{
-			foreach (ModularSA modsa in SkillScriptInitPatch.modsaDict[skillmodel_intlong])
+			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
 			{
-				if (modsa.activationTiming != actevent_FakePower) continue;
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
-				int power = modsa.parryingResultAdder;
+				if (modba.activationTiming != actevent) continue;
+				int power = modba.parryingResultAdder;
 				__result += power;
 			}
 		}
+		
+		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(__instance)) {
+			if (modsa.activationTiming != actevent) continue;
+			int power = modsa.parryingResultAdder;
+			__result += power;
+		}
 
-		foreach (PassiveModel passiveModel in actorAction.Model._passiveDetail.PassiveList)
+		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList.CopyList())
 		{
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong])
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel))
 			{
-				if (modpa.activationTiming != actevent_FakePower) continue;
+				if (modpa.activationTiming != actevent) continue;
 				int power = modpa.parryingResultAdder;
 				__result += power;
 			}
 		}
-		SupportPasPatch.SupportPassiveInit(SkillScriptInitPatch.modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail.EgoPassiveList.CopyList())
 		{
-			List<ModularSA> modpaList = SkillScriptInitPatch.GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
-				if (modpaList[i].activationTiming != actevent_FakePower) continue;
-				int power = modpaList[i].parryingResultAdder;
+				if (modpa.activationTiming != actevent) continue;
+				int power = modpa.parryingResultAdder;
 				__result += power;
 			}
 		}
@@ -230,39 +338,41 @@ class FakePowerPatches
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_GetExpectedCoinScaleAdder(BattleActionModel action, CoinModel coin, ref int __result, SkillModel __instance)
 	{
-		int actevent_FakePower = MainClass.timingDict["FakePower"];
-		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (SkillScriptInitPatch.modsaDict.ContainsKey(skillmodel_intlong)) {
-			foreach (ModularSA modsa in SkillScriptInitPatch.modsaDict[skillmodel_intlong])
+		int actevent = MainClass.timingDict["FakePower"];
+		BattleUnitModel unit = action.Model;
+		if (unit == null) return;
+		
+		foreach (BuffModel buf in unit._buffDetail.GetActivatedBuffModelAll())
+		{
+			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
 			{
-				if (modsa.activationTiming != actevent_FakePower) continue;
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
-				int power = modsa.coinScaleAdder;
+				if (modba.activationTiming != actevent) continue;
+				int power = modba.coinScaleAdder;
 				__result += power;
 			}
 		}
+		
+		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(__instance)) {
+			if (modsa.activationTiming != actevent) continue;
+			int power = modsa.coinScaleAdder;
+			__result += power;
+		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList)
+		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList.CopyList())
 		{
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong])
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel))
 			{
-				if (modpa.activationTiming != actevent_FakePower) continue;
+				if (modpa.activationTiming != actevent) continue;
 				int power = modpa.coinScaleAdder;
 				__result += power;
 			}
 		}
-		SupportPasPatch.SupportPassiveInit(SkillScriptInitPatch.modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail.EgoPassiveList.CopyList())
 		{
-			List<ModularSA> modpaList = SkillScriptInitPatch.GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
-				if (modpaList[i].activationTiming != actevent_FakePower) continue;
-				int power = modpaList[i].coinScaleAdder;
+				if (modpa.activationTiming != actevent) continue;
+				int power = modpa.coinScaleAdder;
 				__result += power;
 			}
 		}
