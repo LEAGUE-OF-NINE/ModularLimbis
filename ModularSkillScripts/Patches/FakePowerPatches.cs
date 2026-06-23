@@ -7,36 +7,36 @@ class FakePowerPatches
 {
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnSetExpectedTarget))]
 	[HarmonyPrefix]
-	private static void Postfix_SkillModel_OnSetExpectedTarget(BattleActionModel action, BattleActionModel targetAction, SkillModel __instace)
+	private static void Postfix_SkillModel_OnSetExpectedTarget(BattleActionModel action, BattleActionModel targetAction, SkillModel __instance)
 	{
 		int actevent = MainClass.timingDict["FakePower"];
-		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(__instace)) {
+		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(__instance)) {
 			if (modsa.activationTiming != actevent) continue;
-			modsa.Enact(action.Model, __instace, action, targetAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			modsa.Enact(action.Model, __instance, action, targetAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 	}
 	
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnAddBattleAction))]
 	[HarmonyPrefix]
-	private static void Postfix_SkillModel_OnAddBattleAction(BattleActionModel action, SinActionModel targetSinActionNullable, SkillModel __instace)
+	private static void Postfix_SkillModel_OnAddBattleAction(BattleActionModel action, SinActionModel targetSinActionNullable, SkillModel __instance)
 	{
 		BattleActionModel targetAction = null;
 		if (targetSinActionNullable != null) targetAction = targetSinActionNullable.CurrentBattleAction;
 		int actevent = MainClass.timingDict["FakePower"];
-		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(__instace)) {
+		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(__instance)) {
 			if (modsa.activationTiming != actevent) continue;
-			modsa.Enact(action.Model, __instace, action, targetAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			modsa.Enact(action.Model, __instance, action, targetAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 	}
 	
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnRemoveBattleAction))]
 	[HarmonyPrefix]
-	private static void Postfix_SkillModel_OnRemoveBattleAction(BattleActionModel action, SkillModel __instace)
+	private static void Postfix_SkillModel_OnRemoveBattleAction(BattleActionModel action, SkillModel __instance)
 	{
 		int actevent = MainClass.timingDict["FakePower"];
-		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(__instace)) {
+		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(__instance)) {
 			if (modsa.activationTiming != actevent) continue;
-			modsa.Enact(action.Model, __instace, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			modsa.Enact(action.Model, __instance, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 	}
 /*
