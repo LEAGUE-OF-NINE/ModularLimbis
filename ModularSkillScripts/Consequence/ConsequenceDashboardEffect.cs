@@ -5,7 +5,7 @@ using System;
 
 namespace ModularSkillScripts.Consequence;
 
-public class ConsequenceDashhoardEffect : IModularConsequence
+public class ConsequenceDashboardEffect : IModularConsequence
 {
 	public void ExecuteConsequence(ModularSA modular, string section, string circledSection, string[] circles)
 	{
@@ -16,7 +16,7 @@ public class ConsequenceDashhoardEffect : IModularConsequence
 		OPERATION_SKILL_EFFECT_TYPE effectType;
 		Enum.TryParse(circles[3], true, out effectType);
 		bool topSlot = circles[4] == "top";
-	
+
 		foreach (BattleUnitModel unit in targets)
 		{
 			var sinActionSlot = SingletonBehavior<BattleUIRoot>.Instance.NewOperationController.GetSinActionSlot(unit.GetSinActionList()[slotNum]);
@@ -32,5 +32,5 @@ public class ConsequenceDashhoardEffect : IModularConsequence
 					break;
 			}
 		}
-	} 
+	}
 }
