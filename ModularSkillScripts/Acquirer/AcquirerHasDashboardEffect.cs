@@ -5,7 +5,7 @@ using System;
 
 namespace ModularSkillScripts.Acquirer;
 
-public class ConsequenceHasDashboardEffect : IModularAcquirer
+public class AcquirerHasDashboardEffect : IModularAcquirer
 {
 	public int ExecuteAcquirer(ModularSA modular, string section, string circledSection, string[] circles)
 	{

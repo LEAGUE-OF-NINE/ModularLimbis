@@ -42,7 +42,7 @@ public class MainClass : BasePlugin
 			"FakePower", // 10
 			"BeforeDefense", // 11
 			"OnDie", // 12
-			"OnOtherDie", // 13 
+			"OnOtherDie", // 13
 			"DuelClash", // 14
 			"DuelClashAfter", // 15
 			"OnSucceedEvade", // 16
@@ -240,7 +240,7 @@ public class MainClass : BasePlugin
 		consequenceDict["insertskill"] = new ConsequenceInsertSkill();
 		consequenceDict["refreshallslotvisual"] = new ConsequenceRefreshAllSlotVisual();
 		consequenceDict["shine"] = new ConsequenceShine();
-		consequenceDict["dashboardeffect"] = new ConsequenceDashhoardEffect();
+		consequenceDict["dashboardeffect"] = new ConsequenceDashboardEffect();
 
 
 		// legacy consequences
@@ -333,8 +333,9 @@ public class MainClass : BasePlugin
 		acquirerDict["ctdsource"] = new AcquirerChangeDamageSource();
 		acquirerDict["countbackup"] = new AcquirerCountBackup();
 		acquirerDict["isbackupenabled"] = new AcquirerIsBackupEnabled();
-		acquirerDict["getskillskillslot"] = new AcquirerGetSkillSkillSlot();
-		
+        acquirerDict["getskillskillslot"] = new AcquirerGetSkillSkillSlot();
+        acquirerDict["hasdashboardeffect"] = new AcquirerHasDashboardEffect();
+
 		// legacy acquirers
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();
 		acquirerDict["mpcheck"] = new AcquirerMpCheck();
@@ -350,7 +351,7 @@ public class MainClass : BasePlugin
 		acquirerDict["areallied"] = new AcquirerAreAllied();
 		acquirerDict["allcoinstate"] = new AcquirerAllCoinState();
 		acquirerDict["resonance"] = new AcquirerResonance();
-		acquirerDict["resource"] = new AcquirerResource(); 
+		acquirerDict["resource"] = new AcquirerResource();
 		acquirerDict["skillbase"] = new AcquirerSkillBase();
 		acquirerDict["skillatkweight"] = new AcquirerSkillAtkWeight();
 		acquirerDict["onescale"] = new AcquirerOneScale();
@@ -427,7 +428,7 @@ public class MainClass : BasePlugin
 		if (trySlotID >= 0)
 		{
 			if (unitOrNull == null) return null;
-				
+
 			trySlotID = Math.Min(trySlotID, unitOrNull.GetPermanentSinActionListCount());
 			sinAction = unitOrNull.GetSinActionList().ToArray()[trySlotID];
 		}
@@ -441,7 +442,7 @@ public class MainClass : BasePlugin
 		else if (selection == "bottom") sin = sinAction.currentSinList.ToArray()[0];
 		return sin;
 	}
-	
+
 	public static ATTRIBUTE_TYPE SortSinResourceGetEnum(SinManager.EgoStockManager stock_manager, string modestring, UNIT_FACTION faction)
 	{
 		bool mode_greatest = false;
@@ -456,7 +457,7 @@ public class MainClass : BasePlugin
 			string selections_0 = selections[0];
 			mode_greatest = !selections_0.Contains("lowest");
 			mode_random = selections_0.Contains("random");
-			
+
 			for (int i = 1; i < selections_count; i++)
 			{
 				ATTRIBUTE_TYPE sin_temp = ATTRIBUTE_TYPE.NONE;
@@ -479,8 +480,8 @@ public class MainClass : BasePlugin
 				ATTRIBUTE_TYPE.VIOLET
 			];
 		}
-		
-		
+
+
 		if (mode_random) //randomize order
 		{
 			int n = sin_list.Count;
@@ -518,7 +519,7 @@ public class MainClass : BasePlugin
 
 		return best_sin;
 	}
-	
+
 	public static System.Collections.Generic.KeyValuePair<string, int> GetMaxValue(
 			System.Collections.Generic.Dictionary<string, int> dict)
 	{
@@ -573,4 +574,3 @@ public class MainClass : BasePlugin
 	public static ManualLogSource Logg;
 	public static DirectoryInfo pluginPath = Directory.CreateDirectory(Path.Combine(Paths.PluginPath, "Lethe", "ModTemplate", "modular_lua"));
 }
-
