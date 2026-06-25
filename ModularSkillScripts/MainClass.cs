@@ -81,7 +81,7 @@ public class MainClass : BasePlugin
 			"DefeatParrying",
 			"ChangeTakeDamage",
 			"OnCoinAfterAttack",
-			"EnemyBeforeAttack",
+			"EnemyStartBehaviour",
 			"AfterChangeShield",
 			"AfterChangeHP",
 			//timingStringList.Add("ChangeSinBuffDamage");
@@ -103,6 +103,7 @@ public class MainClass : BasePlugin
 		// legacy to new stuff translator
 		timingDict.Add("StartBehaviour", timingDict["OnStartBehaviour"]);
 		timingDict.Add("EndBehaviour", timingDict["OnEndBehaviour"]);
+		timingDict.Add("EnemyStartBehavior", timingDict["EnemyStartBehaviour"]);
 		timingDict.Add("OnImmortal", timingDict["Immortal"]);
 		timingDict.Add("OnOtherImmortal", timingDict["ImmortalOther"]);
 		timingDict.Add("OnVisualCoinToss", timingDict["StartVisualCoinToss"]);
@@ -567,7 +568,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.9.0";
+	public const string VERSION = "4.9.1";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 

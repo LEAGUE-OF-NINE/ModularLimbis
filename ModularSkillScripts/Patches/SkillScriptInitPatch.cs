@@ -2034,6 +2034,41 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.Enact(action.Model, __instance, action, null, actevent, timing);
 			}
 		}
+		
+		actevent = MainClass.timingDict["EnemyStartBehaviour"];
+		BattleUnitModel attacker = action.Model;
+		List<BattleUnitModel> targetList = action.GetAliveTargetUnitModelList();
+		foreach (BattleUnitModel victim in targetList)
+		{
+			foreach (BuffModel buffModel in victim._buffDetail.GetActivatedBuffModelAll())
+			{
+				foreach (ModularSA modba in GetAllModbaFromBuffModel(buffModel))
+				{
+					if (modba.activationTiming != actevent) continue;
+					modba.modsa_buffModel = buffModel;
+					modba.modsa_victimModel = victim;
+					modba.Enact(attacker, __instance, action, null, actevent, timing);
+				}
+			}
+			foreach (PassiveModel passiveModel in victim._passiveDetail.PassiveList.CopyList()) {
+				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
+				{
+					if (modpa.activationTiming != actevent) continue;
+					modpa.modsa_passiveModel = passiveModel;
+					modpa.modsa_victimModel = victim;
+					modpa.Enact(attacker, __instance, action, null, actevent, timing);
+				}
+			}
+			foreach (EgoPassiveModel egoPassiveModel in victim._passiveDetail.EgoPassiveList.CopyList()) {
+				foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
+				{
+					if (modpa.activationTiming != actevent) continue;
+					modpa.modsa_passiveModel = egoPassiveModel;
+					modpa.modsa_victimModel = victim;
+					modpa.Enact(attacker, __instance, action, null, actevent, timing);
+				}
+			}
+		}
 	}
 
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetSupportiveDefenseSkillID))]
@@ -2740,46 +2775,6 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	}
 	*/
 
-	/*
-	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnStartEnemyAttack))]
-	[HarmonyPostfix]
-	private static void Postfix_BattleUnitModel_OnStartEnemyAttack(BattleActionModel opponentAction, BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
-	{
-		int actevent = MainClass.timingDict["EnemyBeforeAttack"];
-		BattleUnitModel attacker = opponentAction.Model;
-		SkillModel skill = opponentAction.Skill;
-		
-		foreach (BuffModel buffModel in __instance._buffDetail.GetActivatedBuffModelAll())
-		{
-			foreach (ModularSA modba in GetAllModbaFromBuffModel(buffModel))
-			{
-				modba.modsa_buffModel = buffModel;
-				modba.modsa_target_list.Clear();
-				modba.modsa_target_list.Add(__instance);
-				modba.Enact(__instance, skill, opponentAction, null, actevent, timing);
-			}
-		}
-		
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
-			{
-				modpa.modsa_passiveModel = passiveModel;
-				modpa.modsa_target_list.Clear();
-				modpa.modsa_target_list.Add(__instance);
-				modpa.Enact(attacker, skill, opponentAction, null, actevent, timing);
-			}
-		}
-		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList()) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
-			{
-				modpa.modsa_passiveModel = egoPassiveModel;
-				modpa.modsa_target_list.Clear();
-				modpa.modsa_target_list.Add(__instance);
-				modpa.Enact(attacker, skill, opponentAction, null, actevent, timing);
-			}
-		}
-		
-	}*/
 	
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnEndEnemyAttack))]
 	[HarmonyPostfix]
