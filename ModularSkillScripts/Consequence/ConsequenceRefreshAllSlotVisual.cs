@@ -22,6 +22,25 @@ public class ConsequenceRefreshAllSlotVisual : IModularConsequence
 			MainClass.LogModular("Dude This NewOperationController shit is FUCKING NULL");
 			return;
 		}
+		var battleObjectManager = BattleObjectManager.Instance;
+		if (!battleObjectManager)
+		{
+			MainClass.LogModular("Dude This BattleObjectManager shit is FUCKING NULL");
+			return;
+		}
+
+		foreach (BattleUnitView unit_view in battleObjectManager.GetAliveViewList())
+		{
+			BattleUnitUIManager battleUnitUIManager = unit_view.UIManager;
+			if (!battleUnitUIManager) continue;
+			UnitActionUI unitActionUI = battleUnitUIManager.UnitActionUI;
+			if (!unitActionUI) continue;
+			foreach (UnitActionSlotUI actionSlotUI in unitActionUI._actionSlotUIList)
+			{
+				actionSlotUI.SetData(actionSlotUI._sinAction);
+			}
+		}
+		
 		//BattleObjectManager objManager = SingletonBehavior<BattleObjectManager>.Instance;
 		//SinManager sinManager_inst = Singleton<SinManager>.Instance;
 		foreach (NewOperationSinActionSlot sinActionSlot in opController.SinActionSlotList)
