@@ -409,6 +409,7 @@ public class SkillScriptInitPatch
 		//	}
 		//}
 		copypastesolution(__instance._owner, null, null, null, "RoundStart", timing, __instance);
+		int actEvent = MainClass.timingDict["RoundStart"];
 		foreach (SinActionModel sinAction in __instance._owner.GetSinActionList())
 		{
 			foreach (UnitSinModel sinModel in sinAction.currentSinList)
@@ -420,7 +421,7 @@ public class SkillScriptInitPatch
 				if (!modsaDict.ContainsKey(skillmodel_intlong)) continue;
 				foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 					//MainClass.Logg.LogInfo("Found modsa - RoundStart");
-					modsa.Enact(__instance._owner, skillModel, null, null, MainClass.timingDict["RoundStart"], timing);
+					modsa.Enact(__instance._owner, skillModel, sinModel.GetBattleActionModel(), null, actEvent, timing);
 				}
 			}
 		}
@@ -514,7 +515,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 
 					foreach (ModularSA modsa in GetAllModsaFromSkillModel(skillModel)) {
 						if (modsa.activationTiming != actevent) continue;
-						modsa.Enact(unit, skillModel, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+						modsa.Enact(unit, skillModel, sinModel.GetBattleActionModel(), null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 					}
 				}
 			}
