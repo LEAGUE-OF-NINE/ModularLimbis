@@ -22,7 +22,7 @@ public class ConsequenceRefreshAllSlotVisual : IModularConsequence
 			MainClass.LogModular("Dude This NewOperationController shit is FUCKING NULL");
 			return;
 		}
-		var battleObjectManager = BattleObjectManager.Instance;
+		/*var battleObjectManager = BattleObjectManager.Instance;
 		if (!battleObjectManager)
 		{
 			MainClass.LogModular("Dude This BattleObjectManager shit is FUCKING NULL");
@@ -39,7 +39,7 @@ public class ConsequenceRefreshAllSlotVisual : IModularConsequence
 			{
 				actionSlotUI.SetData(actionSlotUI._sinAction);
 			}
-		}
+		}*/
 		
 		//BattleObjectManager objManager = SingletonBehavior<BattleObjectManager>.Instance;
 		//SinManager sinManager_inst = Singleton<SinManager>.Instance;
