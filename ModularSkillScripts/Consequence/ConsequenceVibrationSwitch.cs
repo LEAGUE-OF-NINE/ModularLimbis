@@ -11,8 +11,12 @@ public class ConsequenceVibrationSwitch : IModularConsequence
 		bool isEntangled = circles.Length > 2;
 		foreach (BattleUnitModel targetModel in modelList)
 		{
-			targetModel.TakeSwitchVibrationToSpecial(modular.modsa_unitModel, buf_keyword, modular.battleTiming, ABILITY_SOURCE_TYPE.SKILL,
-				modular.modsa_selfAction, out _, out _, out _, out _, isEntangled);
+			if (isEntangled)
+			{
+				targetModel.PileUpVibrationToSpecial(modular.modsa_unitModel, BUFF_UNIQUE_KEYWORD.VibrationNesting, buf_keyword, modular.battleTiming, ABILITY_SOURCE_TYPE.SKILL, modular.modsa_selfAction);
+				continue;
+			}
+			targetModel.TakeSwitchVibrationToSpecial(modular.modsa_unitModel, buf_keyword, modular.battleTiming, ABILITY_SOURCE_TYPE.SKILL, modular.modsa_selfAction, out _, out _, out _, out _);
 		}
 	}
 }
