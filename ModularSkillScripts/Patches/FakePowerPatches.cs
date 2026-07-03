@@ -1,16 +1,15 @@
 using HarmonyLib;
-using Il2CppSystem.Collections.Generic;
 using Utils;
 
 namespace ModularSkillScripts.Patches;
 
-class FakePowerPatches
+public class FakePowerPatches
 {
+	public static int actevent_FakePower = 0;
 	[HarmonyPatch(typeof(BattleActionModel), nameof(BattleActionModel.OnSetExpectedTarget))]
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_OnSetExpectedTarget(BattleActionModel targetAction, BattleActionModel __instance)
 	{
-		int actevent = MainClass.timingDict["FakePower"];
 		BattleUnitModel unit = __instance.Model;
 		SkillModel skill = __instance.Skill;
 		if (unit == null || skill == null) return;
@@ -19,33 +18,33 @@ class FakePowerPatches
 		{
 			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
 			{
-				if (modba.activationTiming != actevent) continue;
+				if (modba.activationTiming != actevent_FakePower) continue;
 				modba.modsa_buffModel = buf;
-				modba.Enact(unit, skill, __instance, targetAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				modba.Enact(unit, skill, __instance, targetAction, actevent_FakePower, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 		
 		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(skill)) {
-			if (modsa.activationTiming != actevent) continue;
-			modsa.Enact(unit, skill, __instance, targetAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			if (modsa.activationTiming != actevent_FakePower) continue;
+			modsa.Enact(unit, skill, __instance, targetAction, actevent_FakePower, BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 		
 		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel))
 			{
-				if (modpa.activationTiming != actevent) continue;
+				if (modpa.activationTiming != actevent_FakePower) continue;
 				modpa.modsa_passiveModel = passiveModel;
-				modpa.Enact(unit, skill, __instance, targetAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				modpa.Enact(unit, skill, __instance, targetAction, actevent_FakePower, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail.EgoPassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
-				if (modpa.activationTiming != actevent) continue;
+				if (modpa.activationTiming != actevent_FakePower) continue;
 				modpa.modsa_passiveModel = egoPassiveModel;
-				modpa.Enact(unit, skill, __instance, targetAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				modpa.Enact(unit, skill, __instance, targetAction, actevent_FakePower, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 	}
@@ -54,7 +53,6 @@ class FakePowerPatches
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_OnAddBattleAction(SinActionModel actorAction, SinActionModel targetAction, BattleUnitModel __instance)
 	{
-		int actevent = MainClass.timingDict["FakePower"];
 		
 		BattleActionModel action = actorAction?.CurrentBattleAction;
 		SkillModel skill = action?.Skill;
@@ -66,33 +64,33 @@ class FakePowerPatches
 		{
 			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
 			{
-				if (modba.activationTiming != actevent) continue;
+				if (modba.activationTiming != actevent_FakePower) continue;
 				modba.modsa_buffModel = buf;
-				modba.Enact(__instance, skill, action, tgtact, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				modba.Enact(__instance, skill, action, tgtact, actevent_FakePower, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 		
 		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(skill)) {
-			if (modsa.activationTiming != actevent) continue;
-			modsa.Enact(__instance, skill, action, tgtact, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			if (modsa.activationTiming != actevent_FakePower) continue;
+			modsa.Enact(__instance, skill, action, tgtact, actevent_FakePower, BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 		
 		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel))
 			{
-				if (modpa.activationTiming != actevent) continue;
+				if (modpa.activationTiming != actevent_FakePower) continue;
 				modpa.modsa_passiveModel = passiveModel;
-				modpa.Enact(__instance, skill, action, tgtact, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				modpa.Enact(__instance, skill, action, tgtact, actevent_FakePower, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
-				if (modpa.activationTiming != actevent) continue;
+				if (modpa.activationTiming != actevent_FakePower) continue;
 				modpa.modsa_passiveModel = egoPassiveModel;
-				modpa.Enact(__instance, skill, action, tgtact, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				modpa.Enact(__instance, skill, action, tgtact, actevent_FakePower, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 	}
@@ -101,7 +99,6 @@ class FakePowerPatches
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_OnRemoveBattleAction(SinActionModel actorAction, BattleUnitModel __instance)
 	{
-		int actevent = MainClass.timingDict["FakePower"];
 		
 		BattleActionModel action = actorAction?.CurrentBattleAction;
 		SkillModel skill = action?.Skill;
@@ -111,33 +108,33 @@ class FakePowerPatches
 		{
 			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
 			{
-				if (modba.activationTiming != actevent) continue;
+				if (modba.activationTiming != actevent_FakePower) continue;
 				modba.modsa_buffModel = buf;
-				modba.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				modba.Enact(__instance, skill, action, null, actevent_FakePower, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 		
 		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(skill)) {
-			if (modsa.activationTiming != actevent) continue;
-			modsa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			if (modsa.activationTiming != actevent_FakePower) continue;
+			modsa.Enact(__instance, skill, action, null, actevent_FakePower, BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 		
 		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel))
 			{
-				if (modpa.activationTiming != actevent) continue;
+				if (modpa.activationTiming != actevent_FakePower) continue;
 				modpa.modsa_passiveModel = passiveModel;
-				modpa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				modpa.Enact(__instance, skill, action, null, actevent_FakePower, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
 		{
 			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
-				if (modpa.activationTiming != actevent) continue;
+				if (modpa.activationTiming != actevent_FakePower) continue;
 				modpa.modsa_passiveModel = egoPassiveModel;
-				modpa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				modpa.Enact(__instance, skill, action, null, actevent_FakePower, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 	}
@@ -146,7 +143,6 @@ class FakePowerPatches
 	[HarmonyPrefix]
 	private static void Postfix_SkillModelManager_GetExpectedWinRate(BattleActionModel selfAction, BattleActionModel oppoAction)
 	{
-		int actevent_FakePower = MainClass.timingDict["FakePower"];
 		foreach (long key in SkillScriptInitPatch.modpaDict.Keys) {
 			List<ModularSA> value = SkillScriptInitPatch.modpaDict[key];
 			foreach (ModularSA modular in value) {
@@ -192,7 +188,6 @@ class FakePowerPatches
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_GetExpectedSkillPowerAdder(BattleActionModel action, ref int __result, SkillModel __instance)
 	{
-		int actevent = MainClass.timingDict["FakePower"];
 		BattleUnitModel unit = action.Model;
 		if (unit == null) return;
 		
@@ -200,14 +195,14 @@ class FakePowerPatches
 		{
 			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
 			{
-				if (modba.activationTiming != actevent) continue;
+				if (modba.activationTiming != actevent_FakePower) continue;
 				int power = modba.skillPowerAdder;
 				__result += power;
 			}
 		}
 		
 		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(__instance)) {
-			if (modsa.activationTiming != actevent) continue;
+			if (modsa.activationTiming != actevent_FakePower) continue;
 			int power = modsa.skillPowerAdder;
 			__result += power;
 		}
@@ -216,7 +211,7 @@ class FakePowerPatches
 		{
 			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel))
 			{
-				if (modpa.activationTiming != actevent) continue;
+				if (modpa.activationTiming != actevent_FakePower) continue;
 				int power = modpa.skillPowerAdder;
 				__result += power;
 			}
@@ -225,7 +220,7 @@ class FakePowerPatches
 		{
 			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
-				if (modpa.activationTiming != actevent) continue;
+				if (modpa.activationTiming != actevent_FakePower) continue;
 				int power = modpa.skillPowerAdder;
 				__result += power;
 			}
@@ -250,7 +245,6 @@ class FakePowerPatches
 	private static void Postfix_SkillModel_GetExpectedSkillPowerResultAdder(BattleActionModel action, ref int __result,
 		SkillModel __instance)
 	{
-		int actevent = MainClass.timingDict["FakePower"];
 		BattleUnitModel unit = action.Model;
 		if (unit == null) return;
 		
@@ -258,14 +252,14 @@ class FakePowerPatches
 		{
 			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
 			{
-				if (modba.activationTiming != actevent) continue;
+				if (modba.activationTiming != actevent_FakePower) continue;
 				int power = modba.skillPowerResultAdder;
 				__result += power;
 			}
 		}
 		
 		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(__instance)) {
-			if (modsa.activationTiming != actevent) continue;
+			if (modsa.activationTiming != actevent_FakePower) continue;
 			int power = modsa.skillPowerResultAdder;
 			__result += power;
 		}
@@ -274,7 +268,7 @@ class FakePowerPatches
 		{
 			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel))
 			{
-				if (modpa.activationTiming != actevent) continue;
+				if (modpa.activationTiming != actevent_FakePower) continue;
 				int power = modpa.skillPowerResultAdder;
 				__result += power;
 			}
@@ -283,7 +277,7 @@ class FakePowerPatches
 		{
 			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
-				if (modpa.activationTiming != actevent) continue;
+				if (modpa.activationTiming != actevent_FakePower) continue;
 				int power = modpa.skillPowerResultAdder;
 				__result += power;
 			}
@@ -294,7 +288,6 @@ class FakePowerPatches
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_GetExpectedParryingResultAdder(BattleActionModel actorAction, ref int __result, SkillModel __instance)
 	{
-		int actevent = MainClass.timingDict["FakePower"];
 		BattleUnitModel unit = actorAction.Model;
 		if (unit == null) return;
 		
@@ -302,14 +295,14 @@ class FakePowerPatches
 		{
 			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
 			{
-				if (modba.activationTiming != actevent) continue;
+				if (modba.activationTiming != actevent_FakePower) continue;
 				int power = modba.parryingResultAdder;
 				__result += power;
 			}
 		}
 		
 		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(__instance)) {
-			if (modsa.activationTiming != actevent) continue;
+			if (modsa.activationTiming != actevent_FakePower) continue;
 			int power = modsa.parryingResultAdder;
 			__result += power;
 		}
@@ -318,7 +311,7 @@ class FakePowerPatches
 		{
 			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel))
 			{
-				if (modpa.activationTiming != actevent) continue;
+				if (modpa.activationTiming != actevent_FakePower) continue;
 				int power = modpa.parryingResultAdder;
 				__result += power;
 			}
@@ -327,7 +320,7 @@ class FakePowerPatches
 		{
 			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
-				if (modpa.activationTiming != actevent) continue;
+				if (modpa.activationTiming != actevent_FakePower) continue;
 				int power = modpa.parryingResultAdder;
 				__result += power;
 			}
@@ -338,7 +331,6 @@ class FakePowerPatches
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_GetExpectedCoinScaleAdder(BattleActionModel action, CoinModel coin, ref int __result, SkillModel __instance)
 	{
-		int actevent = MainClass.timingDict["FakePower"];
 		BattleUnitModel unit = action.Model;
 		if (unit == null) return;
 		
@@ -346,14 +338,14 @@ class FakePowerPatches
 		{
 			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
 			{
-				if (modba.activationTiming != actevent) continue;
+				if (modba.activationTiming != actevent_FakePower) continue;
 				int power = modba.coinScaleAdder;
 				__result += power;
 			}
 		}
 		
 		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(__instance)) {
-			if (modsa.activationTiming != actevent) continue;
+			if (modsa.activationTiming != actevent_FakePower) continue;
 			int power = modsa.coinScaleAdder;
 			__result += power;
 		}
@@ -362,7 +354,7 @@ class FakePowerPatches
 		{
 			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel))
 			{
-				if (modpa.activationTiming != actevent) continue;
+				if (modpa.activationTiming != actevent_FakePower) continue;
 				int power = modpa.coinScaleAdder;
 				__result += power;
 			}
@@ -371,7 +363,7 @@ class FakePowerPatches
 		{
 			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
-				if (modpa.activationTiming != actevent) continue;
+				if (modpa.activationTiming != actevent_FakePower) continue;
 				int power = modpa.coinScaleAdder;
 				__result += power;
 			}

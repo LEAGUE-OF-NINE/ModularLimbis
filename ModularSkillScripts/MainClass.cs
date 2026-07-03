@@ -109,6 +109,9 @@ public class MainClass : BasePlugin
 		timingDict.Add("OnOtherImmortal", timingDict["ImmortalOther"]);
 		timingDict.Add("OnVisualCoinToss", timingDict["StartVisualCoinToss"]);
 		timingDict.Add("OnVisualUse", timingDict["StartVisualSkillUse"]);
+		
+		FakePowerPatches.actevent_FakePower = timingDict["FakePower"];
+		
 		Harmony harmony = new Harmony(NAME);
 		Logg = new ManualLogSource(NAME);
 		BepInEx.Logging.Logger.Sources.Add(Logg);
