@@ -91,7 +91,7 @@ public class ConsequenceSkillSend : IModularConsequence
 		bool late = circles.Length > 4 && circles[4] == "late";
 		
 		//fromAction_new.ReadyOriginTargeting();
-		if (isdef) fromUnit.CutInDefenseActionForcely(fromAction_new, true);
+		if (isdef) fromUnit.CutInDefenseActionForcely(fromAction_new, !late);
 		else
 		{
 			BattleActionModelManager.CUT_IN_ACTION_TYPE cutin = BattleActionModelManager.CUT_IN_ACTION_TYPE.ZERO_INDEX;
