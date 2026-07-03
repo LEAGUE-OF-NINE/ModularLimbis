@@ -493,6 +493,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			if (unit == null) continue;
 			
 			int actevent = MainClass.timingDict["AfterSlots"];
+			int actevent_ready = MainClass.timingDict["AfterSlotsReady"];
 			
 			foreach (BuffModel buf in unit._buffDetail.GetActivatedBuffModelAll())
 			{
@@ -508,12 +509,28 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			
 			foreach (SinActionModel sinAction in unit.GetSinActionList())
 			{
+				UnitSinModel readySin = sinAction.readySin;
+				if (readySin != null)
+				{
+					SkillModel skillModel = readySin.GetSkill();
+					if (skillModel != null)
+					{
+						foreach (ModularSA modsa in GetAllModsaFromSkillModel(skillModel))
+						{
+							modsa.interactionTimer = 0;
+							if (modsa.activationTiming != actevent_ready) continue;
+							modsa.Enact(unit, skillModel, readySin.GetBattleActionModel(), null, actevent_ready, BATTLE_EVENT_TIMING.ALL_TIMING);
+						}
+					}
+				}
+					
 				foreach (UnitSinModel sinModel in sinAction.currentSinList)
 				{
 					SkillModel skillModel = sinModel.GetSkill();
 					if (skillModel == null) continue;
 
 					foreach (ModularSA modsa in GetAllModsaFromSkillModel(skillModel)) {
+						modsa.interactionTimer = 0;
 						if (modsa.activationTiming != actevent) continue;
 						modsa.Enact(unit, skillModel, sinModel.GetBattleActionModel(), null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 					}

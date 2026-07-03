@@ -63,18 +63,19 @@ public class MainClass : BasePlugin
 			"Immortal", // 31
 			"ImmortalOther", // 32
 			"SpecialAction", // 33
-			"AfterSlots", // 34
-			"OnCoinToss", // 35
-			"StartBattleSkill", // 36
-			"OnBurst", // 37
-			"StartVisualCoinToss", // 38
-			"StartVisualSkillUse", // 39
-			"WhenGained", // 40
-			"ChangeMotion", // 41
-			"IgnorePanic", // 42
-			"IgnoreBreak", // 43
-			"OnRetreat", // 44
-			"OnGainBuff", // 45
+			"AfterSlots",
+			"AfterSlotsReady",
+			"OnCoinToss",
+			"StartBattleSkill",
+			"OnBurst",
+			"StartVisualCoinToss",
+			"StartVisualSkillUse",
+			"WhenGained",
+			"ChangeMotion",
+			"IgnorePanic",
+			"IgnoreBreak",
+			"OnRetreat",
+			"OnGainBuff",
 			"OnUseBuff",
 			"EncounterStart",
 			"WinParrying",
