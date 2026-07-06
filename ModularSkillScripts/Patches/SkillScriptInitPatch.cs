@@ -2088,7 +2088,43 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 	}
-
+	
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.CanDealTarget))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_CanDealTarget(BattleActionModel action, BattleUnitModel target, CoinModel coin, ref bool __result, BattleUnitModel __instance)
+	{
+		if (!__result) return;
+		
+		int actevent = MainClass.timingDict["CanDealTarget"];
+		SkillModel skill = action.Skill;
+		if (__instance == null || skill == null) return;
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.valueList[9] = 1;
+			modsa.modsa_victimModel = target;
+			modsa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			if (modsa.valueList[9] < 1)
+			{
+				__result = false;
+				return;
+			}
+		}
+		
+		foreach (ModularSA modsa in GetAllModcaFromCoinModel(coin)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.valueList[9] = 1;
+			modsa.modsa_victimModel = target;
+			modsa.modsa_coinModel = coin;
+			modsa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			if (modsa.valueList[9] < 1)
+			{
+				__result = false;
+				return;
+			}
+		}
+	}
+	
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetSupportiveDefenseSkillID))]
 	[HarmonyPrefix]
 	public static bool GetSupportiveDefenseSkillID(
