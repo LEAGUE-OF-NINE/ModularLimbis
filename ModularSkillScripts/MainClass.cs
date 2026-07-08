@@ -248,6 +248,9 @@ public class MainClass : BasePlugin
 		consequenceDict["shine"] = new ConsequenceShine();
 		consequenceDict["dashboardeffect"] = new ConsequenceDashboardEffect();
 		consequenceDict["setslotalarm"] = new ConsequenceSetSlotAlarm();
+		consequenceDict["addduel"] = new ConsequenceAddDuel();
+		consequenceDict["setspusage"] = new ConsequenceSetSpUsage();
+		consequenceDict["instantdeath"] = new ConsequenceInstantDeath();
 
 		// legacy consequences
 		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
@@ -339,8 +342,10 @@ public class MainClass : BasePlugin
 		acquirerDict["ctdsource"] = new AcquirerChangeDamageSource();
 		acquirerDict["countbackup"] = new AcquirerCountBackup();
 		acquirerDict["isbackupenabled"] = new AcquirerIsBackupEnabled();
-    acquirerDict["getskillskillslot"] = new AcquirerGetSkillSkillSlot();
-    acquirerDict["hasdashboardeffect"] = new AcquirerHasDashboardEffect();
+		acquirerDict["getskillskillslot"] = new AcquirerGetSkillSkillSlot();
+		acquirerDict["hasdashboardeffect"] = new AcquirerHasDashboardEffect();
+		acquirerDict["getuptielevel"] = new AcquirerGetUptieLevel();
+		acquirerDict["getbreaklevel"] = new AcquirerGetBreakLevel();
 
 		// legacy acquirers
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();
