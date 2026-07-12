@@ -2123,6 +2123,35 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				return;
 			}
 		}
+		
+		foreach (PassiveModel passiveModel in target._passiveDetail.PassiveList.CopyList()) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modpa.activationTiming != actevent) continue;
+				modpa.valueList[9] = 1;
+				modpa.modsa_victimModel = target;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modpa.valueList[9] < 1)
+				{
+					__result = false;
+					return;
+				}
+			}
+		}
+		foreach (EgoPassiveModel egoPassiveModel in target._passiveDetail.EgoPassiveList.CopyList()) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+				if (modpa.activationTiming != actevent) continue;
+				modpa.valueList[9] = 1;
+				modpa.modsa_victimModel = target;
+				modpa.modsa_passiveModel = egoPassiveModel;
+				modpa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modpa.valueList[9] < 1)
+				{
+					__result = false;
+					return;
+				}
+			}
+		}
 	}
 	
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetSupportiveDefenseSkillID))]
