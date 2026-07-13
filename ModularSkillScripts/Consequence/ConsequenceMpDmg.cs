@@ -23,7 +23,6 @@ public class ConsequenceMpDmg : IModularConsequence
 						sourceUnit.HealTargetMp(targetModel, mpAmount, ABILITY_SOURCE_TYPE.PASSIVE, modular.battleTiming);
 						break;
 					case 1:
-						modular.dummyCoinAbility.AddTriggeredData_MpHeal(mpAmount, targetModel.InstanceID, modular.battleTiming);
 						modular.dummyCoinAbility.HealTargetMp(modular.modsa_unitModel, targetModel, mpAmount, modular.battleTiming);
 						break;
 					default:
