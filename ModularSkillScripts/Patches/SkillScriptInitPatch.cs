@@ -951,6 +951,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(explodedUnit);
+				modpa.modsa_killerModel = giverOrNull;
 				modpa.Enact(__instance._owner, null, null, null, actevent, timing);
 			}
 		}
@@ -965,6 +966,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(explodedUnit);
+				modpa.modsa_killerModel = giverOrNull;
 				modpa.Enact(__instance._owner, null, null, null, actevent, timing);
 			}
 		}
@@ -976,6 +978,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			{
 				modpaList[i].modsa_target_list.Clear();
 				modpaList[i].modsa_target_list.Add(explodedUnit);
+				modpaList[i].modsa_killerModel = giverOrNull;
 				supportPassive._script._owner = __instance._owner;
 				modpaList[i].Enact(__instance._owner, null, null, null, actevent, timing);
 			}
