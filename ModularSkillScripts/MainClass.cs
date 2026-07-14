@@ -348,7 +348,7 @@ public class MainClass : BasePlugin
 		acquirerDict["hasdashboardeffect"] = new AcquirerHasDashboardEffect();
 		acquirerDict["getuptielevel"] = new AcquirerGetUptieLevel();
 		acquirerDict["getbreaklevel"] = new AcquirerGetBreakLevel();
-		acquirerDict["originaldmgmult"] = new AcquirerOriginalDmgMult();
+		acquirerDict["getdmgmult"] = new AcquirerGetDmgMult();
 
 		// legacy acquirers
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();

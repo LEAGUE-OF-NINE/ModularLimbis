@@ -1,6 +1,6 @@
 namespace ModularSkillScripts.Acquirer;
 
-public class AcquirerOriginalDmgMult : IModularAcquirer
+public class AcquirerGetDmgMult : IModularAcquirer
 {
 	public int ExecuteAcquirer(ModularSA modular, string section, string circledSection, string[] circles)
 	{
