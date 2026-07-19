@@ -820,6 +820,8 @@ public class ModularSA : Il2CppSystem.Object
 		if (param.Contains("Enemy")) filterFaction = enemyFaction;
 		else if (param.Contains("Ally")) filterFaction = thisFaction;
 
+		bool deads = param.Contains("Deads");
+		
 		if (filterKeyword)
 		{
 			string[] circles = param.Split('$');
@@ -828,7 +830,46 @@ public class ModularSA : Il2CppSystem.Object
 
 			foreach (BattleUnitModel unit in battleObjectManager.GetAliveList(bufKeyword, 0, assistance, filterFaction)) list.Add(unit);
 		}
-		else if (param.Contains("Deads"))
+		else if (param.Contains("Retreats"))
+		{
+			foreach (BattleUnitModel unit in battleObjectManager.GetModelList(filterFaction, assistance))
+			{
+				if (unit.IsDead()) continue;
+				if (!unit.IsRetreated()) continue;
+				if (noCores && unit.TryCast<BattleUnitModel_Abnormality>() != null) continue;
+				if (noParts && unit.TryCast<BattleUnitModel_Abnormality_Part>() != null) continue;
+				list.Add(unit);
+			}
+		}
+		else if (param.Contains("SkillTargets"))
+		{
+			bool lives = param.Contains("Lives");
+			TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
+			BattleUnitModel mainTarget = targetDataSet.GetMainTarget();
+			if (!(lives && mainTarget.IsDead() || deads && !mainTarget.IsDead())) list.Add(mainTarget);
+			foreach (SinActionModel sinActionModel in targetDataSet.GetSubTargetSinActionList())
+			{
+				BattleUnitModel model = sinActionModel.UnitModel;
+				if (list.Contains(model)) continue;
+				if (lives && model.IsDead()) continue;
+				if (deads && !model.IsDead()) continue;
+				list.Add(sinActionModel.UnitModel);
+			}
+		}
+		else if (param.Contains("SkillSubTargets"))
+		{
+			bool lives = param.Contains("Lives");
+			TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
+			foreach (SinActionModel sinActionModel in targetDataSet.GetSubTargetSinActionList())
+			{
+				BattleUnitModel model = sinActionModel.UnitModel;
+				if (list.Contains(model)) continue;
+				if (lives && model.IsDead()) continue;
+				if (deads && !model.IsDead()) continue;
+				list.Add(sinActionModel.UnitModel);
+			}
+		}
+		else if (deads)
 		{
 			foreach (BattleUnitModel unit in battleObjectManager.GetModelList(filterFaction, assistance))
 			{
@@ -839,17 +880,6 @@ public class ModularSA : Il2CppSystem.Object
 					if (faction != filterFaction) continue;
 				}
 				if (!assistance && unit.IsFactionAlsoNotAssistance(faction)) continue;*/
-				if (noCores && unit.TryCast<BattleUnitModel_Abnormality>() != null) continue;
-				if (noParts && unit.TryCast<BattleUnitModel_Abnormality_Part>() != null) continue;
-				list.Add(unit);
-			}
-		}
-		else if (param.Contains("Retreats"))
-		{
-			foreach (BattleUnitModel unit in battleObjectManager.GetModelList(filterFaction, assistance))
-			{
-				if (unit.IsDead()) continue;
-				if (!unit.IsRetreated()) continue;
 				if (noCores && unit.TryCast<BattleUnitModel_Abnormality>() != null) continue;
 				if (noParts && unit.TryCast<BattleUnitModel_Abnormality_Part>() != null) continue;
 				list.Add(unit);
