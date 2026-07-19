@@ -939,48 +939,48 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnVibrationExplosionOtherUnit(BattleUnitModel explodedUnit, BattleUnitModel giverOrNull, BattleActionModel actionOrNull, ABILITY_SOURCE_TYPE abilitySrc, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
+		BattleUnitModel unit = __instance._owner;
+		if (unit == null) return;
 		int actevent = MainClass.timingDict["OnOtherBurst"];
-		foreach (PassiveModel passiveModel in __instance.PassiveList)
+		
+		foreach (PassiveModel passiveModel in __instance.PassiveList.CopyList())
 		{
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
 			{
+				if (modpa.activationTiming != actevent) continue;
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(explodedUnit);
 				modpa.modsa_killerModel = giverOrNull;
-				modpa.Enact(__instance._owner, null, null, null, actevent, timing);
+				modpa.Enact(unit, null, actionOrNull, null, actevent, timing);
 			}
 		}
-		foreach (EgoPassiveModel egoPassiveModel in __instance.EgoPassiveList)
+		foreach (EgoPassiveModel egoPassiveModel in __instance.EgoPassiveList.CopyList())
 		{
-			if (!egoPassiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = egoPassiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
+				if (modpa.activationTiming != actevent) continue;
 				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.modsa_target_list.Clear();
 				modpa.modsa_target_list.Add(explodedUnit);
 				modpa.modsa_killerModel = giverOrNull;
-				modpa.Enact(__instance._owner, null, null, null, actevent, timing);
+				modpa.Enact(unit, null, actionOrNull, null, actevent, timing);
 			}
 		}
+		
 		SupportPasPatch.SupportPassiveInit(modpaDict);
 		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
 		{
 			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
 			for (int i = 0; i < modpaList.Count; i++)
 			{
-				modpaList[i].modsa_target_list.Clear();
-				modpaList[i].modsa_target_list.Add(explodedUnit);
-				modpaList[i].modsa_killerModel = giverOrNull;
-				supportPassive._script._owner = __instance._owner;
-				modpaList[i].Enact(__instance._owner, null, null, null, actevent, timing);
+				ModularSA modpa = modpaList[i];
+				if (modpa.activationTiming != actevent) continue;
+				modpa.modsa_target_list.Clear();
+				modpa.modsa_target_list.Add(explodedUnit);
+				modpa.modsa_killerModel = giverOrNull;
+				supportPassive._script._owner = unit;
+				modpa.Enact(unit, null, actionOrNull, null, actevent, timing);
 			}
 		}
 	}
