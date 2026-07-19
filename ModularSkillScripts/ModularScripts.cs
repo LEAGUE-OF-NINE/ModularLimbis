@@ -551,7 +551,7 @@ public class ModularSA : Il2CppSystem.Object
 				}
 			}
 		}
-		MainClass.LogModular("ifsuccess: " + param + " | " + success);
+		//MainClass.LogModular("ifsuccess: " + param + " | " + success);
 		return success;
 	}
 
