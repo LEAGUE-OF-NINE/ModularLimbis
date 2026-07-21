@@ -114,6 +114,8 @@ public class MainClass : BasePlugin
 		FakePowerPatches.actevent_FakePower = timingDict["FakePower"];
 		SkillScriptInitPatch.actevent_OSA = timingDict["OSA"];
 		SkillScriptInitPatch.actevent_WH = timingDict["WH"];
+		SkillScriptInitPatch.actevent_BSA = timingDict["BSA"];
+		SkillScriptInitPatch.actevent_BWH = timingDict["BWH"];
 		
 		Harmony harmony = new Harmony(NAME);
 		Logg = new ManualLogSource(NAME);
