@@ -1576,45 +1576,18 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetCriticalChanceAdder))]
 	[HarmonyPostfix]
 	private static void Postfix_BattleUnitMode_GetCriticalChance(BattleActionModel action, CoinModel coin, SkillModel __instance, ref float __result) {
-		int actevent_FakePower = MainClass.timingDict["FakePower"];
-		
-		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (modsaDict.ContainsKey(skillmodel_intlong)) {
-			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				if (modsa.activationTiming == actevent_FakePower) continue;
-				__result += modsa.critAdder / 100f;
-			}
-		}
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(__instance)) __result += modsa.critAdder / 100f;
+		foreach (ModularSA modca in GetAllModcaFromCoinModel(coin)) __result += modca.critAdder / 100f;
 
-		foreach (ModularSA modca in GetAllModcaFromCoinModel(coin)) {
-			if (modca.activationTiming == actevent_FakePower) continue;
-			__result += modca.critAdder / 100f;
+		BattleUnitModel unit = action.Model;
+		foreach (BuffModel buf in unit.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buf)) __result += modsa.critAdder / 100f;
 		}
-		
 		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList.CopyList()) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
-				if (modpa.activationTiming == actevent_FakePower) continue;
-				__result += modpa.critAdder / 100f;
-			}
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) __result += modpa.critAdder / 100f;
 		}
-
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
-			{
-				if (modpa.activationTiming == actevent_FakePower) continue;
-				__result += modpa.critAdder / 100f;
-			}
-		}
-		SupportPasPatch.SupportPassiveInit(modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
-		{
-			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
-			{
-				if (modpaList[i].activationTiming == actevent_FakePower) continue;
-				__result += modpaList[i].critAdder / 100f;
-			}
+		foreach (EgoPassiveModel egoPassiveModel in action.Model._passiveDetail.EgoPassiveList.CopyList()) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false)) __result += modpa.critAdder / 100f;
 		}
 	}
 
