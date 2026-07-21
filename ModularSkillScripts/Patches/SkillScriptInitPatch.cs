@@ -2482,13 +2482,15 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		MainClass.LogModular(" OnGiveHpDamage ");
 	}*/
 
+	
+	public static int actevent_OSA = 0;
+	public static int actevent_WH = 0;
+		
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnTakeAttackDamage))]
 	[HarmonyPostfix]
 	private static void Postfix_BattleUnitModel_OnTakeAttackDamage(BattleActionModel action, CoinModel coin, int realDmg, int hpDamage, BATTLE_EVENT_TIMING timing, bool isCritical, BattleUnitModel __instance)
 	{
 		//MainClass.Logg.LogInfo(" OnTakeAttackDamage ");
-		int actevent_OSA = MainClass.timingDict["OSA"];
-		int actevent_WH = MainClass.timingDict["WH"];
 		SkillModel skill = action.Skill;
 		BattleUnitModel attacker = action.Model;
 		if (__instance.TryCast<BattleUnitModel_Abnormality>() == null)

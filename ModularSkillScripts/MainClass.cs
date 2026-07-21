@@ -112,6 +112,8 @@ public class MainClass : BasePlugin
 		timingDict.Add("OnVisualUse", timingDict["StartVisualSkillUse"]);
 		
 		FakePowerPatches.actevent_FakePower = timingDict["FakePower"];
+		SkillScriptInitPatch.actevent_OSA = timingDict["OSA"];
+		SkillScriptInitPatch.actevent_WH = timingDict["WH"];
 		
 		Harmony harmony = new Harmony(NAME);
 		Logg = new ManualLogSource(NAME);
@@ -581,7 +583,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.9.7";
+	public const string VERSION = "4.9.8";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
