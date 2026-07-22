@@ -289,6 +289,10 @@ public class SkillScriptInitPatch
 	
 	public static void ResetAllModsa()
 	{
+		actevent_OSA = MainClass.timingDict["OSA"];
+		actevent_WH = MainClass.timingDict["WH"];
+		actevent_BSA = MainClass.timingDict["BSA"];
+		actevent_BWH = MainClass.timingDict["BWH"];
 		ClearModularScriptDict(modsaDict);
 		ClearModularScriptDict(modcaDict);
 		ClearModularScriptDict(modpaDict);
