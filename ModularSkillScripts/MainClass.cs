@@ -87,7 +87,15 @@ public class MainClass : BasePlugin
 			"AfterChangeHP",
 			"CanDealTarget",
 			//timingStringList.Add("ChangeSinBuffDamage");
-			"DelayedStart" // HBMBACMAB
+			"DelayedStart", // HBMBACMAB,
+			"StartVisualDuelEnd",
+			"StartVisualGiveDamage",
+			"StartVisualTakeDamage",
+			"StartVisualDuel",
+			"StartVisualDie",
+			"StartVisualPartDestroy",
+			"StartVisualChaseTarget"
+
 		];
 		//timingStringList.Add("ChangeSinBuffDamage");
 

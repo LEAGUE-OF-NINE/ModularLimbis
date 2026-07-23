@@ -2870,6 +2870,8 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	}
 
 
+
+
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnKillTarget))]
 	[HarmonyPostfix]
 	private static void Postfix_BattleUnitModel_OnKillTarget(BattleActionModel actionOrNull, BattleUnitModel target, DAMAGE_SOURCE_TYPE dmgSrcType, BATTLE_EVENT_TIMING timing, BattleUnitModel killer, BattleUnitModel __instance)
@@ -3131,17 +3133,318 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 		SkillModel skill = currentSkillViewer.GetSkillModel();
 		// MainClass.LogModular($"StartVisualCoinToss, skill = {skill.GetID()}");
-		
+
 		//var skillData_fromStatic = Singleton<StaticDataManager>.Instance._skillList.GetData(skillID);
 		//var model = __instance._unitModel.UnitDataModel;
 		//MainClass.LogModular($"Coin toss, skill = {skillID}, model level = {model.Level}, model sync level = {model.SyncLevel}");
 		//var skillModel = new SkillModel(skillData_fromStatic, model.Level, model.SyncLevel);
 		//skillModel.Init(); needed to get noticed by modular skill timing?
-		
+
+		foreach (var passiveModel in unit._passiveDetail.PassiveList)
+		{
+			long passivePtr = passiveModel.Pointer.ToInt64();
+
+			if (!modpaDict.TryGetValue(passivePtr, out var passiveMods))
+				continue;
+
+			foreach (ModularSA modpa in passiveMods)
+			{
+				modpa.Enact(unit, skill, null, null, MainClass.timingDict["StartVisualCoinToss"], BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+
 		long skillmodel_intlong = skill.Pointer.ToInt64();
 		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
 			modsa.Enact(unit, skill, null, null, MainClass.timingDict["StartVisualCoinToss"], BATTLE_EVENT_TIMING.ALL_TIMING);
+		}
+	}
+
+	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.OnEndDuel))]
+	[HarmonyPrefix]
+	private static void Prefix_BattleUnitView_OnEndDuel(BattleUnitView __instance)
+	{
+		BattleSkillViewer currentSkillViewer = __instance.GetCurrentSkillViewer();
+		if (currentSkillViewer == null)
+		{
+			MainClass.LogModular("StartVisualSkillUse currentSkillViewer is Null");
+			return;
+		}
+
+		BattleUnitModel unit = currentSkillViewer.GetModel();
+		if (unit == null)
+		{
+			MainClass.LogModular("StartVisualSkillUse currentSkillViewer.GetModel() is Null. Switching to BattleUnitView.unitModel");
+			unit = __instance.unitModel;
+		}
+		SkillModel skill = currentSkillViewer.GetSkillModel();
+		//MainClass.LogModular($"StartVisualSkillUse, skill = {skill.GetID()}");
+
+		//var skillID = __instance.GetCurrentSkillViewer().curSkillID;
+		//var skillData = Singleton<StaticDataManager>.Instance._skillList.GetData(skillID);
+		//var model = __instance._unitModel.UnitDataModel;
+		//MainClass.LogModular($"SBA, skill = {skillID}, model level = {model.Level}, model sync level = {model.SyncLevel}");
+		//var skillModel = new SkillModel(skillData, model.Level, model.SyncLevel);
+		//skillModel.Init(); // needed to get noticed by modular skill timing?
+
+		foreach (var passiveModel in unit._passiveDetail.PassiveList)
+		{
+			long passivePtr = passiveModel.Pointer.ToInt64();
+
+			if (!modpaDict.TryGetValue(passivePtr, out var passiveMods))
+				continue;
+
+			foreach (ModularSA modpa in passiveMods)
+			{
+				modpa.Enact(unit, skill, null, null,MainClass.timingDict["StartVisualDuelEnd"], BATTLE_EVENT_TIMING.ON_END_DUEL);
+			}
+		}
+
+		long skillmodel_intlong = skill.Pointer.ToInt64();
+		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+		foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
+		{
+			modsa.Enact(unit, skill, null, null, MainClass.timingDict["StartVisualDuelEnd"], BATTLE_EVENT_TIMING.ON_END_DUEL);
+		}
+	}
+
+	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.OnGiveDamage))]
+	[HarmonyPrefix]
+	private static void Prefix_BattleUnitView_OnGiveDamage(BattleUnitView __instance)
+	{
+		BattleSkillViewer currentSkillViewer = __instance.GetCurrentSkillViewer();
+		if (currentSkillViewer == null)
+		{
+			MainClass.LogModular("StartVisualSkillUse currentSkillViewer is Null");
+			return;
+		}
+
+		BattleUnitModel unit = currentSkillViewer.GetModel();
+		if (unit == null)
+		{
+			MainClass.LogModular("StartVisualSkillUse currentSkillViewer.GetModel() is Null. Switching to BattleUnitView.unitModel");
+			unit = __instance.unitModel;
+		}
+		SkillModel skill = currentSkillViewer.GetSkillModel();
+		//MainClass.LogModular($"StartVisualSkillUse, skill = {skill.GetID()}");
+
+		//var skillID = __instance.GetCurrentSkillViewer().curSkillID;
+		//var skillData = Singleton<StaticDataManager>.Instance._skillList.GetData(skillID);
+		//var model = __instance._unitModel.UnitDataModel;
+		//MainClass.LogModular($"SBA, skill = {skillID}, model level = {model.Level}, model sync level = {model.SyncLevel}");
+		//var skillModel = new SkillModel(skillData, model.Level, model.SyncLevel);
+		//skillModel.Init(); // needed to get noticed by modular skill timing?
+
+		foreach (var passiveModel in unit._passiveDetail.PassiveList)
+		{
+			long passivePtr = passiveModel.Pointer.ToInt64();
+
+			if (!modpaDict.TryGetValue(passivePtr, out var passiveMods))
+				continue;
+
+			foreach (ModularSA modpa in passiveMods)
+			{
+				modpa.Enact(unit, skill, null, null, MainClass.timingDict["StartVisualGiveDamage"], BATTLE_EVENT_TIMING.ON_SUCCESS_ATTACK);
+			}
+		}
+
+		long skillmodel_intlong = skill.Pointer.ToInt64();
+		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+		foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
+		{
+			modsa.Enact(unit, skill, null, null, MainClass.timingDict["StartVisualGiveDamage"], BATTLE_EVENT_TIMING.ON_SUCCESS_ATTACK);
+		}
+	}
+
+	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.OnStartDuel))]
+	[HarmonyPrefix]
+	private static void Prefix_BattleUnitView_OnStartDuel(BattleUnitView __instance)
+	{
+		BattleSkillViewer currentSkillViewer = __instance.GetCurrentSkillViewer();
+		if (currentSkillViewer == null)
+		{
+			MainClass.LogModular("StartVisualSkillUse currentSkillViewer is Null");
+			return;
+		}
+
+		BattleUnitModel unit = currentSkillViewer.GetModel();
+		if (unit == null)
+		{
+			MainClass.LogModular("StartVisualSkillUse currentSkillViewer.GetModel() is Null. Switching to BattleUnitView.unitModel");
+			unit = __instance.unitModel;
+		}
+		SkillModel skill = currentSkillViewer.GetSkillModel();
+		//MainClass.LogModular($"StartVisualSkillUse, skill = {skill.GetID()}");
+
+		//var skillID = __instance.GetCurrentSkillViewer().curSkillID;
+		//var skillData = Singleton<StaticDataManager>.Instance._skillList.GetData(skillID);
+		//var model = __instance._unitModel.UnitDataModel;
+		//MainClass.LogModular($"SBA, skill = {skillID}, model level = {model.Level}, model sync level = {model.SyncLevel}");
+		//var skillModel = new SkillModel(skillData, model.Level, model.SyncLevel);
+		//skillModel.Init(); // needed to get noticed by modular skill timing?
+
+		foreach (var passiveModel in unit._passiveDetail.PassiveList)
+		{
+			long passivePtr = passiveModel.Pointer.ToInt64();
+
+			if (!modpaDict.TryGetValue(passivePtr, out var passiveMods))
+				continue;
+
+			foreach (ModularSA modpa in passiveMods)
+			{
+				modpa.Enact(unit, skill, null, null, MainClass.timingDict["StartVisualDuel"], BATTLE_EVENT_TIMING.ON_START_DUEL);
+			}
+		}
+
+		long skillmodel_intlong = skill.Pointer.ToInt64();
+		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+		foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
+		{
+			modsa.Enact(unit, skill, null, null, MainClass.timingDict["StartVisualDuel"], BATTLE_EVENT_TIMING.ON_START_DUEL);
+		}
+	}
+
+	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.OnDie))]
+	[HarmonyPrefix]
+	private static void Prefix_BattleUnitView_OnVisualDie(BattleUnitView __instance)
+	{
+		BattleSkillViewer currentSkillViewer = __instance.GetCurrentSkillViewer();
+		if (currentSkillViewer == null)
+		{
+			MainClass.LogModular("StartVisualSkillUse currentSkillViewer is Null");
+			return;
+		}
+
+		BattleUnitModel unit = currentSkillViewer.GetModel();
+		if (unit == null)
+		{
+			MainClass.LogModular("StartVisualSkillUse currentSkillViewer.GetModel() is Null. Switching to BattleUnitView.unitModel");
+			unit = __instance.unitModel;
+		}
+		SkillModel skill = currentSkillViewer.GetSkillModel();
+		//MainClass.LogModular($"StartVisualSkillUse, skill = {skill.GetID()}");
+
+		//var skillID = __instance.GetCurrentSkillViewer().curSkillID;
+		//var skillData = Singleton<StaticDataManager>.Instance._skillList.GetData(skillID);
+		//var model = __instance._unitModel.UnitDataModel;
+		//MainClass.LogModular($"SBA, skill = {skillID}, model level = {model.Level}, model sync level = {model.SyncLevel}");
+		//var skillModel = new SkillModel(skillData, model.Level, model.SyncLevel);
+		//skillModel.Init(); // needed to get noticed by modular skill timing?
+
+		foreach (var passiveModel in unit._passiveDetail.PassiveList)
+		{
+			long passivePtr = passiveModel.Pointer.ToInt64();
+
+			if (!modpaDict.TryGetValue(passivePtr, out var passiveMods))
+				continue;
+
+			foreach (ModularSA modpa in passiveMods)
+			{
+				modpa.Enact(unit, skill, null, null, MainClass.timingDict["StartVisualDie"], BATTLE_EVENT_TIMING.ON_DIE);
+			}
+		}
+
+		long skillmodel_intlong = skill.Pointer.ToInt64();
+		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+		foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
+		{
+			modsa.Enact(unit, skill, null, null, MainClass.timingDict["StartVisualDie"], BATTLE_EVENT_TIMING.ON_DIE);
+		}
+	}
+
+	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.OnChaseTarget))]
+	[HarmonyPrefix]
+	private static void Prefix_BattleUnitView_OnChaseTarget(BattleUnitView __instance)
+	{
+		BattleSkillViewer currentSkillViewer = __instance.GetCurrentSkillViewer();
+		if (currentSkillViewer == null)
+		{
+			MainClass.LogModular("StartVisualSkillUse currentSkillViewer is Null");
+			return;
+		}
+
+		BattleUnitModel unit = currentSkillViewer.GetModel();
+		if (unit == null)
+		{
+			MainClass.LogModular("StartVisualSkillUse currentSkillViewer.GetModel() is Null. Switching to BattleUnitView.unitModel");
+			unit = __instance.unitModel;
+		}
+		SkillModel skill = currentSkillViewer.GetSkillModel();
+		//MainClass.LogModular($"StartVisualSkillUse, skill = {skill.GetID()}");
+
+		//var skillID = __instance.GetCurrentSkillViewer().curSkillID;
+		//var skillData = Singleton<StaticDataManager>.Instance._skillList.GetData(skillID);
+		//var model = __instance._unitModel.UnitDataModel;
+		//MainClass.LogModular($"SBA, skill = {skillID}, model level = {model.Level}, model sync level = {model.SyncLevel}");
+		//var skillModel = new SkillModel(skillData, model.Level, model.SyncLevel);
+		//skillModel.Init(); // needed to get noticed by modular skill timing?
+
+		foreach (var passiveModel in unit._passiveDetail.PassiveList)
+		{
+			long passivePtr = passiveModel.Pointer.ToInt64();
+
+			if (!modpaDict.TryGetValue(passivePtr, out var passiveMods))
+				continue;
+
+			foreach (ModularSA modpa in passiveMods)
+			{
+				modpa.Enact(unit, skill, null, null, MainClass.timingDict["StartVisualChaseTarget"], BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+
+		long skillmodel_intlong = skill.Pointer.ToInt64();
+		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+		foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
+		{
+			modsa.Enact(unit, skill, null, null, MainClass.timingDict["StartVisualChaseTarget"], BATTLE_EVENT_TIMING.ALL_TIMING);
+		}
+	}
+
+	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.OnPartDestroyed))]
+	[HarmonyPrefix]
+	private static void Prefix_BattleUnitView_OnPartDestroyed(BattleUnitView __instance)
+	{
+		BattleSkillViewer currentSkillViewer = __instance.GetCurrentSkillViewer();
+		if (currentSkillViewer == null)
+		{
+			MainClass.LogModular("StartVisualSkillUse currentSkillViewer is Null");
+			return;
+		}
+
+		BattleUnitModel unit = currentSkillViewer.GetModel();
+		if (unit == null)
+		{
+			MainClass.LogModular("StartVisualSkillUse currentSkillViewer.GetModel() is Null. Switching to BattleUnitView.unitModel");
+			unit = __instance.unitModel;
+		}
+		SkillModel skill = currentSkillViewer.GetSkillModel();
+		//MainClass.LogModular($"StartVisualSkillUse, skill = {skill.GetID()}");
+
+		//var skillID = __instance.GetCurrentSkillViewer().curSkillID;
+		//var skillData = Singleton<StaticDataManager>.Instance._skillList.GetData(skillID);
+		//var model = __instance._unitModel.UnitDataModel;
+		//MainClass.LogModular($"SBA, skill = {skillID}, model level = {model.Level}, model sync level = {model.SyncLevel}");
+		//var skillModel = new SkillModel(skillData, model.Level, model.SyncLevel);
+		//skillModel.Init(); // needed to get noticed by modular skill timing?
+
+		foreach (var passiveModel in unit._passiveDetail.PassiveList)
+		{
+			long passivePtr = passiveModel.Pointer.ToInt64();
+
+			if (!modpaDict.TryGetValue(passivePtr, out var passiveMods))
+				continue;
+
+			foreach (ModularSA modpa in passiveMods)
+			{
+				modpa.Enact(unit, skill, null, null, MainClass.timingDict["StartVisualPartDestroy"], BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+
+		long skillmodel_intlong = skill.Pointer.ToInt64();
+		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
+		foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
+		{
+			modsa.Enact(unit, skill, null, null, MainClass.timingDict["StartVisualPartDestroy"], BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 	}
 
@@ -3164,14 +3467,27 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 		SkillModel skill = currentSkillViewer.GetSkillModel();
 		//MainClass.LogModular($"StartVisualSkillUse, skill = {skill.GetID()}");
-		
+
 		//var skillID = __instance.GetCurrentSkillViewer().curSkillID;
 		//var skillData = Singleton<StaticDataManager>.Instance._skillList.GetData(skillID);
 		//var model = __instance._unitModel.UnitDataModel;
 		//MainClass.LogModular($"SBA, skill = {skillID}, model level = {model.Level}, model sync level = {model.SyncLevel}");
 		//var skillModel = new SkillModel(skillData, model.Level, model.SyncLevel);
 		//skillModel.Init(); // needed to get noticed by modular skill timing?
-		
+
+		foreach (var passiveModel in unit._passiveDetail.PassiveList)
+		{
+			long passivePtr = passiveModel.Pointer.ToInt64();
+
+			if (!modpaDict.TryGetValue(passivePtr, out var passiveMods))
+				continue;
+
+			foreach (ModularSA modpa in passiveMods)
+			{
+				modpa.Enact(unit, skill, null, null, MainClass.timingDict["StartVisualSkillUse"], BATTLE_EVENT_TIMING.ON_TAKE_ATTACK_DAMAGE);
+			}
+		}
+
 		long skillmodel_intlong = skill.Pointer.ToInt64();
 		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
