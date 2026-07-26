@@ -744,6 +744,49 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 	}
 
+	public static BUFF_UNIQUE_KEYWORD keyword_BufMaxStackAdder = BUFF_UNIQUE_KEYWORD.None;
+	public static BUFF_UNIQUE_KEYWORD keyword_BufMaxTurnAdder = BUFF_UNIQUE_KEYWORD.None;
+	
+	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.GetMaxBuffStackAdder))]
+	[HarmonyPostfix]
+	private static void Postfix_PassiveModel_GetMaxBuffStackAdder(BUFF_UNIQUE_KEYWORD keyword, ref int __result, PassiveDetail __instance) {
+		BattleUnitModel unit = __instance._owner;
+		if (unit == null) return;
+		int actevent = MainClass.timingDict["BufMaxStackAdder"];
+		keyword_BufMaxStackAdder = keyword;
+		
+		foreach (PassiveModel passiveModel in __instance._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel))
+			{
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.valueList[9] = 0;
+				modsa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modsa.valueList[9] != 0) __result += modsa.valueList[9];
+			}
+		}
+	}
+	
+	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.GetMaxBuffTurnAdder))]
+	[HarmonyPostfix]
+	private static void Postfix_PassiveModel_GetMaxBuffTurnAdder(BUFF_UNIQUE_KEYWORD keyword, ref int __result, PassiveDetail __instance) {
+		BattleUnitModel unit = __instance._owner;
+		if (unit == null) return;
+		int actevent = MainClass.timingDict["BufMaxTurnAdder"];
+		keyword_BufMaxTurnAdder = keyword;
+		
+		foreach (PassiveModel passiveModel in __instance._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel))
+			{
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.valueList[9] = 0;
+				modsa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modsa.valueList[9] != 0) __result += modsa.valueList[9];
+			}
+		}
+	}
+
 	[HarmonyPatch(typeof(SupporterPassiveModel), nameof(SupporterPassiveModel.OnDieOtherUnit))]
 	[HarmonyPostfix]
 	public static void Postfix_OnDieOtherUnit(BattleUnitModel killer, BattleUnitModel dead, BATTLE_EVENT_TIMING timing, DAMAGE_SOURCE_TYPE dmgSrcType, BUFF_UNIQUE_KEYWORD keyword)
@@ -2392,7 +2435,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			modba.Enact(unit, skillOrNull, actionOrNull, null, actevent, timing);
 		}
 	}
-
+	
 	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.GetSkillPowerAdder))]
 	[HarmonyPostfix]
 	private static void Postfix_BuffModel_GetSkillPowerAdder(ref int __result, BuffModel __instance) {

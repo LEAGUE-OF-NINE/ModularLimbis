@@ -93,8 +93,9 @@ public class MainClass : BasePlugin
 			"StartVisualDuel",
 			"StartVisualDie",
 			"StartVisualPartDestroy",
-			"StartVisualChaseTarget"
-
+			"StartVisualChaseTarget",
+			"BufMaxStackAdder",
+			"BufMaxTurnAdder"
 		];
 		//timingStringList.Add("ChangeSinBuffDamage");
 
@@ -358,6 +359,8 @@ public class MainClass : BasePlugin
 		acquirerDict["getbreaklevel"] = new AcquirerGetBreakLevel();
 		acquirerDict["getdmgmult"] = new AcquirerGetDmgMult();
 		acquirerDict["partdestroy"] = new AcquirerPartDestroy();
+		acquirerDict["bufmaxstackadderiskeyword"] = new AcquirerBufMaxAdderIsKeyword(0);
+		acquirerDict["bufmaxturnadderiskeyword"] = new AcquirerBufMaxAdderIsKeyword(1);
 		
 		// legacy acquirers
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();
