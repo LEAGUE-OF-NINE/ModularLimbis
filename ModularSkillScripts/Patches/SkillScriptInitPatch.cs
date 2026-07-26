@@ -1381,18 +1381,24 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	// PASSIVES END
 
 
+	[HarmonyPatch(typeof(CoinModel), nameof(CoinModel.GetCoinScaleAdder))]
+	[HarmonyPostfix]
+	private static void Postfix_CoinModel_GetCoinScaleAdder(BattleActionModel action, ref int __result, CoinModel __instance)
+	{
+		foreach (ModularSA modsa in GetAllModcaFromCoinModel(__instance)) {
+			__result += modsa.coinScaleAdder;
+		}
+	}
+
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetCoinScaleAdder))]
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_GetCoinScaleAdder(BattleActionModel action, ref int __result, SkillModel __instance)
 	{
-		int actevent_FakePower = MainClass.timingDict["FakePower"];
-		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (modsaDict.ContainsKey(skillmodel_intlong)) {
-			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				if (modsa.activationTiming == actevent_FakePower) continue;
-				int power = modsa.coinScaleAdder;
-				__result += power;
-			}
+		int actevent_FakePower = FakePowerPatches.actevent_FakePower;
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(__instance)) {
+			if (modsa.activationTiming == actevent_FakePower) continue;
+			int power = modsa.coinScaleAdder;
+			__result += power;
 		}
 
 		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList.CopyList()) {
