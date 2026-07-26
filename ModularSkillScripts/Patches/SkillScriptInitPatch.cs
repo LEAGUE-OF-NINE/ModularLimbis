@@ -1121,6 +1121,82 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 
 		if (finalDmgChange != resultDmg) __result = finalDmgChange;
 	}
+	
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.ChangeAttackDamage))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_ChangeAttackDamage(
+		BattleActionModel action,
+		BattleUnitModel target,
+		CoinModel coin,
+		int resultDmg,
+		ref bool isCritical,
+		BATTLE_EVENT_TIMING timing,
+		BattleUnitModel __instance,
+		ref int __result)
+	{
+		int finalDmgChange = __result;
+		int actevent = MainClass.timingDict["ChangeAttackDamage"];
+		SkillModel skill = action._skill;
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill))
+		{
+			if (modsa.activationTiming != actevent) continue;
+			modsa.valueList[9] = finalDmgChange;
+			modsa.modsa_coinModel = coin;
+			modsa.Enact(__instance, skill, action, null, actevent, timing);
+			finalDmgChange = modsa.valueList[9];
+		}
+		
+		foreach (ModularSA modsa in GetAllModcaFromCoinModel(coin))
+		{
+			if (modsa.activationTiming != actevent) continue;
+			modsa.valueList[9] = finalDmgChange;
+			modsa.modsa_coinModel = coin;
+			modsa.Enact(__instance, skill, action, null, actevent, timing);
+			finalDmgChange = modsa.valueList[9];
+		}
+		
+		foreach (BuffModel buf in __instance.GetActivatedBuffModels())
+		{
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buf))
+			{
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[9] = finalDmgChange;
+				modsa.modsa_buffModel = buf;
+				modsa.modsa_coinModel = coin;
+				modsa.Enact(__instance, skill, action, null, actevent, timing);
+				finalDmgChange = modsa.valueList[9];
+			}
+		}
+		
+		foreach (PassiveModel passiveModel in __instance._passiveDetail._passivelist.CopyList())
+		{
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel))
+			{
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[9] = finalDmgChange;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.modsa_coinModel = coin;
+				modsa.Enact(__instance, skill, action, null, actevent, timing);
+				finalDmgChange = modsa.valueList[9];
+			}
+		}
+
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail._egoPassiveList.CopyList())
+		{
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false))
+			{
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[9] = finalDmgChange;
+				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.modsa_coinModel = coin;
+				modsa.Enact(__instance, skill, action, null, actevent, timing);
+				finalDmgChange = modsa.valueList[9];
+			}
+		}
+
+		__result = finalDmgChange;
+	}
 
 
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnAddShield))]

@@ -95,7 +95,8 @@ public class MainClass : BasePlugin
 			"StartVisualPartDestroy",
 			"StartVisualChaseTarget",
 			"BufMaxStackAdder",
-			"BufMaxTurnAdder"
+			"BufMaxTurnAdder",
+			"ChangeAttackDamage"
 		];
 		//timingStringList.Add("ChangeSinBuffDamage");
 
