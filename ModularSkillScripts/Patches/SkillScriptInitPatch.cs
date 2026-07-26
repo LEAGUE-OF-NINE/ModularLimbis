@@ -765,6 +765,16 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				if (modsa.valueList[9] != 0) __result += modsa.valueList[9];
 			}
 		}
+		foreach (EgoPassiveModel egoPassiveModel in __instance._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel,false))
+			{
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.valueList[9] = 0;
+				modsa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modsa.valueList[9] != 0) __result += modsa.valueList[9];
+			}
+		}
 	}
 	
 	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.GetMaxBuffTurnAdder))]
@@ -780,6 +790,16 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			{
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = passiveModel;
+				modsa.valueList[9] = 0;
+				modsa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modsa.valueList[9] != 0) __result += modsa.valueList[9];
+			}
+		}
+		foreach (EgoPassiveModel egoPassiveModel in __instance._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel,false))
+			{
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = egoPassiveModel;
 				modsa.valueList[9] = 0;
 				modsa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 				if (modsa.valueList[9] != 0) __result += modsa.valueList[9];
