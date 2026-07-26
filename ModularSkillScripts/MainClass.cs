@@ -259,6 +259,7 @@ public class MainClass : BasePlugin
 		consequenceDict["setspusage"] = new ConsequenceSetSpUsage();
 		consequenceDict["instantdeath"] = new ConsequenceInstantDeath();
 		consequenceDict["activatebuffunreliable"] = new ConsequenceActivateBuffUnreliable();
+		consequenceDict["partdestroy"] = new ConsequencePartDestroy();
 
 		// legacy consequences
 		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
@@ -356,7 +357,8 @@ public class MainClass : BasePlugin
 		acquirerDict["getuptielevel"] = new AcquirerGetUptieLevel();
 		acquirerDict["getbreaklevel"] = new AcquirerGetBreakLevel();
 		acquirerDict["getdmgmult"] = new AcquirerGetDmgMult();
-
+		acquirerDict["partdestroy"] = new AcquirerPartDestroy();
+		
 		// legacy acquirers
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();
 		acquirerDict["mpcheck"] = new AcquirerMpCheck();
@@ -562,9 +564,9 @@ public class MainClass : BasePlugin
 	{
 		logEnabled = EnableLogging.Value;
 	}
-	public static void LogModular(object thing)
+	public static void LogModular(object thing, bool ignorelogenabled = false)
 	{
-		if (logEnabled) Logg.LogInfo(thing);
+		if (ignorelogenabled || logEnabled) Logg.LogInfo(thing);
 	}
 
 
@@ -588,7 +590,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.9.9";
+	public const string VERSION = "5.0.0";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
