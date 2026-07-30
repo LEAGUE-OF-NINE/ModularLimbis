@@ -13,6 +13,7 @@ using ModularSkillScripts.Acquirer;
 using ModularSkillScripts.Patches;
 using Il2CppSystem.Text.RegularExpressions;
 using StringSplitOptions = System.StringSplitOptions;
+using CSound;
 
 //using Antlr4.Runtime;
 //using Antlr4.Runtime.Tree;
@@ -262,7 +263,8 @@ public class MainClass : BasePlugin
 		consequenceDict["instantdeath"] = new ConsequenceInstantDeath();
 		consequenceDict["activatebuffunreliable"] = new ConsequenceActivateBuffUnreliable();
 		consequenceDict["partdestroy"] = new ConsequencePartDestroy();
-
+		consequenceDict["playcustomsound"] = new ConsequencePlayCustomSound();
+		consequenceDict["stopcustomsound"] = new ConsequenceStopSound();
 		// legacy consequences
 		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
 		consequenceDict["buf"] = new ConsequenceBuf();
@@ -594,7 +596,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "5.0.0";
+	public const string VERSION = "5.0.1";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
