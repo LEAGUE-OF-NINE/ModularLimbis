@@ -151,7 +151,8 @@ public class ModularSA : Il2CppSystem.Object
 	}
 
 	public string originalString = "";
-	public readonly char[] parenthesisSeparator = ['(', ')'];
+	public static readonly char[] parenthesisSeparator = { '(', ')' };
+	public static readonly char[] CompareSeparator = { '<', '>', '=' };
 
 	public int[] valueList = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 	public void ResetValueList()
@@ -206,7 +207,7 @@ public class ModularSA : Il2CppSystem.Object
 	public bool resetWhenUse = false;
 	public bool clearValues = false;
 
-	private List<string> batch_list = new();
+	private readonly ModularScript modularScript = new();
 
 	public BattleActionModel modsa_selfAction = null;
 	public BattleActionModel modsa_oppoAction = null;
@@ -369,7 +370,7 @@ public class ModularSA : Il2CppSystem.Object
 					break;
 				}
 			}
-			
+
 			if (dummyPassiveAbility == null)
 			{
 				MainClass.LogModular("Creating dummy passive Ability Script with no Parent PassiveModel (last resort)");
@@ -377,7 +378,7 @@ public class ModularSA : Il2CppSystem.Object
 				pa.Init(modsa_unitModel, new List<PassiveConditionStaticData>(), new List<PassiveConditionStaticData>(), new List<int>());
 				dummyPassiveAbility = pa;
 			}
-			
+
 		}
 		else
 		{
@@ -414,15 +415,15 @@ public class ModularSA : Il2CppSystem.Object
 			List<BattleUnitModel> loopTarget_list = modsa_target_list.CopyList();
 			if (modsa_loopString.Any()) loopTarget_list = GetTargetModelList(modsa_loopString);
 			else if (loopTarget_list.Count < 1) loopTarget_list.Add(GetTargetModel("MainTarget"));
+			var batches = modularScript.Batches;
 			foreach (BattleUnitModel unit in loopTarget_list)
 			{
 				modsa_loopTarget = unit;
 				_fullStop = false;
-				for (int i = 0; i < batch_list.Count; i++)
+				for (int i = 0; i < batches.Count; i++)
 				{
 					if (_fullStop) break;
-					string batch = batch_list.ToArray()[i];
-					ProcessBatch(batch);
+					ExecuteBatch(batches[i]);
 				}
 			}
 			modsa_target_list.Clear();
@@ -477,9 +478,9 @@ public class ModularSA : Il2CppSystem.Object
 
 	private LuaValue ParseLuaValue(string rawstring)
 	{
-		if (rawstring == null || 
-		    string.Equals(rawstring, "nil", StringComparison.OrdinalIgnoreCase) || 
-		    string.Equals(rawstring, "null", StringComparison.OrdinalIgnoreCase))
+		if (rawstring == null ||
+				string.Equals(rawstring, "nil", StringComparison.OrdinalIgnoreCase) ||
+				string.Equals(rawstring, "null", StringComparison.OrdinalIgnoreCase))
 		{
 			return LuaValue.Nil;
 		}
@@ -497,53 +498,34 @@ public class ModularSA : Il2CppSystem.Object
 		if (rawstring.StartsWith("VALUE_")) return new LuaValue(GetNumFromParamString(rawstring));
 		return new LuaValue(rawstring);
 	}
-
-	private bool CheckIF(string param)
+	private bool EvaluateCond(CondExpr expr)
 	{
-		string[] circles = param.Split(parenthesisSeparator)[1].Split(',');
-
-		int mode = -1; // AND
-		switch (circles[0])
-		{
-			case "AND": mode = 0; break;
-			case "OR": mode = 1; break;
-			case "XOR": mode = 2; break;
-		}
-
-		int idx = 0;
-		if (mode == -1) mode = 0;
-		else idx++;
-
-		char[] ifSeparator = ['<', '>', '='];
 		bool success = false;
 		bool success_first = false;
-		for (int i = idx; i < circles.Length; i++)
+		for (int i = 0; i < expr.Clauses.Count; i++)
 		{
-			string circle_string = circles[i];
-			var symbols = Regex.Matches(circle_string, "(<|>|=)", RegexOptions.IgnoreCase, TimeSpan.FromMinutes(1));
-			string[] parameters = circle_string.Split(ifSeparator);
-			string firstParam = parameters[0];
-			string secondParam = parameters[1];
+			CondClause clause = expr.Clauses[i];
+			int firstValue = EvaluateNumArg(clause.Left);
+			int secondValue = EvaluateNumArg(clause.Right);
 
-			int firstValue = GetNumFromParamString(firstParam);
-			int secondValue = GetNumFromParamString(secondParam);
+			switch (clause.Op)
+			{
+				case '<': success = firstValue < secondValue; break;
+				case '>': success = firstValue > secondValue; break;
+				case '=': success = firstValue == secondValue; break;
+			}
 
-			string symbol = symbols[0].Value;
-			if (symbol == "<") success = firstValue < secondValue;
-			else if (symbol == ">") success = firstValue > secondValue;
-			else if (symbol == "=") success = firstValue == secondValue;
-
-			if (mode == 0)
+			if (expr.Mode == CondMode.AND)
 			{
 				if (!success) break;
 			}
-			else if (mode == 1)
+			else if (expr.Mode == CondMode.OR)
 			{
 				if (success) break;
 			}
 			else
 			{
-				if (i == idx) success_first = success;
+				if (i == 0) success_first = success;
 				else
 				{
 					success = success_first == success;
@@ -551,39 +533,27 @@ public class ModularSA : Il2CppSystem.Object
 				}
 			}
 		}
-		//MainClass.LogModular("ifsuccess: " + param + " | " + success);
+		//MainClass.LogModular("ifsuccess: " + expr + " | " + success);
 		return success;
 	}
 
 
 	public int GetNumFromParamString(string param)
 	{
-		int value = 0;
-		bool negative = param[0] == '-';
-		if (negative) param = param.Remove(0, 1);
-		bool math = param[0] == 'm';
-		if (math) param = param.Remove(0, 1);
-		bool acquire = param[0] == 'G';
-		if (acquire) param = param.Remove(0, 1);
-		if (param.Last() == ')') param = param.Remove(param.Length - 1);
+		return EvaluateNumArg(ScriptCache.GetNumArg(param));
+	}
 
-		if (math) value = DoMath(param);
-		else if (param.StartsWith("VALUE_"))
+	private int EvaluateNumArg(NumArg arg)
+	{
+		int value;
+		switch (arg.Kind)
 		{
-			int value_idx = 0;
-			int.TryParse(param[6].ToString(), out value_idx);
-			value = valueList[value_idx];
+			case NumArgKind.Math: value = EvaluateMath(arg.Math); break;
+			case NumArgKind.ValueRef: value = valueList[arg.ValueIndex]; break;
+			case NumArgKind.Acquire: value = EvaluateValueAssign(arg.Acquire); break;
+			default: value = arg.Literal; break;
 		}
-		else if (acquire)
-		{
-			param = Regex.Replace(param, @"{", "(");
-			param = Regex.Replace(param, @"}", ")");
-			param = Regex.Replace(param, @"-", ",");
-			value = AcquireValue(param);
-		}
-		else int.TryParse(param, out value);
-
-		if (negative) value *= -1;
+		if (arg.Negative) value *= -1;
 		return value;
 	}
 
@@ -603,111 +573,112 @@ public class ModularSA : Il2CppSystem.Object
 		{
 			case "Null": return unitList;
 			case "Self":
-			{
-				unitList.Add(modsa_unitModel);
-				return unitList;
-			}
+				{
+					unitList.Add(modsa_unitModel);
+					return unitList;
+				}
 			case "SelfCore":
-			{
-				BattleUnitModel_Abnormality_Part part = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
-				if (part != null) unitList.Add(part.Abnormality);
-				else unitList.Add(modsa_unitModel);
+				{
+					BattleUnitModel_Abnormality_Part part = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
+					if (part != null) unitList.Add(part.Abnormality);
+					else unitList.Add(modsa_unitModel);
 
-				return unitList;
-			}
+					return unitList;
+				}
 			case "SelfParts":
-			{
-	
-				BattleUnitModel_Abnormality_Part part = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
-				BattleUnitModel_Abnormality isLikeAnAbno = null;
-				if (part != null) isLikeAnAbno = part.Abnormality;
-				else 
 				{
-					isLikeAnAbno = modsa_unitModel.TryCast<BattleUnitModel_Abnormality>();
-				};
 
-				if (isLikeAnAbno == null) return unitList;
+					BattleUnitModel_Abnormality_Part part = modsa_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
+					BattleUnitModel_Abnormality isLikeAnAbno = null;
+					if (part != null) isLikeAnAbno = part.Abnormality;
+					else
+					{
+						isLikeAnAbno = modsa_unitModel.TryCast<BattleUnitModel_Abnormality>();
+					}
+					;
 
-				var LikeListOfAbnoParts = isLikeAnAbno._partList;
-				foreach (var partOfAbno in  LikeListOfAbnoParts)
-				{
-					unitList.Add(partOfAbno);
+					if (isLikeAnAbno == null) return unitList;
+
+					var LikeListOfAbnoParts = isLikeAnAbno._partList;
+					foreach (var partOfAbno in LikeListOfAbnoParts)
+					{
+						unitList.Add(partOfAbno);
+					}
+
+					return unitList;
 				}
-
-				return unitList;
-			}
 			case "Target":
-			{
-				if (modsa_loopTarget != null) unitList.Add(modsa_loopTarget);
-				return unitList;
-			}
-			case "TargetCore":
-			{
-				BattleUnitModel_Abnormality_Part part = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality_Part>();
-				if (part != null) unitList.Add(part.Abnormality);
-				else unitList.Add(modsa_loopTarget);
-				return unitList;
-			}
-			case "TargetParts":
-			{
-
-				BattleUnitModel_Abnormality_Part part = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality_Part>();
-				BattleUnitModel_Abnormality isLikeAnAbno = null;
-				if (part != null) isLikeAnAbno = part.Abnormality;
-				else
 				{
-					isLikeAnAbno = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality>();
+					if (modsa_loopTarget != null) unitList.Add(modsa_loopTarget);
+					return unitList;
 				}
+			case "TargetCore":
+				{
+					BattleUnitModel_Abnormality_Part part = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality_Part>();
+					if (part != null) unitList.Add(part.Abnormality);
+					else unitList.Add(modsa_loopTarget);
+					return unitList;
+				}
+			case "TargetParts":
+				{
+
+					BattleUnitModel_Abnormality_Part part = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality_Part>();
+					BattleUnitModel_Abnormality isLikeAnAbno = null;
+					if (part != null) isLikeAnAbno = part.Abnormality;
+					else
+					{
+						isLikeAnAbno = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality>();
+					}
 				;
 
-				if (isLikeAnAbno == null) return unitList;
+					if (isLikeAnAbno == null) return unitList;
 
-				var LikeListOfAbnoParts = isLikeAnAbno._partList;
-				foreach (var partOfAbno in LikeListOfAbnoParts)
-				{
-					unitList.Add(partOfAbno);
+					var LikeListOfAbnoParts = isLikeAnAbno._partList;
+					foreach (var partOfAbno in LikeListOfAbnoParts)
+					{
+						unitList.Add(partOfAbno);
+					}
+
+					return unitList;
 				}
-
-				return unitList;
-			}
 			case "MainTarget":
-			{
-				if (modsa_selfAction == null) { unitList.Add(null); return unitList; }
-				TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
-				unitList.Add(targetDataSet.GetMainTarget());
-				return unitList;
-			}
+				{
+					if (modsa_selfAction == null) { unitList.Add(null); return unitList; }
+					TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
+					unitList.Add(targetDataSet.GetMainTarget());
+					return unitList;
+				}
 			case "EveryTarget":
-			{
-				TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
-				unitList.Add(targetDataSet.GetMainTarget());
-				foreach (SinActionModel sinActionModel in targetDataSet.GetSubTargetSinActionList())
 				{
-					BattleUnitModel model = sinActionModel.UnitModel;
-					if (!unitList.Contains(model)) unitList.Add(sinActionModel.UnitModel);
+					TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
+					unitList.Add(targetDataSet.GetMainTarget());
+					foreach (SinActionModel sinActionModel in targetDataSet.GetSubTargetSinActionList())
+					{
+						BattleUnitModel model = sinActionModel.UnitModel;
+						if (!unitList.Contains(model)) unitList.Add(sinActionModel.UnitModel);
+					}
+					return unitList;
 				}
-				return unitList;
-			}
 			case "SubTarget":
-			{
-				TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
-				foreach (SinActionModel sinActionModel in targetDataSet.GetSubTargetSinActionList())
 				{
-					BattleUnitModel model = sinActionModel.UnitModel;
-					if (!unitList.Contains(model)) unitList.Add(sinActionModel.UnitModel);
+					TargetDataSet targetDataSet = modsa_selfAction._targetDataDetail.GetCurrentTargetSet();
+					foreach (SinActionModel sinActionModel in targetDataSet.GetSubTargetSinActionList())
+					{
+						BattleUnitModel model = sinActionModel.UnitModel;
+						if (!unitList.Contains(model)) unitList.Add(sinActionModel.UnitModel);
+					}
+					return unitList;
 				}
-				return unitList;
-			}
 			case "Victim":
-			{
-				unitList.Add(modsa_victimModel);
-				return unitList;
-			}
+				{
+					unitList.Add(modsa_victimModel);
+					return unitList;
+				}
 			case "Killer":
-			{
-				unitList.Add(modsa_killerModel);
-				return unitList;
-			}
+				{
+					unitList.Add(modsa_killerModel);
+					return unitList;
+				}
 			case "All":
 				return battleObjectManager.GetModelList();
 		}
@@ -821,7 +792,7 @@ public class ModularSA : Il2CppSystem.Object
 		else if (param.Contains("Ally")) filterFaction = thisFaction;
 
 		bool deads = param.Contains("Deads");
-		
+
 		if (filterKeyword)
 		{
 			string[] circles = param.Split('$');
@@ -1125,81 +1096,73 @@ public class ModularSA : Il2CppSystem.Object
 				MainClass.Logg.LogError("LUA cannot be used with other batches");
 				return;
 			}
-			else batch_list.Add(batch);
+			else modularScript.Batches.Add(ScriptCache.GetBatch(batch));
+		}
+	}
+	private void ExecuteBatch(ScriptBatch batch)
+	{
+		var elements = batch.Parts;
+		for (int i = 0; i < elements.Count; i++)
+		{
+			BatchPart element = elements[i];
+			switch (element.Kind)
+			{
+				case BatchElementKind.ContinueIfNot:
+					if (EvaluateCond(element.Cond))
+					{
+						_fullStop = true;
+						return;
+					}
+					continue;
+				case BatchElementKind.ContinueIf:
+					if (!EvaluateCond(element.Cond))
+					{
+						_fullStop = true;
+						return;
+					}
+					continue;
+				case BatchElementKind.IfNot:
+					if (EvaluateCond(element.Cond)) return;
+					continue;
+				case BatchElementKind.If:
+					if (!EvaluateCond(element.Cond)) return;
+					continue;
+				case BatchElementKind.ValueAssign:
+					valueList[element.ValueIndex] = EvaluateValueAssign(element.Assign); 
+					continue;
+				case BatchElementKind.Consequence:
+					ExecuteConsequenceCall(element.Call); 
+					continue;
+			}
 		}
 	}
 
-	private void ProcessBatch(string batch)
+	private void ExecuteConsequenceCall(CallExpr call)
 	{
-		string[] batchArgs = batch.Split(':');
-		for (int i = 0; i < batchArgs.Length; i++)
+		if (MainClass.consequenceDict.TryGetValue(call.Method, out var consequence))
 		{
-			if (batchArgs[i].StartsWith("CONTINUEIFNOT"))
-			{
-				if (CheckIF(batchArgs[i]))
-				{
-					_fullStop = true;
-					return;
-				}
-				continue;
-			}
-			else if (batchArgs[i].StartsWith("STOPIF") || batchArgs[i].StartsWith("CONTINUEIF"))
-			{
-				if (!CheckIF(batchArgs[i]))
-				{
-					_fullStop = true;
-					return;
-				}
-				continue;
-			}
-			else if (batchArgs[i].StartsWith("IFNOT")) { if (CheckIF(batchArgs[i])) break; else continue; }
-			else if (batchArgs[i].StartsWith("IF")) { if (!CheckIF(batchArgs[i])) break; else continue; }
-			else if (batchArgs[i].StartsWith("VALUE_"))
-			{
-				string numChar = batchArgs[i][6].ToString();
-				int valueidx = 0;
-				int.TryParse(numChar, out valueidx);
-				valueList[valueidx] = AcquireValue(batchArgs[i + 1]); // GETTERS
-				i += 1;
-				continue;
-			}
-
-			Consequence(batchArgs[i]); // CONSEQUENCES
-		}
-	}
-
-	private void Consequence(string section)
-	{
-		string[] sectionArgs = section.Split(parenthesisSeparator);
-		string mEth = sectionArgs[0];
-		string circledSection = "";
-		if (sectionArgs.Length >= 2) circledSection = sectionArgs[1];
-		string[] circles = circledSection.Split(',');
-		if (MainClass.consequenceDict.TryGetValue(mEth, out var consequence))
-		{
-			consequence.ExecuteConsequence(this, section, circledSection, circles);
+			consequence.ExecuteConsequence(this, call.Raw, call.CircledSection, call.Circles);
 		}
 		else
 		{
-			MainClass.LogModular("Invalid Consequence: " + mEth);
+			MainClass.LogModular("Invalid Consequence: " + call.Method);
 		}
 	}
 
 	public int DoMath(string s)
 	{
-		var symbols = MainClass.mathsymbolRegex.Matches(s);
-		string[] parameters = s.Split(MainClass.mathSeparator);
-		string firstParam = parameters[0];
-		double finalValue = GetNumFromParamString(firstParam);
+		return EvaluateMath(ScriptCache.GetMath(s));
+	}
 
-		for (int i = 0; i < symbols.Count; i++)
+	private int EvaluateMath(MathExpr expr)
+	{
+		double finalValue = EvaluateNumArg(expr.Terms[0].Value);
+		for (int i = 1; i < expr.Terms.Count; i++)
 		{
-			string param = parameters[i + 1];
-			string symbol_string = symbols[i].Value;
-			char symbol = symbol_string[0];
-			int amount = GetNumFromParamString(param);
+			MathTerm term = expr.Terms[i];
+			int amount = EvaluateNumArg(term.Value);
 
-			switch (symbol)
+			switch (term.Op)
 			{
 				case '+': finalValue += amount; break;
 				case '-': finalValue -= amount; break;
@@ -1214,24 +1177,16 @@ public class ModularSA : Il2CppSystem.Object
 		return (int)finalValue;
 	}
 
-	private int AcquireValue(string section)
+	private int EvaluateValueAssign(ValueAssignExpr expr)
 	{
-		string[] sectionArgs = section.Split(parenthesisSeparator);
+		if (expr.DirectNumeric) return EvaluateNumArg(expr.Direct);
 
-		if (char.IsNumber(section.Last())) return GetNumFromParamString(sectionArgs[0]);
-
-		string methodology = sectionArgs[0];
-		string circledSection = "";
-		if (sectionArgs.Length > 1) circledSection = sectionArgs[1];
-		string[] circles = [];
-		if (circledSection.Length > 0) circles = circledSection.Split(',');
-
-		if (MainClass.acquirerDict.TryGetValue(methodology, out var acquirer))
+		if (MainClass.acquirerDict.TryGetValue(expr.Call.Method, out var acquirer))
 		{
-			return acquirer.ExecuteAcquirer(this, section, circledSection, circles);
+			return acquirer.ExecuteAcquirer(this, expr.Call.Raw, expr.Call.CircledSection, expr.Call.Circles);
 		}
 
-		MainClass.LogModular("Invalid Getter: " + methodology);
+		MainClass.LogModular("Invalid Getter: " + expr.Call.Method);
 		return -1;
 	}
 
