@@ -3374,7 +3374,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPatch(typeof(BattleEgoModel), nameof(BattleEgoModel.GetNeedResourceCount))]
 	[HarmonyPostfix]
 	private static void Postfix_BattleEgoModel_EGOUseCost(
-		ATTRIBUTE_TYPE type,
+		ATTRIBUTE_TYPE attributeType,
 		bool isOverClock,
 		ref int __result,
 		BattleEgoModel __instance)
@@ -3388,7 +3388,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		
 		int actevent = MainClass.timingDict["EGOCost"];
 		
-		int sintype = type == ATTRIBUTE_TYPE.NONE ? -1 : (int)type;
+		int sintype = attributeType == ATTRIBUTE_TYPE.NONE ? -1 : (int)attributeType;
 		if (skill != null)
 		{
 			foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
