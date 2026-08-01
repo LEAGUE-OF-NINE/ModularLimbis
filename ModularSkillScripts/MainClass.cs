@@ -371,6 +371,7 @@ public class MainClass : BasePlugin
 		acquirerDict["partdestroy"] = new AcquirerPartDestroy();
 		acquirerDict["bufmaxstackadderiskeyword"] = new AcquirerBufMaxAdderIsKeyword(0);
 		acquirerDict["bufmaxturnadderiskeyword"] = new AcquirerBufMaxAdderIsKeyword(1);
+		acquirerDict["bufkeywordtoint"] = new AcquirerBufKeywordToInt();
 		
 		// legacy acquirers
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();
@@ -419,6 +420,7 @@ public class MainClass : BasePlugin
 		acquirerDict["gethpincrement"] = new AcquirerGetHpIncrementByLevel();
 		acquirerDict["diduseskilllastturn"] = new AcquirerDidUseSkillLastTurn();
 		acquirerDict["isactionable"] = new AcquirerIsActionable();
+		acquirerDict["buffkeywordtoint"] = new AcquirerBufKeywordToInt();
 
 		// Register Lua functions
 		luaFunctionDict["clearvalues"] = new ModularSkillScripts.LuaFunction.LuaFunctionClearValues();
