@@ -11,8 +11,7 @@ public class ConsequenceBreakRecover : IModularConsequence
 		BATTLE_EVENT_TIMING timing = modular.battleTiming;
 		foreach (BattleUnitModel targetModel in modelList)
 		{
-			if (targetModel.IsForcelyBreak() && force) targetModel.RecoverAllBreak(timing);
-			else targetModel.RecoverAllBreak(timing);
+			if (!targetModel.IsForcelyBreak() || force) targetModel.RecoverAllBreak(timing);
 		}
 	}
 }
