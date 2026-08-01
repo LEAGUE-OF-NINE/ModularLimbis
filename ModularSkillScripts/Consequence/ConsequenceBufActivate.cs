@@ -1,6 +1,7 @@
 using Lethe.Patches;
 using System;
 using Il2CppSystem.Collections.Generic;
+using ModularSkillScripts.Patches;
 
 namespace ModularSkillScripts.Consequence;
 
@@ -25,7 +26,8 @@ public class ConsequenceBufActivate : IModularConsequence
 		
 		int overwrite_amount = 0;
 		if (circles_length > 5) overwrite_amount = modular.GetNumFromParamString(circles[5]);
-		
+		int actevent = MainClass.timingDict["BufActivate"];
+		BATTLE_EVENT_TIMING timing = modular.battleTiming;
 		Il2CppSystem.Nullable<int> nulint = new((int)999);
 		foreach (BattleUnitModel targetModel in modelList)
 		{
@@ -36,11 +38,34 @@ public class ConsequenceBufActivate : IModularConsequence
 				if (buf._buffKeyword._mainUniqueKeyword != buffUniqueKeyword) continue;
 
 				for (int i = 0; i < activate_times; i++) {
-					if (overwrite_amount > 0) buf.ForceToActivateBuffEffect(targetModel, attacker, 0, 0,
+					if (overwrite_amount > 0) {
+						buf.ForceToActivateBuffEffect(targetModel, attacker, 0, 0,
 						nulint, modular.battleTiming, sinKind, overwrite_amount);
-					else buf.ForceToActivateBuffEffect(targetModel, attacker, 0, 0,
+						foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
+						{
+							if (modsa.activationTiming != actevent) continue;
+							modsa.modsa_buffModel = buf;
+							modsa.modsa_killerModel = attacker;
+							modsa.valueList[9] = overwrite_amount;
+							modsa.valueList[8] = dmg_sin;
+							modsa.Enact(targetModel, null, null, null, actevent, timing);
+						}
+					} else {
+						buf.ForceToActivateBuffEffect(targetModel, attacker, 0, 0,
 						nulint, modular.battleTiming, sinKind);
+						foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
+						{
+							if (modsa.activationTiming != actevent) continue;
+							modsa.modsa_buffModel = buf;
+							modsa.modsa_killerModel = attacker;
+							modsa.valueList[9] = overwrite_amount;
+							modsa.valueList[8] = dmg_sin;
+							modsa.Enact(targetModel, null, null, null, actevent, timing);
+						}
+					}
 				}
+				
+				
 			}
 		}
 	}

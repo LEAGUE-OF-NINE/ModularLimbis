@@ -2703,30 +2703,6 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			modsa.Enact(unit, null, null, null, actevent, timing);
 		}
 	}
-	
-	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.ForceToActivateBuffEffect))]
-	[HarmonyPostfix]
-	private static void Postfix_BuffModel_ForceToActivateBuffEffect(BattleUnitModel unit,
-		BattleUnitModel giverOrNull,
-		BATTLE_EVENT_TIMING timing,
-		ATTRIBUTE_TYPE overwriteAttributeType,
-		int overwriteDmg,
-		BuffModel __instance)
-	{
-		int actevent = MainClass.timingDict["BufActivate"];
-		int sintype = overwriteAttributeType == ATTRIBUTE_TYPE.NONE ? -1 : (int)overwriteAttributeType;
-		
-		foreach (ModularSA modsa in GetAllModbaFromBuffModel(__instance))
-		{
-			if (modsa.activationTiming != actevent) continue;
-			modsa.modsa_buffModel = __instance;
-			modsa.modsa_killerModel = giverOrNull;
-			modsa.valueList[9] = overwriteDmg;
-			modsa.valueList[8] = sintype;
-			modsa.Enact(unit, null, null, null, actevent, timing);
-		}
-	}
-
 
 
 	// BUFFMODEL UP TO HERE
