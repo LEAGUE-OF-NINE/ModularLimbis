@@ -3371,49 +3371,51 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}*/
 	}
 
-	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetAttributeUseCostAdderByAttributeStock))]
+	[HarmonyPatch(typeof(BattleEgoModel), nameof(BattleEgoModel.GetNeedResourceCount))]
 	[HarmonyPostfix]
-	private static void Postfix_BattleUnitModel_EGOUseCost(UnitSinModel sinModel,
+	private static void Postfix_BattleEgoModel_EGOUseCost(
 		ATTRIBUTE_TYPE type,
-		int originCost,
 		bool isOverClock,
 		ref int __result,
-		BattleUnitModel __instance)
+		BattleEgoModel __instance)
 	{
+		UnitSinModel sin = __instance.OriginSin;
+		if (sin == null) return;
+		BattleUnitModel unit = sin.Model;
+		if (unit == null) return;
+		SkillModel skill = sin.GetSkill();
+		BattleActionModel action = sin._currentAction;
+		
 		int actevent = MainClass.timingDict["EGOCost"];
-		SkillModel skill = sinModel.GetSkill();
-		BattleActionModel action = sinModel._currentAction;
+		
 		int sintype = type == ATTRIBUTE_TYPE.NONE ? -1 : (int)type;
 		if (skill != null)
 		{
 			foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.valueList[9] = sintype;
-				modsa.valueList[8] = originCost;
-				modsa.valueList[7] = 0;
-				modsa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result += modsa.valueList[7];
+				modsa.valueList[8] = __result;
+				modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[8];
 			}
 		}
 
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.valueList[9] = sintype;
-				modsa.valueList[8] = originCost;
-				modsa.valueList[7] = 0;
-				modsa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result += modsa.valueList[7];
+				modsa.valueList[8] = __result;
+				modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[8];
 			}
 		}
-		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList()) {
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail._egoPassiveList.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.valueList[9] = sintype;
-				modsa.valueList[8] = originCost;
-				modsa.valueList[7] = 0;
-				modsa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result += modsa.valueList[7];
+				modsa.valueList[8] = __result;
+				modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[8];
 			}
 		}
 	}
