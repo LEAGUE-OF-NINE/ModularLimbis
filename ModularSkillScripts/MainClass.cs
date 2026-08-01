@@ -97,7 +97,8 @@ public class MainClass : BasePlugin
 			"StartVisualChaseTarget",
 			"BufMaxStackAdder",
 			"BufMaxTurnAdder",
-			"ChangeAttackDamage"
+			"ChangeAttackDamage",
+			"BuffActivate"
 		];
 		//timingStringList.Add("ChangeSinBuffDamage");
 
@@ -111,6 +112,7 @@ public class MainClass : BasePlugin
 		timingDict.Add("BWH", timingDict["BeforeWhenHit"]);
 		timingDict.Add("SBS", timingDict["StartBattleSkill"]);
 		timingDict.Add("OnUseBuf", timingDict["OnUseBuff"]);
+		timingDict.Add("BufActivate", timingDict["BuffActivate"]);
 
 		// legacy to new stuff translator
 		timingDict.Add("StartBehaviour", timingDict["OnStartBehaviour"]);
@@ -262,6 +264,7 @@ public class MainClass : BasePlugin
 		consequenceDict["setspusage"] = new ConsequenceSetSpUsage();
 		consequenceDict["instantdeath"] = new ConsequenceInstantDeath();
 		consequenceDict["activatebuffunreliable"] = new ConsequenceActivateBuffUnreliable();
+		consequenceDict["buffactivate"] = new ConsequenceBufActivate();
 		consequenceDict["partdestroy"] = new ConsequencePartDestroy();
 		consequenceDict["playcustomsound"] = new ConsequencePlayCustomSound();
 		consequenceDict["stopcustomsound"] = new ConsequenceStopSound();
@@ -271,6 +274,7 @@ public class MainClass : BasePlugin
 		consequenceDict["explosion"] = new ConsequenceExplosion();
 		consequenceDict["surge"] = new ConsequenceSurge();
 		consequenceDict["activatebufunreliable"] = consequenceDict["activatebuffunreliable"];
+		consequenceDict["bufactivate"] = consequenceDict["buffactivate"];
 	}
 
 	private static void RegisterAcquirers()

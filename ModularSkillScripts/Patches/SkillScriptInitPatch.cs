@@ -2581,10 +2581,34 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	private static void Postfix_BuffModel_RightAfterGettingBuff(BattleUnitModel unit, int gettingNewStack, ABILITY_SOURCE_TYPE abilitySrcType, BATTLE_EVENT_TIMING timing, BuffModel __instance)
 	{
 		int actevent = MainClass.timingDict["WhenGained"];
-		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance))
+		foreach (ModularSA modsa in GetAllModbaFromBuffModel(__instance))
 		{
-			modba.modsa_buffModel = __instance;
-			modba.Enact(unit, null, null, null, actevent, timing);
+			if (modsa.activationTiming != actevent) continue;
+			modsa.modsa_buffModel = __instance;
+			modsa.Enact(unit, null, null, null, actevent, timing);
+		}
+	}
+	
+	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.ForceToActivateBuffEffect))]
+	[HarmonyPostfix]
+	private static void Postfix_BuffModel_ForceToActivateBuffEffect(BattleUnitModel unit,
+		BattleUnitModel giverOrNull,
+		BATTLE_EVENT_TIMING timing,
+		ATTRIBUTE_TYPE overwriteAttributeType,
+		int overwriteDmg,
+		BuffModel __instance)
+	{
+		int actevent = MainClass.timingDict["BufActivate"];
+		int sintype = overwriteAttributeType == ATTRIBUTE_TYPE.NONE ? -1 : (int)overwriteAttributeType;
+		
+		foreach (ModularSA modsa in GetAllModbaFromBuffModel(__instance))
+		{
+			if (modsa.activationTiming != actevent) continue;
+			modsa.modsa_buffModel = __instance;
+			modsa.modsa_killerModel = giverOrNull;
+			modsa.valueList[9] = overwriteDmg;
+			modsa.valueList[8] = sintype;
+			modsa.Enact(unit, null, null, null, actevent, timing);
 		}
 	}
 
