@@ -393,7 +393,29 @@ public class SkillScriptInitPatch
 	// REAL PATCHES START HERE
 	// REAL PATCHES START HERE
 
-
+	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnRoundStart_After_Event))]
+	[HarmonyPrefix]
+	private static void Prefix_PassiveDetail_OnRoundStart_After_Event(BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
+	{
+		BattleUnitModel unit = __instance._owner;
+		if (unit == null) return;
+		
+		List<BattleEgoModel> egomodel_list = unit.GetEgoModelList();
+		foreach (BattleEgoModel egoModel in egomodel_list)
+		{
+			EgoStaticData egodata = egoModel._data;
+			foreach (string keyword_s in egodata.egoKeywordList)
+			{
+				if (!keyword_s.StartsWith("ALWAYS_")) continue;
+				string passiveID_s = keyword_s.Remove(0, 7);
+				if (!int.TryParse(passiveID_s, out int passiveID)) continue;
+				if (passiveID <= 0) continue;
+				if (unit.HasPassive(passiveID)) continue;
+				unit.AddPassive(passiveID);
+			}
+		}
+	}
+	
 	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnRoundStart_After_Event))]
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnRoundStart_After_Event(BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
@@ -402,7 +424,7 @@ public class SkillScriptInitPatch
 			List<ModularSA> value = modpaDict[key];
 			foreach (ModularSA modular in value) modular.ResetAdders();
 		}
-
+		
 		//Il2CppSystem.Collections.Generic.List<SupportUnitModel> supportUnitList = BattleObjectManager.Instance.GetSupportUnitModels(UNIT_FACTION.PLAYER);
 
 		//foreach (SupportUnitModel supportUnitModel in supportUnitList) {
@@ -3278,6 +3300,53 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modpa.Enact(__instance, skill, action, null, actevent, timing);
 			}
 		}*/
+	}
+
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetAttributeUseCostAdderByAttributeStock))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_EGOUseCost(UnitSinModel sinModel,
+		ATTRIBUTE_TYPE type,
+		int originCost,
+		bool isOverClock,
+		ref int __result,
+		BattleUnitModel __instance)
+	{
+		int actevent = MainClass.timingDict["EGOCost"];
+		SkillModel skill = sinModel.GetSkill();
+		BattleActionModel action = sinModel._currentAction;
+		int sintype = type == ATTRIBUTE_TYPE.NONE ? -1 : (int)type;
+		if (skill != null)
+		{
+			foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[9] = sintype;
+				modsa.valueList[8] = originCost;
+				modsa.valueList[7] = 0;
+				modsa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result += modsa.valueList[7];
+			}
+		}
+
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[9] = sintype;
+				modsa.valueList[8] = originCost;
+				modsa.valueList[7] = 0;
+				modsa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result += modsa.valueList[7];
+			}
+		}
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[9] = sintype;
+				modsa.valueList[8] = originCost;
+				modsa.valueList[7] = 0;
+				modsa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result += modsa.valueList[7];
+			}
+		}
 	}
 
 	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.OpenSkillInfoUI))]
