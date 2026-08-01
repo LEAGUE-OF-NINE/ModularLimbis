@@ -86,6 +86,8 @@ public class MainClass : BasePlugin
 			"EnemyStartBehaviour",
 			"AfterChangeShield",
 			"AfterChangeHP",
+			"BeforeChangeSanity",
+			"AfterChangeSanity",
 			"CanDealTarget",
 			//timingStringList.Add("ChangeSinBuffDamage");
 			"DelayedStart", // HBMBACMAB,

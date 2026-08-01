@@ -1329,6 +1329,99 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 	}
+	
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.ChangeMpDamage))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_ChangeMpDamage(
+		int resultDmg,
+		BattleActionModel actionOrNull,
+		BASE_MENTAL_CONDITION mentalConditionOrNone,
+		BUFF_UNIQUE_KEYWORD keywordOrNone,
+		AbilityBase abilityOrNull,
+		BATTLE_EVENT_TIMING timing,
+		ref int __result,
+		BattleUnitModel __instance)
+	{
+		int actevent = MainClass.timingDict["BeforeChangeSanity"];
+		
+		int mental_int = (int)mentalConditionOrNone;
+		int keyword_int = (int)keywordOrNone;
+		int ability_int = abilityOrNull == null ? 0 : 1;
+		foreach (BuffModel buf in __instance.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buf)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_buffModel = buf;
+				modsa.valueList[9] = __result;
+				modsa.valueList[8] = mental_int;
+				modsa.valueList[7] = keyword_int;
+				modsa.valueList[6] = ability_int;
+				modsa.Enact(__instance, null, actionOrNull, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[9];
+			}
+		}
+		
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.valueList[9] = __result;
+				modsa.valueList[8] = mental_int;
+				modsa.valueList[7] = keyword_int;
+				modsa.valueList[6] = ability_int;
+				modsa.Enact(__instance, null, actionOrNull, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[9];
+			}
+		}
+
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.valueList[9] = __result;
+				modsa.valueList[8] = mental_int;
+				modsa.valueList[7] = keyword_int;
+				modsa.valueList[6] = ability_int;
+				modsa.Enact(__instance, null, actionOrNull, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[9];
+			}
+		}
+	}
+	
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnChangeMp))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_OnChangeMp(
+		int oldMp, int newMp, BattleUnitModel __instance)
+	{
+		int actevent = MainClass.timingDict["AfterChangeSanity"];
+		int mpdiff = newMp - oldMp;
+		
+		foreach (BuffModel buf in __instance.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buf)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[9] = mpdiff;
+				modsa.modsa_buffModel = buf;
+				modsa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+		
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[9] = mpdiff;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[9] = mpdiff;
+				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+	}
 
 	//[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetSinBuffDamageMultiplier))]
 	//[HarmonyPostfix]
