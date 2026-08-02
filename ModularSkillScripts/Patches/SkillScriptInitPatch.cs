@@ -18,6 +18,8 @@ public class SkillScriptInitPatch
 	{
 		int actevent = MainClass.timingDict["YIPPEE"];
 		
+		// modsa.modsa_coinModel = coin; on ALL accounts if applicable. Please.
+		
 		// Bufs
 		foreach (BuffModel buf in unit.GetActivatedBuffModels()) {
 			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buf)) {
