@@ -50,7 +50,7 @@ public class SkillScriptInitPatch
 			}
 		}
 		foreach (EgoPassiveModel pasmodel in unit._passiveDetail._egoPassiveList.CopyList()) {
-			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel, false)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = pasmodel;
 				modsa.Enact(unit, skill, null, null, actevent, timing);
@@ -72,7 +72,7 @@ public class SkillScriptInitPatch
 			}
 		}
 		foreach (EgoPassiveModel pasmodel in __instance._egoPassiveList.CopyList()) {
-			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel, false)) {
 				if (resetWhenUse && modsa.resetWhenUse) modsa.ResetAdders(); // on-demand power adder reset (used for passives)
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = pasmodel;
@@ -706,39 +706,30 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	private static void Postfix_PassiveDetail_OnBeforeDefense(BattleActionModel action, PassiveDetail __instance)
 	{
 		int actevent = MainClass.timingDict["BeforeDefense"];
-		foreach (PassiveModel passiveModel in __instance.PassiveList) {
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
-				if (Input.GetKeyInt(KeyCode.LeftControl)) MainClass.Logg.LogInfo("Found modpassive - OnBeforeDefense: " + modpa.passiveID);
-				modpa.modsa_passiveModel = passiveModel;
-				modpa.Enact(action.Model, action.Skill, action, null, actevent, BATTLE_EVENT_TIMING.NONE);
+		BattleUnitModel unit = action.Model;
+		SkillModel skill = action.Skill;
+		
+		foreach (PassiveModel pasmodel in __instance._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
-		foreach (EgoPassiveModel egoPassiveModel in __instance.EgoPassiveList)
-		{
-			if (!egoPassiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = egoPassiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
-			{
-				if (Input.GetKeyInt(KeyCode.LeftControl)) MainClass.Logg.LogInfo("Found modpassive - OnBeforeDefense: " + modpa.passiveID);
-				modpa.modsa_passiveModel = egoPassiveModel;
-				modpa.Enact(action.Model, action.Skill, action, null, actevent, BATTLE_EVENT_TIMING.NONE);
+		foreach (EgoPassiveModel pasmodel in __instance._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
+		
 		SupportPasPatch.SupportPassiveInit(modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
-		{
-			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
-			{
-				if (Input.GetKeyInt(KeyCode.LeftControl)) MainClass.Logg.LogInfo("Found modpassive - OnBeforeDefense: " + modpaList[i].passiveID);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodelSupport(supportPassive)) {
+				if (modsa.activationTiming != actevent) continue;
 				supportPassive._script._owner = action.Model;
-				modpaList[i].Enact(action.Model, action.Skill, action, null, actevent, BATTLE_EVENT_TIMING.NONE);
+				modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 	}
