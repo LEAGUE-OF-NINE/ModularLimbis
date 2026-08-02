@@ -14,9 +14,8 @@ public class FakePowerPatches
 		SkillModel skill = __instance.Skill;
 		if (unit == null || skill == null) return;
 		
-		foreach (BuffModel buf in unit._buffDetail.GetActivatedBuffModelAll())
-		{
-			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
+		foreach (BuffModel buf in unit.GetActivatedBuffModels()) {
+			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel_Fast(buf))
 			{
 				if (modba.activationTiming != actevent_FakePower) continue;
 				modba.modsa_buffModel = buf;
@@ -24,23 +23,21 @@ public class FakePowerPatches
 			}
 		}
 		
-		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(skill)) {
+		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel_Fast(skill)) {
 			if (modsa.activationTiming != actevent_FakePower) continue;
 			modsa.Enact(unit, skill, __instance, targetAction, actevent_FakePower, BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 		
-		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel))
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(passiveModel))
 			{
 				if (modpa.activationTiming != actevent_FakePower) continue;
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(unit, skill, __instance, targetAction, actevent_FakePower, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
-		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail.EgoPassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false))
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail._egoPassiveList) {
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(egoPassiveModel, false))
 			{
 				if (modpa.activationTiming != actevent_FakePower) continue;
 				modpa.modsa_passiveModel = egoPassiveModel;
@@ -53,16 +50,15 @@ public class FakePowerPatches
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_OnAddBattleAction(SinActionModel actorAction, SinActionModel targetAction, BattleUnitModel __instance)
 	{
-		
+		// Intentionally not copying list because we don't need to. It's FakePower.
 		BattleActionModel action = actorAction?.CurrentBattleAction;
 		SkillModel skill = action?.Skill;
 		if (skill == null) return;
 
 		BattleActionModel tgtact = targetAction?.CurrentBattleAction;
 		
-		foreach (BuffModel buf in __instance._buffDetail.GetActivatedBuffModelAll())
-		{
-			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
+		foreach (BuffModel buf in __instance.GetActivatedBuffModels()) {
+			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel_Fast(buf))
 			{
 				if (modba.activationTiming != actevent_FakePower) continue;
 				modba.modsa_buffModel = buf;
@@ -70,23 +66,23 @@ public class FakePowerPatches
 			}
 		}
 		
-		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(skill)) {
+		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel_Fast(skill)) {
 			if (modsa.activationTiming != actevent_FakePower) continue;
 			modsa.Enact(__instance, skill, action, tgtact, actevent_FakePower, BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 		
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
+		foreach (PassiveModel passiveModel in __instance._passiveDetail._passivelist)
 		{
-			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel))
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(passiveModel))
 			{
 				if (modpa.activationTiming != actevent_FakePower) continue;
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(__instance, skill, action, tgtact, actevent_FakePower, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
-		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail._egoPassiveList)
 		{
-			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false))
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(egoPassiveModel, false))
 			{
 				if (modpa.activationTiming != actevent_FakePower) continue;
 				modpa.modsa_passiveModel = egoPassiveModel;
@@ -104,33 +100,29 @@ public class FakePowerPatches
 		SkillModel skill = action?.Skill;
 		if (skill == null) return;
 		
-		foreach (BuffModel buf in __instance._buffDetail.GetActivatedBuffModelAll())
-		{
-			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
-			{
+		foreach (BuffModel buf in __instance.GetActivatedBuffModels()) {
+			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel_Fast(buf)) {
 				if (modba.activationTiming != actevent_FakePower) continue;
 				modba.modsa_buffModel = buf;
 				modba.Enact(__instance, skill, action, null, actevent_FakePower, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 		
-		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(skill)) {
+		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel_Fast(skill)) {
 			if (modsa.activationTiming != actevent_FakePower) continue;
 			modsa.Enact(__instance, skill, action, null, actevent_FakePower, BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 		
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel))
+		foreach (PassiveModel passiveModel in __instance._passiveDetail._passivelist) {
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(passiveModel))
 			{
 				if (modpa.activationTiming != actevent_FakePower) continue;
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(__instance, skill, action, null, actevent_FakePower, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
-		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false))
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail._egoPassiveList) {
+			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(egoPassiveModel, false))
 			{
 				if (modpa.activationTiming != actevent_FakePower) continue;
 				modpa.modsa_passiveModel = egoPassiveModel;
@@ -191,38 +183,32 @@ public class FakePowerPatches
 		BattleUnitModel unit = action.Model;
 		if (unit == null) return;
 		
-		foreach (BuffModel buf in unit._buffDetail.GetActivatedBuffModelAll())
-		{
-			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
-			{
-				if (modba.activationTiming != actevent_FakePower) continue;
-				int power = modba.skillPowerAdder;
-				__result += power;
+		foreach (BuffModel buf in unit.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModbaFromBuffModel_Fast(buf)) {
+				if (modsa.activationTiming != actevent_FakePower) continue;
+				__result += modsa.skillPowerAdder;
 			}
 		}
 		
-		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(__instance)) {
+		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel_Fast(__instance)) {
 			if (modsa.activationTiming != actevent_FakePower) continue;
-			int power = modsa.skillPowerAdder;
-			__result += power;
+			__result += modsa.skillPowerAdder;
 		}
 
-		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList.CopyList())
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist)
 		{
-			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel))
+			foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(passiveModel))
 			{
-				if (modpa.activationTiming != actevent_FakePower) continue;
-				int power = modpa.skillPowerAdder;
-				__result += power;
+				if (modsa.activationTiming != actevent_FakePower) continue;
+				__result += modsa.skillPowerAdder;
 			}
 		}
-		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail.EgoPassiveList.CopyList())
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail._egoPassiveList)
 		{
-			foreach (ModularSA modpa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false))
+			foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(egoPassiveModel, false))
 			{
-				if (modpa.activationTiming != actevent_FakePower) continue;
-				int power = modpa.skillPowerAdder;
-				__result += power;
+				if (modsa.activationTiming != actevent_FakePower) continue;
+				__result += modsa.skillPowerAdder;
 			}
 		}
 		

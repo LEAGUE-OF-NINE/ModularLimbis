@@ -401,37 +401,53 @@ public class SkillScriptInitPatch
 		}
 	}
 
+	public static List<ModularSA> empty_modsa_list = new(); // Return this instead of initializing a new list
+	
 	public static List<ModularSA> GetAllModsaFromSkillModel(SkillModel skill)
 	{
 		long ptr_intlong = skill.Pointer.ToInt64();
-		if (modsaDict.ContainsKey(ptr_intlong)) return modsaDict[ptr_intlong].CopyList();
-		return new List<ModularSA>();
+		return modsaDict.TryGetValue(ptr_intlong, out List<ModularSA> value) ? value.CopyList() : empty_modsa_list;
+	}
+	public static List<ModularSA> GetAllModsaFromSkillModel_Fast(SkillModel skill) // Does not CopyList()
+	{
+		long ptr_intlong = skill.Pointer.ToInt64();
+		return modsaDict.TryGetValue(ptr_intlong, out List<ModularSA> value) ? value : empty_modsa_list;
 	}
 	public static List<ModularSA> GetAllModcaFromCoinModel(CoinModel coinModel)
 	{
 		long ptr_intlong = coinModel.Pointer.ToInt64();
-		if (modcaDict.ContainsKey(ptr_intlong)) return modcaDict[ptr_intlong].CopyList();
-		return new List<ModularSA>();
+		return modcaDict.TryGetValue(ptr_intlong, out List<ModularSA> value) ? value.CopyList() : empty_modsa_list;
 	}
 	public static List<ModularSA> GetAllModpaFromPasmodel(PassiveModel passiveModel, bool checkActive = true)
 	{
 		if (!checkActive || passiveModel.CheckActiveCondition()) {
 			long ptr_intlong = passiveModel.Pointer.ToInt64();
-			if (modpaDict.ContainsKey(ptr_intlong)) return modpaDict[ptr_intlong].CopyList();
+			if (modpaDict.TryGetValue(ptr_intlong, out List<ModularSA> value)) return value.CopyList();
 		}
-		return new List<ModularSA>();
+		return empty_modsa_list;
+	}
+	public static List<ModularSA> GetAllModpaFromPasmodel_Fast(PassiveModel passiveModel, bool checkActive = true) // Does not CopyList()
+	{
+		if (!checkActive || passiveModel.CheckActiveCondition()) {
+			long ptr_intlong = passiveModel.Pointer.ToInt64();
+			if (modpaDict.TryGetValue(ptr_intlong, out List<ModularSA> value)) return value;
+		}
+		return empty_modsa_list;
 	}
 	public static List<ModularSA> GetAllModpaFromPasmodelSupport(SupporterPassiveModel supporterPassiveModel)
 	{
 		long ptr_intlong = supporterPassiveModel.Pointer.ToInt64();
-		if (modpaDict.ContainsKey(ptr_intlong)) return modpaDict[ptr_intlong].CopyList();
-		return new List<ModularSA>();
+		return modpaDict.TryGetValue(ptr_intlong, out List<ModularSA> value) ? value.CopyList() : empty_modsa_list;
 	}
 	public static List<ModularSA> GetAllModbaFromBuffModel(BuffModel buffModel)
 	{
 		long ptr_intlong = buffModel.Pointer.ToInt64();
-		if (modbaDict.ContainsKey(ptr_intlong)) return modbaDict[ptr_intlong].CopyList();
-		return new List<ModularSA>();
+		return modbaDict.TryGetValue(ptr_intlong, out List<ModularSA> value) ? value.CopyList() : empty_modsa_list;
+	}
+	public static List<ModularSA> GetAllModbaFromBuffModel_Fast(BuffModel buffModel) // Does not CopyList()
+	{
+		long ptr_intlong = buffModel.Pointer.ToInt64();
+		return modbaDict.TryGetValue(ptr_intlong, out List<ModularSA> value) ? value : empty_modsa_list;
 	}
 
 	// REAL PATCHES START HERE
