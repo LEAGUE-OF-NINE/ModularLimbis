@@ -101,7 +101,8 @@ public class MainClass : BasePlugin
 			"BufMaxTurnAdder",
 			"ChangeAttackDamage",
 			"BuffActivate",
-			"EGOCost"
+			"EGOCost",
+			"ExpectedBasePower"
 		];
 		//timingStringList.Add("ChangeSinBuffDamage");
 
@@ -127,6 +128,7 @@ public class MainClass : BasePlugin
 		timingDict.Add("OnVisualUse", timingDict["StartVisualSkillUse"]);
 		
 		FakePowerPatches.actevent_FakePower = timingDict["FakePower"];
+		FakePowerPatches.actevent_BaseCheck = timingDict["ExpectedBasePower"];
 		
 		Harmony harmony = new Harmony(NAME);
 		Logg = new ManualLogSource(NAME);

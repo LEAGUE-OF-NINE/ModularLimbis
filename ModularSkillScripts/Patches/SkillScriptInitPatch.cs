@@ -1692,85 +1692,52 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_GetCoinScaleAdder(BattleActionModel action, ref int __result, SkillModel __instance)
 	{
-		int actevent_FakePower = FakePowerPatches.actevent_FakePower;
-		foreach (ModularSA modsa in GetAllModsaFromSkillModel(__instance)) {
-			if (modsa.activationTiming == actevent_FakePower) continue;
+		BattleUnitModel unit = action.Model;
+		if (unit == null) return;
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel_Fast(__instance)) {
+			if (modsa.EXPECTED) continue;
 			int power = modsa.coinScaleAdder;
 			__result += power;
 		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList.CopyList()) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
-				if (modpa.activationTiming == actevent_FakePower) continue;
-				int power = modpa.coinScaleAdder;
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
+				if (modsa.EXPECTED) continue;
+				int power = modsa.coinScaleAdder;
 				if (power != 0) __result += power;
 			}
 		}
-
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
-			{
-				if (modpa.activationTiming == actevent_FakePower) continue;
-				int power = modpa.coinScaleAdder;
-				if (power != 0) __result += power;
-			}
-		}
-		SupportPasPatch.SupportPassiveInit(modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
-		{
-			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
-			{
-				if (modpaList[i].activationTiming == actevent_FakePower) continue;
-				int power = modpaList[i].coinScaleAdder;
+		foreach (EgoPassiveModel passiveModel in unit._passiveDetail._egoPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel, false)) {
+				if (modsa.EXPECTED) continue;
+				int power = modsa.coinScaleAdder;
 				if (power != 0) __result += power;
 			}
 		}
 	}
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetSkillPowerAdder))]
 	[HarmonyPostfix]
-	private static void Postfix_SkillModel_GetSkillPowerAdder(BattleActionModel action, ref int __result, SkillModel __instance) {
-		int actevent_FakePower = MainClass.timingDict["FakePower"];
-		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (modsaDict.ContainsKey(skillmodel_intlong)) {
-			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				if (modsa.activationTiming == actevent_FakePower) continue;
-				int power = modsa.skillPowerAdder;
-				if (power != 0) MainClass.Logg.LogInfo("Found modsa - base power adder: " + power);
-				__result += power;
-			}
+	private static void Postfix_SkillModel_GetSkillPowerAdder(BattleActionModel action, ref int __result, SkillModel __instance)
+	{
+		BattleUnitModel unit = action.Model;
+		if (unit == null) return;
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel_Fast(__instance)) {
+			if (modsa.EXPECTED) continue;
+			__result += modsa.skillPowerAdder;
 		}
 
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList.CopyList()) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
-				if (modpa.activationTiming == actevent_FakePower) continue;
-				int power = modpa.skillPowerAdder;
-				if (power != 0) MainClass.Logg.LogInfo("Found modpa - base power adder: ");
-				__result += power;
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
+				if (modsa.EXPECTED) continue;
+				__result += modsa.skillPowerAdder;
 			}
 		}
-
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
-			{
-				if (modpa.activationTiming == actevent_FakePower) continue;
-				int power = modpa.skillPowerAdder;
-				if (power != 0) MainClass.Logg.LogInfo("Found modpa - base power adder: ");
-				__result += power;
-			}
-		}
-		SupportPasPatch.SupportPassiveInit(modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
-		{
-			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
-			{
-				if (modpaList[i].activationTiming == actevent_FakePower) continue;
-				int power = modpaList[i].skillPowerAdder;
-				if (power != 0) MainClass.Logg.LogInfo("Found modpa - base power adder: ");
-				__result += power;
+		foreach (EgoPassiveModel passiveModel in unit._passiveDetail._egoPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel, false)) {
+				if (modsa.EXPECTED) continue;
+				__result += modsa.skillPowerAdder;
 			}
 		}
 	}
@@ -1778,55 +1745,32 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_GetSkillPowerResultAdder(BattleActionModel action, BATTLE_EVENT_TIMING timing, CoinModel coinOrNull, ref int __result, SkillModel __instance)
 	{
-		int actevent_FakePower = MainClass.timingDict["FakePower"];
+		BattleUnitModel unit = action.Model;
+		if (unit == null) return;
 		
-		foreach (ModularSA modsa in GetAllModsaFromSkillModel(__instance)) {
-			if (modsa.activationTiming == actevent_FakePower) continue;
-			int power = modsa.skillPowerResultAdder;
-			if (power != 0) MainClass.Logg.LogInfo("Found modsa - final power adder: " + power);
-			__result += power;
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel_Fast(__instance)) {
+			if (modsa.EXPECTED) continue;
+			__result += modsa.skillPowerResultAdder;
 		}
-		
+
 		if (coinOrNull != null)
 		{
-			foreach (ModularSA modca in GetAllModcaFromCoinModel(coinOrNull))
-			{
-				if (modca.activationTiming == actevent_FakePower) continue;
-				int power = modca.skillPowerResultAdder;
-				if (power != 0) MainClass.Logg.LogInfo("Found modca - final power adder: " + power);
-				if (power != 0) __result += power;
+			foreach (ModularSA modsa in GetAllModcaFromCoinModel(coinOrNull)) {
+				if (modsa.EXPECTED) continue;
+				__result += modsa.skillPowerResultAdder;
 			}
 		}
-
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList.CopyList()) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
-				if (modpa.activationTiming == actevent_FakePower) continue;
-				int power = modpa.skillPowerResultAdder;
-				if (power != 0) MainClass.Logg.LogInfo("Found modpa - final power adder: ");
-				__result += power;
+		
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
+				if (modsa.EXPECTED) continue;
+				__result += modsa.skillPowerResultAdder;
 			}
 		}
-
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
-			{
-				if (modpa.activationTiming == actevent_FakePower) continue;
-				int power = modpa.skillPowerResultAdder;
-				if (power != 0) MainClass.Logg.LogInfo("Found modpa - final power adder: ");
-				__result += power;
-			}
-		}
-		SupportPasPatch.SupportPassiveInit(modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
-		{
-			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
-			{
-				if (modpaList[i].activationTiming == actevent_FakePower) continue;
-				int power = modpaList[i].skillPowerResultAdder;
-				if (power != 0) MainClass.Logg.LogInfo("Found modpa - final power adder: ");
-				__result += power;
+		foreach (EgoPassiveModel passiveModel in unit._passiveDetail._egoPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel, false)) {
+				if (modsa.EXPECTED) continue;
+				__result += modsa.skillPowerResultAdder;
 			}
 		}
 	}
@@ -1834,46 +1778,24 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_GetParryingResultAdder(BattleActionModel actorAction, ref int __result, SkillModel __instance)
 	{
-		int actevent_FakePower = MainClass.timingDict["FakePower"];
-		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (modsaDict.ContainsKey(skillmodel_intlong)) {
-			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				if (modsa.activationTiming == actevent_FakePower) continue;
-				int power = modsa.parryingResultAdder;
-				if (power != 0) MainClass.Logg.LogInfo("Found modsa - clash power adder: " + power);
-				__result += power;
+		BattleUnitModel unit = actorAction.Model;
+		if (unit == null) return;
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel_Fast(__instance)) {
+			if (modsa.EXPECTED) continue;
+			__result += modsa.parryingResultAdder;
+		}
+		
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
+				if (modsa.EXPECTED) continue;
+				__result += modsa.parryingResultAdder;
 			}
 		}
-
-		foreach (PassiveModel passiveModel in actorAction.Model._passiveDetail.PassiveList.CopyList()) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
-				if (modpa.activationTiming == actevent_FakePower) continue;
-				int power = modpa.parryingResultAdder;
-				if (power != 0) MainClass.Logg.LogInfo("Found modpa - clash power adder: " + power);
-				__result += power;
-			}
-		}
-
-		foreach (EgoPassiveModel egoPassiveModel in actorAction.Model._passiveDetail.EgoPassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
-			{
-				if (modpa.activationTiming == actevent_FakePower) continue;
-				int power = modpa.parryingResultAdder;
-				if (power != 0) MainClass.Logg.LogInfo("Found modpa - clash power adder: " + power);
-				__result += power;
-			}
-		}
-		SupportPasPatch.SupportPassiveInit(modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
-		{
-			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
-			{
-				if (modpaList[i].activationTiming == actevent_FakePower) continue;
-				int power = modpaList[i].parryingResultAdder;
-				if (power != 0) MainClass.Logg.LogInfo("Found modpa - clash power adder: " + power);
-				__result += power;
+		foreach (EgoPassiveModel passiveModel in unit._passiveDetail._egoPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel, false)) {
+				if (modsa.EXPECTED) continue;
+				__result += modsa.parryingResultAdder;
 			}
 		}
 	}
@@ -1901,49 +1823,28 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_GetAttackDmgAdder(BattleActionModel action, CoinModel coin, ref int __result, SkillModel __instance)
 	{
-		int actevent_FakePower = MainClass.timingDict["FakePower"];
+		BattleUnitModel unit = action.Model;
+		if (unit == null) return;
 		
-		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (modsaDict.ContainsKey(skillmodel_intlong)) {
-			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				if (modsa.activationTiming == actevent_FakePower) continue;
-				int power = modsa.atkDmgAdder;
-				if (power != 0) __result += power;
-			}
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel_Fast(__instance)) {
+			if (modsa.EXPECTED) continue;
+			__result += modsa.atkDmgAdder;
+		}
+		foreach (ModularSA modsa in GetAllModcaFromCoinModel(coin)) {
+			if (modsa.EXPECTED) continue;
+			__result += modsa.atkDmgAdder;
 		}
 		
-		foreach (ModularSA modca in GetAllModcaFromCoinModel(coin)) {
-			if (modca.activationTiming == actevent_FakePower) continue;
-			int power = modca.atkDmgAdder;
-			if (power != 0) __result += power;
-		}
-
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList.CopyList()) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
-				if (modpa.activationTiming == actevent_FakePower) continue;
-				int power = modpa.atkDmgAdder;
-				if (power != 0) __result += power;
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
+				if (modsa.EXPECTED) continue;
+				__result += modsa.atkDmgAdder;
 			}
 		}
-
-		foreach (EgoPassiveModel egoPassiveModel in action.Model._passiveDetail.EgoPassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
-			{
-				if (modpa.activationTiming == actevent_FakePower) continue;
-				int power = modpa.atkDmgAdder;
-				if (power != 0) __result += power;
-			}
-		}
-		SupportPasPatch.SupportPassiveInit(modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
-		{
-			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
-			{
-				if (modpaList[i].activationTiming == actevent_FakePower) continue;
-				int power = modpaList[i].atkDmgAdder;
-				if (power != 0) __result += power;
+		foreach (EgoPassiveModel passiveModel in unit._passiveDetail._egoPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel, false)) {
+				if (modsa.EXPECTED) continue;
+				__result += modsa.atkDmgAdder;
 			}
 		}
 	}
@@ -1951,49 +1852,31 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_GetAttackDmgMultiplier(BattleActionModel action, CoinModel coin, ref float __result, SkillModel __instance)
 	{
-		int actevent_FakePower = MainClass.timingDict["FakePower"];
-
-		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (modsaDict.ContainsKey(skillmodel_intlong)) {
-			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				if (modsa.activationTiming == actevent_FakePower) continue;
+		BattleUnitModel unit = action.Model;
+		if (unit == null) return;
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel_Fast(__instance)) {
+			if (modsa.EXPECTED) continue;
+			int power = modsa.atkMultAdder;
+			if (power != 0) __result += power * 0.01f;
+		}
+		foreach (ModularSA modsa in GetAllModcaFromCoinModel(coin)) {
+			if (modsa.EXPECTED) continue;
+			int power = modsa.atkMultAdder;
+			if (power != 0) __result += power * 0.01f;
+		}
+		
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
+				if (modsa.EXPECTED) continue;
 				int power = modsa.atkMultAdder;
 				if (power != 0) __result += power * 0.01f;
 			}
 		}
-
-		foreach (ModularSA modca in GetAllModcaFromCoinModel(coin))
-		{
-			if (modca.activationTiming == actevent_FakePower) continue;
-			int power = modca.atkMultAdder;
-			if (power != 0) __result += power * 0.01f;
-		}
-		
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.PassiveList.CopyList()) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
-				if (modpa.activationTiming == actevent_FakePower) continue;
-				int power = modpa.atkMultAdder;
-				if (power != 0) __result += power * 0.01f;
-			}
-		}
-
-		foreach (PassiveModel passiveModel in action.Model._passiveDetail.EgoPassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel, false))
-			{
-				if (modpa.activationTiming == actevent_FakePower) continue;
-				int power = modpa.atkMultAdder;
-				if (power != 0) __result += power * 0.01f;
-			}
-		}
-		SupportPasPatch.SupportPassiveInit(modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
-		{
-			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
-			{
-				if (modpaList[i].activationTiming == actevent_FakePower) continue;
-				int power = modpaList[i].atkMultAdder;
+		foreach (EgoPassiveModel passiveModel in unit._passiveDetail._egoPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel, false)) {
+				if (modsa.EXPECTED) continue;
+				int power = modsa.atkMultAdder;
 				if (power != 0) __result += power * 0.01f;
 			}
 		}
@@ -2694,45 +2577,33 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.GetSkillPowerAdder))]
 	[HarmonyPostfix]
 	private static void Postfix_BuffModel_GetSkillPowerAdder(ref int __result, BuffModel __instance) {
-		int actevent_FakePower = MainClass.timingDict["FakePower"];
-		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
-			if (modba.activationTiming == actevent_FakePower) continue;
-			int power = modba.skillPowerAdder;
-			if (power != 0) MainClass.Logg.LogInfo("Found modba - base power adder: " + power);
-			__result += power;
+		foreach (ModularSA modsa in GetAllModbaFromBuffModel_Fast(__instance)) {
+			if (modsa.EXPECTED) continue;
+			__result += modsa.skillPowerAdder;
 		}
 	}
 	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.GetSkillPowerResultAdder))]
 	[HarmonyPostfix]
 	private static void Postfix_BuffModel_GetSkillPowerResultAdder(ref int __result, BuffModel __instance) {
-		int actevent_FakePower = MainClass.timingDict["FakePower"];
-		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
-			if (modba.activationTiming == actevent_FakePower) continue;
-			int power = modba.skillPowerResultAdder;
-			if (power != 0) MainClass.Logg.LogInfo("Found modba - final power adder: " + power);
-			__result += power;
+		foreach (ModularSA modsa in GetAllModbaFromBuffModel_Fast(__instance)) {
+			if (modsa.EXPECTED) continue;
+			__result += modsa.skillPowerResultAdder;
 		}
 	}
 	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.GetParryingResultAdder))]
 	[HarmonyPostfix]
 	private static void Postfix_BuffModel_GetParryingResultAdder(ref int __result, BuffModel __instance) {
-		int actevent_FakePower = MainClass.timingDict["FakePower"];
-		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
-			if (modba.activationTiming == actevent_FakePower) continue;
-			int power = modba.parryingResultAdder;
-			if (power != 0) MainClass.Logg.LogInfo("Found modba - clash power adder: " + power);
-			__result += power;
+		foreach (ModularSA modsa in GetAllModbaFromBuffModel_Fast(__instance)) {
+			if (modsa.EXPECTED) continue;
+			__result += modsa.parryingResultAdder;
 		}
 	}
 	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.GetCoinScaleAdder))]
 	[HarmonyPostfix]
 	private static void Postfix_BuffModel_GetCoinScaleAdder(ref int __result, BuffModel __instance) {
-		int actevent_FakePower = MainClass.timingDict["FakePower"];
-		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance)) {
-			if (modba.activationTiming == actevent_FakePower) continue;
-			int power = modba.coinScaleAdder;
-			if (power != 0) MainClass.Logg.LogInfo("Found modba - coin power adder: " + power);
-			__result += power;
+		foreach (ModularSA modsa in GetAllModbaFromBuffModel_Fast(__instance)) {
+			if (modsa.EXPECTED) continue;
+			__result += modsa.coinScaleAdder;
 		}
 	}
 	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.RightAfterGettingBuff))]
@@ -3850,28 +3721,19 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	public static void TryGetOverwriteAtkBehaviour_Postfix(SkillModel __instance, CoinModel coin, ref ATK_BEHAVIOUR atkBehaviour, ref bool __result)
 	{
-		int actevent_FakePower = MainClass.timingDict["FakePower"];
-		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (modsaDict.ContainsKey(skillmodel_intlong))
-		{
-			foreach (ModularSA modsa in modsaDict[skillmodel_intlong])
-			{
-				if (modsa.activationTiming == actevent_FakePower) continue;
-				ATK_BEHAVIOUR atkType = modsa.atktype;
-				if (atkType < ATK_BEHAVIOUR.NONE)
-				{
-					atkBehaviour = modsa.atktype;
-					__result = true;
-				}
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel_Fast(__instance)) {
+			if (modsa.EXPECTED) continue;
+			ATK_BEHAVIOUR atkType = modsa.atktype;
+			if (atkType != ATK_BEHAVIOUR.NONE) {
+				atkBehaviour = modsa.atktype;
+				__result = true;
 			}
 		}
-		foreach (ModularSA modca in GetAllModcaFromCoinModel(coin))
-		{
-			if (modca.activationTiming == actevent_FakePower) continue;
-			ATK_BEHAVIOUR atkType = modca.atktype;
-			if (atkType < ATK_BEHAVIOUR.NONE)
-			{
-				atkBehaviour = modca.atktype;
+		foreach (ModularSA modsa in GetAllModcaFromCoinModel(coin)) {
+			if (modsa.EXPECTED) continue;
+			ATK_BEHAVIOUR atkType = modsa.atktype;
+			if (atkType != ATK_BEHAVIOUR.NONE) {
+				atkBehaviour = modsa.atktype;
 				__result = true;
 			}
 		}

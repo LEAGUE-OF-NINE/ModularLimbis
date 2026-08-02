@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Battle;
+using ModularSkillScripts.Patches;
 using Utils;
 using static BattleActionModel.TargetDataDetail;
 using IntPtr = System.IntPtr;
@@ -235,6 +236,7 @@ public class ModularSA : Il2CppSystem.Object
 	public string modsa_luaScriptMain = null;
 	public string[] modsa_luaScriptMainArgs = null;
 	public ConsequenceChangeMotion.MotionDetail modsa_motionDetail = null;
+	public bool EXPECTED = false;
 
 	public void ResetAdders()
 	{
@@ -1045,8 +1047,9 @@ public class ModularSA : Il2CppSystem.Object
 				string timingArg = batch.Remove(0, 7);
 				string[] circles = timingArg.Split(parenthesisSeparator);
 				string circle_0 = circles[0];
-				if (MainClass.timingDict.ContainsKey(circle_0)) activationTiming = MainClass.timingDict[circle_0];
-
+				if (MainClass.timingDict.TryGetValue(circle_0, out int value)) activationTiming = value;
+				if (activationTiming == FakePowerPatches.actevent_FakePower) EXPECTED = true;
+					
 				if (circles.Length > 1)
 				{
 					string hitArgs = circles[1];
@@ -1120,6 +1123,7 @@ public class ModularSA : Il2CppSystem.Object
 			}
 			else if (batch.Equals("RESETWHENUSE", StringComparison.OrdinalIgnoreCase)) resetWhenUse = true;
 			else if (batch.Equals("CLEARVALUES", StringComparison.OrdinalIgnoreCase)) clearValues = true;
+			else if (batch.Equals("EXPECTED", StringComparison.OrdinalIgnoreCase)) EXPECTED = true;
 			else if (luaFound)
 			{
 				MainClass.Logg.LogError("LUA cannot be used with other batches");
