@@ -741,36 +741,27 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		int actevent_OnDie = MainClass.timingDict["OnDie"];
 		int actevent_OnOtherDie = MainClass.timingDict["OnOtherDie"];
 		BattleUnitModel deadUnit = __instance._owner;
-
-		foreach (PassiveModel passiveModel in __instance.PassiveList) {
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
-				modpa.modsa_passiveModel = passiveModel;
-				modpa.modsa_target_list.Clear();
-				modpa.modsa_target_list.Add(killer);
-				modpa.modsa_killerModel = killer;
-				modpa.modsa_victimModel = deadUnit;
-
-				modpa.Enact(deadUnit, null, null, actionOrNull, actevent_OnDie, timing);
+		
+		foreach (PassiveModel pasmodel in __instance._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
+				if (modsa.activationTiming != actevent_OnDie) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(killer);
+				modsa.modsa_killerModel = killer;
+				modsa.modsa_victimModel = deadUnit;
+				modsa.Enact(deadUnit, null, actionOrNull, null, actevent_OnDie, timing);
 			}
 		}
-		foreach (EgoPassiveModel egoPassiveModel in __instance.EgoPassiveList)
-		{
-			if (!egoPassiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = egoPassiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
-			{
-				modpa.modsa_passiveModel = egoPassiveModel;
-				modpa.modsa_target_list.Clear();
-				modpa.modsa_target_list.Add(killer);
-				modpa.modsa_killerModel = killer;
-				modpa.modsa_victimModel = deadUnit;
-				modpa.Enact(deadUnit, null, null, actionOrNull, actevent_OnDie, timing);
+		foreach (EgoPassiveModel pasmodel in __instance._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel, false)) {
+				if (modsa.activationTiming != actevent_OnDie) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(killer);
+				modsa.modsa_killerModel = killer;
+				modsa.modsa_victimModel = deadUnit;
+				modsa.Enact(deadUnit, null, actionOrNull, null, actevent_OnDie, timing);
 			}
 		}
 
@@ -778,25 +769,26 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		BattleObjectManager battleObjManager_inst = SingletonBehavior<BattleObjectManager>.Instance;
 		foreach (BattleUnitModel unit in battleObjManager_inst.GetAliveListExceptSelf(deadUnit, false, false))
 		{
-			foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList.CopyList()) {
-				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
-					modpa.modsa_passiveModel = passiveModel;
-					modpa.modsa_target_list.Clear();
-					modpa.modsa_target_list.Add(deadUnit);
-					modpa.modsa_killerModel = killer;
-					modpa.modsa_victimModel = deadUnit;
-					modpa.Enact(unit, null, null, actionOrNull, actevent_OnOtherDie, timing);
+			foreach (PassiveModel pasmodel in __instance._passivelist.CopyList()) {
+				foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
+					if (modsa.activationTiming != actevent_OnOtherDie) continue;
+					modsa.modsa_passiveModel = pasmodel;
+					modsa.modsa_target_list.Clear();
+					modsa.modsa_target_list.Add(deadUnit);
+					modsa.modsa_killerModel = killer;
+					modsa.modsa_victimModel = deadUnit;
+					modsa.Enact(unit, null, actionOrNull, null, actevent_OnOtherDie, timing);
 				}
 			}
-
-			foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail.EgoPassiveList.CopyList()) {
-				foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
-					modpa.modsa_passiveModel = egoPassiveModel;
-					modpa.modsa_target_list.Clear();
-					modpa.modsa_target_list.Add(deadUnit);
-					modpa.modsa_killerModel = killer;
-					modpa.modsa_victimModel = deadUnit;
-					modpa.Enact(unit, null, null, actionOrNull, actevent_OnOtherDie, timing);
+			foreach (EgoPassiveModel pasmodel in __instance._egoPassiveList.CopyList()) {
+				foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel, false)) {
+					if (modsa.activationTiming != actevent_OnOtherDie) continue;
+					modsa.modsa_passiveModel = pasmodel;
+					modsa.modsa_target_list.Clear();
+					modsa.modsa_target_list.Add(deadUnit);
+					modsa.modsa_killerModel = killer;
+					modsa.modsa_victimModel = deadUnit;
+					modsa.Enact(unit, null, actionOrNull, null, actevent_OnOtherDie, timing);
 				}
 			}
 		}
