@@ -196,12 +196,14 @@ public class FakePowerPatches
 			foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModbaFromBuffModel_Fast(buf)) {
 				if (modsa.activationTiming != actevent_BaseCheck) continue;
 				modsa.modsa_buffModel = buf;
+				modsa.modsa_expected_sinaction = expectedTargetSinActionOrNull;
 				modsa.Enact(unit, skill, action, opposing_action, actevent_BaseCheck, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 		
 		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel_Fast(skill)) {
 			if (modsa.activationTiming != actevent_BaseCheck) continue;
+			modsa.modsa_expected_sinaction = expectedTargetSinActionOrNull;
 			modsa.Enact(unit, skill, action, opposing_action, actevent_BaseCheck, BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 		
@@ -210,6 +212,7 @@ public class FakePowerPatches
 			{
 				if (modsa.activationTiming != actevent_BaseCheck) continue;
 				modsa.modsa_passiveModel = passiveModel;
+				modsa.modsa_expected_sinaction = expectedTargetSinActionOrNull;
 				modsa.Enact(unit, skill, action, opposing_action, actevent_BaseCheck, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
@@ -218,6 +221,7 @@ public class FakePowerPatches
 			{
 				if (modsa.activationTiming != actevent_BaseCheck) continue;
 				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.modsa_expected_sinaction = expectedTargetSinActionOrNull;
 				modsa.Enact(unit, skill, action, opposing_action, actevent_BaseCheck, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}

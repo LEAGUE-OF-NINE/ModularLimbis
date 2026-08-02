@@ -189,7 +189,8 @@ public class ModularSA : Il2CppSystem.Object
 		modsa_luaScript = null;
 		modsa_luaScriptMain = null;
 		modsa_motionDetail = null;
-
+		modsa_expected_sinaction = null;
+		
 		SpecialKey = KeyCode.LeftControl;
 
 		keywordTrigger = BUFF_UNIQUE_KEYWORD.None;
@@ -237,6 +238,7 @@ public class ModularSA : Il2CppSystem.Object
 	public string[] modsa_luaScriptMainArgs = null;
 	public ConsequenceChangeMotion.MotionDetail modsa_motionDetail = null;
 	public bool EXPECTED = false;
+	public SinActionModel modsa_expected_sinaction = null;
 
 	public void ResetAdders()
 	{
@@ -415,7 +417,11 @@ public class ModularSA : Il2CppSystem.Object
 			// normal non-lua execution
 			List<BattleUnitModel> loopTarget_list = modsa_target_list.CopyList();
 			if (modsa_loopString.Any()) loopTarget_list = GetTargetModelList(modsa_loopString);
-			else if (loopTarget_list.Count < 1) loopTarget_list.Add(GetTargetModel("MainTarget"));
+			else if (loopTarget_list.Count < 1)
+			{
+				if (EXPECTED && modsa_expected_sinaction != null) loopTarget_list.Add(modsa_expected_sinaction.UnitModel);
+				else loopTarget_list.Add(GetTargetModel("MainTarget"));
+			}
 			foreach (BattleUnitModel unit in loopTarget_list)
 			{
 				modsa_loopTarget = unit;
@@ -645,9 +651,11 @@ public class ModularSA : Il2CppSystem.Object
 			}
 			case "TargetCore":
 			{
-				BattleUnitModel_Abnormality_Part part = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality_Part>();
-				if (part != null) unitList.Add(part.Abnormality);
-				else unitList.Add(modsa_loopTarget);
+				if (modsa_loopTarget != null) {
+					BattleUnitModel_Abnormality_Part part = modsa_loopTarget.TryCast<BattleUnitModel_Abnormality_Part>();
+					if (part != null) unitList.Add(part.Abnormality);
+					else unitList.Add(modsa_loopTarget);
+				}
 				return unitList;
 			}
 			case "TargetParts":
