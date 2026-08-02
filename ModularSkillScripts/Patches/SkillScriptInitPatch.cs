@@ -57,51 +57,39 @@ public class SkillScriptInitPatch
 		
 	}
 	
-	public static void SimpleEnactPassive(BattleUnitModel unitModel, SkillModel skillModel_inst, BattleActionModel selfAction, BattleActionModel oppoAction, string actevent, BATTLE_EVENT_TIMING timing, PassiveDetail __instance, bool resetWhenUse = false)
+	public static void SimpleEnactPassive(BattleUnitModel unitModel, SkillModel skillModel_inst, BattleActionModel selfAction, BattleActionModel oppoAction, string actevent_s, BATTLE_EVENT_TIMING timing, PassiveDetail __instance, bool resetWhenUse = false)
 	{
-		int acteventint = MainClass.timingDict[actevent];
-
-		List<PassiveModel> pasmodel_list = __instance._passivelist;
-		List<EgoPassiveModel> egopasmodel_list = __instance._egoPassiveList;
+		int actevent = MainClass.timingDict[actevent_s];
 		
-		for (int i = pasmodel_list.Count - 1; i >= 0; i--)	{
-			PassiveModel pasmodel = pasmodel_list[i];
-			List<ModularSA> modsa_list = GetAllModpaFromPasmodel(pasmodel);
-			for (int i2 = modsa_list.Count - 1; i2 >= 0; i2--) {
-				ModularSA modsa = modsa_list[i2];
+		foreach (PassiveModel pasmodel in __instance._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
 				if (resetWhenUse && modsa.resetWhenUse) modsa.ResetAdders(); // on-demand power adder reset (used for passives)
-				if (modsa.activationTiming != acteventint) continue;
+				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = pasmodel;
-				modsa.Enact(unitModel, skillModel_inst, selfAction, oppoAction, acteventint, timing);
+				modsa.Enact(unitModel, skillModel_inst, selfAction, oppoAction, actevent, timing);
 			}
 		}
-		
-		for (int i = egopasmodel_list.Count - 1; i >= 0; i--)	{
-			PassiveModel pasmodel = egopasmodel_list[i];
-			List<ModularSA> modsa_list = GetAllModpaFromPasmodel(pasmodel);
-			for (int i2 = modsa_list.Count - 1; i2 >= 0; i2--) {
-				ModularSA modsa = modsa_list[i2];
+		foreach (EgoPassiveModel pasmodel in __instance._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
 				if (resetWhenUse && modsa.resetWhenUse) modsa.ResetAdders(); // on-demand power adder reset (used for passives)
-				if (modsa.activationTiming != acteventint) continue;
+				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = pasmodel;
-				modsa.Enact(unitModel, skillModel_inst, selfAction, oppoAction, acteventint, timing);
+				modsa.Enact(unitModel, skillModel_inst, selfAction, oppoAction, actevent, timing);
 			}
 		}
 		
 		SupportPasPatch.SupportPassiveInit(modpaDict);
 		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
 		{
-			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
-			{
-				ModularSA modsa = modpaList[i];
+			foreach (ModularSA modsa in GetAllModpaFromPasmodelSupport(supportPassive)) {
 				if (resetWhenUse && modsa.resetWhenUse) modsa.ResetAdders();
-				if (modsa.activationTiming != acteventint) continue;
+				if (modsa.activationTiming != actevent) continue;
 				supportPassive._script._owner = unitModel;
-				modsa.Enact(unitModel, skillModel_inst, selfAction, oppoAction, acteventint, timing);
+				modsa.Enact(unitModel, skillModel_inst, selfAction, oppoAction, actevent, timing);
 			}
 		}
 	}
+	
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.Init), new Type[] { })]
 	[HarmonyPostfix]
 	private static void Postfix_SkillModelInit_AddSkillScript(SkillModel __instance)
