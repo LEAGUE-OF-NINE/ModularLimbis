@@ -19,12 +19,8 @@ public class SkillScriptInitPatch
 		int actevent = MainClass.timingDict["YIPPEE"];
 		
 		// Bufs
-		List<BuffModel> buf_list = unit.GetActivatedBuffModels();
-		for (int i = buf_list.Count - 1; i >= 0; i--)	{
-			BuffModel buf = buf_list[i];
-			List<ModularSA> modsa_list = GetAllModbaFromBuffModel(buf);
-			for (int i2 = modsa_list.Count - 1; i2 >= 0; i2--) {
-				ModularSA modsa = modsa_list[i2];
+		foreach (BuffModel buf in unit.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buf)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_buffModel = buf;
 				modsa.Enact(unit, skill, null, null, actevent, timing);
@@ -32,44 +28,33 @@ public class SkillScriptInitPatch
 		}
 		
 		// Skill, then Coin
-		List<ModularSA> skill_modsa_list = GetAllModsaFromSkillModel(skill);
-		for (int i = skill_modsa_list.Count - 1; i >= 0; i--)	{
-			ModularSA modsa = skill_modsa_list[i];
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
 			if (modsa.activationTiming != actevent) continue;
 			modsa.modsa_coinModel = coin;
 			modsa.Enact(unit, skill, null, null, actevent, timing);
 		}
-		List<ModularSA> coin_modsa_list = GetAllModcaFromCoinModel(coin);
-		for (int i = coin_modsa_list.Count - 1; i >= 0; i--)	{
-			ModularSA modsa = coin_modsa_list[i];
+		foreach (ModularSA modsa in GetAllModcaFromCoinModel(coin)) {
 			if (modsa.activationTiming != actevent) continue;
 			modsa.modsa_coinModel = coin;
 			modsa.Enact(unit, skill, null, null, actevent, timing);
 		}
 		
 		// Passives, then EGO passives
-		List<PassiveModel> pasmodel_list = unit._passiveDetail._passivelist;
-		for (int i = pasmodel_list.Count - 1; i >= 0; i--)	{
-			PassiveModel pasmodel = pasmodel_list[i];
-			List<ModularSA> modsa_list = GetAllModpaFromPasmodel(pasmodel);
-			for (int i2 = modsa_list.Count - 1; i2 >= 0; i2--) {
-				ModularSA modsa = modsa_list[i2];
+		foreach (PassiveModel pasmodel in unit._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = pasmodel;
 				modsa.Enact(unit, skill, null, null, actevent, timing);
 			}
 		}
-		List<EgoPassiveModel> egopasmodel_list = unit._passiveDetail._egoPassiveList;
-		for (int i = egopasmodel_list.Count - 1; i >= 0; i--)	{
-			PassiveModel pasmodel = egopasmodel_list[i];
-			List<ModularSA> modsa_list = GetAllModpaFromPasmodel(pasmodel);
-			for (int i2 = modsa_list.Count - 1; i2 >= 0; i2--) {
-				ModularSA modsa = modsa_list[i2];
+		foreach (EgoPassiveModel pasmodel in unit._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = pasmodel;
 				modsa.Enact(unit, skill, null, null, actevent, timing);
 			}
 		}
+		
 	}
 	
 	public static void SimpleEnactPassive(BattleUnitModel unitModel, SkillModel skillModel_inst, BattleActionModel selfAction, BattleActionModel oppoAction, string actevent, BATTLE_EVENT_TIMING timing, PassiveDetail __instance, bool resetWhenUse = false)
