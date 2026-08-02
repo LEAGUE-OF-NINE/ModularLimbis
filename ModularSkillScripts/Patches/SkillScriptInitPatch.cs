@@ -14,7 +14,7 @@ namespace ModularSkillScripts.Patches;
 
 public class SkillScriptInitPatch
 {
-	public static void copypastesolution(BattleUnitModel unitModel, SkillModel skillModel_inst, BattleActionModel selfAction, BattleActionModel oppoAction, string actevent, BATTLE_EVENT_TIMING timing, PassiveDetail __instance, bool resetWhenUse = false)
+	public static void SimpleEnactPassive(BattleUnitModel unitModel, SkillModel skillModel_inst, BattleActionModel selfAction, BattleActionModel oppoAction, string actevent, BATTLE_EVENT_TIMING timing, PassiveDetail __instance, bool resetWhenUse = false)
 	{
 		int acteventint = MainClass.timingDict[actevent];
 		foreach (PassiveModel passiveModel in __instance._passivelist.CopyList())
@@ -438,7 +438,7 @@ public class SkillScriptInitPatch
 		//		modpa.Enact(__instance._owner, null, null, null, actevent, timing);
 		//	}
 		//}
-		copypastesolution(__instance._owner, null, null, null, "RoundStart", timing, __instance);
+		SimpleEnactPassive(__instance._owner, null, null, null, "RoundStart", timing, __instance);
 		int actevent = MainClass.timingDict["RoundStart"];
 		foreach (SinActionModel sinAction in __instance._owner.GetSinActionList())
 		{
@@ -466,7 +466,7 @@ public class SkillScriptInitPatch
 			BattleUnitModel unit = passiveDetail._owner;
 			if (unit == null) continue;
 			
-			copypastesolution(unit, null, null, null, "DelayedStart", BATTLE_EVENT_TIMING.ALL_TIMING, passiveDetail);
+			SimpleEnactPassive(unit, null, null, null, "DelayedStart", BATTLE_EVENT_TIMING.ALL_TIMING, passiveDetail);
 			int actevent = MainClass.timingDict["DelayedStart"];
 			
 			foreach (SinActionModel sinAction in unit.GetSinActionList())
@@ -532,7 +532,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				}
 			}
 			
-			copypastesolution(unit, null, null, null, "AfterSlots", BATTLE_EVENT_TIMING.ALL_TIMING, passiveDetail);
+			SimpleEnactPassive(unit, null, null, null, "AfterSlots", BATTLE_EVENT_TIMING.ALL_TIMING, passiveDetail);
 			
 			foreach (SinActionModel sinAction in unit.GetSinActionList())
 			{
@@ -571,13 +571,13 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnBattleStart(BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
-		copypastesolution(__instance._owner, null, null, null, "StartBattle", timing, __instance);
+		SimpleEnactPassive(__instance._owner, null, null, null, "StartBattle", timing, __instance);
 	}
 	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnStageStart))]
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnStageStart(BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
-		copypastesolution(__instance._owner, null, null, null, "EncounterStart", timing, __instance);
+		SimpleEnactPassive(__instance._owner, null, null, null, "EncounterStart", timing, __instance);
 	}
 
 
@@ -585,7 +585,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnBattleEnd(BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
-		copypastesolution(__instance._owner, null, null, null, "EndBattle", timing, __instance);
+		SimpleEnactPassive(__instance._owner, null, null, null, "EndBattle", timing, __instance);
 	}
 
 
@@ -593,7 +593,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnStartTurnBeforeLog(BattleActionModel action, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
-		copypastesolution(__instance._owner, action.Skill, action, null, "WhenUse", timing, __instance, true);
+		SimpleEnactPassive(__instance._owner, action.Skill, action, null, "WhenUse", timing, __instance, true);
 	}
 
 
@@ -601,31 +601,31 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnStartDuel(BattleActionModel ownerAction, BattleActionModel opponentAction, PassiveDetail __instance)
 	{
-		copypastesolution(__instance._owner, ownerAction.Skill, ownerAction, opponentAction, "StartDuel", BATTLE_EVENT_TIMING.ON_START_DUEL, __instance);
+		SimpleEnactPassive(__instance._owner, ownerAction.Skill, ownerAction, opponentAction, "StartDuel", BATTLE_EVENT_TIMING.ON_START_DUEL, __instance);
 	}
 	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnWinDuel))]
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnWinDuel(BattleActionModel selfAction, BattleActionModel oppoAction, int parryingCount, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
-		copypastesolution(__instance._owner, selfAction.Skill, selfAction, oppoAction, "WinDuel", timing, __instance);
+		SimpleEnactPassive(__instance._owner, selfAction.Skill, selfAction, oppoAction, "WinDuel", timing, __instance);
 	}
 	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnLoseDuel))]
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnLoseDuel(BattleActionModel selfAction, BattleActionModel oppoAction, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
-		copypastesolution(__instance._owner, selfAction.Skill, selfAction, oppoAction, "DefeatDuel", timing, __instance); ;
+		SimpleEnactPassive(__instance._owner, selfAction.Skill, selfAction, oppoAction, "DefeatDuel", timing, __instance); ;
 	}
 	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnWinParrying))]
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnWinParrying(BattleActionModel selfAction, BattleActionModel oppoAction, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
-		copypastesolution(__instance._owner, selfAction.Skill, selfAction, oppoAction, "WinParrying", timing, __instance);
+		SimpleEnactPassive(__instance._owner, selfAction.Skill, selfAction, oppoAction, "WinParrying", timing, __instance);
 	}
 	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnLoseParrying))]
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnLoseParryingl(BattleActionModel selfAction, BattleActionModel oppoAction, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
-		copypastesolution(__instance._owner, selfAction.Skill, selfAction, oppoAction, "DefeatParrying", timing, __instance); ;
+		SimpleEnactPassive(__instance._owner, selfAction.Skill, selfAction, oppoAction, "DefeatParrying", timing, __instance); ;
 	}
 
 
@@ -633,7 +633,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_BeforeAttack(BattleActionModel action, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
-		copypastesolution(__instance._owner, action.Skill, action, null, "BeforeAttack", timing, __instance);
+		SimpleEnactPassive(__instance._owner, action.Skill, action, null, "BeforeAttack", timing, __instance);
 	}
 
 
@@ -641,7 +641,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnEndTurn(BattleActionModel action, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
-		copypastesolution(__instance._owner, action.Skill, action, null, "EndSkill", timing, __instance);
+		SimpleEnactPassive(__instance._owner, action.Skill, action, null, "EndSkill", timing, __instance);
 	}
 
 
@@ -649,14 +649,14 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnStartBehaviour(BattleActionModel action, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
-		copypastesolution(__instance._owner, action.Skill, action, null, "OnStartBehaviour", timing, __instance);
+		SimpleEnactPassive(__instance._owner, action.Skill, action, null, "OnStartBehaviour", timing, __instance);
 	}
 
 	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnEndBehaviour))]
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnEndBehaviour(BattleActionModel action, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
-		copypastesolution(__instance._owner, action.Skill, action, null, "OnEndBehaviour", timing, __instance);
+		SimpleEnactPassive(__instance._owner, action.Skill, action, null, "OnEndBehaviour", timing, __instance);
 	}
 
 
@@ -1079,7 +1079,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnDiscardSin(UnitSinModel sin, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
-		copypastesolution(__instance._owner, sin.GetSkill(), sin._currentAction, null, "OnDiscard", timing, __instance);
+		SimpleEnactPassive(__instance._owner, sin.GetSkill(), sin._currentAction, null, "OnDiscard", timing, __instance);
 	}
 
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.ChangeTakeDamage))]
@@ -1631,7 +1631,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnRetreat(BattleUnitModel triggerUnit, BUFF_UNIQUE_KEYWORD retreatKeyword, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
-		copypastesolution(__instance._owner, null, null, null, "OnRetreat", timing, __instance);
+		SimpleEnactPassive(__instance._owner, null, null, null, "OnRetreat", timing, __instance);
 	}
 
 	// PASSIVES END
