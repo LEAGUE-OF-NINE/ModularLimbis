@@ -125,9 +125,6 @@ public class UniquePatches
 		BattleUnitModel unit = sinAction.UnitModel;
 		if (unit == null || !unit.IsActionable()) return false;
 		
-		BattleActionModel action = sinAction._currentBattleAction;
-		if (action == null) return false; // Please have Action
-		
 		UnitDataModel unitData = unit.UnitDataModel;
 		UnitStaticData unitStaticData = unitData?._classInfo;
 		if (unitStaticData == null) return false;
@@ -140,6 +137,8 @@ public class UniquePatches
 		if (currentSinList.Count < 1) return false;
 		UnitSinModel sin = currentSinList[0];
 		SkillModel skill = sin.GetSkill();
+		BattleActionModel action = sin.GetBattleActionModel();
+		if (action == null) return false; // Please have Action
 		int skillID = skill.GetID();
 		if (!defID_list.Contains(skillID)) return false; // Skill is not in Defense List
 		
@@ -206,9 +205,14 @@ public class UniquePatches
 	{
 		BattleUnitModel unit = sinAction.UnitModel;
 		if (unit == null || !unit.IsActionable()) return;
-		BattleActionModel action = sinAction._currentBattleAction;
-		SkillModel skill = action?._skill;
-		if (skill == null) return;
+		
+		List<UnitSinModel> currentSinList = sinAction.currentSinList;
+		if (currentSinList.Count < 1) return; // No Skills? no_bitches.png
+		
+		UnitSinModel sin = currentSinList[0];
+		SkillModel skill = sin.GetSkill();
+		BattleActionModel action = sin.GetBattleActionModel();
+		if (action == null) return; // Please have Action
 		
 		int actevent = MainClass.timingDict["DefenseSwitch"];
 
