@@ -23,7 +23,7 @@ namespace ModularSkillScripts;
 
 [BepInPlugin(GUID, NAME, VERSION)]
 [BepInDependency("Lethe")]
-[BepInIncompatibility("DefenseCycling")] 
+[BepInIncompatibility("GlitchGames.DefenseCycling")] 
 public class MainClass : BasePlugin
 {
 	public override void Load()
