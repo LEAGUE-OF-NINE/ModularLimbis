@@ -23,6 +23,7 @@ namespace ModularSkillScripts;
 
 [BepInPlugin(GUID, NAME, VERSION)]
 [BepInDependency("Lethe")]
+[BepInIncompatibility("DefenseCycling")] 
 public class MainClass : BasePlugin
 {
 	public override void Load()
@@ -102,7 +103,9 @@ public class MainClass : BasePlugin
 			"ChangeAttackDamage",
 			"BuffActivate",
 			"EGOCost",
-			"ExpectedBasePower"
+			"ExpectedBasePower",
+			"DefenseCycle",
+			"DefenseSwitch"
 		];
 		//timingStringList.Add("ChangeSinBuffDamage");
 
@@ -607,7 +610,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "5.0.4";
+	public const string VERSION = "5.0.5";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
