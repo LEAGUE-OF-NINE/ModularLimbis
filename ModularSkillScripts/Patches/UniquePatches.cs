@@ -2,6 +2,7 @@ using BattleUI.Operation;
 using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
 using BepInEx.Unity.IL2CPP.UnityEngine;
+using ModularSkillScripts.Consequence;
 
 namespace ModularSkillScripts.Patches;
 
@@ -17,6 +18,7 @@ public class UniquePatches
 		if (successDefenseCycle)
 		{
 			RunDefenseSwitch(sinAction);
+			ConsequenceRefreshAllSlotVisual.ActivateRefresh();
 			return false;
 		}
 		return true;
