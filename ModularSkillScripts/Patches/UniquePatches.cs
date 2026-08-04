@@ -147,7 +147,7 @@ public class UniquePatches
 		}
 		
 		int actevent = MainClass.timingDict["DefenseCycle"];
-		int overrideCycleWithPassive_skillID = -1;
+		int overrideCycleWithPassive_skillID = 0;
 		foreach (PassiveModel pasmodel in unit._passiveDetail._passivelist) {
 			foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(pasmodel)) {
 				if (modsa.activationTiming != actevent) continue;
@@ -162,10 +162,13 @@ public class UniquePatches
 			}
 		}
 
-		if (overrideCycleWithPassive_skillID > 0)
-		{
+		if (overrideCycleWithPassive_skillID > 0) {
 			action.TryChangeSkill(overrideCycleWithPassive_skillID);
 			return true;
+		}
+		if (overrideCycleWithPassive_skillID < 0) {
+			action.TryChangeSkill(defID_list[0]);
+			return false;
 		}
 		
 		List<int> ID_whitelist = new();
@@ -183,6 +186,7 @@ public class UniquePatches
 		
 		int defenseNextCycle = 0;
 		bool cycling = false;
+		bool end_of_cycle = false;
 		for (int i = 1; i < defID_count; i++)
 		{
 			int previousSkillID = defID_list[i - 1];
@@ -193,9 +197,14 @@ public class UniquePatches
 					defenseNextCycle = checkID;
 					break;
 				}
-			} 
+			}
 		}
-		if (defenseNextCycle < 1) return false; // Not Found or Reached End of List
+
+		if (defenseNextCycle < 1) // Not Found or Reached End of List
+		{
+			action.TryChangeSkill(defID_list[0]); // Assumes there IS a whitelist in unit.keywordlist, but failed to cycle
+			return false;
+		}
 
 		action.TryChangeSkill(defenseNextCycle);
 		return true;
