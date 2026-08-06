@@ -4,17 +4,8 @@ public class AcquirerIsUsableInDuel : IModularAcquirer
 {
 	public int ExecuteAcquirer(ModularSA modular, string section, string circledSection, string[] circles)
 	{
-		CoinModel targetAction = modular.modsa_coinModel;
-		if (circles[0] == "Target") targetAction = modular.modsa_coinModel;
-		if (targetAction == null) return -1;
-
-		if (targetAction.IsUsableInDuel == true)
-		{
-			return 1;
-		}
-		else
-		{
-			return 0;
-		}
+		CoinModel coin = modular.modsa_coinModel;
+		if (coin == null) return -1;
+		return coin.IsUsableInDuel ? 1 : 0;
 	}
 }
