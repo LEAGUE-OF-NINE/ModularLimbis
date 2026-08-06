@@ -1506,6 +1506,8 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 	}
+	
+	/*
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetForcedCoinResultOnAction))]
 	[HarmonyPostfix]
 	private static void Postfix_BattleUnitModel_GetForcedCoinResultOnAction(
@@ -1565,7 +1567,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				}
 			}
 		}
-	}
+	}*/
 	
 	//[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetSinBuffDamageMultiplier))]
 	//[HarmonyPostfix]
