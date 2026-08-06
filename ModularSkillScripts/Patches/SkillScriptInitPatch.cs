@@ -1467,6 +1467,104 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 	}
 
+	[HarmonyPatch(typeof(CoinModel), nameof(CoinModel.GetProb))]
+	[HarmonyPostfix]
+	private static void Postfix_CoinModel_GetProb(ref float __result, CoinModel __instance)
+	{
+		foreach (ModularSA modsa in GetAllModcaFromCoinModel(__instance)) {
+			int check = modsa.headsChanceAdder;
+			if (check != 0) __result += (float)check * 0.01f;
+		}
+	}
+	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetCoinProb))]
+	[HarmonyPostfix]
+	private static void Postfix_SkillModel_GetProb(BattleUnitModel unit, ref float __result, SkillModel __instance)
+	{
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel_Fast(__instance)) {
+			int check = modsa.headsChanceAdder;
+			if (check != 0) __result += (float)check * 0.01f;
+		}
+		
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
+				int check = modsa.headsChanceAdder;
+				if (check != 0) __result += (float)check * 0.01f;
+			}
+		}
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail._egoPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(egoPassiveModel, false)) {
+				int check = modsa.headsChanceAdder;
+				if (check != 0) __result += (float)check * 0.01f;
+			}
+		}
+	}
+	[HarmonyPatch(typeof(BattleActionModel), nameof(BattleActionModel.TryGetForcedCoinResult))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleActionModel_TryGetForcedCoinResult(
+		Il2CppSystem.Nullable<bool> isParrying,
+		ref COIN_RESULT result,
+		BattleActionModel oppoActionOrNull,
+		ref bool __result, BattleActionModel __instance)
+	{
+		if (__result) return;
+		BattleUnitModel unit = __instance._model;
+		if (unit == null) return;
+		if (unit.TryCast<BattleUnitModel_Abnormality>() != null) return; //no cores please
+		SkillModel skill = __instance._skill;
+		if (skill == null) return;
+		
+		int actevent = MainClass.timingDict["TryForcedCoinResult"];
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel_Fast(skill)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.valueList[9] = -1;
+			modsa.Enact(unit, skill, __instance, oppoActionOrNull, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			int check = modsa.valueList[9];
+			if (check > -1) {
+				__result = true;
+				result = check == 0 ? COIN_RESULT.TAIL : COIN_RESULT.HEAD;
+				return;
+			}
+		}
+
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[9] = -1;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.Enact(unit, skill, __instance, oppoActionOrNull, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				int check = modsa.valueList[9];
+				if (check > -1) {
+					__result = true;
+					result = check == 0 ? COIN_RESULT.TAIL : COIN_RESULT.HEAD;
+					return;
+				}
+			}
+		}
+		
+		if (unit.IsAbnormalityOrPart)
+		{
+			BattleUnitModel_Abnormality_Part part = __instance.TryCast<BattleUnitModel_Abnormality_Part>();
+			if (part != null) {
+				unit = part._abnormality;
+				foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
+					foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
+						if (modsa.activationTiming != actevent) continue;
+						modsa.valueList[9] = -1;
+						modsa.modsa_passiveModel = passiveModel;
+						modsa.Enact(unit, skill, __instance, oppoActionOrNull, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+						int check = modsa.valueList[9];
+						if (check > -1) {
+							__result = true;
+							result = check == 0 ? COIN_RESULT.TAIL : COIN_RESULT.HEAD;
+							return;
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	//[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetSinBuffDamageMultiplier))]
 	//[HarmonyPostfix]
 	//private static void Postfix_BattleUnitModel_GetSinBuffDamageMultiplier(

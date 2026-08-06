@@ -105,7 +105,8 @@ public class MainClass : BasePlugin
 			"EGOCost",
 			"ExpectedBasePower",
 			"DefenseCycle",
-			"DefenseSwitch"
+			"DefenseSwitch",
+			"TryForcedCoinResult"
 		];
 		//timingStringList.Add("ChangeSinBuffDamage");
 
@@ -170,6 +171,7 @@ public class MainClass : BasePlugin
 		consequenceDict["scale"] = new ConsequenceScale();
 		consequenceDict["dmgadd"] = new ConsequenceDmgAdd();
 		consequenceDict["dmgmult"] = new ConsequenceDmgMult();
+		consequenceDict["headschance"] = new ConsequenceHeadsChance();
 		consequenceDict["healsp"] = new ConsequenceMpDmg();
 		consequenceDict["reusecoin"] = new ConsequenceReuseCoin();
 		consequenceDict["bonusdmg"] = new ConsequenceBonusDmg();
@@ -610,7 +612,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "5.0.5";
+	public const string VERSION = "5.0.6";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
