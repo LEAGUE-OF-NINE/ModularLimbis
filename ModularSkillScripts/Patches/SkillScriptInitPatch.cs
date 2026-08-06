@@ -3,6 +3,7 @@ using System.Linq;
 using BepInEx.Unity.IL2CPP.UnityEngine;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using HarmonyLib;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem.Collections.Generic;
 using ModularSkillScripts.Consequence;
 using SD;
@@ -1476,10 +1477,17 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			if (check != 0) __result += (float)check * 0.01f;
 		}
 	}
-	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetCoinProb))]
+	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetCoinProb), new Type[] { typeof(BattleUnitModel), typeof(float) })]
 	[HarmonyPostfix]
 	private static void Postfix_SkillModel_GetProb(BattleUnitModel unit, ref float __result, SkillModel __instance)
 	{
+		foreach (BuffModel buf in unit.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel_Fast(buf)) {
+				int check = modsa.headsChanceAdder;
+				if (check != 0) __result += (float)check * 0.01f;
+			}
+		}
+		
 		foreach (ModularSA modsa in GetAllModsaFromSkillModel_Fast(__instance)) {
 			int check = modsa.headsChanceAdder;
 			if (check != 0) __result += (float)check * 0.01f;
@@ -1498,19 +1506,16 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 	}
-	[HarmonyPatch(typeof(BattleActionModel), nameof(BattleActionModel.TryGetForcedCoinResult))]
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetForcedCoinResultOnAction))]
 	[HarmonyPostfix]
-	private static void Postfix_BattleActionModel_TryGetForcedCoinResult(
-		Il2CppSystem.Nullable<bool> isParrying,
-		ref COIN_RESULT result,
-		BattleActionModel oppoActionOrNull,
-		ref bool __result, BattleActionModel __instance)
+	private static void Postfix_BattleUnitModel_GetForcedCoinResultOnAction(
+		BattleActionModel action, ref COIN_RESULT __result, BattleUnitModel __instance)
 	{
-		if (__result) return;
-		BattleUnitModel unit = __instance._model;
+		if (__result != COIN_RESULT.NONE) return;
+		BattleUnitModel unit = __instance;
 		if (unit == null) return;
 		if (unit.TryCast<BattleUnitModel_Abnormality>() != null) return; //no cores please
-		SkillModel skill = __instance._skill;
+		SkillModel skill = action._skill;
 		if (skill == null) return;
 		
 		int actevent = MainClass.timingDict["TryForcedCoinResult"];
@@ -1518,11 +1523,10 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		foreach (ModularSA modsa in GetAllModsaFromSkillModel_Fast(skill)) {
 			if (modsa.activationTiming != actevent) continue;
 			modsa.valueList[9] = -1;
-			modsa.Enact(unit, skill, __instance, oppoActionOrNull, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			int check = modsa.valueList[9];
 			if (check > -1) {
-				__result = true;
-				result = check == 0 ? COIN_RESULT.TAIL : COIN_RESULT.HEAD;
+				__result = check == 0 ? COIN_RESULT.TAIL : COIN_RESULT.HEAD;
 				return;
 			}
 		}
@@ -1532,11 +1536,10 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				if (modsa.activationTiming != actevent) continue;
 				modsa.valueList[9] = -1;
 				modsa.modsa_passiveModel = passiveModel;
-				modsa.Enact(unit, skill, __instance, oppoActionOrNull, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 				int check = modsa.valueList[9];
 				if (check > -1) {
-					__result = true;
-					result = check == 0 ? COIN_RESULT.TAIL : COIN_RESULT.HEAD;
+					__result = check == 0 ? COIN_RESULT.TAIL : COIN_RESULT.HEAD;
 					return;
 				}
 			}
@@ -1552,11 +1555,10 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 						if (modsa.activationTiming != actevent) continue;
 						modsa.valueList[9] = -1;
 						modsa.modsa_passiveModel = passiveModel;
-						modsa.Enact(unit, skill, __instance, oppoActionOrNull, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+						modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 						int check = modsa.valueList[9];
 						if (check > -1) {
-							__result = true;
-							result = check == 0 ? COIN_RESULT.TAIL : COIN_RESULT.HEAD;
+							__result = check == 0 ? COIN_RESULT.TAIL : COIN_RESULT.HEAD;
 							return;
 						}
 					}
@@ -3384,12 +3386,11 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}*/
 	}
 
-	[HarmonyPatch(typeof(BattleEgoModel), nameof(BattleEgoModel.GetNeedResourceCount))]
+	/*
+	[HarmonyPatch(typeof(BattleEgoModel), nameof(BattleEgoModel.GetResourceNeedArray))]
 	[HarmonyPostfix]
 	private static void Postfix_BattleEgoModel_EGOUseCost(
-		ATTRIBUTE_TYPE attributeType,
-		bool isOverClock,
-		ref int __result,
+		ref Il2CppStructArray<AttributeNeed> __result,
 		BattleEgoModel __instance)
 	{
 		UnitSinModel sin = __instance.OriginSin;
@@ -3400,8 +3401,16 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		BattleActionModel action = sin._currentAction;
 		
 		int actevent = MainClass.timingDict["EGOCost"];
+
+		int need_wrath = 0;
 		
-		int sintype = attributeType == ATTRIBUTE_TYPE.NONE ? -1 : (int)attributeType;
+		foreach (AttributeNeed sinneed in __result)
+		{
+			ATTRIBUTE_TYPE attributeType = sinneed.attributeType;
+			int sintype = attributeType == ATTRIBUTE_TYPE.NONE ? -1 : (int)attributeType;
+			
+		}
+		
 		if (skill != null)
 		{
 			foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
@@ -3431,7 +3440,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				__result = modsa.valueList[8];
 			}
 		}
-	}
+	}*/
 
 	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.OpenSkillInfoUI))]
 	[HarmonyPrefix]
