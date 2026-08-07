@@ -2157,43 +2157,33 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	private static void Postfix_SkillModel_OnBeforeParryingOnce(BattleActionModel ownerAction, BattleActionModel oppoAction, SkillModel __instance)
 	{
 		int actevent = MainClass.timingDict["DuelClash"];
-		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (modsaDict.ContainsKey(skillmodel_intlong)) {
-			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-				modsa.Enact(ownerAction.Model, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+		BattleUnitModel unit = ownerAction._model;
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(__instance)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.Enact(unit, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+		}
+		
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.Enact(unit, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
-
-		foreach (PassiveModel passiveModel in ownerAction.Model._passiveDetail.PassiveList.CopyList()) {
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
-				modpa.modsa_passiveModel = passiveModel;
-				modpa.Enact(ownerAction.Model, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-			}
-		}
-		foreach (PassiveModel passiveModel in ownerAction.Model._passiveDetail.EgoPassiveList.CopyList())
-		{
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
-			{
-				modpa.modsa_passiveModel = passiveModel;
-				modpa.Enact(ownerAction.Model, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+		foreach (EgoPassiveModel passiveModel in unit._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.Enact(unit, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 		SupportPasPatch.SupportPassiveInit(modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
-		{
-			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
-			{
-				supportPassive._script._owner = ownerAction.Model;
-				modpaList[i].Enact(ownerAction.Model, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodelSupport(supportPassive)) {
+				if (modsa.activationTiming != actevent) continue;
+				supportPassive._script._owner = unit;
+				modsa.Enact(unit, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 	}
