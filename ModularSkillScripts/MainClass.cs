@@ -46,7 +46,7 @@ public class MainClass : BasePlugin
 			"OnDie", // 12
 			"OnOtherDie", // 13
 			"DuelClash", // 14
-			"DuelClashAfter", // 15
+			"AfterDuelClash", // 15
 			"OnSucceedEvade", // 16
 			"OnDefeatEvade", // 17
 			"OnStartBehaviour", // 18

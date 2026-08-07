@@ -2187,16 +2187,56 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 	}
-
-	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnBeforeParryingOnce_AfterLog))]
+	
+	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnAfterParryingOnce_BeforeLog))]
 	[HarmonyPostfix]
-	private static void Postfix_SkillModel_OnBeforeParryingOnce_AfterLog(BattleActionModel ownerAction, BattleActionModel oppoAction, SkillModel __instance)
+	private static void Postfix_SkillModel_OnAfterParryingOnceBeforeLog(PARRYING_RESULT reuslt,
+		BattleActionModel ownerAction,
+		BattleActionModel oppoAction,
+		BATTLE_EVENT_TIMING timing, SkillModel __instance)
 	{
-		int actevent = MainClass.timingDict["DuelClashAfter"];
-		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
-		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-			modsa.Enact(ownerAction.Model, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+		int actevent = MainClass.timingDict["AfterDuelClash"];
+		BattleUnitModel unit = ownerAction._model;
+
+		int parry_result = reuslt switch
+		{
+			PARRYING_RESULT.NONE => 0,
+			PARRYING_RESULT.DRAW => 0,
+			PARRYING_RESULT.LOSE => -1,
+			PARRYING_RESULT.WIN => 1,
+			_ => 0
+		};
+
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(__instance)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.valueList[9] = parry_result;
+			modsa.Enact(unit, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+		}
+		
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[9] = parry_result;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.Enact(unit, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+		foreach (EgoPassiveModel passiveModel in unit._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[9] = parry_result;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.Enact(unit, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodelSupport(supportPassive)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[9] = parry_result;
+				supportPassive._script._owner = unit;
+				modsa.Enact(unit, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
 		}
 	}
 
@@ -2620,18 +2660,6 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		{
 			modba.modsa_buffModel = __instance;
 			modba.Enact(unit, sin.GetSkill(), null, null, actevent, timing);
-		}
-	}
-
-	[HarmonyPatch(typeof(BuffModel), nameof(BuffModel.OnBeforeParryingOnce_AfterLog))]
-	[HarmonyPostfix]
-	private static void Postfix_BuffModel_OnBeforeParryingOnce_AfterLog(BattleActionModel ownerAction, BattleActionModel opponentAction, BuffModel __instance)
-	{
-		int actevent = MainClass.timingDict["DuelClash"];
-		foreach (ModularSA modba in GetAllModbaFromBuffModel(__instance))
-		{
-			modba.modsa_buffModel = __instance;
-			modba.Enact(ownerAction.Model, null, ownerAction, opponentAction, actevent, BATTLE_EVENT_TIMING.ON_START_DUEL);
 		}
 	}
 
