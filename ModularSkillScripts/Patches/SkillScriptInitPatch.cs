@@ -1731,36 +1731,32 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	private static void Postfix_BattleUnitModel_IgnoreBreak(ref bool __result, BattleUnitModel __instance)
 	{
 		int actevent = MainClass.timingDict["IgnoreBreak"];
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
-			{
-				modpa.ignorebreak = false;
-				modpa.modsa_passiveModel = passiveModel;
-				modpa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modpa.ignorebreak) __result = true;
+		foreach (PassiveModel passiveModel in __instance._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.ignorebreak = __result;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modsa.ignorebreak) __result = true;
 			}
 		}
-		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
-			{
-				modpa.ignorebreak = false;
-				modpa.modsa_passiveModel = egoPassiveModel;
-				modpa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modpa.ignorebreak) __result = true;
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.ignorebreak = __result;
+				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modsa.ignorebreak) __result = true;
 			}
 		}
 		SupportPasPatch.SupportPassiveInit(modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
-		{
-			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
-			{
-				modpaList[i].ignorebreak = false;
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodelSupport(supportPassive)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.ignorebreak = __result;
 				supportPassive._script._owner = __instance;
-				modpaList[i].Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modpaList[i].ignorebreak) __result = true;
+				modsa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modsa.ignorebreak) __result = true;
 			}
 		}
 	}
