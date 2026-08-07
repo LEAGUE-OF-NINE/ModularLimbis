@@ -1655,7 +1655,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	{
 		if (isInstantDeath) return;
 		int actevent = MainClass.timingDict["ImmortalOther"];
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
+		foreach (PassiveModel passiveModel in __instance._passiveDetail._passivelist.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.immortality = __result;
@@ -1666,7 +1666,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				__result = modsa.immortality;
 			}
 		}
-		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList()) {
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail._egoPassiveList.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.immortality = __result;
