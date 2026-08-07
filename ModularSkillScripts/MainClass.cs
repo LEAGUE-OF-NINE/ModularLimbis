@@ -429,6 +429,7 @@ public class MainClass : BasePlugin
 		acquirerDict["diduseskilllastturn"] = new AcquirerDidUseSkillLastTurn();
 		acquirerDict["isactionable"] = new AcquirerIsActionable();
 		acquirerDict["buffkeywordtoint"] = new AcquirerBufKeywordToInt();
+		acquirerDict["iscrit"] = new AcquirerIsCrit();
 
 		// Register Lua functions
 		luaFunctionDict["clearvalues"] = new ModularSkillScripts.LuaFunction.LuaFunctionClearValues();
