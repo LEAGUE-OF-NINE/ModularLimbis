@@ -1210,6 +1210,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			if (modsa.activationTiming != actevent) continue;
 			modsa.valueList[9] = finalDmgChange;
 			modsa.modsa_coinModel = coin;
+			modsa.wasCrit = isCritical;
 			modsa.Enact(__instance, skill, action, null, actevent, timing);
 			finalDmgChange = modsa.valueList[9];
 		}
@@ -1219,6 +1220,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			if (modsa.activationTiming != actevent) continue;
 			modsa.valueList[9] = finalDmgChange;
 			modsa.modsa_coinModel = coin;
+			modsa.wasCrit = isCritical;
 			modsa.Enact(__instance, skill, action, null, actevent, timing);
 			finalDmgChange = modsa.valueList[9];
 		}
@@ -1231,6 +1233,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.valueList[9] = finalDmgChange;
 				modsa.modsa_buffModel = buf;
 				modsa.modsa_coinModel = coin;
+				modsa.wasCrit = isCritical;
 				modsa.Enact(__instance, skill, action, null, actevent, timing);
 				finalDmgChange = modsa.valueList[9];
 			}
@@ -1244,6 +1247,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.valueList[9] = finalDmgChange;
 				modsa.modsa_passiveModel = passiveModel;
 				modsa.modsa_coinModel = coin;
+				modsa.wasCrit = isCritical;
 				modsa.Enact(__instance, skill, action, null, actevent, timing);
 				finalDmgChange = modsa.valueList[9];
 			}
@@ -1257,6 +1261,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.valueList[9] = finalDmgChange;
 				modsa.modsa_passiveModel = egoPassiveModel;
 				modsa.modsa_coinModel = coin;
+				modsa.wasCrit = isCritical;
 				modsa.Enact(__instance, skill, action, null, actevent, timing);
 				finalDmgChange = modsa.valueList[9];
 			}
