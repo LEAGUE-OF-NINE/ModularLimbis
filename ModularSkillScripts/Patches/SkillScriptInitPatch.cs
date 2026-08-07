@@ -1619,32 +1619,33 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	{
 		if (isInstantDeath) return;
 		int actevent = MainClass.timingDict["Immortal"];
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
-				modpa.immortality = false;
-				modpa.modsa_passiveModel = passiveModel;
-				modpa.Enact(__instance, null, null, null, actevent, timing);
-				if (modpa.immortality) __result = true;
+		foreach (PassiveModel passiveModel in __instance._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.immortality = __result;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.Enact(__instance, null, null, null, actevent, timing);
+				__result = modsa.immortality;
 			}
 		}
-		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList()) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
-				modpa.immortality = false;
-				modpa.modsa_passiveModel = egoPassiveModel;
-				modpa.Enact(__instance, null, null, null, actevent, timing);
-				if (modpa.immortality) __result = true;
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.immortality = __result;
+				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.Enact(__instance, null, null, null, actevent, timing);
+				__result = modsa.immortality;
 			}
 		}
 		SupportPasPatch.SupportPassiveInit(modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
-		{
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList) {
 			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
-			foreach (ModularSA modpa in modpaList)
-			{
-				modpa.immortality = false;
+			foreach (ModularSA modsa in modpaList) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.immortality = __result;
 				supportPassive._script._owner = __instance;
-				modpa.Enact(__instance, null, null, null, actevent, timing);
-				if (modpa.immortality) __result = true;
+				modsa.Enact(__instance, null, null, null, actevent, timing);
+				__result = modsa.immortality;
 			}
 		}
 	}
