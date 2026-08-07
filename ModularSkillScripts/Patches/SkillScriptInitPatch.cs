@@ -2751,137 +2751,6 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		SkillModel skill = action.Skill;
 		BattleUnitModel attacker = action.Model;
 		
-		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
-			if (modsa.activationTiming != actevent_OSA) continue;
-			modsa.lastFinalDmg = realDmg;
-			modsa.lastHpDmg = hpDamage;
-			modsa.wasCrit = isCritical;
-			modsa.modsa_coinModel = coin;
-			modsa.modsa_target_list.Clear();
-			modsa.modsa_target_list.Add(__instance);
-			modsa.Enact(attacker, skill, action, null, actevent_OSA, timing);
-		}
-
-		foreach (ModularSA modca in GetAllModcaFromCoinModel(coin)) {
-			if (modca.activationTiming != actevent_OSA) continue;
-			modca.lastFinalDmg = realDmg;
-			modca.lastHpDmg = hpDamage;
-			modca.wasCrit = isCritical;
-			//modca.wasClash = isWinDuel.HasValue;
-			//if (modca.wasClash) modca.wasWin = isWinDuel.Value;
-			modca.modsa_coinModel = coin;
-			modca.modsa_target_list.Clear();
-			modca.modsa_target_list.Add(__instance);
-			modca.Enact(attacker, skill, action, null, actevent_OSA, timing);
-		}
-		
-		foreach (BuffModel buffModel in attacker._buffDetail.GetActivatedBuffModelAll()) {
-			foreach (ModularSA modba in GetAllModbaFromBuffModel(buffModel)) {
-				if (modba.activationTiming != actevent_OSA) continue;
-				modba.lastFinalDmg = realDmg;
-				modba.lastHpDmg = hpDamage;
-				modba.wasCrit = isCritical;
-				modba.modsa_coinModel = coin;
-				modba.modsa_buffModel = buffModel;
-				modba.modsa_target_list.Clear();
-				modba.modsa_target_list.Add(__instance);
-				modba.Enact(attacker, skill, action, null, actevent_OSA, timing);
-			}
-		}
-
-		foreach (PassiveModel passiveModel in attacker._passiveDetail.PassiveList.CopyList()) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
-				if (modpa.activationTiming != actevent_OSA) continue;
-				modpa.lastFinalDmg = realDmg;
-				modpa.lastHpDmg = hpDamage;
-				modpa.wasCrit = isCritical;
-				modpa.modsa_coinModel = coin;
-				modpa.modsa_passiveModel = passiveModel;
-				modpa.modsa_target_list.Clear();
-				modpa.modsa_target_list.Add(__instance);
-				modpa.Enact(attacker, skill, action, null, actevent_OSA, timing);
-			}
-		}
-		foreach (EgoPassiveModel egoPassiveModel in attacker._passiveDetail.EgoPassiveList.CopyList()) {
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
-				if (modpa.activationTiming != actevent_OSA) continue;
-				modpa.lastFinalDmg = realDmg;
-				modpa.lastHpDmg = hpDamage;
-				modpa.wasCrit = isCritical;
-				modpa.modsa_coinModel = coin;
-				modpa.modsa_passiveModel = egoPassiveModel;
-				modpa.modsa_target_list.Clear();
-				modpa.modsa_target_list.Add(__instance);
-				modpa.Enact(attacker, skill, action, null, actevent_OSA, timing);
-			}
-		}
-		
-		BattleUnitModel_Abnormality_Part attacker_part = attacker.TryCast<BattleUnitModel_Abnormality_Part>();
-		BattleUnitModel attacker_core = attacker_part?._abnormality;
-		if (attacker_core != null)
-		{
-			foreach (BuffModel buffModel in attacker_core._buffDetail.GetActivatedBuffModelAll()) {
-				foreach (ModularSA modba in GetAllModbaFromBuffModel(buffModel)) {
-					if (modba.activationTiming != actevent_OSA) continue;
-					modba.lastFinalDmg = realDmg;
-					modba.lastHpDmg = hpDamage;
-					modba.wasCrit = isCritical;
-					modba.modsa_coinModel = coin;
-					modba.modsa_buffModel = buffModel;
-					modba.modsa_target_list.Clear();
-					modba.modsa_target_list.Add(__instance);
-					modba.Enact(attacker, skill, action, null, actevent_OSA, timing);
-				}
-			}
-			
-			foreach (PassiveModel passiveModel in attacker_core._passiveDetail.PassiveList.CopyList()) {
-				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
-					if (modpa.activationTiming != actevent_OSA) continue;
-					modpa.lastFinalDmg = realDmg;
-					modpa.lastHpDmg = hpDamage;
-					modpa.wasCrit = isCritical;
-					modpa.modsa_coinModel = coin;
-					modpa.modsa_passiveModel = passiveModel;
-					modpa.modsa_target_list.Clear();
-					modpa.modsa_target_list.Add(__instance);
-					modpa.Enact(attacker, skill, action, null, actevent_OSA, timing);
-				}
-			}
-			foreach (EgoPassiveModel egoPassiveModel in attacker_core._passiveDetail.EgoPassiveList.CopyList()) {
-				foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
-					if (modpa.activationTiming != actevent_OSA) continue;
-					modpa.lastFinalDmg = realDmg;
-					modpa.lastHpDmg = hpDamage;
-					modpa.wasCrit = isCritical;
-					modpa.modsa_coinModel = coin;
-					modpa.modsa_passiveModel = egoPassiveModel;
-					modpa.modsa_target_list.Clear();
-					modpa.modsa_target_list.Add(__instance);
-					modpa.Enact(attacker, skill, action, null, actevent_OSA, timing);
-				}
-			}
-		}
-		
-		
-		SupportPasPatch.SupportPassiveInit(modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
-		{
-			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
-			{
-				modpaList[i].lastFinalDmg = realDmg;
-				modpaList[i].lastHpDmg = hpDamage;
-				modpaList[i].wasCrit = isCritical;
-				modpaList[i].modsa_coinModel = coin;
-				supportPassive._script._owner = attacker;
-				modpaList[i].modsa_target_list.Clear();
-				modpaList[i].modsa_target_list.Add(__instance);
-				modpaList[i].Enact(attacker, skill, action, null, actevent_OSA, timing);
-			}
-		}
-
-		
-		
 		foreach (BuffModel buffModel in __instance._buffDetail.GetActivatedBuffModelAll()) {
 			foreach (ModularSA modba in GetAllModbaFromBuffModel(buffModel)) {
 				if (modba.activationTiming != actevent_WH) continue;
@@ -2974,21 +2843,147 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		
 		
 		SupportPasPatch.SupportPassiveInit(modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
-		{
-			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
-			{
-				modpaList[i].lastFinalDmg = realDmg;
-				modpaList[i].lastHpDmg = hpDamage;
-				modpaList[i].wasCrit = isCritical;
-				modpaList[i].modsa_coinModel = coin;
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodelSupport(supportPassive)) {
+				if (modsa.activationTiming != actevent_WH) continue;
+				modsa.lastFinalDmg = realDmg;
+				modsa.lastHpDmg = hpDamage;
+				modsa.wasCrit = isCritical;
+				modsa.modsa_coinModel = coin;
 				supportPassive._script._owner = attacker; 
-				modpaList[i].modsa_target_list.Clear();
-				modpaList[i].modsa_target_list.Add(__instance);
-				modpaList[i].Enact(attacker, skill, action, null, actevent_WH, timing);
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(__instance);
+				modsa.Enact(attacker, skill, action, null, actevent_WH, timing);
 			}
 		}
+		
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+			if (modsa.activationTiming != actevent_OSA) continue;
+			modsa.lastFinalDmg = realDmg;
+			modsa.lastHpDmg = hpDamage;
+			modsa.wasCrit = isCritical;
+			modsa.modsa_coinModel = coin;
+			modsa.modsa_target_list.Clear();
+			modsa.modsa_target_list.Add(__instance);
+			modsa.Enact(attacker, skill, action, null, actevent_OSA, timing);
+		}
+
+		foreach (ModularSA modca in GetAllModcaFromCoinModel(coin)) {
+			if (modca.activationTiming != actevent_OSA) continue;
+			modca.lastFinalDmg = realDmg;
+			modca.lastHpDmg = hpDamage;
+			modca.wasCrit = isCritical;
+			//modca.wasClash = isWinDuel.HasValue;
+			//if (modca.wasClash) modca.wasWin = isWinDuel.Value;
+			modca.modsa_coinModel = coin;
+			modca.modsa_target_list.Clear();
+			modca.modsa_target_list.Add(__instance);
+			modca.Enact(attacker, skill, action, null, actevent_OSA, timing);
+		}
+		
+		foreach (BuffModel buffModel in attacker._buffDetail.GetActivatedBuffModelAll()) {
+			foreach (ModularSA modba in GetAllModbaFromBuffModel(buffModel)) {
+				if (modba.activationTiming != actevent_OSA) continue;
+				modba.lastFinalDmg = realDmg;
+				modba.lastHpDmg = hpDamage;
+				modba.wasCrit = isCritical;
+				modba.modsa_coinModel = coin;
+				modba.modsa_buffModel = buffModel;
+				modba.modsa_target_list.Clear();
+				modba.modsa_target_list.Add(__instance);
+				modba.Enact(attacker, skill, action, null, actevent_OSA, timing);
+			}
+		}
+
+		foreach (PassiveModel passiveModel in attacker._passiveDetail.PassiveList.CopyList()) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modpa.activationTiming != actevent_OSA) continue;
+				modpa.lastFinalDmg = realDmg;
+				modpa.lastHpDmg = hpDamage;
+				modpa.wasCrit = isCritical;
+				modpa.modsa_coinModel = coin;
+				modpa.modsa_passiveModel = passiveModel;
+				modpa.modsa_target_list.Clear();
+				modpa.modsa_target_list.Add(__instance);
+				modpa.Enact(attacker, skill, action, null, actevent_OSA, timing);
+			}
+		}
+		foreach (EgoPassiveModel egoPassiveModel in attacker._passiveDetail.EgoPassiveList.CopyList()) {
+			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+				if (modpa.activationTiming != actevent_OSA) continue;
+				modpa.lastFinalDmg = realDmg;
+				modpa.lastHpDmg = hpDamage;
+				modpa.wasCrit = isCritical;
+				modpa.modsa_coinModel = coin;
+				modpa.modsa_passiveModel = egoPassiveModel;
+				modpa.modsa_target_list.Clear();
+				modpa.modsa_target_list.Add(__instance);
+				modpa.Enact(attacker, skill, action, null, actevent_OSA, timing);
+			}
+		}
+		
+		BattleUnitModel_Abnormality_Part attacker_part = attacker.TryCast<BattleUnitModel_Abnormality_Part>();
+		BattleUnitModel attacker_core = attacker_part?._abnormality;
+		if (attacker_core != null)
+		{
+			foreach (BuffModel buffModel in attacker_core._buffDetail.GetActivatedBuffModelAll()) {
+				foreach (ModularSA modba in GetAllModbaFromBuffModel(buffModel)) {
+					if (modba.activationTiming != actevent_OSA) continue;
+					modba.lastFinalDmg = realDmg;
+					modba.lastHpDmg = hpDamage;
+					modba.wasCrit = isCritical;
+					modba.modsa_coinModel = coin;
+					modba.modsa_buffModel = buffModel;
+					modba.modsa_target_list.Clear();
+					modba.modsa_target_list.Add(__instance);
+					modba.Enact(attacker, skill, action, null, actevent_OSA, timing);
+				}
+			}
+			
+			foreach (PassiveModel passiveModel in attacker_core._passiveDetail._passivelist.CopyList()) {
+				foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
+					if (modpa.activationTiming != actevent_OSA) continue;
+					modpa.lastFinalDmg = realDmg;
+					modpa.lastHpDmg = hpDamage;
+					modpa.wasCrit = isCritical;
+					modpa.modsa_coinModel = coin;
+					modpa.modsa_passiveModel = passiveModel;
+					modpa.modsa_target_list.Clear();
+					modpa.modsa_target_list.Add(__instance);
+					modpa.Enact(attacker, skill, action, null, actevent_OSA, timing);
+				}
+			}
+			foreach (EgoPassiveModel egoPassiveModel in attacker_core._passiveDetail._egoPassiveList.CopyList()) {
+				foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+					if (modpa.activationTiming != actevent_OSA) continue;
+					modpa.lastFinalDmg = realDmg;
+					modpa.lastHpDmg = hpDamage;
+					modpa.wasCrit = isCritical;
+					modpa.modsa_coinModel = coin;
+					modpa.modsa_passiveModel = egoPassiveModel;
+					modpa.modsa_target_list.Clear();
+					modpa.modsa_target_list.Add(__instance);
+					modpa.Enact(attacker, skill, action, null, actevent_OSA, timing);
+				}
+			}
+		}
+		
+		SupportPasPatch.SupportPassiveInit(modpaDict);
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodelSupport(supportPassive)) {
+				if (modsa.activationTiming != actevent_OSA) continue;
+				modsa.lastFinalDmg = realDmg;
+				modsa.lastHpDmg = hpDamage;
+				modsa.wasCrit = isCritical;
+				modsa.modsa_coinModel = coin;
+				supportPassive._script._owner = attacker;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(__instance);
+				modsa.Enact(attacker, skill, action, null, actevent_OSA, timing);
+			}
+		}
+		
 	}
 
 
