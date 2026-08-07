@@ -3151,54 +3151,75 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnKillTarget))]
 	[HarmonyPostfix]
-	private static void Postfix_BattleUnitModel_OnKillTarget(BattleActionModel actionOrNull, BattleUnitModel target, DAMAGE_SOURCE_TYPE dmgSrcType, BATTLE_EVENT_TIMING timing, BattleUnitModel killer, BattleUnitModel __instance)
+	private static void Postfix_BattleUnitModel_OnKillTarget(BattleActionModel actionOrNull, CoinModel coinOrNull, BattleUnitModel target, DAMAGE_SOURCE_TYPE dmgSrcType, BATTLE_EVENT_TIMING timing, BattleUnitModel killer, BattleUnitModel __instance)
 	{
-		if (actionOrNull == null || actionOrNull.Skill == null) return;
+		BattleUnitModel unit = __instance;
+		SkillModel skill = actionOrNull?._skill;
 		int actevent = MainClass.timingDict["EnemyKill"];
-		SkillModel skill = actionOrNull.Skill;
-		long skillmodel_intlong = skill.Pointer.ToInt64();
-		if (modsaDict.ContainsKey(skillmodel_intlong)) {
-			foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+		
+		foreach (BuffModel buf in unit.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buf)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_buffModel = buf;
+				modsa.modsa_coinModel = coinOrNull;
 				modsa.modsa_victimModel = target;
-				modsa.modsa_killerModel = __instance;
-				modsa.Enact(__instance, skill, actionOrNull, null, actevent, timing);
+				modsa.modsa_killerModel = unit;
+				modsa.Enact(unit, skill, actionOrNull, null, actevent, timing);
 			}
 		}
 
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong]) {
-				modpa.modsa_passiveModel = passiveModel;
-				modpa.modsa_victimModel = target;
-				modpa.modsa_killerModel = __instance;
-				modpa.Enact(__instance, skill, actionOrNull, null, actevent, timing);
-			}
-		}
-		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
+		if (skill != null)
 		{
-			if (!egoPassiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = egoPassiveModel.Pointer.ToInt64();
-			if (!modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in modpaDict[passiveModel_intlong])
-			{
-				modpa.modsa_passiveModel = egoPassiveModel;
-				modpa.modsa_victimModel = target;
-				modpa.modsa_killerModel = __instance;
-				modpa.Enact(__instance, skill, actionOrNull, null, actevent, timing);
+			foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_coinModel = coinOrNull;
+				modsa.modsa_victimModel = target;
+				modsa.modsa_killerModel = unit;
+				modsa.Enact(unit, skill, actionOrNull, null, actevent, timing);
 			}
 		}
+
+		if (coinOrNull != null)
+		{
+			foreach (ModularSA modsa in GetAllModcaFromCoinModel(coinOrNull)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_coinModel = coinOrNull;
+				modsa.modsa_victimModel = target;
+				modsa.modsa_killerModel = unit;
+				modsa.Enact(unit, skill, actionOrNull, null, actevent, timing);
+			}
+		}
+		
+		foreach (PassiveModel pasmodel in unit._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.modsa_coinModel = coinOrNull;
+				modsa.modsa_victimModel = target;
+				modsa.modsa_killerModel = unit;
+				modsa.Enact(unit, skill, actionOrNull, null, actevent, timing);
+			}
+		}
+		foreach (EgoPassiveModel pasmodel in unit._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.modsa_coinModel = coinOrNull;
+				modsa.modsa_victimModel = target;
+				modsa.modsa_killerModel = unit;
+				modsa.Enact(unit, skill, actionOrNull, null, actevent, timing);
+			}
+		}
+		
 		SupportPasPatch.SupportPassiveInit(modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
-		{
-			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
-			{
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodelSupport(supportPassive)) {
+				if (modsa.activationTiming != actevent) continue;
 				supportPassive._script._owner = __instance;
-				modpaList[i].Enact(__instance, skill, actionOrNull, null, actevent, timing);
+				modsa.modsa_coinModel = coinOrNull;
+				modsa.modsa_victimModel = target;
+				modsa.modsa_killerModel = unit;
+				modsa.Enact(__instance, skill, actionOrNull, null, actevent, timing);
 			}
 		}
 	}
