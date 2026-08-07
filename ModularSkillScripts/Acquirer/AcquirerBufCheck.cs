@@ -7,11 +7,24 @@ public class AcquirerBufCheck : IModularAcquirer
 {
 	public int ExecuteAcquirer(ModularSA modular, string section, string circledSection, string[] circles)
 	{
-		BattleUnitModel targetModel = modular.GetTargetModel(circles[0]);
-		if (targetModel == null) return -1;
-		int circles_length = circles.Length;
+		int total = 0;
+		var modelList = modular.GetTargetModelList(circles[0]);
+		if (modelList.Count < 1) return -1;
+
 		BUFF_UNIQUE_KEYWORD buf_keyword = CustomBuffs.ParseBuffUniqueKeyword(circles[1]);
-		BattleUnitBuffManager instance = Singleton<BattleUnitBuffManager>.Instance;
+		BattleUnitBuffManager bufManager = Singleton<BattleUnitBuffManager>.Instance;
+		foreach (BattleUnitModel unit in modelList)
+		{
+			if (unit == null) continue;
+			total += BufCheck(unit, circles, buf_keyword, bufManager);
+		}
+
+		return total;
+	}
+
+	public int BufCheck(BattleUnitModel targetModel, string[] circles, BUFF_UNIQUE_KEYWORD buf_keyword, BattleUnitBuffManager bufManager)
+	{
+		int circles_length = circles.Length;
 		BuffDetail bufDetail = targetModel._buffDetail;
 		int stack = 0;
 		int turn = 0;
@@ -55,9 +68,9 @@ public class AcquirerBufCheck : IModularAcquirer
 			"turn" => turn,
 			"+" => stack + turn,
 			"*" => stack * turn,
-			"consumed" => instance.GetUsedBuffTurn(targetModel.InstanceID, buf_keyword), // keep compatibility
-			"turnConsumed" => instance.GetUsedBuffTurn(targetModel.InstanceID, buf_keyword),
-			"stackConsumed" => instance.GetUsedBuffStack(targetModel.InstanceID, buf_keyword),
+			"consumed" => bufManager.GetUsedBuffTurn(targetModel.InstanceID, buf_keyword), // keep compatibility
+			"turnConsumed" => bufManager.GetUsedBuffTurn(targetModel.InstanceID, buf_keyword),
+			"stackConsumed" => bufManager.GetUsedBuffStack(targetModel.InstanceID, buf_keyword),
  			_ => stack
 		};
 	}
