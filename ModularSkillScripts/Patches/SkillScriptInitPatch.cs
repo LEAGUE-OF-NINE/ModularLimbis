@@ -3348,48 +3348,46 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		int actevent = MainClass.timingDict["OnCoinAfterAttack"];
 		SkillModel skill = action.Skill;
 		
-		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill))
-		{
+		foreach (BuffModel buffModel in __instance.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buffModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_coinModel = coin;
+				modsa.modsa_buffModel = buffModel;
+				modsa.lastFinalDmg = value;
+				modsa.Enact(__instance, skill, action, null, actevent, timing);
+			}
+		}
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+			if (modsa.activationTiming != actevent) continue;
 			modsa.modsa_coinModel = coin;
 			modsa.lastFinalDmg = value;
 			modsa.Enact(__instance, skill, action, null, actevent, timing);
 		}
 		
-		foreach (ModularSA modca in GetAllModcaFromCoinModel(coin)) {
-			modca.modsa_coinModel = coin;
-			modca.lastFinalDmg = value;
-			modca.Enact(__instance, skill, action, null, actevent, timing);
+		foreach (ModularSA modsa in GetAllModcaFromCoinModel(coin)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.modsa_coinModel = coin;
+			modsa.lastFinalDmg = value;
+			modsa.Enact(__instance, skill, action, null, actevent, timing);
 		}
-
-		foreach (BuffModel buffModel in __instance._buffDetail.GetActivatedBuffModelAll())
-		{
-			foreach (ModularSA modba in GetAllModbaFromBuffModel(buffModel))
-			{
-				modba.modsa_coinModel = coin;
-				modba.modsa_buffModel = buffModel;
-				modba.lastFinalDmg = value;
-				modba.Enact(__instance, skill, action, null, actevent, timing);
+		
+		foreach (PassiveModel passiveModel in __instance._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_coinModel = coin;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.lastFinalDmg = value;
+				modsa.Enact(__instance, skill, action, null, actevent, timing);
 			}
 		}
-
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
-			{
-				modpa.modsa_coinModel = coin;
-				modpa.modsa_passiveModel = passiveModel;
-				modpa.lastFinalDmg = value;
-				modpa.Enact(__instance, skill, action, null, actevent, timing);
-			}
-		}
-		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
-			{
-				modpa.modsa_coinModel = coin;
-				modpa.modsa_passiveModel = egoPassiveModel;
-				modpa.lastFinalDmg = value;
-				modpa.Enact(__instance, skill, action, null, actevent, timing);
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_coinModel = coin;
+				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.lastFinalDmg = value;
+				modsa.Enact(__instance, skill, action, null, actevent, timing);
 			}
 		}
 		
