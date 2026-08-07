@@ -1655,42 +1655,37 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	{
 		if (isInstantDeath) return;
 		int actevent = MainClass.timingDict["ImmortalOther"];
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
-			{
-				modpa.immortality = false;
-				modpa.modsa_passiveModel = passiveModel;
-				modpa.modsa_target_list.Clear();
-				modpa.modsa_target_list.Add(checkTarget);
-				modpa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modpa.immortality) __result = true;
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.immortality = __result;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(checkTarget);
+				modsa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.immortality;
 			}
 		}
-		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
-			{
-				modpa.immortality = false;
-				modpa.modsa_passiveModel = egoPassiveModel;
-				modpa.modsa_target_list.Clear();
-				modpa.modsa_target_list.Add(checkTarget);
-				modpa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modpa.immortality) __result = true;
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.immortality = __result;
+				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(checkTarget);
+				modsa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.immortality;
 			}
 		}
 		SupportPasPatch.SupportPassiveInit(modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
-		{
-			List<ModularSA> modpaList = GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
-			{
-				modpaList[i].immortality = false;
+		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList) {
+			foreach(ModularSA modsa in GetAllModpaFromPasmodelSupport(supportPassive)) {
+				modsa.immortality = __result;
 				supportPassive._script._owner = __instance;
-				modpaList[i].modsa_target_list.Clear();
-				modpaList[i].modsa_target_list.Add(checkTarget);
-				modpaList[i].Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modpaList[i].immortality) __result = true;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(checkTarget);
+				modsa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.immortality;
 			}
 		}
 	}
