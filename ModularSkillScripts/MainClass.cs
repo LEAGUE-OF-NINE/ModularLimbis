@@ -380,6 +380,7 @@ public class MainClass : BasePlugin
 		acquirerDict["bufmaxstackadderiskeyword"] = new AcquirerBufMaxAdderIsKeyword(0);
 		acquirerDict["bufmaxturnadderiskeyword"] = new AcquirerBufMaxAdderIsKeyword(1);
 		acquirerDict["bufkeywordtoint"] = new AcquirerBufKeywordToInt();
+		acquirerDict["weighteddamage"] = new AcquirerWeightedDamage();
 		
 		// legacy acquirers
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();
