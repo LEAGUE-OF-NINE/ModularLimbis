@@ -786,7 +786,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		BattleObjectManager battleObjManager_inst = SingletonBehavior<BattleObjectManager>.Instance;
 		foreach (BattleUnitModel unit in battleObjManager_inst.GetAliveListExceptSelf(deadUnit, false, false))
 		{
-			foreach (PassiveModel pasmodel in __instance._passivelist.CopyList()) {
+			foreach (PassiveModel pasmodel in unit._passiveDetail._passivelist.CopyList()) {
 				foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
 					if (modsa.activationTiming != actevent_OnOtherDie) continue;
 					modsa.modsa_passiveModel = pasmodel;
@@ -797,7 +797,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 					modsa.Enact(unit, null, actionOrNull, null, actevent_OnOtherDie, timing);
 				}
 			}
-			foreach (EgoPassiveModel pasmodel in __instance._egoPassiveList.CopyList()) {
+			foreach (EgoPassiveModel pasmodel in unit._passiveDetail._egoPassiveList.CopyList()) {
 				foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel, false)) {
 					if (modsa.activationTiming != actevent_OnOtherDie) continue;
 					modsa.modsa_passiveModel = pasmodel;
