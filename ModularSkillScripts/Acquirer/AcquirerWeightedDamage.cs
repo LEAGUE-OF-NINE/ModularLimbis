@@ -8,6 +8,7 @@ public class AcquirerWeightedDamage : IModularAcquirer
 	public int ExecuteAcquirer(ModularSA modular, string section, string circledSection, string[] circles)
 	{
 		int dmg = modular.valueList[9];
+		if (dmg < 2) return dmg;
 		BattleUnitModel victim = modular.modsa_victimModel;
 		if (victim == null) return dmg;
 		List<BattleUnitModel> targetList = modular.modsa_selfAction.GetAliveTargetUnitModelList();
@@ -27,7 +28,7 @@ public class AcquirerWeightedDamage : IModularAcquirer
 		
 		if (hp_max_total < 2) return dmg;
 		float hp_ratio = (float)hp_max_victim / hp_max_total;
-		
+		hp_ratio = Math.Clamp(hp_ratio + 0.03f, 0.05f, 0.98f);
 		return (int)MathF.Ceiling(dmg * hp_ratio);
 	}
 }
