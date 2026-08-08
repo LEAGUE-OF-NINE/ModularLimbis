@@ -1211,6 +1211,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			modsa.valueList[9] = finalDmgChange;
 			modsa.modsa_coinModel = coin;
 			modsa.wasCrit = isCritical;
+			modsa.modsa_target_list.Clear();
+			modsa.modsa_target_list.Add(target);
+			modsa.modsa_victimModel = target;
 			modsa.Enact(__instance, skill, action, null, actevent, timing);
 			finalDmgChange = modsa.valueList[9];
 		}
@@ -1221,6 +1224,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			modsa.valueList[9] = finalDmgChange;
 			modsa.modsa_coinModel = coin;
 			modsa.wasCrit = isCritical;
+			modsa.modsa_target_list.Clear();
+			modsa.modsa_target_list.Add(target);
+			modsa.modsa_victimModel = target;
 			modsa.Enact(__instance, skill, action, null, actevent, timing);
 			finalDmgChange = modsa.valueList[9];
 		}
@@ -1234,6 +1240,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_buffModel = buf;
 				modsa.modsa_coinModel = coin;
 				modsa.wasCrit = isCritical;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(target);
+				modsa.modsa_victimModel = target;
 				modsa.Enact(__instance, skill, action, null, actevent, timing);
 				finalDmgChange = modsa.valueList[9];
 			}
@@ -1248,6 +1257,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_passiveModel = passiveModel;
 				modsa.modsa_coinModel = coin;
 				modsa.wasCrit = isCritical;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(target);
+				modsa.modsa_victimModel = target;
 				modsa.Enact(__instance, skill, action, null, actevent, timing);
 				finalDmgChange = modsa.valueList[9];
 			}
@@ -1262,6 +1274,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_passiveModel = egoPassiveModel;
 				modsa.modsa_coinModel = coin;
 				modsa.wasCrit = isCritical;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(target);
+				modsa.modsa_victimModel = target;
 				modsa.Enact(__instance, skill, action, null, actevent, timing);
 				finalDmgChange = modsa.valueList[9];
 			}
