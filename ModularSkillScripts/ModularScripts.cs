@@ -611,7 +611,7 @@ public class ModularSA : Il2CppSystem.Object
 		if (param_sub_list.Length > 1) {
 			foreach (string param_sub in param_sub_list) {
 				List<BattleUnitModel> unitList_sub = null;
-				bool except = param_sub.StartsWith("EXC:");
+				bool except = param_sub.StartsWith("EXC");
 				if (except) {
 					string param_exc = param_sub.Remove(0, 4);
 					unitList_sub = GetTargetModelList(param_exc);
