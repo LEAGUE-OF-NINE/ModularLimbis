@@ -3302,24 +3302,27 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	{
 		int actevent = MainClass.timingDict["OnCoinToss"];
 		SkillModel skill = action.Skill;
-		
-		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
-			if (modsa.activationTiming != actevent) continue;
-			modsa.modsa_coinModel = coin;
-			modsa.Enact(__instance, skill, action, null, actevent, timing);
-		}
-		
-		foreach (ModularSA modsa in GetAllModcaFromCoinModel(coin)) {
-			if (modsa.activationTiming != actevent) continue;
-			modsa.modsa_coinModel = coin;
-			modsa.Enact(__instance, skill, action, null, actevent, timing);
-		}
 
 		foreach (BuffModel buffModel in __instance._buffDetail.GetActivatedBuffModelAll()) {
 			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buffModel)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_coinModel = coin;
 				modsa.modsa_buffModel = buffModel;
+				modsa.Enact(__instance, skill, action, null, actevent, timing);
+			}
+		}
+
+		if (__instance.TryCast<BattleUnitModel_Abnormality>() == null) // No Cores Please
+		{
+			foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_coinModel = coin;
+				modsa.Enact(__instance, skill, action, null, actevent, timing);
+			}
+		
+			foreach (ModularSA modsa in GetAllModcaFromCoinModel(coin)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_coinModel = coin;
 				modsa.Enact(__instance, skill, action, null, actevent, timing);
 			}
 		}
