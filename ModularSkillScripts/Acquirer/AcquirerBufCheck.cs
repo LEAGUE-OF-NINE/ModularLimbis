@@ -1,4 +1,5 @@
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using Il2CppSystem.Collections.Generic;
 using Lethe.Patches;
 
 namespace ModularSkillScripts.Acquirer;
@@ -8,7 +9,7 @@ public class AcquirerBufCheck : IModularAcquirer
 	public int ExecuteAcquirer(ModularSA modular, string section, string circledSection, string[] circles)
 	{
 		int total = 0;
-		var modelList = modular.GetTargetModelList(circles[0]);
+		List<BattleUnitModel> modelList = modular.GetTargetModelList(circles[0]);
 		if (modelList.Count < 1) return -1;
 
 		BUFF_UNIQUE_KEYWORD buf_keyword = CustomBuffs.ParseBuffUniqueKeyword(circles[1]);
