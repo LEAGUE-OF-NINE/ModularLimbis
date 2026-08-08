@@ -613,7 +613,7 @@ public class ModularSA : Il2CppSystem.Object
 				List<BattleUnitModel> unitList_sub = null;
 				bool except = param_sub.StartsWith("EXC");
 				if (except) {
-					string param_exc = param_sub.Remove(0, 4);
+					string param_exc = param_sub.Remove(0, 3);
 					unitList_sub = GetTargetModelList(param_exc);
 					unitList.RemoveAll(new Func<BattleUnitModel, bool>(x => unitList_sub.Contains(x)));
 				} else {
