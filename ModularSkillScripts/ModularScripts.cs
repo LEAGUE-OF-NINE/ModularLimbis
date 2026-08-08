@@ -606,6 +606,26 @@ public class ModularSA : Il2CppSystem.Object
 	public List<BattleUnitModel> GetTargetModelList(string param)
 	{
 		List<BattleUnitModel> unitList = new List<BattleUnitModel>(8);
+		
+		string[] param_sub_list = param.Split('+', StringSplitOptions.RemoveEmptyEntries);
+		if (param_sub_list.Length > 1) {
+			foreach (string param_sub in param_sub_list) {
+				List<BattleUnitModel> unitList_sub = null;
+				bool except = param_sub.StartsWith("EXC:");
+				if (except) {
+					string param_exc = param_sub.Remove(0, 4);
+					unitList_sub = GetTargetModelList(param_exc);
+					unitList.RemoveAll(new Func<BattleUnitModel, bool>(x => unitList_sub.Contains(x)));
+				} else {
+					unitList_sub = GetTargetModelList(param_sub);
+					foreach (BattleUnitModel x in unitList_sub) {
+						if (!unitList.Contains(x)) unitList.Add(x);
+					}
+				}
+			}
+			return unitList;
+		}
+		
 		SinManager sinManager_inst = Singleton<SinManager>.Instance;
 		BattleObjectManager battleObjectManager = sinManager_inst._battleObjectManager;
 
