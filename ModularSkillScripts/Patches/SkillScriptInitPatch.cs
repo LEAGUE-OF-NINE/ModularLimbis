@@ -3419,6 +3419,106 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}*/
 	}
 
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetMpUsageByEgoAdder))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_GetMpUsageByEgoAdder(
+		int originUsage,
+		BattleActionModel actionNullable,
+		BattleEgoModel egoModelNullable,
+		bool isOverclock,
+		ref int __result,
+		BattleUnitModel __instance)
+	{
+		BattleUnitModel unit = __instance;
+		if (unit == null) return;
+		SkillModel skill = actionNullable?._skill;
+		
+		int actevent = MainClass.timingDict["EGOCostMP"];
+		
+		if (skill != null)
+		{
+			foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[9] = originUsage + __result;
+				modsa.valueList[8] = isOverclock ? 1 : 0;
+				modsa.Enact(unit, skill, actionNullable, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[9] - originUsage;
+			}
+		}
+
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.valueList[9] = originUsage + __result;
+				modsa.valueList[8] = isOverclock ? 1 : 0;
+				modsa.Enact(unit, skill, actionNullable, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[9] - originUsage;
+			}
+		}
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.valueList[9] = originUsage + __result;
+				modsa.valueList[8] = isOverclock ? 1 : 0;
+				modsa.Enact(unit, skill, actionNullable, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[9] - originUsage;
+			}
+		}
+	}
+	
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetAttributeUseCostAdderByAttributeStock))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_EGOUseCost(
+		UnitSinModel sinModel,
+		ATTRIBUTE_TYPE type,
+		int originCost,
+		bool isOverClock,
+		ref int __result,
+		BattleUnitModel __instance)
+	{
+		int actevent = MainClass.timingDict["EGOCost"];
+		SkillModel skill = sinModel.GetSkill();
+		BattleActionModel action = sinModel._currentAction;
+		int sintype = type == ATTRIBUTE_TYPE.NONE ? -1 : (int)type;
+		
+		if (skill != null)
+		{
+			foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[9] = originCost + __result;
+				modsa.valueList[8] = isOverClock ? 1 : 0;
+				modsa.valueList[7] = sintype;
+				modsa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[9] - originCost;
+			}
+		}
+
+		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.valueList[9] = originCost + __result;
+				modsa.valueList[8] = isOverClock ? 1 : 0;
+				modsa.valueList[7] = sintype;
+				modsa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[9] - originCost;
+			}
+		}
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.valueList[9] = originCost + __result;
+				modsa.valueList[8] = isOverClock ? 1 : 0;
+				modsa.valueList[7] = sintype;
+				modsa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[9] - originCost;
+			}
+		}
+	}
+	
 	/*
 	[HarmonyPatch(typeof(BattleEgoModel), nameof(BattleEgoModel.GetResourceNeedArray))]
 	[HarmonyPostfix]
@@ -3426,7 +3526,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		ref Il2CppStructArray<AttributeNeed> __result,
 		BattleEgoModel __instance)
 	{
-		UnitSinModel sin = __instance.OriginSin;
+		UnitSinModel sin = __instance._originSin;
 		if (sin == null) return;
 		BattleUnitModel unit = sin.Model;
 		if (unit == null) return;
@@ -3434,43 +3534,148 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		BattleActionModel action = sin._currentAction;
 		
 		int actevent = MainClass.timingDict["EGOCost"];
-
-		int need_wrath = 0;
 		
-		foreach (AttributeNeed sinneed in __result)
+		int need_crimson = 0;
+		int need_scarlet = 0;
+		int need_amber = 0;
+		int need_shamrock = 0;
+		int need_azure = 0;
+		int need_indigo = 0;
+		int need_violet = 0;
+		
+		for (int i = 0; i < __result.Count; i++)
 		{
-			ATTRIBUTE_TYPE attributeType = sinneed.attributeType;
-			int sintype = attributeType == ATTRIBUTE_TYPE.NONE ? -1 : (int)attributeType;
-			
+			AttributeNeed sinneed = __result[i];
+			switch (sinneed.attributeType)
+			{
+				case ATTRIBUTE_TYPE.CRIMSON: {
+					need_crimson = sinneed.need;
+				} break;
+				case ATTRIBUTE_TYPE.SCARLET: {
+					need_scarlet = sinneed.need;
+				} break;
+				case ATTRIBUTE_TYPE.AMBER: {
+					need_amber = sinneed.need;
+				} break;
+				case ATTRIBUTE_TYPE.SHAMROCK: {
+					need_shamrock = sinneed.need;
+				} break;
+				case ATTRIBUTE_TYPE.AZURE: {
+					need_azure = sinneed.need;
+				} break;
+				case ATTRIBUTE_TYPE.INDIGO: {
+					need_indigo = sinneed.need;
+				} break;
+				case ATTRIBUTE_TYPE.VIOLET: {
+					need_violet = sinneed.need;
+				} break;
+				default: {
+					// Do nothing
+				} break;
+			}
 		}
 		
 		if (skill != null)
 		{
 			foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = sintype;
-				modsa.valueList[8] = __result;
+				modsa.valueList[0] = need_crimson;
+				modsa.valueList[1] = need_scarlet;
+				modsa.valueList[2] = need_amber;
+				modsa.valueList[3] = need_shamrock;
+				modsa.valueList[4] = need_azure;
+				modsa.valueList[5] = need_indigo;
+				modsa.valueList[6] = need_violet;
 				modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[8];
+				need_crimson = modsa.valueList[0];
+				need_scarlet = modsa.valueList[1];
+				need_amber = modsa.valueList[2];
+				need_shamrock = modsa.valueList[3];
+				need_azure = modsa.valueList[4];
+				need_indigo = modsa.valueList[5];
+				need_violet = modsa.valueList[6];
 			}
 		}
 
 		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = sintype;
-				modsa.valueList[8] = __result;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.valueList[0] = need_crimson;
+				modsa.valueList[1] = need_scarlet;
+				modsa.valueList[2] = need_amber;
+				modsa.valueList[3] = need_shamrock;
+				modsa.valueList[4] = need_azure;
+				modsa.valueList[5] = need_indigo;
+				modsa.valueList[6] = need_violet;
 				modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[8];
+				need_crimson = modsa.valueList[0];
+				need_scarlet = modsa.valueList[1];
+				need_amber = modsa.valueList[2];
+				need_shamrock = modsa.valueList[3];
+				need_azure = modsa.valueList[4];
+				need_indigo = modsa.valueList[5];
+				need_violet = modsa.valueList[6];
 			}
 		}
 		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail._egoPassiveList.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = sintype;
-				modsa.valueList[8] = __result;
+				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.valueList[0] = need_crimson;
+				modsa.valueList[1] = need_scarlet;
+				modsa.valueList[2] = need_amber;
+				modsa.valueList[3] = need_shamrock;
+				modsa.valueList[4] = need_azure;
+				modsa.valueList[5] = need_indigo;
+				modsa.valueList[6] = need_violet;
 				modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[8];
+				need_crimson = modsa.valueList[0];
+				need_scarlet = modsa.valueList[1];
+				need_amber = modsa.valueList[2];
+				need_shamrock = modsa.valueList[3];
+				need_azure = modsa.valueList[4];
+				need_indigo = modsa.valueList[5];
+				need_violet = modsa.valueList[6];
+			}
+		}
+		
+		for (int i = 0; i < __result.Count; i++)
+		{
+			AttributeNeed sinneed = __result[i];
+			switch (sinneed.attributeType)
+			{
+				case ATTRIBUTE_TYPE.CRIMSON: {
+					AttributeNeed sinneed_new = new() {attributeType = sinneed.attributeType, need = need_crimson, current = sinneed.current};
+					__result[i] = sinneed_new;
+				} break;
+				case ATTRIBUTE_TYPE.SCARLET: {
+					AttributeNeed sinneed_new = new() {attributeType = sinneed.attributeType, need = need_scarlet, current = sinneed.current};
+					__result[i] = sinneed_new;
+				} break;
+				case ATTRIBUTE_TYPE.AMBER: {
+					AttributeNeed sinneed_new = new() {attributeType = sinneed.attributeType, need = need_amber, current = sinneed.current};
+					__result[i] = sinneed_new;
+				} break;
+				case ATTRIBUTE_TYPE.SHAMROCK: {
+					AttributeNeed sinneed_new = new() {attributeType = sinneed.attributeType, need = need_shamrock, current = sinneed.current};
+					__result[i] = sinneed_new;
+				} break;
+				case ATTRIBUTE_TYPE.AZURE: {
+					AttributeNeed sinneed_new = new() {attributeType = sinneed.attributeType, need = need_azure, current = sinneed.current};
+					__result[i] = sinneed_new;
+				} break;
+				case ATTRIBUTE_TYPE.INDIGO: {
+					AttributeNeed sinneed_new = new() {attributeType = sinneed.attributeType, need = need_indigo, current = sinneed.current};
+					__result[i] = sinneed_new;
+				} break;
+				case ATTRIBUTE_TYPE.VIOLET: {
+					AttributeNeed sinneed_new = new() {attributeType = sinneed.attributeType, need = need_violet, current = sinneed.current};
+					__result[i] = sinneed_new;
+				} break;
+				default: {
+					// Do nothing
+				} break;
 			}
 		}
 	}*/
