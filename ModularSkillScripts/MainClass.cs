@@ -278,6 +278,7 @@ public class MainClass : BasePlugin
 		consequenceDict["partdestroy"] = new ConsequencePartDestroy();
 		consequenceDict["playcustomsound"] = new ConsequencePlayCustomSound();
 		consequenceDict["stopcustomsound"] = new ConsequenceStopSound();
+		consequenceDict["stopsound"] = new ConsequenceStopVSound();
 		// legacy consequences
 		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
 		consequenceDict["buf"] = new ConsequenceBuf();
