@@ -3421,7 +3421,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetMpUsageByEgoAdder))]
 	[HarmonyPostfix]
-	private static void Postfix_BattleUnitModel_GetMpUsageByEgoAdder(
+	private static void Postfix_SkillModel_GetMpUsage(
 		int originUsage,
 		BattleActionModel actionNullable,
 		BattleEgoModel egoModelNullable,
@@ -3431,19 +3431,20 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	{
 		BattleUnitModel unit = __instance;
 		if (unit == null) return;
-		SkillModel skill = actionNullable?._skill;
+		SkillModel skill = null;
+		if (actionNullable != null) skill = actionNullable._skill;
+		else if (egoModelNullable?._awakeningSkillModel != null) skill = egoModelNullable._awakeningSkillModel;
+		else if (egoModelNullable?._corrosionSkillModel != null) skill = egoModelNullable._corrosionSkillModel;
+		else return;
 		
 		int actevent = MainClass.timingDict["EGOCostMP"];
 		
-		if (skill != null)
-		{
-			foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
-				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = originUsage + __result;
-				modsa.valueList[8] = isOverclock ? 1 : 0;
-				modsa.Enact(unit, skill, actionNullable, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[9] - originUsage;
-			}
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.valueList[9] = originUsage + __result;
+			modsa.valueList[8] = isOverclock ? 1 : 0;
+			modsa.Enact(unit, skill, actionNullable, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			__result = modsa.valueList[9] - originUsage;
 		}
 
 		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist.CopyList()) {
@@ -3468,6 +3469,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 	}
 	
+	/*
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetAttributeUseCostAdderByAttributeStock))]
 	[HarmonyPostfix]
 	private static void Postfix_BattleUnitModel_EGOUseCost(
@@ -3495,7 +3497,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
+		foreach (PassiveModel passiveModel in __instance._passiveDetail._passivelist.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = passiveModel;
@@ -3506,7 +3508,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				__result = modsa.valueList[9] - originCost;
 			}
 		}
-		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList()) {
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail._egoPassiveList.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = egoPassiveModel;
@@ -3517,7 +3519,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				__result = modsa.valueList[9] - originCost;
 			}
 		}
-	}
+	}*/
 	
 	/*
 	[HarmonyPatch(typeof(BattleEgoModel), nameof(BattleEgoModel.GetResourceNeedArray))]
