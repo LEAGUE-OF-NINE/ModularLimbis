@@ -131,51 +131,6 @@ public class FakePowerPatches
 			}
 		}
 	}
-/*
-	[HarmonyPatch(typeof(SkillModelManager), nameof(SkillModelManager.GetExpectedWinRate))]
-	[HarmonyPrefix]
-	private static void Postfix_SkillModelManager_GetExpectedWinRate(BattleActionModel selfAction, BattleActionModel oppoAction)
-	{
-		foreach (long key in SkillScriptInitPatch.modpaDict.Keys) {
-			List<ModularSA> value = SkillScriptInitPatch.modpaDict[key];
-			foreach (ModularSA modular in value) {
-				if (modular.activationTiming != actevent_FakePower) continue;
-				modular.ResetAdders();
-			}
-		}
-		SkillAbility_RingFingerFavuismTestEffectOnSetTarget
-		long skillmodel_intlong = selfAction.Skill.Pointer.ToInt64();
-		if (SkillScriptInitPatch.modsaDict.ContainsKey(skillmodel_intlong)) {
-			foreach (ModularSA modsa in SkillScriptInitPatch.modsaDict[skillmodel_intlong]) {
-				if (skillmodel_intlong != modsa.ptr_intlong) continue;
-				modsa.Enact(selfAction.Model, selfAction.Skill, selfAction, oppoAction, actevent_FakePower, BATTLE_EVENT_TIMING.NONE);
-			}
-		}
-
-		foreach (PassiveModel passiveModel in selfAction.Model._passiveDetail.PassiveList)
-		{
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong])
-			{
-				if (modpa.activationTiming != actevent_FakePower) continue;
-				modpa.Enact(selfAction.Model, selfAction.Skill, selfAction, oppoAction, actevent_FakePower, BATTLE_EVENT_TIMING.NONE);
-			}
-		}
-		SupportPasPatch.SupportPassiveInit(SkillScriptInitPatch.modpaDict);
-		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
-		{
-			List<ModularSA> modpaList = SkillScriptInitPatch.GetAllModpaFromPasmodelSupport(supportPassive);
-			for (int i = 0; i < modpaList.Count; i++)
-			{
-				if (modpaList[i].activationTiming != actevent_FakePower) continue;
-				modpaList[i].Enact(selfAction.Model, selfAction.Skill, selfAction, oppoAction, actevent_FakePower, BATTLE_EVENT_TIMING.NONE);
-			}
-		}
-	}
-*/
 
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetExpectedSkillPowerAdder))]
 	[HarmonyPostfix]
