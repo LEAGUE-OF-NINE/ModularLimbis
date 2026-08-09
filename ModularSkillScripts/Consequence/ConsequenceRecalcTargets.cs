@@ -20,7 +20,8 @@ public class ConsequenceRecalcTargets : IModularConsequence
 				action.RecheckSubTargetWhenChangeTargetNum();
 			} return;
 			case "BegoneSubTargets":{
-				targetDataSet.RemoveAllSubTarget(action); // Force subtarget destruction
+				targetDataSet.RemoveAllSubTarget(action);
+				targetDataSet._subTargetList?.Clear(); // Force subtarget destruction
 			} return;
 			case "Remove": {
 				List<BattleUnitModel> removal_list = modular.GetTargetModelList(circles[1]);
