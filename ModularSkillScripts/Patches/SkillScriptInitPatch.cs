@@ -814,17 +814,26 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	public static BUFF_UNIQUE_KEYWORD keyword_BufMaxStackAdder = BUFF_UNIQUE_KEYWORD.None;
 	public static BUFF_UNIQUE_KEYWORD keyword_BufMaxTurnAdder = BUFF_UNIQUE_KEYWORD.None;
 	
-	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.GetMaxBuffStackAdder))]
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetMaxBuffStackAdder))]
 	[HarmonyPostfix]
-	private static void Postfix_PassiveModel_GetMaxBuffStackAdder(BUFF_UNIQUE_KEYWORD keyword, ref int __result, PassiveDetail __instance) {
-		BattleUnitModel unit = __instance._owner;
+	private static void Postfix_BattleUnitModel_GetMaxBuffStackAdder(BUFF_UNIQUE_KEYWORD keyword, ref int __result, BattleUnitModel __instance) {
+		BattleUnitModel unit = __instance;
 		if (unit == null) return;
 		int actevent = MainClass.timingDict["BufMaxStackAdder"];
 		keyword_BufMaxStackAdder = keyword;
 		
-		foreach (PassiveModel passiveModel in __instance._passivelist.CopyList()) {
-			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel))
-			{
+		foreach (BuffModel buf in unit.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel_Fast(buf)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_buffModel = buf;
+				modsa.valueList[9] = 0;
+				modsa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modsa.valueList[9] != 0) __result += modsa.valueList[9];
+			}
+		}
+		
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = passiveModel;
 				modsa.valueList[9] = 0;
@@ -832,9 +841,8 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				if (modsa.valueList[9] != 0) __result += modsa.valueList[9];
 			}
 		}
-		foreach (EgoPassiveModel egoPassiveModel in __instance._egoPassiveList.CopyList()) {
-			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel,false))
-			{
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail._egoPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(egoPassiveModel,false)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = egoPassiveModel;
 				modsa.valueList[9] = 0;
@@ -844,17 +852,26 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 	}
 	
-	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.GetMaxBuffTurnAdder))]
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.GetMaxBuffTurnAdder))]
 	[HarmonyPostfix]
-	private static void Postfix_PassiveModel_GetMaxBuffTurnAdder(BUFF_UNIQUE_KEYWORD keyword, ref int __result, PassiveDetail __instance) {
-		BattleUnitModel unit = __instance._owner;
+	private static void Postfix_BattleUnitModel_GetMaxBuffTurnAdder(BUFF_UNIQUE_KEYWORD keyword, ref int __result, BattleUnitModel __instance) {
+		BattleUnitModel unit = __instance;
 		if (unit == null) return;
 		int actevent = MainClass.timingDict["BufMaxTurnAdder"];
 		keyword_BufMaxTurnAdder = keyword;
 		
-		foreach (PassiveModel passiveModel in __instance._passivelist.CopyList()) {
-			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel))
-			{
+		foreach (BuffModel buf in unit.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel_Fast(buf)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_buffModel = buf;
+				modsa.valueList[9] = 0;
+				modsa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modsa.valueList[9] != 0) __result += modsa.valueList[9];
+			}
+		}
+		
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = passiveModel;
 				modsa.valueList[9] = 0;
@@ -862,9 +879,8 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				if (modsa.valueList[9] != 0) __result += modsa.valueList[9];
 			}
 		}
-		foreach (EgoPassiveModel egoPassiveModel in __instance._egoPassiveList.CopyList()) {
-			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel,false))
-			{
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail._egoPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(egoPassiveModel,false)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = egoPassiveModel;
 				modsa.valueList[9] = 0;
