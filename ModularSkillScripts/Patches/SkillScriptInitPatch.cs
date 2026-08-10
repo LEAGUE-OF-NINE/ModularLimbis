@@ -161,7 +161,7 @@ public class SkillScriptInitPatch
 		List<string> requireIDList = __instance.ClassInfo.requireIDList;
 		for (int i = 0; i < requireIDList.Count; i++)
 		{
-			string param = requireIDList.ToArray()[i];
+			string param = requireIDList[i];
 			if (!param.StartsWith("Modular/")) continue;
 
 			long ptr = __instance.Pointer.ToInt64();
@@ -172,11 +172,16 @@ public class SkillScriptInitPatch
 			modpa.passiveID = __instance.ClassInfo.ID;
 			modpa.abilityMode = 2; // 2 means passive
 			modpa.modsa_unitModel = owner;
+			modpa.modsa_passiveModel = __instance;
 			MainClass.LogModular("modPassiveAbility init: " + param);
 
 			modpa.SetupModular(param.Remove(0, 8));
 			if (!modpaDict.ContainsKey(ptr)) modpaDict.Add(ptr, new List<ModularSA>());
 			modpaDict[ptr].Add(modpa);
+
+			int actevent = MainClass.timingDict["OnInit"];
+			if (modpa.activationTiming != actevent) continue;
+			modpa.Enact(owner, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 	}
 

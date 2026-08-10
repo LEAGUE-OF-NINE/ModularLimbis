@@ -107,7 +107,8 @@ public class MainClass : BasePlugin
 			"ExpectedBasePower",
 			"DefenseCycle",
 			"DefenseSwitch",
-			"TryForcedCoinResult"
+			"TryForcedCoinResult",
+			"OnInit"
 		];
 		//timingStringList.Add("ChangeSinBuffDamage");
 
@@ -281,6 +282,7 @@ public class MainClass : BasePlugin
 		consequenceDict["stopcustomsound"] = new ConsequenceStopSound();
 		consequenceDict["stopsound"] = new ConsequenceStopVSound();
 		consequenceDict["recalctargets"] = new ConsequenceRecalcTargets();
+		consequenceDict["updatemaxbuf"] = new ConsequenceUpdateMaxBuf();
 		// legacy consequences
 		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
 		consequenceDict["buf"] = new ConsequenceBuf();
@@ -288,6 +290,7 @@ public class MainClass : BasePlugin
 		consequenceDict["surge"] = new ConsequenceSurge();
 		consequenceDict["activatebufunreliable"] = consequenceDict["activatebuffunreliable"];
 		consequenceDict["bufactivate"] = consequenceDict["buffactivate"];
+		consequenceDict["updatemaxbuff"] = consequenceDict["updatemaxbuf"];
 	}
 
 	private static void RegisterAcquirers()
