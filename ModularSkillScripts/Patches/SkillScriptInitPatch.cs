@@ -3703,23 +3703,17 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 	}*/
 
+	
+	
+	
 	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.OpenSkillInfoUI))]
 	[HarmonyPrefix]
 	private static void OpenSkillInfoUI(LogSkillAbilityData skillData, BattleUnitView __instance)
 	{
 		BattleSkillViewer currentSkillViewer = __instance.GetCurrentSkillViewer();
-		if (currentSkillViewer == null)
-		{
-			MainClass.LogModular("StartVisualCoinToss currentSkillViewer is Null");
-			return;
-		}
+		if (currentSkillViewer == null) return;
 		
-		BattleUnitModel unit = currentSkillViewer.GetModel();
-		if (unit == null)
-		{
-			MainClass.LogModular("StartVisualCoinToss currentSkillViewer.GetModel() is Null. Switching to BattleUnitView.unitModel");
-			unit = __instance.unitModel;
-		}
+		BattleUnitModel unit = currentSkillViewer.GetModel() ?? __instance.unitModel;
 		SkillModel skill = currentSkillViewer.GetSkillModel();
 		// MainClass.LogModular($"StartVisualCoinToss, skill = {skill.GetID()}");
 
@@ -3748,6 +3742,54 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 	}
 
+
+	public static BattleLog battleLog_sct = null;
+	
+	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.StartCoinToss))]
+	[HarmonyPrefix]
+	private static void Prefix_BattleUnitView_StartCoinToss(
+		BattleLog log,
+		int InstanceID,
+		VIEW_TYPE vt,
+		int skillId,
+		int targetCharacterId,
+		List<SkillPowerData> skillPowerDataList,
+		int coinLogIndex,
+		bool isDuel,
+		LogSkillAbilityData skillData,
+		bool isAttack, BattleUnitView __instance)
+	{
+		BattleSkillViewer currentSkillViewer = __instance.GetCurrentSkillViewer();
+		if (currentSkillViewer == null) return;
+
+		BattleUnitModel unit = currentSkillViewer.GetModel() ?? __instance.unitModel;
+		SkillModel skill = currentSkillViewer.GetSkillModel();
+		
+		int actevent = MainClass.timingDict["VisualStartCoinToss"];
+		battleLog_sct = log;
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.Enact(unit, skill, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+		}
+		
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.Enact(unit, skill, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+		
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail._egoPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(egoPassiveModel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.Enact(unit, skill, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+	}
+	
 	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.OnEndDuel))]
 	[HarmonyPrefix]
 	private static void Prefix_BattleUnitView_OnEndDuel(BattleUnitView __instance)

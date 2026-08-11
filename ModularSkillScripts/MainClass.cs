@@ -98,6 +98,7 @@ public class MainClass : BasePlugin
 			"StartVisualDie",
 			"StartVisualPartDestroy",
 			"StartVisualChaseTarget",
+			"VisualStartCoinToss",
 			"BufMaxStackAdder",
 			"BufMaxTurnAdder",
 			"ChangeAttackDamage",
@@ -132,6 +133,7 @@ public class MainClass : BasePlugin
 		timingDict.Add("OnOtherImmortal", timingDict["ImmortalOther"]);
 		timingDict.Add("OnVisualCoinToss", timingDict["StartVisualCoinToss"]);
 		timingDict.Add("OnVisualUse", timingDict["StartVisualSkillUse"]);
+		timingDict.Add("VisualSCT", timingDict["VisualStartCoinToss"]);
 		
 		FakePowerPatches.actevent_FakePower = timingDict["FakePower"];
 		FakePowerPatches.actevent_BaseCheck = timingDict["ExpectedBasePower"];
@@ -302,6 +304,7 @@ public class MainClass : BasePlugin
 		acquirerDict["getsp"] = new AcquirerMpCheck();
 		acquirerDict["gethp"] = new AcquirerHpCheck();
 		acquirerDict["getbuff"] = new AcquirerBufCheck();
+		acquirerDict["visualbufcheck"] = new AcquirerVisualBufCheck();
 		acquirerDict["gettime"] = new AcquirerTimeGet();
 		acquirerDict["getdmg"] = new AcquirerGetDmg();
 		acquirerDict["gethpdmg"] = new AcquirerGetHpDmg();
