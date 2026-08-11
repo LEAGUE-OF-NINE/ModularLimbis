@@ -17,6 +17,7 @@ public class ConsequenceUpdateMaxBuf : IModularConsequence
 	public void UpdateMaxBufOnUnit(BattleUnitModel unit)
 	{
 		foreach (BuffModel buf in unit.GetActivatedBuffModels()) {
+			buf.SetMaxStackAndTurn(unit);
 			buf.UpdateMaxStackAndTurn(unit);
 		}
 	}
