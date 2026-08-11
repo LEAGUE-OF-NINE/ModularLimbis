@@ -34,11 +34,13 @@ public class ConsequenceRecalcTargets : IModularConsequence
 				}
 			} return;
 			case "Add": {
+				BattleUnitModel maintarget = targetDataSet.GetMainTarget();
 				List<BattleUnitModel> add_list = modular.GetTargetModelList(circles[1]);
 				List<SinActionModel> subtarget_sinaction_list = targetDataSet.GetSubTargetSinActionList();
-				foreach(BattleUnitModel unit_add in add_list)
-				{
+				foreach(BattleUnitModel unit_add in add_list) {
+					if (unit_add == null || unit_add == maintarget) continue;
 					SinActionModel sinaction_add = unit_add.GetFirstSinAction();
+					if (sinaction_add == null || sinaction_add.GetSlotWeight() < 1) continue;
 					if (!subtarget_sinaction_list.Contains(sinaction_add)) {
 						TargetSinActionData targetSinActionData = new(sinaction_add);
 						targetDataSet._subTargetList?.Add(targetSinActionData);
