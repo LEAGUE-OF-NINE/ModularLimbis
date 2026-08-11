@@ -387,7 +387,9 @@ public class MainClass : BasePlugin
 		acquirerDict["bufmaxturnadderiskeyword"] = new AcquirerBufMaxAdderIsKeyword(1);
 		acquirerDict["bufkeywordtoint"] = new AcquirerBufKeywordToInt();
 		acquirerDict["weighteddamage"] = new AcquirerWeightedDamage();
-		
+		acquirerDict["getchainatktype"] = new AcquirerGetChainAtkType();
+		acquirerDict["getskillamountondash"] = new AcquirerGetSkillAmountOnDash();
+
 		// legacy acquirers
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();
 		acquirerDict["mpcheck"] = new AcquirerMpCheck();
