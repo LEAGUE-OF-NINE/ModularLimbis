@@ -3744,7 +3744,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 
 
 	public static BattleLog battleLog_sct = null;
-	
+	/*
 	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.StartCoinToss))]
 	[HarmonyPrefix]
 	private static void Prefix_BattleUnitView_StartCoinToss(
@@ -3788,7 +3788,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.Enact(unit, skill, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
-	}
+	}*/
 	
 	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.OnEndDuel))]
 	[HarmonyPrefix]
