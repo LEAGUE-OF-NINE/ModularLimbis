@@ -3703,12 +3703,11 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 	}*/
 
-	
-	
+	public static BattleLog battleLog_sct = null;
 	
 	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.OpenSkillInfoUI))]
 	[HarmonyPrefix]
-	private static void OpenSkillInfoUI(LogSkillAbilityData skillData, BattleUnitView __instance)
+	private static void OpenSkillInfoUI(BattleLog log, LogSkillAbilityData skillData, bool isAttack, BattleUnitView __instance)
 	{
 		BattleSkillViewer currentSkillViewer = __instance.GetCurrentSkillViewer();
 		if (currentSkillViewer == null) return;
@@ -3723,27 +3722,36 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		//var skillModel = new SkillModel(skillData_fromStatic, model.Level, model.SyncLevel);
 		//skillModel.Init(); needed to get noticed by modular skill timing?
 
-		int actevent = MainClass.timingDict["StartVisualCoinToss"];
+		int actevent = MainClass.timingDict["VisualSCT"];
+		battleLog_sct = log;
+		int v9 = isAttack ? 1 : 0;
 		
-		foreach (ModularSA modpa in GetAllModsaFromSkillModel(skill))
-		{
-			if (modpa.activationTiming != actevent) continue;
-			modpa.Enact(unit, skill, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.valueList[9] = v9;
+			modsa.Enact(unit, skill, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 		
-		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
-			{
-				if (modpa.activationTiming != actevent) continue;
-				modpa.modsa_passiveModel = passiveModel;
-				modpa.Enact(unit, skill, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[9] = v9;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.Enact(unit, skill, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
+		
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail._egoPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(egoPassiveModel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[9] = v9;
+				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.Enact(unit, skill, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}}
 	}
 
 
-	public static BattleLog battleLog_sct = null;
 	/*
 	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.StartCoinToss))]
 	[HarmonyPrefix]

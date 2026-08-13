@@ -98,7 +98,6 @@ public class MainClass : BasePlugin
 			"StartVisualDie",
 			"StartVisualPartDestroy",
 			"StartVisualChaseTarget",
-			"VisualStartCoinToss",
 			"BufMaxStackAdder",
 			"BufMaxTurnAdder",
 			"ChangeAttackDamage",
@@ -133,7 +132,8 @@ public class MainClass : BasePlugin
 		timingDict.Add("OnOtherImmortal", timingDict["ImmortalOther"]);
 		timingDict.Add("OnVisualCoinToss", timingDict["StartVisualCoinToss"]);
 		timingDict.Add("OnVisualUse", timingDict["StartVisualSkillUse"]);
-		timingDict.Add("VisualSCT", timingDict["VisualStartCoinToss"]);
+		timingDict.Add("VisualStartCoinToss", timingDict["StartVisualCoinToss"]);
+		timingDict.Add("VisualSCT", timingDict["StartVisualCoinToss"]);
 		
 		FakePowerPatches.actevent_FakePower = timingDict["FakePower"];
 		FakePowerPatches.actevent_BaseCheck = timingDict["ExpectedBasePower"];
