@@ -14,6 +14,7 @@ using ModularSkillScripts.Patches;
 using Il2CppSystem.Text.RegularExpressions;
 using StringSplitOptions = System.StringSplitOptions;
 using CSound;
+using ModularSkillScripts.MObjGetter;
 
 //using Antlr4.Runtime;
 //using Antlr4.Runtime.Tree;
@@ -443,6 +444,10 @@ public class MainClass : BasePlugin
 		acquirerDict["buffkeywordtoint"] = new AcquirerBufKeywordToInt();
 		acquirerDict["iscrit"] = new AcquirerIsCrit();
 
+		
+		// MObj Getters
+		mobjgetDict["unit"] = new MObjGetUnit();
+		
 		// Register Lua functions
 		luaFunctionDict["clearvalues"] = new ModularSkillScripts.LuaFunction.LuaFunctionClearValues();
 		luaFunctionDict["resetadders"] = new ModularSkillScripts.LuaFunction.LuaFunctionResetAdders();
@@ -610,6 +615,7 @@ public class MainClass : BasePlugin
 	public static readonly System.Collections.Generic.Dictionary<string, int> timingDict = new();
 	public static readonly System.Collections.Generic.Dictionary<string, IModularConsequence> consequenceDict = new();
 	public static readonly System.Collections.Generic.Dictionary<string, IModularAcquirer> acquirerDict = new();
+	public static readonly System.Collections.Generic.Dictionary<string, IModularMObjGetter> mobjgetDict = new();
 	public static readonly System.Collections.Generic.Dictionary<string, ModularSkillScripts.LuaFunction.IModularLuaFunction> luaFunctionDict = new();
 	public static System.Collections.Generic.List<SupporterPassiveModel> supporterPassiveList = new System.Collections.Generic.List<SupporterPassiveModel>();
 	public static System.Collections.Generic.List<SupporterPassiveModel> activeSupporterPassiveList = new System.Collections.Generic.List<SupporterPassiveModel>();

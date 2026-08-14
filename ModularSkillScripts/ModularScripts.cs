@@ -13,6 +13,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Battle;
 using ModularSkillScripts.Patches;
+using SharpCompress;
 using Utils;
 using static BattleActionModel.TargetDataDetail;
 using IntPtr = System.IntPtr;
@@ -155,6 +156,7 @@ public class ModularSA : Il2CppSystem.Object
 	public readonly char[] parenthesisSeparator = ['(', ')'];
 
 	public int[] valueList = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+	public object[] mobjList = [null, null, null, null, null, null, null, null, null, null];
 	public void ResetValueList()
 	{
 		activationCounter = 0;
@@ -597,6 +599,13 @@ public class ModularSA : Il2CppSystem.Object
 		return value;
 	}
 
+	public object GetMObjFromParamString(string param)
+	{
+		if (param.Last() == ')') param = param.Remove(param.Length - 1);
+		int.TryParse(param[5].ToString(), out int mobj_idx);
+		return mobjList[mobj_idx];
+	}
+	
 	public bool GetBoolFromParamString(string str)
 	{
 		if (GetNumFromParamString(str) != 0) return true;
@@ -811,19 +820,28 @@ public class ModularSA : Il2CppSystem.Object
 				if (unit is BattleUnitModel_Abnormality) unitList.Add(unit);
 			}
 		}
-		else
+		else if (param.StartsWith("MOBJ"))
 		{
+			int.TryParse(param[5].ToString(), out int mobj_idx);
+			object mobj = mobjList[mobj_idx];
+			if (mobj is List<BattleUnitModel> unitList_mobj) {
+				foreach (BattleUnitModel unit in unitList_mobj) {
+					unitList.Add(unit);
+				}
+			}
+		} else {
 			System.Collections.Generic.List<BattleUnitModel> list = GetCustomTargetingList(battleObjectManager, param, thisFaction, enemyFaction);
 
 			int num = 1;
-			if (param.Contains("VALUE_"))
-			{
+			if (param.Contains("VALUE_")) {
 				string[] circles = param.Split('$');
 				string numstring = circles[0].Substring(circles[0].Length - 7);
 				num = GetNumFromParamString(numstring);
-			}
-			else
-			{
+			} else if (param.Contains("VALUE_")) {
+				string[] circles = param.Split('$');
+				string numstring = circles[0].Substring(circles[0].Length - 7);
+				num = GetNumFromParamString(numstring);
+			} else {
 				string text = Regex.Replace(param, "\\D", "");
 				if (text.Length > 0) num = int.Parse(text);
 			}
@@ -1042,8 +1060,16 @@ public class ModularSA : Il2CppSystem.Object
 			}
 			return foundUnit;
 		}
-		else
+		else if (param.StartsWith("MOBJ"))
 		{
+			if (!int.TryParse(param[5].ToString(), out int mobj_idx)) return null;
+			object mobj = mobjList[mobj_idx];
+			if (mobj is BattleUnitModel unit_mobj) return unit_mobj;
+			if (mobj is List<BattleUnitModel> unitList_mobj) {
+				if (unitList_mobj.Count > 0) return unitList_mobj[0];
+			}
+			return null;
+		} else {
 			BattleObjectManager battleObjectManager_inst = SingletonBehavior<BattleObjectManager>.Instance;
 			if (battleObjectManager_inst == null) return null;
 			BattleUnitModel foundUnit = null;
@@ -1168,37 +1194,41 @@ public class ModularSA : Il2CppSystem.Object
 		string[] batchArgs = batch.Split(':');
 		for (int i = 0; i < batchArgs.Length; i++)
 		{
-			if (batchArgs[i].StartsWith("CONTINUEIFNOT"))
+			string thisBatch = batchArgs[i];
+			
+			if (thisBatch.StartsWith("CONTINUEIFNOT"))
 			{
-				if (CheckIF(batchArgs[i]))
+				if (CheckIF(thisBatch))
 				{
 					_fullStop = true;
 					return;
 				}
 				continue;
 			}
-			else if (batchArgs[i].StartsWith("STOPIF") || batchArgs[i].StartsWith("CONTINUEIF"))
+			else if (thisBatch.StartsWith("STOPIF") || thisBatch.StartsWith("CONTINUEIF"))
 			{
-				if (!CheckIF(batchArgs[i]))
+				if (!CheckIF(thisBatch))
 				{
 					_fullStop = true;
 					return;
 				}
 				continue;
 			}
-			else if (batchArgs[i].StartsWith("IFNOT")) { if (CheckIF(batchArgs[i])) break; else continue; }
-			else if (batchArgs[i].StartsWith("IF")) { if (!CheckIF(batchArgs[i])) break; else continue; }
-			else if (batchArgs[i].StartsWith("VALUE_"))
-			{
-				string numChar = batchArgs[i][6].ToString();
-				int valueidx = 0;
-				int.TryParse(numChar, out valueidx);
+			else if (thisBatch.StartsWith("IFNOT")) { if (CheckIF(thisBatch)) break; else continue; }
+			else if (thisBatch.StartsWith("IF")) { if (!CheckIF(thisBatch)) break; else continue; }
+			else if (thisBatch.StartsWith("VALUE_")) {
+				int.TryParse(thisBatch[6].ToString(), out int valueidx);
 				valueList[valueidx] = AcquireValue(batchArgs[i + 1]); // GETTERS
+				i += 1;
+				continue;
+			} else if (thisBatch.StartsWith("MOBJ")) {
+				int.TryParse(thisBatch[5].ToString(), out int mobj_idx);
+				mobjList[mobj_idx] = AcquireModularObject(batchArgs[i + 1]);
 				i += 1;
 				continue;
 			}
 
-			Consequence(batchArgs[i]); // CONSEQUENCES
+			Consequence(thisBatch); // CONSEQUENCES
 		}
 	}
 
@@ -1250,9 +1280,30 @@ public class ModularSA : Il2CppSystem.Object
 
 	private int AcquireValue(string section)
 	{
-		string[] sectionArgs = section.Split(parenthesisSeparator);
+		string[] sectionArgs = section.Split(parenthesisSeparator, StringSplitOptions.RemoveEmptyEntries);
 
 		if (char.IsNumber(section.Last())) return GetNumFromParamString(sectionArgs[0]);
+
+		string methodology = sectionArgs[0];
+		string circledSection = "";
+		if (sectionArgs.Length > 1) circledSection = sectionArgs[1];
+		string[] circles = [];
+		if (circledSection.Length > 0) circles = circledSection.Split(',');
+
+		if (MainClass.acquirerDict.TryGetValue(methodology, out var acquirer))
+		{
+			return acquirer.ExecuteAcquirer(this, section, circledSection, circles);
+		}
+
+		MainClass.LogModular("Invalid Getter: " + methodology);
+		return -1;
+	}
+	
+	private object AcquireModularObject(string section)
+	{
+		string[] sectionArgs = section.Split(parenthesisSeparator, StringSplitOptions.RemoveEmptyEntries);
+
+		if (char.IsNumber(section.Last())) return GetMObjFromParamString(sectionArgs[0]);
 
 		string methodology = sectionArgs[0];
 		string circledSection = "";
@@ -1380,4 +1431,20 @@ public interface IModularAcquirer
 	/// <param name="circles">Arguments specified in the circled section, e.g. ["Self", "argument", "3", "4"]</param>
 	/// <returns>The value which this value getter evalutes to</returns>
 	int ExecuteAcquirer(ModularSA modular, string section, string circledSection, string[] circles);
+}
+
+/// <summary>
+/// Interface for defining modular value getters in the system.
+/// </summary>
+public interface IModularMObjGetter
+{
+	/// <summary>
+	/// Executes a mobj getter based on the provided parameters.
+	/// </summary>
+	/// <param name="modular">The modular instance, where all the controlling values and helper functions can be found</param>
+	/// <param name="section">The raw string of the consequence declaration, e.g. "consequence(Self, argument, 3, 4)"</param>
+	/// <param name="circledSection">The section inside parenthesis, e.g. "Self, argument, 3, 4"</param>
+	/// <param name="circles">Arguments specified in the circled section, e.g. ["Self", "argument", "3", "4"]</param>
+	/// <returns>The value which this value getter evalutes to</returns>
+	object ExecuteMObjGetter(ModularSA modular, string section, string circledSection, string[] circles);
 }

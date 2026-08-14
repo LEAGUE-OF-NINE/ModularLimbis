@@ -3748,7 +3748,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_passiveModel = egoPassiveModel;
 				modsa.Enact(unit, skill, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
-		}}
+		}
 	}
 
 
