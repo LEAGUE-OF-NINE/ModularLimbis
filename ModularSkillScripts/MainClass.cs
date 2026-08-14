@@ -393,6 +393,7 @@ public class MainClass : BasePlugin
 		acquirerDict["weighteddamage"] = new AcquirerWeightedDamage();
 		acquirerDict["getchainatktype"] = new AcquirerGetChainAtkType();
 		acquirerDict["getskillamountondash"] = new AcquirerGetSkillAmountOnDash();
+		acquirerDict["isbaseskill"] = new AcquirerIsBaseSkill();
 
 		// legacy acquirers
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();
