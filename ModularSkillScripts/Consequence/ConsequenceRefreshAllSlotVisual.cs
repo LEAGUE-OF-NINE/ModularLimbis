@@ -10,15 +10,18 @@ public class ConsequenceRefreshAllSlotVisual : IModularConsequence
 {
 	public void ExecuteConsequence(ModularSA modular, string section, string circledSection, string[] circles)
 	{
+		ActivateRefresh();
+	}
+
+	public static void ActivateRefresh()
+	{
 		BattleUIRoot battleUIRoot = SingletonBehavior<BattleUIRoot>.Instance;
-		if (!battleUIRoot)
-		{
+		if (!battleUIRoot) {
 			MainClass.LogModular("Dude This BattleUIRoot shit is FUCKING NULL");
 			return;
 		}
 		NewOperationController opController = battleUIRoot.NewOperationController;
-		if (!opController)
-		{
+		if (!opController) {
 			MainClass.LogModular("Dude This NewOperationController shit is FUCKING NULL");
 			return;
 		}
@@ -61,6 +64,5 @@ public class ConsequenceRefreshAllSlotVisual : IModularConsequence
 				opSinSlot_bottom._skillSlot.SetSkill(opSinSlot_bottom.UnitSin, opSinSlot_bottom.UnitSin.SinOption == SIN_OPTION.Ego);
 			}
 		}
-		
 	}
 }

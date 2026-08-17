@@ -1,23 +1,36 @@
+using System.Linq;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem.Collections.Generic;
 using Lethe.Patches;
 
 namespace ModularSkillScripts.Acquirer;
 
-public class AcquirerBufCheck : IModularAcquirer
+public class AcquirerSumGetter : IModularAcquirer
 {
 	public int ExecuteAcquirer(ModularSA modular, string section, string circledSection, string[] circles)
 	{
-		int total = 0;
-		List<BattleUnitModel> modelList = modular.GetTargetModelList(circles[0]);
-		if (modelList.Count < 1) return -1;
+		if (circles.Length < 3) {
+			MainClass.LogModular("SumGetter not enough circles", true);
+			return -1;
+		}
 
-		BUFF_UNIQUE_KEYWORD buf_keyword = CustomBuffs.ParseBuffUniqueKeyword(circles[1]);
-		BattleUnitBuffManager bufManager = Singleton<BattleUnitBuffManager>.Instance;
-		foreach (BattleUnitModel unit in modelList)
-		{
+		if (!MainClass.acquirerDict.TryGetValue(circles[0], out IModularAcquirer acquirer)) {
+			MainClass.LogModular("SumGetter invalid getter circle", true);
+			return -1;
+		}
+		
+		List<BattleUnitModel> modelList = modular.GetTargetModelList(circles[1]);
+		if (modelList.Count < 1) {
+			MainClass.LogModular("SumGetter unit list is empty", true);
+			return -1;
+		}
+
+		string[] circles_new = circles.Skip(2).ToArray();
+		int total = 0;
+		
+		foreach (BattleUnitModel unit in modelList) {
 			if (unit == null) continue;
-			total += BufCheck(unit, circles, buf_keyword, bufManager);
+			total += acquirer.ExecuteAcquirer(modular, section, circledSection, circles);
 		}
 
 		return total;

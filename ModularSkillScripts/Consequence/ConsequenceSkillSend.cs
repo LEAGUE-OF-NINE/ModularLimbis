@@ -47,23 +47,13 @@ public class ConsequenceSkillSend : IModularConsequence
 		BattleActionModel fromAction_new = new BattleActionModel(fromSinModel_new, fromUnit, fromSinAction_new);
 		//fromAction_new._targetDataDetail.ClearAllTargetData(fromAction_new);
 
-		List<BattleUnitModel> targetList = new();
-		string[] target_stringList = circles[1].Split('+', StringSplitOptions.RemoveEmptyEntries);
-		foreach (string target_string in target_stringList)
-		{
-			List<BattleUnitModel> targetList_temp = modular.GetTargetModelList(target_string);
-			foreach (BattleUnitModel unit in targetList_temp)
-			{
-				if (unit.IsDead()) continue;
-				if (targetList.Contains(unit)) continue;
-				targetList.Add(unit);
-			}
-		}
+		List<BattleUnitModel> targetList = modular.GetTargetModelList(circles[1]);
 		
 		List<SinActionModel> subtargetSinActionList = new();
 		SinActionModel maintarget_sinAction = null;
 		foreach (BattleUnitModel targetModel in targetList)
 		{
+			if (targetModel.IsDead()) continue;
 			List<SinActionModel> sinActionList = targetModel.GetSinActionList();
 			if (sinActionList.Count < 1) continue;
 			SinActionModel sinAction = sinActionList[0];

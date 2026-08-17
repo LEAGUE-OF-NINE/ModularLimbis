@@ -13,6 +13,8 @@ using ModularSkillScripts.Acquirer;
 using ModularSkillScripts.Patches;
 using Il2CppSystem.Text.RegularExpressions;
 using StringSplitOptions = System.StringSplitOptions;
+using CSound;
+using ModularSkillScripts.MObjGetter;
 
 //using Antlr4.Runtime;
 //using Antlr4.Runtime.Tree;
@@ -22,6 +24,7 @@ namespace ModularSkillScripts;
 
 [BepInPlugin(GUID, NAME, VERSION)]
 [BepInDependency("Lethe")]
+[BepInIncompatibility("GlitchGames.DefenseCycling")] 
 public class MainClass : BasePlugin
 {
 	public override void Load()
@@ -44,7 +47,7 @@ public class MainClass : BasePlugin
 			"OnDie", // 12
 			"OnOtherDie", // 13
 			"DuelClash", // 14
-			"DuelClashAfter", // 15
+			"AfterDuelClash", // 15
 			"OnSucceedEvade", // 16
 			"OnDefeatEvade", // 17
 			"OnStartBehaviour", // 18
@@ -85,6 +88,8 @@ public class MainClass : BasePlugin
 			"EnemyStartBehaviour",
 			"AfterChangeShield",
 			"AfterChangeHP",
+			"BeforeChangeSanity",
+			"AfterChangeSanity",
 			"CanDealTarget",
 			//timingStringList.Add("ChangeSinBuffDamage");
 			"DelayedStart", // HBMBACMAB,
@@ -93,8 +98,18 @@ public class MainClass : BasePlugin
 			"StartVisualDuel",
 			"StartVisualDie",
 			"StartVisualPartDestroy",
-			"StartVisualChaseTarget"
-
+			"StartVisualChaseTarget",
+			"BufMaxStackAdder",
+			"BufMaxTurnAdder",
+			"ChangeAttackDamage",
+			"BuffActivate",
+			"EGOCost",
+			"EGOCostMP",
+			"ExpectedBasePower",
+			"DefenseCycle",
+			"DefenseSwitch",
+			"TryForcedCoinResult",
+			"OnInit"
 		];
 		//timingStringList.Add("ChangeSinBuffDamage");
 
@@ -108,6 +123,7 @@ public class MainClass : BasePlugin
 		timingDict.Add("BWH", timingDict["BeforeWhenHit"]);
 		timingDict.Add("SBS", timingDict["StartBattleSkill"]);
 		timingDict.Add("OnUseBuf", timingDict["OnUseBuff"]);
+		timingDict.Add("BufActivate", timingDict["BuffActivate"]);
 
 		// legacy to new stuff translator
 		timingDict.Add("StartBehaviour", timingDict["OnStartBehaviour"]);
@@ -117,8 +133,11 @@ public class MainClass : BasePlugin
 		timingDict.Add("OnOtherImmortal", timingDict["ImmortalOther"]);
 		timingDict.Add("OnVisualCoinToss", timingDict["StartVisualCoinToss"]);
 		timingDict.Add("OnVisualUse", timingDict["StartVisualSkillUse"]);
+		timingDict.Add("VisualStartCoinToss", timingDict["StartVisualCoinToss"]);
+		timingDict.Add("VisualSCT", timingDict["StartVisualCoinToss"]);
 		
 		FakePowerPatches.actevent_FakePower = timingDict["FakePower"];
+		FakePowerPatches.actevent_BaseCheck = timingDict["ExpectedBasePower"];
 		
 		Harmony harmony = new Harmony(NAME);
 		Logg = new ManualLogSource(NAME);
@@ -157,6 +176,7 @@ public class MainClass : BasePlugin
 		consequenceDict["scale"] = new ConsequenceScale();
 		consequenceDict["dmgadd"] = new ConsequenceDmgAdd();
 		consequenceDict["dmgmult"] = new ConsequenceDmgMult();
+		consequenceDict["headschance"] = new ConsequenceHeadsChance();
 		consequenceDict["healsp"] = new ConsequenceMpDmg();
 		consequenceDict["reusecoin"] = new ConsequenceReuseCoin();
 		consequenceDict["bonusdmg"] = new ConsequenceBonusDmg();
@@ -259,13 +279,21 @@ public class MainClass : BasePlugin
 		consequenceDict["setspusage"] = new ConsequenceSetSpUsage();
 		consequenceDict["instantdeath"] = new ConsequenceInstantDeath();
 		consequenceDict["activatebuffunreliable"] = new ConsequenceActivateBuffUnreliable();
-
+		consequenceDict["buffactivate"] = new ConsequenceBufActivate();
+		consequenceDict["partdestroy"] = new ConsequencePartDestroy();
+		consequenceDict["playcustomsound"] = new ConsequencePlayCustomSound();
+		consequenceDict["stopcustomsound"] = new ConsequenceStopSound();
+		consequenceDict["stopsound"] = new ConsequenceStopVSound();
+		consequenceDict["recalctargets"] = new ConsequenceRecalcTargets();
+		consequenceDict["updatemaxbuf"] = new ConsequenceUpdateMaxBuf();
 		// legacy consequences
 		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
 		consequenceDict["buf"] = new ConsequenceBuf();
 		consequenceDict["explosion"] = new ConsequenceExplosion();
 		consequenceDict["surge"] = new ConsequenceSurge();
 		consequenceDict["activatebufunreliable"] = consequenceDict["activatebuffunreliable"];
+		consequenceDict["bufactivate"] = consequenceDict["buffactivate"];
+		consequenceDict["updatemaxbuff"] = consequenceDict["updatemaxbuf"];
 	}
 
 	private static void RegisterAcquirers()
@@ -277,6 +305,7 @@ public class MainClass : BasePlugin
 		acquirerDict["getsp"] = new AcquirerMpCheck();
 		acquirerDict["gethp"] = new AcquirerHpCheck();
 		acquirerDict["getbuff"] = new AcquirerBufCheck();
+		acquirerDict["visualbufcheck"] = new AcquirerVisualBufCheck();
 		acquirerDict["gettime"] = new AcquirerTimeGet();
 		acquirerDict["getdmg"] = new AcquirerGetDmg();
 		acquirerDict["gethpdmg"] = new AcquirerGetHpDmg();
@@ -299,6 +328,7 @@ public class MainClass : BasePlugin
 		acquirerDict["getskillid"] = new AcquirerGetSkillId();
 		acquirerDict["getcoincount"] = new AcquirerGetCoinCount();
 		acquirerDict["getallcoinstates"] = new AcquirerAllCoinState();
+		acquirerDict["coinstate"] = new AcquirerCoinState();
 		acquirerDict["getresonance"] = new AcquirerResonance();
 		acquirerDict["getresource"] = new AcquirerResource();
 		acquirerDict["resourcegetenum"] = new AcquirerResourceGetEnum();
@@ -356,6 +386,13 @@ public class MainClass : BasePlugin
 		acquirerDict["getuptielevel"] = new AcquirerGetUptieLevel();
 		acquirerDict["getbreaklevel"] = new AcquirerGetBreakLevel();
 		acquirerDict["getdmgmult"] = new AcquirerGetDmgMult();
+		acquirerDict["partdestroy"] = new AcquirerPartDestroy();
+		acquirerDict["bufmaxstackadderiskeyword"] = new AcquirerBufMaxAdderIsKeyword(0);
+		acquirerDict["bufmaxturnadderiskeyword"] = new AcquirerBufMaxAdderIsKeyword(1);
+		acquirerDict["bufkeywordtoint"] = new AcquirerBufKeywordToInt();
+		acquirerDict["weighteddamage"] = new AcquirerWeightedDamage();
+		acquirerDict["getchainatktype"] = new AcquirerGetChainAtkType();
+		acquirerDict["getskillamountondash"] = new AcquirerGetSkillAmountOnDash();
 
 		// legacy acquirers
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();
@@ -404,7 +441,13 @@ public class MainClass : BasePlugin
 		acquirerDict["gethpincrement"] = new AcquirerGetHpIncrementByLevel();
 		acquirerDict["diduseskilllastturn"] = new AcquirerDidUseSkillLastTurn();
 		acquirerDict["isactionable"] = new AcquirerIsActionable();
+		acquirerDict["buffkeywordtoint"] = new AcquirerBufKeywordToInt();
+		acquirerDict["iscrit"] = new AcquirerIsCrit();
 
+		
+		// MObj Getters
+		mobjgetDict["unit"] = new MObjGetUnit();
+		
 		// Register Lua functions
 		luaFunctionDict["clearvalues"] = new ModularSkillScripts.LuaFunction.LuaFunctionClearValues();
 		luaFunctionDict["resetadders"] = new ModularSkillScripts.LuaFunction.LuaFunctionResetAdders();
@@ -562,9 +605,9 @@ public class MainClass : BasePlugin
 	{
 		logEnabled = EnableLogging.Value;
 	}
-	public static void LogModular(object thing)
+	public static void LogModular(object thing, bool ignorelogenabled = false)
 	{
-		if (logEnabled) Logg.LogInfo(thing);
+		if (ignorelogenabled || logEnabled) Logg.LogInfo(thing);
 	}
 
 
@@ -572,6 +615,7 @@ public class MainClass : BasePlugin
 	public static readonly System.Collections.Generic.Dictionary<string, int> timingDict = new();
 	public static readonly System.Collections.Generic.Dictionary<string, IModularConsequence> consequenceDict = new();
 	public static readonly System.Collections.Generic.Dictionary<string, IModularAcquirer> acquirerDict = new();
+	public static readonly System.Collections.Generic.Dictionary<string, IModularMObjGetter> mobjgetDict = new();
 	public static readonly System.Collections.Generic.Dictionary<string, ModularSkillScripts.LuaFunction.IModularLuaFunction> luaFunctionDict = new();
 	public static System.Collections.Generic.List<SupporterPassiveModel> supporterPassiveList = new System.Collections.Generic.List<SupporterPassiveModel>();
 	public static System.Collections.Generic.List<SupporterPassiveModel> activeSupporterPassiveList = new System.Collections.Generic.List<SupporterPassiveModel>();
@@ -588,7 +632,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "4.9.9";
+	public const string VERSION = "5.1.1";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 

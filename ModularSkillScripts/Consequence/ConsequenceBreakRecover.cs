@@ -1,15 +1,17 @@
+using Il2CppSystem.Collections.Generic;
+
 namespace ModularSkillScripts.Consequence;
 
 public class ConsequenceBreakRecover : IModularConsequence
 {
 	public void ExecuteConsequence(ModularSA modular, string section, string circledSection, string[] circles)
 	{
-		var modelList = modular.GetTargetModelList(circles[0]);
-		bool force = circles.Length > 1;
+		List<BattleUnitModel> modelList = modular.GetTargetModelList(circles[0]);
+		bool force = circles.Length > 1 && (circles[1] == "force" || circles[1] == "forced");
+		BATTLE_EVENT_TIMING timing = modular.battleTiming;
 		foreach (BattleUnitModel targetModel in modelList)
 		{
-			if (force) targetModel.RecoverAllBreak(modular.battleTiming);
-			else targetModel.RecoverBreak(modular.battleTiming);
+			if (!targetModel.IsForcelyBreak() || force) targetModel.RecoverAllBreak(timing);
 		}
 	}
 }
