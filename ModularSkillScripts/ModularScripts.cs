@@ -313,6 +313,8 @@ public class ModularSA : Il2CppSystem.Object
 			return;
 		}
 
+		if (modsa_target_list.Count > 0) modsa_loopTarget = modsa_target_list[0];
+
 		modsa_unitModel = unitModel;
 		modsa_skillModel = skillModel_inst;
 		modsa_selfAction = selfAction;
