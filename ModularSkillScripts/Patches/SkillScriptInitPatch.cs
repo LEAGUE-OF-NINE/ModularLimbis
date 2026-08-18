@@ -761,9 +761,11 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnDie(BattleUnitModel killer, BattleActionModel actionOrNull, DAMAGE_SOURCE_TYPE dmgSrcType, BUFF_UNIQUE_KEYWORD keyword, BATTLE_EVENT_TIMING timing, PassiveDetail __instance)
 	{
+		BattleUnitModel deadUnit = __instance._owner;
+		if (deadUnit.TryCast<BattleUnitModel_Abnormality_Part>() != null) return; // no parts please
+		
 		int actevent_OnDie = MainClass.timingDict["OnDie"];
 		int actevent_OnOtherDie = MainClass.timingDict["OnOtherDie"];
-		BattleUnitModel deadUnit = __instance._owner;
 		
 		foreach (PassiveModel pasmodel in __instance._passivelist.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
@@ -900,6 +902,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	public static void Postfix_OnDieOtherUnit(BattleUnitModel killer, BattleUnitModel dead, BATTLE_EVENT_TIMING timing, DAMAGE_SOURCE_TYPE dmgSrcType, BUFF_UNIQUE_KEYWORD keyword)
 	{
+		if (dead.TryCast<BattleUnitModel_Abnormality_Part>() != null) return; // no parts please
 		int actevent_OnDie = MainClass.timingDict["OnDie"];
 		int actevent_OnOtherDie = MainClass.timingDict["OnOtherDie"];
 		SupportPasPatch.SupportPassiveInit(modpaDict);
