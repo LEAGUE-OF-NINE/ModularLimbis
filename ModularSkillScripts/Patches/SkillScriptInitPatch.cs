@@ -3028,6 +3028,144 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		
 	}
 
+	
+	[HarmonyPatch(typeof(BattleActionModel), nameof(BattleActionModel.IgnoreDefenseSkill))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleActionModel_IgnoreDefense(BattleUnitModel target, ref bool __result, BattleActionModel __instance)
+	{
+		int actevent = MainClass.timingDict["IsIgnoreDefense"];
+		
+		BattleUnitModel attacker = __instance._model;
+		SkillModel skill = __instance.Skill;
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.modsa_victimModel = target;
+			modsa.valueList[9] = __result ? 1 : 0;
+			modsa.Enact(attacker, skill, __instance, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			__result = modsa.valueList[9] > 0;
+		}
+		
+		foreach (BuffModel buffModel in attacker._buffDetail.GetActivatedBuffModelAll()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buffModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_buffModel = buffModel;
+				modsa.modsa_victimModel = target;
+				modsa.valueList[9] = __result ? 1 : 0;
+				modsa.Enact(attacker, skill, __instance, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[9] > 0;
+			}
+		}
+		
+		foreach (PassiveModel passiveModel in attacker._passiveDetail.PassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.modsa_victimModel = target;
+				modsa.valueList[9] = __result ? 1 : 0;
+				modsa.Enact(attacker, skill, __instance, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[9] > 0;
+			}
+		}
+	}
+	
+	[HarmonyPatch(typeof(BattleActionModel), nameof(BattleActionModel.IgnoreSupportiveDefense))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleActionModel_IgnoreSupportiveDefense(
+		BattleUnitModel originTarget,
+		BattleUnitModel supportiveDefender,
+		ref bool __result, BattleActionModel __instance)
+	{
+		int actevent = MainClass.timingDict["IsIgnoreSupportiveDefense"];
+		
+		BattleUnitModel attacker = __instance._model;
+		SkillModel skill = __instance.Skill;
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.modsa_victimModel = originTarget;
+			modsa.modsa_killerModel = supportiveDefender;
+			modsa.valueList[9] = __result ? 1 : 0;
+			modsa.Enact(attacker, skill, __instance, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			__result = modsa.valueList[9] > 0;
+		}
+		
+		foreach (BuffModel buffModel in attacker._buffDetail.GetActivatedBuffModelAll()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buffModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_buffModel = buffModel;
+				modsa.modsa_victimModel = originTarget;
+				modsa.modsa_killerModel = supportiveDefender;
+				modsa.valueList[9] = __result ? 1 : 0;
+				modsa.Enact(attacker, skill, __instance, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[9] > 0;
+			}
+		}
+		
+		foreach (PassiveModel passiveModel in attacker._passiveDetail.PassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.modsa_victimModel = originTarget;
+				modsa.modsa_killerModel = supportiveDefender;
+				modsa.valueList[9] = __result ? 1 : 0;
+				modsa.Enact(attacker, skill, __instance, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[9] > 0;
+			}
+		}
+	}
+	
+	[HarmonyPatch(typeof(BattleActionModel), nameof(BattleActionModel.CanDuel))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleActionModel_CanDuel(
+		BattleActionModel opponentAction,
+		ref bool __result, BattleActionModel __instance)
+	{
+		if (opponentAction == null) return;
+		BattleUnitModel opp_unit = opponentAction._model;
+		if (opp_unit == null) return;
+		
+		int actevent = MainClass.timingDict["CanDuel"];
+		
+		BattleUnitModel attacker = __instance._model;
+		SkillModel skill = __instance.Skill;
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.modsa_victimModel = opp_unit;
+			modsa.modsa_target_list.Clear();
+			modsa.modsa_target_list.Add(opp_unit);
+			modsa.valueList[9] = __result ? 1 : 0;
+			modsa.Enact(attacker, skill, __instance, opponentAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			__result = modsa.valueList[9] > 0;
+		}
+		
+		foreach (BuffModel buffModel in attacker._buffDetail.GetActivatedBuffModelAll()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buffModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_buffModel = buffModel;
+				modsa.modsa_victimModel = opp_unit;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(opp_unit);
+				modsa.valueList[9] = __result ? 1 : 0;
+				modsa.Enact(attacker, skill, __instance, opponentAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[9] > 0;
+			}
+		}
+		
+		foreach (PassiveModel passiveModel in attacker._passiveDetail.PassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.modsa_victimModel = opp_unit;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(opp_unit);
+				modsa.valueList[9] = __result ? 1 : 0;
+				modsa.Enact(attacker, skill, __instance, opponentAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[9] > 0;
+			}
+		}
+	}
 
 	[HarmonyPatch(typeof(BattleActionModel), nameof(BattleActionModel.OnAttackConfirmed))]
 	[HarmonyPostfix]

@@ -110,7 +110,10 @@ public class MainClass : BasePlugin
 			"DefenseCycle",
 			"DefenseSwitch",
 			"TryForcedCoinResult",
-			"OnInit"
+			"OnInit",
+			"CanDuel",
+			"IsIgnoreDefense",
+			"IsIgnoreSupportiveDefense"
 		];
 		//timingStringList.Add("ChangeSinBuffDamage");
 
