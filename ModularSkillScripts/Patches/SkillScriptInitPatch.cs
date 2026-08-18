@@ -2223,6 +2223,8 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.Enact(unit, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
+		
+		BeforeAnyFlip(unit, ownerAction, oppoAction, null, BATTLE_EVENT_TIMING.ALL_TIMING);
 	}
 	
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnAfterParryingOnce_BeforeLog))]
@@ -3372,6 +3374,58 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				supportPassive._script._owner = __instance;
 				modsa.modsa_coinModel = coin;
 				modsa.Enact(__instance, skill, action, null, actevent, timing);
+			}
+		}
+
+		BeforeAnyFlip(__instance, action, null, coin, timing);
+	}
+	
+	public static void BeforeAnyFlip(BattleUnitModel unit, BattleActionModel action, BattleActionModel oppoAction, CoinModel coin, BATTLE_EVENT_TIMING timing)
+	{
+		int actevent = MainClass.timingDict["BeforeAnyFlip"];
+		SkillModel skill = action.Skill;
+
+		foreach (BuffModel buffModel in unit._buffDetail.GetActivatedBuffModelAll()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buffModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_coinModel = coin;
+				modsa.modsa_buffModel = buffModel;
+				modsa.Enact(unit, skill, action, oppoAction, actevent, timing);
+			}
+		}
+
+		if (unit.TryCast<BattleUnitModel_Abnormality>() == null) // No Cores Please
+		{
+			foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_coinModel = coin;
+				modsa.Enact(unit, skill, action, oppoAction, actevent, timing);
+			}
+
+			if (coin != null)
+			{
+				foreach (ModularSA modsa in GetAllModcaFromCoinModel(coin)) {
+					if (modsa.activationTiming != actevent) continue;
+					modsa.modsa_coinModel = coin;
+					modsa.Enact(unit, skill, action, oppoAction, actevent, timing);
+				}
+			}
+		}
+
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_coinModel = coin;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.Enact(unit, skill, action, oppoAction, actevent, timing);
+			}
+		}
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_coinModel = coin;
+				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.Enact(unit, skill, action, oppoAction, actevent, timing);
 			}
 		}
 	}
