@@ -290,6 +290,7 @@ public class MainClass : BasePlugin
 		consequenceDict["stopsound"] = new ConsequenceStopVSound();
 		consequenceDict["recalctargets"] = new ConsequenceRecalcTargets();
 		consequenceDict["updatemaxbuf"] = new ConsequenceUpdateMaxBuf();
+		consequenceDict["refreshsinresourcevisual"] = new ConsequenceRefreshSinResourceVisual();
 		// legacy consequences
 		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
 		consequenceDict["buf"] = new ConsequenceBuf();
