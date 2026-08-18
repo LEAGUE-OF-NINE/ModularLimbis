@@ -152,9 +152,12 @@ public class MainClass : BasePlugin
 		ClassInjector.RegisterTypeInIl2Cpp<ModUnitData>();
 		ClassInjector.RegisterTypeInIl2Cpp<ModularSA>();
 		ClassInjector.RegisterTypeInIl2Cpp<SkillScriptInitPatch.CoroutineRunner>();
+		ClassInjector.RegisterTypeInIl2Cpp<BlackMagic.Orb>();
+		ClassInjector.RegisterTypeInIl2Cpp<BlackMagic.OrbOrbiter>();
 
 		//ClassInjector.RegisterTypeInIl2Cpp<ModularSA.BattleUnitComparer>();
 		harmony.PatchAll(typeof(SkillScriptInitPatch));
+		//harmony.PatchAll(typeof(BlackMagic)); BLACK MAGIC
 		harmony.PatchAll(typeof(StagePatches));
 		harmony.PatchAll(typeof(UniquePatches));
 		// harmony.PatchAll(typeof(LogoPlayerPatches));

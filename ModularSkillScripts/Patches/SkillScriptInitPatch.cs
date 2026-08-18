@@ -575,7 +575,8 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	private static void Postfix_StageController_StartRoundAfterAbnormalityChoice_Init()
 	{
 		CoroutineRunner.Instance.StartCoroutine(IAmABum().WrapToIl2Cpp());
-			foreach (KeyValuePair<int, BattleObjectManager.BattleUnit> allUnit in SingletonBehavior<BattleObjectManager>.Instance._allUnitDictionary)
+		
+		foreach (KeyValuePair<int, BattleObjectManager.BattleUnit> allUnit in SingletonBehavior<BattleObjectManager>.Instance._allUnitDictionary)
 		{
 			PassiveDetail passiveDetail = allUnit.Value?.Model._passiveDetail;
 			if (passiveDetail == null) continue;
