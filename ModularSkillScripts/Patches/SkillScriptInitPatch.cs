@@ -4052,6 +4052,39 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 	}
 
+	
+	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.EndBehaviourAction))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitView_EndBehaviourAction(BattleActionLog actionLog, BattleUnitView __instance)
+	{
+		BattleSkillViewer currentSkillViewer = __instance.GetCurrentSkillViewer();
+		if (currentSkillViewer == null) return;
+		BattleUnitModel unit = currentSkillViewer.GetModel() ?? __instance.unitModel;
+		SkillModel skill = currentSkillViewer.GetSkillModel();
+
+		int actevent = MainClass.timingDict["VisualEndBhv"];
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.Enact(unit, skill, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+		}
+		
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.Enact(unit, skill, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+		
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail._egoPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(egoPassiveModel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.Enact(unit, skill, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+	}
 
 	/*
 	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.StartCoinToss))]

@@ -74,6 +74,7 @@ public class MainClass : BasePlugin
 			"OnBurst",
 			"StartVisualCoinToss",
 			"StartVisualSkillUse",
+			"VisualEndBehaviour",
 			"WhenGained",
 			"ChangeMotion",
 			"IgnorePanic",
@@ -140,6 +141,7 @@ public class MainClass : BasePlugin
 		timingDict.Add("OnVisualUse", timingDict["StartVisualSkillUse"]);
 		timingDict.Add("VisualStartCoinToss", timingDict["StartVisualCoinToss"]);
 		timingDict.Add("VisualSCT", timingDict["StartVisualCoinToss"]);
+		timingDict.Add("VisualEndBhv", timingDict["VisualEndBehaviour"]);
 		
 		FakePowerPatches.actevent_FakePower = timingDict["FakePower"];
 		FakePowerPatches.actevent_BaseCheck = timingDict["ExpectedBasePower"];
