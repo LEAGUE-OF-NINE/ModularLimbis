@@ -161,7 +161,8 @@ public class MainClass : BasePlugin
 
 		//ClassInjector.RegisterTypeInIl2Cpp<ModularSA.BattleUnitComparer>();
 		harmony.PatchAll(typeof(SkillScriptInitPatch));
-		//harmony.PatchAll(typeof(BlackMagic)); BLACK MAGIC
+		// BLACK MAGIC
+		//harmony.PatchAll(typeof(BlackMagic));
 		harmony.PatchAll(typeof(StagePatches));
 		harmony.PatchAll(typeof(UniquePatches));
 		// harmony.PatchAll(typeof(LogoPlayerPatches));
@@ -642,7 +643,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "5.1.2";
+	public const string VERSION = "5.1.4";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 

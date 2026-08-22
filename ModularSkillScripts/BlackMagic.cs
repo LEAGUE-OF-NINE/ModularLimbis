@@ -11,8 +11,10 @@ using Il2CppSystem.Collections.Generic;
 using ModularSkillScripts.Consequence;
 using SD;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.ProBuilder;
 using UnityEngine.Rendering;
+using UnityEngine.Timeline;
 using Utils;
 using static BattleUI.Abnormality.AbnormalityPartSkills;
 using static MirrorDungeonSelectThemeUIPanel.UIResources;
@@ -43,6 +45,7 @@ public class BlackMagic
 		BattleUnitView view = objManager.GetView(unit);
 		if (!view) return;
 		CharacterAppearance aper = objManager.GetViewAppaearance(unit);
+		orbOrbiter.appearance_ref = aper;
 		//MainClass.LogModular("Aper1: " + aper.gameObject.name);
 		//MainClass.LogModular("Aper2: " + aper.transform.parent.gameObject.name);
 		//MainClass.LogModular("Aper3: " + aper.transform.parent.parent.gameObject.name);
@@ -87,6 +90,7 @@ public class BlackMagic
 		
 		public List<Orb> orbsprite_list = new();
 		public Transform unittransform_ref = null;
+		public CharacterAppearance appearance_ref = null;
 		private const float pi_fast = 3.1416f;
 		private const float pi_fast_circle = pi_fast*2;
 		private float encirclement_rotation = 0f;
@@ -98,6 +102,20 @@ public class BlackMagic
 		void Update()
 		{
 			if (!unittransform_ref) return;
+			if (!appearance_ref) return;
+			PlayableDirector director = appearance_ref._playableDirector;
+			PlayableAsset playableAsset = director.playableAsset;
+			if (!playableAsset) return;
+			TimelineAsset timelineAsset = playableAsset.TryCast<TimelineAsset>();
+			if (!timelineAsset) return;
+			MainClass.LogModular("TimelineAsset: " + timelineAsset.name, true);
+			MainClass.LogModular("Progress: " + director.time, true);
+			foreach (TrackAsset trackAsset in timelineAsset.GetOutputTracks().CopyToList())
+			{
+				MainClass.LogModular("TrackName: " + trackAsset.name, true);
+			}
+
+			return;
 			float delta = Time.deltaTime;
 
 			Vector3 view_pos = unittransform_ref.localPosition;
