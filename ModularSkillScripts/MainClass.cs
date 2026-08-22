@@ -113,7 +113,8 @@ public class MainClass : BasePlugin
 			"OnInit",
 			"CanDuel",
 			"IsIgnoreDefense",
-			"IsIgnoreSupportiveDefense"
+			"IsIgnoreSupportiveDefense",
+			"SkillStaggerVictim"
 		];
 		//timingStringList.Add("ChangeSinBuffDamage");
 

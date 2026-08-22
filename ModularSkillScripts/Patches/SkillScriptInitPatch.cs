@@ -955,9 +955,77 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 	}
 
+	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnBreakTarget))]
+	[HarmonyPostfix]
+	public static void Postfix_SkillModel_OnBreakTarget(BattleActionModel action,
+		CoinModel coinOrNull,
+		BattleUnitModel target,
+		DAMAGE_SOURCE_TYPE dmgSrcType,
+		BATTLE_EVENT_TIMING timing,
+		SkillModel __instance)
+	{
+		int actevent = MainClass.timingDict["SkillStaggerVictim"];
+
+		BattleUnitModel attacker = action._model;
+		
+		foreach (BuffModel buf in attacker.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buf)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_buffModel = buf;
+				modsa.modsa_coinModel = coinOrNull;
+				modsa.modsa_victimModel = target;
+				modsa.Enact(attacker, __instance, action, null, actevent, timing);
+			}
+		}
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(__instance)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.modsa_coinModel = coinOrNull;
+			modsa.modsa_victimModel = target;
+			modsa.Enact(attacker, __instance, action, null, actevent, timing);
+		}
+
+		if (coinOrNull != null)
+		{
+			foreach (ModularSA modsa in GetAllModcaFromCoinModel(coinOrNull)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_coinModel = coinOrNull;
+				modsa.modsa_victimModel = target;
+				modsa.Enact(attacker, __instance, action, null, actevent, timing);
+			}
+		}
+		
+		
+		// Passives, then EGO passives
+		foreach (PassiveModel pasmodel in attacker._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.modsa_coinModel = coinOrNull;
+				modsa.modsa_victimModel = target;
+				modsa.Enact(attacker, __instance, action, null, actevent, timing);
+			}
+		}
+		foreach (EgoPassiveModel pasmodel in attacker._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.modsa_coinModel = coinOrNull;
+				modsa.modsa_victimModel = target;
+				modsa.Enact(attacker, __instance, action, null, actevent, timing);
+			}
+		}
+		
+	}
+
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnBreak))]
 	[HarmonyPostfix]
-	private static void Postfix_PassiveDetail_OnBreak(BATTLE_EVENT_TIMING timing, BattleUnitModel attackerOrNull, BattleUnitModel __instance)
+	public static void Postfix_BattleUnitModel_OnBreak(BATTLE_EVENT_TIMING timing,
+		BattleUnitModel attackerOrNull,
+		BattleActionModel actionOrNull,
+		DAMAGE_SOURCE_TYPE dmgSrcType,
+		bool isBreakForcely,
+		BattleUnitModel __instance)
 	{
 		int actevent_OnBreak = MainClass.timingDict["OnBreak"];
 		int actevent_OnOtherBreak = MainClass.timingDict["OnOtherBreak"];
@@ -1013,6 +1081,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				}
 			}
 		}
+		
 		// Support Passive
 		SupportPasPatch.SupportPassiveInit(modpaDict);
 		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList)
