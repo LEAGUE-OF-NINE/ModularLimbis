@@ -2157,13 +2157,38 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 
 	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.OnBeforeTurn))]
 	[HarmonyPostfix]
-	private static void Postfix_SkillModel_OnBeforeTurn(BattleActionModel action, SkillModel __instance)
+	private static void Postfix_SkillModel_OnBeforeTurn(BattleActionModel action, BATTLE_EVENT_TIMING timing, SkillModel __instance)
 	{
+		BattleUnitModel unit = action._model;
+		if (unit == null) return;
 		int actevent = MainClass.timingDict["BeforeUse"];
-		long skillmodel_intlong = __instance.Pointer.ToInt64();
-		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
-		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-			modsa.Enact(action.Model, __instance, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+
+		foreach (BuffModel buf in unit.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buf)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_buffModel = buf;
+				modsa.Enact(action.Model, __instance, action, null, actevent, timing);
+			}
+		}
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(__instance)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.Enact(action.Model, __instance, action, null, actevent, timing);
+		}
+		
+		foreach (PassiveModel pasmodel in unit._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.Enact(action.Model, __instance, action, null, actevent, timing);
+			}
+		}
+		foreach (EgoPassiveModel pasmodel in unit._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.Enact(action.Model, __instance, action, null, actevent, timing);
+			}
 		}
 	}
 
