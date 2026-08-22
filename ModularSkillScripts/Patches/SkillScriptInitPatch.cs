@@ -3037,13 +3037,15 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		
 		BattleUnitModel attacker = __instance._model;
 		SkillModel skill = __instance.Skill;
+
+		int result_v = __result ? 1 : 0;
 		
 		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
 			if (modsa.activationTiming != actevent) continue;
 			modsa.modsa_victimModel = target;
-			modsa.valueList[9] = __result ? 1 : 0;
+			modsa.valueList[9] = result_v;
 			modsa.Enact(attacker, skill, __instance, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-			__result = modsa.valueList[9] > 0;
+			result_v = modsa.valueList[9];
 		}
 		
 		foreach (BuffModel buffModel in attacker._buffDetail.GetActivatedBuffModelAll()) {
@@ -3051,9 +3053,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_buffModel = buffModel;
 				modsa.modsa_victimModel = target;
-				modsa.valueList[9] = __result ? 1 : 0;
+				modsa.valueList[9] = result_v;
 				modsa.Enact(attacker, skill, __instance, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[9] > 0;
+				result_v = modsa.valueList[9];
 			}
 		}
 		
@@ -3062,11 +3064,13 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = passiveModel;
 				modsa.modsa_victimModel = target;
-				modsa.valueList[9] = __result ? 1 : 0;
+				modsa.valueList[9] = result_v;
 				modsa.Enact(attacker, skill, __instance, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[9] > 0;
+				result_v = modsa.valueList[9];
 			}
 		}
+		
+		__result = result_v > 0;
 	}
 	
 	[HarmonyPatch(typeof(BattleActionModel), nameof(BattleActionModel.IgnoreSupportiveDefense))]
@@ -3081,13 +3085,15 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		BattleUnitModel attacker = __instance._model;
 		SkillModel skill = __instance.Skill;
 		
+		int result_v = __result ? 1 : 0;
+		
 		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
 			if (modsa.activationTiming != actevent) continue;
 			modsa.modsa_victimModel = originTarget;
 			modsa.modsa_killerModel = supportiveDefender;
-			modsa.valueList[9] = __result ? 1 : 0;
+			modsa.valueList[9] = result_v;
 			modsa.Enact(attacker, skill, __instance, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-			__result = modsa.valueList[9] > 0;
+			result_v = modsa.valueList[9];
 		}
 		
 		foreach (BuffModel buffModel in attacker._buffDetail.GetActivatedBuffModelAll()) {
@@ -3096,9 +3102,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_buffModel = buffModel;
 				modsa.modsa_victimModel = originTarget;
 				modsa.modsa_killerModel = supportiveDefender;
-				modsa.valueList[9] = __result ? 1 : 0;
+				modsa.valueList[9] = result_v;
 				modsa.Enact(attacker, skill, __instance, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[9] > 0;
+				result_v = modsa.valueList[9];
 			}
 		}
 		
@@ -3108,11 +3114,13 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_passiveModel = passiveModel;
 				modsa.modsa_victimModel = originTarget;
 				modsa.modsa_killerModel = supportiveDefender;
-				modsa.valueList[9] = __result ? 1 : 0;
+				modsa.valueList[9] = result_v;
 				modsa.Enact(attacker, skill, __instance, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[9] > 0;
+				result_v = modsa.valueList[9];
 			}
 		}
+		
+		__result = result_v > 0;
 	}
 	
 	[HarmonyPatch(typeof(BattleActionModel), nameof(BattleActionModel.CanDuel))]
@@ -3130,14 +3138,16 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		BattleUnitModel attacker = __instance._model;
 		SkillModel skill = __instance.Skill;
 		
+		int result_v = __result ? 1 : 0;
+		
 		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
 			if (modsa.activationTiming != actevent) continue;
 			modsa.modsa_victimModel = opp_unit;
 			modsa.modsa_target_list.Clear();
 			modsa.modsa_target_list.Add(opp_unit);
-			modsa.valueList[9] = __result ? 1 : 0;
+			modsa.valueList[9] = result_v;
 			modsa.Enact(attacker, skill, __instance, opponentAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-			__result = modsa.valueList[9] > 0;
+			result_v = modsa.valueList[9];
 		}
 		
 		foreach (BuffModel buffModel in attacker._buffDetail.GetActivatedBuffModelAll()) {
@@ -3147,9 +3157,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_victimModel = opp_unit;
 				modsa.modsa_target_list.Clear();
 				modsa.modsa_target_list.Add(opp_unit);
-				modsa.valueList[9] = __result ? 1 : 0;
+				modsa.valueList[9] = result_v;
 				modsa.Enact(attacker, skill, __instance, opponentAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[9] > 0;
+				result_v = modsa.valueList[9];
 			}
 		}
 		
@@ -3160,11 +3170,12 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_victimModel = opp_unit;
 				modsa.modsa_target_list.Clear();
 				modsa.modsa_target_list.Add(opp_unit);
-				modsa.valueList[9] = __result ? 1 : 0;
+				modsa.valueList[9] = result_v;
 				modsa.Enact(attacker, skill, __instance, opponentAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[9] > 0;
+				result_v = modsa.valueList[9];
 			}
 		}
+		__result = result_v > 0;
 	}
 
 	[HarmonyPatch(typeof(BattleActionModel), nameof(BattleActionModel.OnAttackConfirmed))]
