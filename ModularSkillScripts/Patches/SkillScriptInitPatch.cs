@@ -2030,6 +2030,13 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		BattleUnitModel unit = action.Model;
 		if (unit == null) return;
 		
+		foreach (BuffModel buf in unit.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel_Fast(buf)) {
+				if (modsa.EXPECTED) continue;
+				__result += modsa.atkDmgAdder;
+			}
+		}
+		
 		foreach (ModularSA modsa in GetAllModsaFromSkillModel_Fast(__instance)) {
 			if (modsa.EXPECTED) continue;
 			__result += modsa.atkDmgAdder;
@@ -2058,6 +2065,14 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	{
 		BattleUnitModel unit = action.Model;
 		if (unit == null) return;
+		
+		foreach (BuffModel buf in unit.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel_Fast(buf)) {
+				if (modsa.EXPECTED) continue;
+				int power = modsa.atkMultAdder;
+				if (power != 0) __result += power * 0.01f;
+			}
+		}
 		
 		foreach (ModularSA modsa in GetAllModsaFromSkillModel_Fast(__instance)) {
 			if (modsa.EXPECTED) continue;
