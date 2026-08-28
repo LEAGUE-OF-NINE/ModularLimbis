@@ -3441,8 +3441,55 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 	}
 
-
-
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnReleaseStandBy))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_OnReleaseStandBy(BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
+	{
+		int actevent = MainClass.timingDict["OnFieldedFromBackup"];
+		
+		foreach (PassiveModel pasmodel in __instance._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.Enact(__instance, null, null, null, actevent, timing);
+			}
+		}
+		foreach (EgoPassiveModel pasmodel in __instance._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.Enact(__instance, null, null, null, actevent, timing);
+			}
+		}
+	}
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnReturnToField))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_OnReturnToField(
+		int retreatTurn,
+		//BattleUnitModel triggerUnit,
+		//BUFF_UNIQUE_KEYWORD retreatKeyword,
+		//List<OnReleaseStandByOrOnReturnData> batonPassTargetAbilities,
+		BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
+	{
+		int actevent = MainClass.timingDict["OnReturnFromRetreat"];
+		
+		foreach (PassiveModel pasmodel in __instance._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.valueList[9] = retreatTurn;
+				modsa.Enact(__instance, null, null, null, actevent, timing);
+			}
+		}
+		foreach (EgoPassiveModel pasmodel in __instance._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.valueList[9] = retreatTurn;
+				modsa.Enact(__instance, null, null, null, actevent, timing);
+			}
+		}
+	}
 
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnKillTarget))]
 	[HarmonyPostfix]
