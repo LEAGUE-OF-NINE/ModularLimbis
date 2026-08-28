@@ -767,6 +767,18 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		int actevent_OnDie = MainClass.timingDict["OnDie"];
 		int actevent_OnOtherDie = MainClass.timingDict["OnOtherDie"];
 		
+		foreach (BuffModel buf in deadUnit.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buf)) {
+				if (modsa.activationTiming != actevent_OnDie) continue;
+				modsa.modsa_buffModel = buf;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(killer);
+				modsa.modsa_killerModel = killer;
+				modsa.modsa_victimModel = deadUnit;
+				modsa.Enact(deadUnit, null, actionOrNull, null, actevent_OnDie, timing);
+			}
+		}
+		
 		foreach (PassiveModel pasmodel in __instance._passivelist.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
 				if (modsa.activationTiming != actevent_OnDie) continue;
