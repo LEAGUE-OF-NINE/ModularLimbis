@@ -40,7 +40,7 @@ public class ConsequenceBufActivate : IModularConsequence
 				for (int i = 0; i < activate_times; i++) {
 					if (overwrite_amount > 0) {
 						buf.ForceToActivateBuffEffect(targetModel, attacker, 0, 0,
-						nulint, modular.battleTiming, sinKind, overwrite_amount);
+						nulint, timing, sinKind, overwrite_amount);
 						foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
 						{
 							if (modsa.activationTiming != actevent) continue;
@@ -52,7 +52,7 @@ public class ConsequenceBufActivate : IModularConsequence
 						}
 					} else {
 						buf.ForceToActivateBuffEffect(targetModel, attacker, 0, 0,
-						nulint, modular.battleTiming, sinKind);
+						nulint, timing, sinKind);
 						foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
 						{
 							if (modsa.activationTiming != actevent) continue;

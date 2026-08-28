@@ -3429,27 +3429,58 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	[HarmonyPostfix]
 	private static void Postfix_BattleUnitModel_OnSucceedEvade(BattleActionModel evadeAction, BattleActionModel attackAction, BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
 	{
+		BattleUnitModel attacker = attackAction.Model;
 		SkillModel skill = evadeAction.Skill;
-		long skillmodel_intlong = skill.Pointer.ToInt64();
-		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 		int actevent = MainClass.timingDict["OnSucceedEvade"];
-		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
-			modsa.modsa_target_list.Clear();
-			modsa.modsa_target_list.Add(attackAction.Model);
-			modsa.Enact(__instance, skill, evadeAction, attackAction, actevent, timing);
-		}
+		ModularTiming_Evade(__instance, attacker, skill, evadeAction, attackAction, actevent, timing);
 	}
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnFailedEvade))]
 	[HarmonyPostfix]
 	private static void Postfix_BattleUnitModel_OnFailedEvade(BattleActionModel evadeAction, BattleActionModel attackAction, BATTLE_EVENT_TIMING timing, BattleUnitModel __instance) {
+		BattleUnitModel attacker = attackAction.Model;
 		SkillModel skill = evadeAction.Skill;
-		long skillmodel_intlong = skill.Pointer.ToInt64();
-		if (!modsaDict.ContainsKey(skillmodel_intlong)) return;
 		int actevent = MainClass.timingDict["OnDefeatEvade"];
-		foreach (ModularSA modsa in modsaDict[skillmodel_intlong]) {
+		ModularTiming_Evade(__instance, attacker, skill, evadeAction, attackAction, actevent, timing);
+	}
+	public static void ModularTiming_Evade(
+		BattleUnitModel unit, BattleUnitModel attacker,
+		SkillModel skill, BattleActionModel evadeAction, BattleActionModel attackAction,
+		int actevent, BATTLE_EVENT_TIMING timing)
+	{
+		foreach (BuffModel buf in unit.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buf)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_buffModel = buf;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(attacker);
+				modsa.Enact(unit, skill, evadeAction, attackAction, actevent, timing);
+			}
+		}
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+			if (modsa.activationTiming != actevent) continue;
 			modsa.modsa_target_list.Clear();
-			modsa.modsa_target_list.Add(attackAction.Model);
-			modsa.Enact(__instance, skill, evadeAction, attackAction, actevent, timing);
+			modsa.modsa_target_list.Add(attacker);
+			modsa.Enact(unit, skill, evadeAction, attackAction, actevent, timing);
+		}
+		
+		foreach (PassiveModel pasmodel in unit._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(attacker);
+				modsa.Enact(unit, skill, evadeAction, attackAction, actevent, timing);
+			}
+		}
+		foreach (EgoPassiveModel pasmodel in unit._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(attacker);
+				modsa.Enact(unit, skill, evadeAction, attackAction, actevent, timing);
+			}
 		}
 	}
 
