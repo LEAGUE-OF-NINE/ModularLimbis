@@ -411,6 +411,7 @@ public class MainClass : BasePlugin
 		acquirerDict["getskillamountondash"] = new AcquirerGetSkillAmountOnDash();
 		acquirerDict["isignoredefense"] = new AcquirerIsIgnoreDefense();
 		acquirerDict["isbaseskill"] = new AcquirerIsBaseSkill();
+		acquirerDict["isduel"] = new AcquirerIsDuel();
 
 		// legacy acquirers
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();
