@@ -16,3 +16,19 @@ public class ConsequenceBloodfeast : IModularConsequence
 		}
 	}
 }
+
+public class ConsequenceScorchfield : IModularConsequence
+{
+	public void ExecuteConsequence(ModularSA modular, string section, string circledSection, string[] circles)
+	{
+		string mode_s = circles[0];
+		int stack = modular.GetNumFromParamString(circles[1]);
+		if (string.Equals(mode_s, "add", StringComparison.OrdinalIgnoreCase)) FireFieldBuff.BuffInstance.AddStack(stack, modular.battleTiming, false);
+		else if (string.Equals(mode_s, "sub", StringComparison.OrdinalIgnoreCase)) FireFieldBuff.BuffInstance.SubStack(stack, modular.battleTiming);
+		else if (circles.Length > 1 && string.Equals(mode_s, "use", StringComparison.OrdinalIgnoreCase))
+		{
+			BattleUnitModel targetModel = modular.GetTargetModel(circles[2]);
+			FireFieldBuff.BuffInstance.UseBuffStack(targetModel, stack, modular.battleTiming, null);
+		}
+	}
+}

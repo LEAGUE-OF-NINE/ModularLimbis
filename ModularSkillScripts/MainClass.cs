@@ -246,6 +246,7 @@ public class MainClass : BasePlugin
 		consequenceDict["deluge"] = new ConsequenceSurge();
 		consequenceDict["makeunbreakable"] = new ConsequenceMakeUnbreakable();
 		consequenceDict["bloodfeast"] = new ConsequenceBloodfeast();
+		consequenceDict["scorchfield"] = new ConsequenceScorchfield();
 		consequenceDict["critchance"] = new ConsequenceCritChance();
 		consequenceDict["critratio"] = new ConsequenceCritRatio();
 		consequenceDict["changemotion"] = new ConsequenceChangeMotion();
@@ -372,6 +373,7 @@ public class MainClass : BasePlugin
 		acquirerDict["iscoinrerolled"] = new AcquirerCoinRerolled();
 		acquirerDict["stageextraslot"] = new AcquirerStageExtraSlot();
 		acquirerDict["getbloodfeast"] = new AcquirerGetBloodfeast();
+		acquirerDict["getscorchfield"] = new AcquirerGetScorchfield();
 		acquirerDict["isunbreakable"] = new AcquirerIsUnbreakable();
 		acquirerDict["isusableinduel"] = new AcquirerIsUsableInDuel();
 		acquirerDict["issameunit"] = new AcquirerSameUnit();

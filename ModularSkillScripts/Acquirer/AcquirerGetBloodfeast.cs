@@ -20,3 +20,11 @@ public class AcquirerGetBloodfeast : IModularAcquirer
 		else return 0;
 	}
 }
+
+public class AcquirerGetScorchfield : IModularAcquirer
+{
+	public int ExecuteAcquirer(ModularSA modular, string section, string circledSection, string[] circles)
+	{
+		return FireFieldBuff.TryGetCurrentStack(out int stack) ? stack : 0;
+	}
+}
