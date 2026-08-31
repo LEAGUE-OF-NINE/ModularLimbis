@@ -413,6 +413,7 @@ public class MainClass : BasePlugin
 		acquirerDict["isbaseskill"] = new AcquirerIsBaseSkill();
 		acquirerDict["isduel"] = new AcquirerIsDuel();
 		acquirerDict["abs"] = new AcquirerAbsolute();
+		acquirerDict["ispart"] = new AcquirerIsPart();
 
 		// legacy acquirers
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();
