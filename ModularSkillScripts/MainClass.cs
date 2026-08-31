@@ -365,7 +365,8 @@ public class MainClass : BasePlugin
 		acquirerDict["turn"] = new AcquirerTurn();
 		acquirerDict["onusebufstack"] = new AcquirerStack(1);
 		acquirerDict["onusebufturn"] = new AcquirerTurn(1);
-		acquirerDict["onusebufiskeyword"] = new AcquirerOnUseBufIsKeyword();
+		acquirerDict["onusebufiskeyword"] = new AcquirerTimingBufIsKeyword(0);
+		acquirerDict["ongainbufiskeyword"] = new AcquirerTimingBufIsKeyword(1);
 		acquirerDict["isfocused"] = new AcquirerIsFocused();
 		acquirerDict["getunitcount"] = new AcquirerUnitCount();
 		acquirerDict["getbreakcount"] = new AcquirerBreakCount();

@@ -1110,24 +1110,18 @@ public class ModularSA : Il2CppSystem.Object
 					
 				if (circles.Length > 1)
 				{
-					string hitArgs = circles[1];
-					if (hitArgs.Contains("Head")) _onlyHeads = true;
-					else if (hitArgs.Contains("Tail")) _onlyTails = true;
+					string circle_1 = circles[1];
+					if (circle_1.Contains("Head")) _onlyHeads = true;
+					else if (circle_1.Contains("Tail")) _onlyTails = true;
 
-					if (hitArgs.Contains("NoCrit")) _onlyNonCrit = true;
-					else if (hitArgs.Contains("Crit")) _onlyCrit = true;
+					if (circle_1.Contains("NoCrit")) _onlyNonCrit = true;
+					else if (circle_1.Contains("Crit")) _onlyCrit = true;
 
-					//if (hitArgs.Contains("Win")) _onlyClashWin = true;
-					//else if (hitArgs.Contains("Lose")) _onlyClashLose = true;
-					if (!Il2CppSystem.Enum.TryParse(hitArgs, out BUFF_UNIQUE_KEYWORD parsedKeyword)) parsedKeyword = BUFF_UNIQUE_KEYWORD.None;
+					if (!Il2CppSystem.Enum.TryParse(circle_1, out BUFF_UNIQUE_KEYWORD parsedKeyword)) parsedKeyword = BUFF_UNIQUE_KEYWORD.None;
 					keywordTrigger = parsedKeyword;
-					MainClass.LogModular($"Parsed buff keyword {hitArgs} and set to keywordTrigger: {parsedKeyword}");
-					if (!Enum.TryParse(hitArgs, true, out KeyCode parsedKey))
-					{
-						parsedKey = KeyCode.LeftControl;
-					}
+					if (!Enum.TryParse(circle_1, true, out KeyCode parsedKey)) parsedKey = KeyCode.LeftControl;
 					SpecialKey = parsedKey;
-					MainClass.LogModular("Parsed key and set to SpecialKey: " + hitArgs);
+					MainClass.LogModular("Parsed key and set to SpecialKey: " + SpecialKey.ToString());
 				}
 				else if (circle_0 == "SpecialAction")
 				{
