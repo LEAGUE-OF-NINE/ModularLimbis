@@ -1120,7 +1120,7 @@ public class ModularSA : Il2CppSystem.Object
 					//if (hitArgs.Contains("Win")) _onlyClashWin = true;
 					//else if (hitArgs.Contains("Lose")) _onlyClashLose = true;
 					BUFF_UNIQUE_KEYWORD parsedKeyword = CustomBuffs.ParseBuffUniqueKeyword(hitArgs);
-					if (parsedKeyword.ToString() != hitArgs) parsedKeyword = BUFF_UNIQUE_KEYWORD.None;
+					// if (parsedKeyword.ToString() != hitArgs) parsedKeyword = BUFF_UNIQUE_KEYWORD.None;
 					keywordTrigger = parsedKeyword;
 					MainClass.LogModular("Parsed buff keyword and set to keywordTrigger: " + hitArgs);
 					if (!Enum.TryParse(hitArgs, true, out KeyCode parsedKey))
