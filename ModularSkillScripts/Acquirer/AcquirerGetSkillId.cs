@@ -22,6 +22,6 @@ public class AcquirerGetSkillId : IModularAcquirer
 		if (modular.modsa_skillModel != null) return modular.modsa_skillModel.GetID();
 		if (action != null) return action.Skill.GetID();
 		
-		return 0;
+		return -1;
 	}
 }

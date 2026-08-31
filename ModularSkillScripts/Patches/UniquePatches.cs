@@ -3,6 +3,7 @@ using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
 using BepInEx.Unity.IL2CPP.UnityEngine;
 using ModularSkillScripts.Consequence;
+using Utils;
 
 namespace ModularSkillScripts.Patches;
 
@@ -37,71 +38,51 @@ public class UniquePatches
 		if (!unit.IsActionable()) return true;
 		int actevent = MainClass.timingDict["SpecialAction"];
 		bool success = false;
+		
+		UnitSinModel sinModel = sinAction.currentSelectSin;
+		BattleActionModel action = null;
+		SkillModel skill = null;
 
-		List<BuffModel> buflist = unit.GetActivatedBuffModels();
-		int buf_i = 0;
-		while (buf_i < buflist.Count)
-		{
-			BuffModel buf = buflist[buf_i];
-			buf_i += 1;
-			foreach (ModularSA modba in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf))
-			{
-				if (!Input.GetKeyInt(modba.SpecialKey)) continue;
-				MainClass.LogModular("Found bufpassive - SPECIAL");
-				MainClass.LogModular("Triggered Key: " + modba.SpecialKey.ToString());
-				success = true;
-				modba.modsa_buffModel = buf;
-				modba.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-			}
+		if (sinModel?.GetSkill() != null) {
+			action = sinModel.GetBattleActionModel();
+			skill = sinModel.GetSkill();
 		}
 
-		if (sinAction.currentSelectSin != null && sinAction.currentSelectSin.GetSkill() != null)
-		{
-			UnitSinModel sinModel = sinAction.currentSelectSin;
-			BattleActionModel action = sinModel.GetBattleActionModel();
-			SkillModel skill = sinModel.GetSkill();
-			long skillmodel_intlong = skill.Pointer.ToInt64();
-			if (SkillScriptInitPatch.modsaDict.ContainsKey(skillmodel_intlong))
-			{
-				foreach (ModularSA modsa in SkillScriptInitPatch.modsaDict[skillmodel_intlong])
-				{
-					if (!Input.GetKeyInt(modsa.SpecialKey)) continue;
-					success = true;
-					modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING); // normal code
-				}
+		foreach (BuffModel buf in unit.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModbaFromBuffModel(buf)) {
+				if (modsa.activationTiming != actevent) continue;
+				if (!Input.GetKeyInt(modsa.SpecialKey)) continue;
+				success = true;
+				modsa.modsa_buffModel = buf;
+				modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 		
-		foreach (PassiveModel passiveModel in unit._passiveDetail.PassiveList)
-		{
-			if (!passiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = passiveModel.Pointer.ToInt64();
-			if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong])
-			{
-				if (!Input.GetKeyInt(modpa.SpecialKey)) continue;
-				MainClass.LogModular("FoundS modpassive - SPECIAL: " + modpa.passiveID);
-				MainClass.LogModular("Triggered Key: " + modpa.SpecialKey.ToString());
+		if (skill != null) {
+			foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModsaFromSkillModel(skill)) {
+				if (modsa.activationTiming != actevent) continue;
+				if (!Input.GetKeyInt(modsa.SpecialKey)) continue;
 				success = true;
-				modpa.modsa_passiveModel = passiveModel;
-				modpa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
-		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail.EgoPassiveList)
-		{
-			if (!egoPassiveModel.CheckActiveCondition()) continue;
-			long passiveModel_intlong = egoPassiveModel.Pointer.ToInt64();
-			if (!SkillScriptInitPatch.modpaDict.ContainsKey(passiveModel_intlong)) continue;
-
-			foreach (ModularSA modpa in SkillScriptInitPatch.modpaDict[passiveModel_intlong])
-			{
-				if (!Input.GetKeyInt(modpa.SpecialKey)) continue;
+		
+		foreach (PassiveModel pasmodel in unit._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel(pasmodel)) {
+				if (modsa.activationTiming != actevent) continue;
+				if (!Input.GetKeyInt(modsa.SpecialKey)) continue;
 				success = true;
-				MainClass.LogModular("FoundS modpassive - SPECIAL: " + modpa.passiveID);
-				MainClass.LogModular("Triggered Key: " + modpa.SpecialKey.ToString());
-				modpa.modsa_passiveModel = egoPassiveModel;
-				modpa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			}
+		}
+		foreach (EgoPassiveModel pasmodel in unit._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel(pasmodel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				if (!Input.GetKeyInt(modsa.SpecialKey)) continue;
+				success = true;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
 		}
 
