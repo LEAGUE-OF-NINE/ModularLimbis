@@ -52,32 +52,6 @@ private static void Postfix_UnitInformationDataManager_SetData(
 				}
 			}
 		}
-
-		if (instModel._skillList != null &&
-			__instance._skillListData._skillBoxDatas != null)
-		{
-			List<int> skillIds = new List<int>();
-
-			foreach (SkillModel s in instModel._skillList)
-			{
-				if (s != null)
-					skillIds.Add(s.GetID());
-			}
-
-			for (int i = __instance._skillListData._skillBoxDatas.Count - 1;
-				i >= 0;
-				i--)
-			{
-				var sb = __instance._skillListData._skillBoxDatas[i];
-
-				if (sb == null ||
-					sb.skillModel == null ||
-					!skillIds.Contains(sb.skillModel.GetID()))
-				{
-					__instance._skillListData._skillBoxDatas.RemoveAt(i);
-				}
-			}
-		}
 	}
 
 	[HarmonyPatch(typeof(NewOperationController), nameof(NewOperationController.EquipDefense))]
