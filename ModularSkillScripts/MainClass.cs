@@ -246,7 +246,7 @@ public class MainClass : BasePlugin
 		consequenceDict["deluge"] = new ConsequenceSurge();
 		consequenceDict["makeunbreakable"] = new ConsequenceMakeUnbreakable();
 		consequenceDict["bloodfeast"] = new ConsequenceBloodfeast();
-		consequenceDict["scorchfield"] = new ConsequenceScorchfield();
+		consequenceDict["stagebuf"] = new ConsequenceStageBuf();
 		consequenceDict["critchance"] = new ConsequenceCritChance();
 		consequenceDict["critratio"] = new ConsequenceCritRatio();
 		consequenceDict["changemotion"] = new ConsequenceChangeMotion();
@@ -374,7 +374,7 @@ public class MainClass : BasePlugin
 		acquirerDict["iscoinrerolled"] = new AcquirerCoinRerolled();
 		acquirerDict["stageextraslot"] = new AcquirerStageExtraSlot();
 		acquirerDict["getbloodfeast"] = new AcquirerGetBloodfeast();
-		acquirerDict["getscorchfield"] = new AcquirerGetScorchfield();
+		acquirerDict["stagebuf"] = new AcquirerStageBuf();
 		acquirerDict["isunbreakable"] = new AcquirerIsUnbreakable();
 		acquirerDict["isusableinduel"] = new AcquirerIsUsableInDuel();
 		acquirerDict["issameunit"] = new AcquirerSameUnit();
@@ -654,7 +654,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "5.1.6";
+	public const string VERSION = "5.1.7";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
