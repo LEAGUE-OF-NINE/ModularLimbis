@@ -4,11 +4,56 @@ using Il2CppSystem.Collections.Generic;
 using BepInEx.Unity.IL2CPP.UnityEngine;
 using ModularSkillScripts.Consequence;
 using Utils;
+using UnitInformation.Tab;
 
 namespace ModularSkillScripts.Patches;
 
 public class UniquePatches
+{	
+[HarmonyPatch(typeof(UnitInformationDataManager),
+    nameof(UnitInformationDataManager.SetData),
+    typeof(UnitModel),
+    typeof(UnitInformationOptionData))]
+[HarmonyPostfix]
+private static void Postfix_UnitInformationDataManager_SetData(
+    UnitInformationDataManager __instance,
+    UnitModel unitModel,
+    UnitInformationOptionData optionData)
 {
+		if (__instance == null || unitModel == null)
+			return;
+
+		UnitDataModel instModel = __instance._unitDataModel;
+		if (instModel == null || __instance._skillListData == null)
+			return;
+
+		if (instModel._passiveList != null &&
+			__instance._skillListData._passiveDataList != null)
+		{
+			List<int> passiveIds = new List<int>();
+
+			foreach (PassiveModel p in instModel._passiveList)
+			{
+				if (p != null)
+					passiveIds.Add(p.GetID());
+			}
+
+			for (int i = __instance._skillListData._passiveDataList.Count - 1;
+				i >= 0;
+				i--)
+			{
+				var pb = __instance._skillListData._passiveDataList[i];
+
+				if (pb == null ||
+					pb.passiveData == null ||
+					!passiveIds.Contains(pb.passiveData.GetID()))
+				{
+					__instance._skillListData._passiveDataList.RemoveAt(i);
+				}
+			}
+		}
+	}
+
 	[HarmonyPatch(typeof(NewOperationController), nameof(NewOperationController.EquipDefense))]
 	[HarmonyPrefix]
 	private static bool Prefix_NewOperationController_EquipDefense(bool equiped, SinActionModel sinAction)
