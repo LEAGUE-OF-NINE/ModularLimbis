@@ -17,6 +17,7 @@ public class ConsequencePassiveRemove : IModularConsequence
 			}
 
 			foreach (PassiveModel passive in removal) targetModel.GetPassiveList().Remove(passive);
+			foreach (PassiveModel passive in removal) targetModel._unitDataModel._passiveList.Remove(passive);
 		}
 	}
 }
