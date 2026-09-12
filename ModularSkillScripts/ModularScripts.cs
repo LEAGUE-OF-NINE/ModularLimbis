@@ -2,6 +2,7 @@ using BepInEx.Unity.IL2CPP.UnityEngine;
 using Il2CppInterop.Runtime.Injection;
 using Il2CppSystem.Collections.Generic;
 using Lethe.Patches;
+using Lethe.EnumInjections;
 using Lua;
 using Lua.Standard;
 using ModularSkillScripts.Consequence;

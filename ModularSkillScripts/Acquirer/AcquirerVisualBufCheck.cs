@@ -1,6 +1,7 @@
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem.Collections.Generic;
 using Lethe.Patches;
+using Lethe.EnumInjections;
 using ModularSkillScripts.Patches;
 
 namespace ModularSkillScripts.Acquirer;

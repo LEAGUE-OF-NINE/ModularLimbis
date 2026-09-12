@@ -1,4 +1,5 @@
 using Lethe.Patches;
+using Lethe.EnumInjections;
 using System;
 using Il2CppSystem.Collections.Generic;
 using ModularSkillScripts.Patches;

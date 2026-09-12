@@ -1,4 +1,5 @@
 using Lethe.Patches;
+using Lethe.EnumInjections;
 using ModularSkillScripts.Patches;
 
 namespace ModularSkillScripts.Acquirer;
