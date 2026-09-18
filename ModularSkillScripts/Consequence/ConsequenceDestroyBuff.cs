@@ -1,4 +1,5 @@
 using System;
+using Lethe.EnumInjections;
 using Lethe.Patches;
 
 namespace ModularSkillScripts.Consequence;

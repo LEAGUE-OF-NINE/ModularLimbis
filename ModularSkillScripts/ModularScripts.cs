@@ -1,6 +1,7 @@
 using BepInEx.Unity.IL2CPP.UnityEngine;
 using Il2CppInterop.Runtime.Injection;
 using Il2CppSystem.Collections.Generic;
+using Lethe.EnumInjections;
 using Lethe.Patches;
 using Lua;
 using Lua.Standard;

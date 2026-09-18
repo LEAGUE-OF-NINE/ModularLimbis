@@ -1,3 +1,4 @@
+using Lethe.EnumInjections;
 using Lethe.Patches;
 using System;
 

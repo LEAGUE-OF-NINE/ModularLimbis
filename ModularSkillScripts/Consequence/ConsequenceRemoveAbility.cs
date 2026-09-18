@@ -11,7 +11,7 @@ public class ConsequenceRemoveAbility : IModularConsequence
 		Enum.TryParse(circles[1], true, out ability);
 		foreach (BattleUnitModel targetModel in modelList)
 		{
-			targetModel._systemAbilityDetail.DestoryAbility(ability);
+			targetModel._systemAbilityDetail.DestoryAbility(ability, modular.battleTiming);
 		}
 	}
 }

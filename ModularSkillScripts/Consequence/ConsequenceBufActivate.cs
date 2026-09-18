@@ -1,3 +1,4 @@
+using Lethe.EnumInjections;
 using Lethe.Patches;
 using System;
 using Il2CppSystem.Collections.Generic;
