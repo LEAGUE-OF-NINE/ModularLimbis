@@ -13,6 +13,8 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Battle;
+using CustomBuffs = Lethe.Patches.CustomBuffs;
+
 using ModularSkillScripts.Patches;
 using SharpCompress;
 using Utils;

@@ -1,5 +1,6 @@
 using Lethe.EnumInjections;
 using Lethe.Patches;
+using CustomBuffs = Lethe.Patches.CustomBuffs;
 
 namespace ModularSkillScripts.Consequence;
 

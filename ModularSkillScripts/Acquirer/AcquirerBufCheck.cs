@@ -2,6 +2,7 @@ using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem.Collections.Generic;
 using Lethe.EnumInjections;
 using Lethe.Patches;
+using CustomBuffs = Lethe.Patches.CustomBuffs;
 
 namespace ModularSkillScripts.Acquirer;
 

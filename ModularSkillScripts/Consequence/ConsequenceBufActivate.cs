@@ -3,6 +3,7 @@ using Lethe.Patches;
 using System;
 using Il2CppSystem.Collections.Generic;
 using ModularSkillScripts.Patches;
+using CustomBuffs = Lethe.Patches.CustomBuffs;
 
 namespace ModularSkillScripts.Consequence;
 
