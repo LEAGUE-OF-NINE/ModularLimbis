@@ -1603,11 +1603,12 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			if (check != 0) __result += (float)check * 0.01f;
 		}
 	}
-	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetCoinProb), new Type[] { typeof(BattleUnitModel), typeof(float) })]
+	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetCoinProb), new Type[] { typeof(CoinModel), typeof(UnitModel), typeof(float) })]
 	[HarmonyPostfix]
-	private static void Postfix_SkillModel_GetProb(BattleUnitModel unit, ref float __result, SkillModel __instance)
+	private static void Postfix_SkillModel_GetProb(CoinModel coinOrNull, UnitModel unit, float defaultProb, ref float __result, SkillModel __instance)
 	{
-		foreach (BuffModel buf in unit.GetActivatedBuffModels()) {
+		BattleUnitModel a = (BattleUnitModel)unit;
+		foreach (BuffModel buf in a.GetActivatedBuffModels()) {
 			foreach (ModularSA modsa in GetAllModbaFromBuffModel_Fast(buf)) {
 				int check = modsa.headsChanceAdder;
 				if (check != 0) __result += (float)check * 0.01f;
@@ -1619,13 +1620,13 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			if (check != 0) __result += (float)check * 0.01f;
 		}
 		
-		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
+		foreach (PassiveModel passiveModel in a._passiveDetail._passivelist) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
 				int check = modsa.headsChanceAdder;
 				if (check != 0) __result += (float)check * 0.01f;
 			}
 		}
-		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail._egoPassiveList) {
+		foreach (EgoPassiveModel egoPassiveModel in a._passiveDetail._egoPassiveList) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(egoPassiveModel, false)) {
 				int check = modsa.headsChanceAdder;
 				if (check != 0) __result += (float)check * 0.01f;
