@@ -146,11 +146,11 @@ public class UniquePatches
 		}
 
 		if (overrideCycleWithPassive_skillID > 0) {
-			action.TryChangeSkill(overrideCycleWithPassive_skillID);
+			ConsequenceChangeSkill.ChangeSkillOfAction(action, overrideCycleWithPassive_skillID);
 			return true;
 		}
 		if (overrideCycleWithPassive_skillID < 0) {
-			action.TryChangeSkill(defID_list[0]);
+			ConsequenceChangeSkill.ChangeSkillOfAction(action, defID_list[0]);
 			return false;
 		}
 		
@@ -185,11 +185,11 @@ public class UniquePatches
 
 		if (defenseNextCycle < 1) // Not Found or Reached End of List
 		{
-			action.TryChangeSkill(defID_list[0]); // Assumes there IS a whitelist in unit.keywordlist, but failed to cycle
+			ConsequenceChangeSkill.ChangeSkillOfAction(action, defID_list[0]); // Assumes there IS a whitelist in unit.keywordlist, but failed to cycle
 			return false;
 		}
 
-		action.TryChangeSkill(defenseNextCycle);
+		ConsequenceChangeSkill.ChangeSkillOfAction(action, defenseNextCycle);
 		return true;
 	}
 	
