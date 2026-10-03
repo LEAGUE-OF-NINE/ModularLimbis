@@ -1594,22 +1594,25 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 	}
 
-	[HarmonyPatch(typeof(CoinModel), nameof(CoinModel.GetProb))]
+	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetCoinProb), new Type[] { typeof(BattleUnitModel), typeof(CoinModel), typeof(float), typeof(BattleActionModel) })]
 	[HarmonyPostfix]
-	private static void Postfix_CoinModel_GetProb(ref float __result, CoinModel __instance)
+	private static void Postfix_SkillModel_GetProb(
+		BattleUnitModel unit,
+		CoinModel coinOrNull,
+		float defaultProb,
+		BattleActionModel actionOrNull,
+		ref float __result, SkillModel __instance)
 	{
-		foreach (ModularSA modsa in GetAllModcaFromCoinModel(__instance)) {
-			int check = modsa.headsChanceAdder;
-			if (check != 0) __result += (float)check * 0.01f;
-		}
-	}
-	[HarmonyPatch(typeof(SkillModel), nameof(SkillModel.GetCoinProb), new Type[] { typeof(CoinModel), typeof(UnitModel), typeof(float) })]
-	[HarmonyPostfix]
-	private static void Postfix_SkillModel_GetProb(CoinModel coinOrNull, UnitModel unit, float defaultProb, ref float __result, SkillModel __instance)
-	{
-		BattleUnitModel a = (BattleUnitModel)unit;
-		foreach (BuffModel buf in a.GetActivatedBuffModels()) {
+		foreach (BuffModel buf in unit.GetActivatedBuffModels()) {
 			foreach (ModularSA modsa in GetAllModbaFromBuffModel_Fast(buf)) {
+				int check = modsa.headsChanceAdder;
+				if (check != 0) __result += (float)check * 0.01f;
+			}
+		}
+
+		if (coinOrNull != null)
+		{
+			foreach (ModularSA modsa in GetAllModcaFromCoinModel(coinOrNull)) {
 				int check = modsa.headsChanceAdder;
 				if (check != 0) __result += (float)check * 0.01f;
 			}
@@ -1620,13 +1623,13 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			if (check != 0) __result += (float)check * 0.01f;
 		}
 		
-		foreach (PassiveModel passiveModel in a._passiveDetail._passivelist) {
+		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
 				int check = modsa.headsChanceAdder;
 				if (check != 0) __result += (float)check * 0.01f;
 			}
 		}
-		foreach (EgoPassiveModel egoPassiveModel in a._passiveDetail._egoPassiveList) {
+		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail._egoPassiveList) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(egoPassiveModel, false)) {
 				int check = modsa.headsChanceAdder;
 				if (check != 0) __result += (float)check * 0.01f;
