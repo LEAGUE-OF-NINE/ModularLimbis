@@ -117,7 +117,8 @@ public class MainClass : BasePlugin
 			"IsIgnoreSupportiveDefense",
 			"SkillStaggerVictim",
 			"OnFieldedFromBackup",
-			"OnReturnFromRetreat"
+			"OnReturnFromRetreat",
+			"TrigData"
 		];
 		//timingStringList.Add("ChangeSinBuffDamage");
 
@@ -301,6 +302,7 @@ public class MainClass : BasePlugin
 		consequenceDict["recalctargets"] = new ConsequenceRecalcTargets();
 		consequenceDict["updatemaxbuf"] = new ConsequenceUpdateMaxBuf();
 		consequenceDict["refreshsinresourcevisual"] = new ConsequenceRefreshSinResourceVisual();
+		consequenceDict["BETAtrigdata"] = new ConsequenceTrigData();
 		// legacy consequences
 		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
 		consequenceDict["buf"] = new ConsequenceBuf();
@@ -654,7 +656,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "5.1.7";
+	public const string VERSION = "5.1.8";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 

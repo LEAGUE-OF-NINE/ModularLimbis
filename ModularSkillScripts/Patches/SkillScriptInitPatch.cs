@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using BattleUI.BattleUnit;
 using BepInEx.Unity.IL2CPP.UnityEngine;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using HarmonyLib;
@@ -4113,6 +4114,75 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		}
 	}*/
 
+	public static List<long> trigdata_pointer_list = new();
+	
+	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.ViewAbilityTypo))]
+	[HarmonyPrefix]
+	public static bool Prefix_AbilityTriggeredData_OnPrinted(
+		AbilityTriggeredData triggerdData,
+		BattleUnitDamageTypoUISlot slot,
+		ref BattleUnitDamageTypoUISlot __result,
+		BattleUnitView __instance)
+	{
+		long trigdata_pointer = triggerdData.Pointer.ToInt64();
+		if (!trigdata_pointer_list.Contains(trigdata_pointer)) return true;
+		trigdata_pointer_list.Remove(trigdata_pointer);
+		int instanceID = triggerdData.TargetInstanceID;
+		//if (instanceID != 666999666) return true;
+		BattleObjectManager battleObjManager = SingletonBehavior<BattleObjectManager>.Instance;
+		
+		BattleUnitModel unit = null;
+		foreach (BattleUnitModel x in battleObjManager.GetModelList()) {
+			if (x.InstanceID == instanceID) {
+				unit = x;
+				break;
+			}
+		}
+		if (unit == null) return true;
+		
+		int actevent = MainClass.timingDict["TrigData"];
+		int valuevalue = triggerdData.Value;
+		BATTLE_EVENT_TIMING timing = triggerdData.Timing;
+
+		SkillModel skill = null;
+		BattleActionModel action = null;
+		BattleSkillViewer currentSkillViewer = __instance.GetCurrentSkillViewer();
+		if (currentSkillViewer != null)
+		{
+			skill = currentSkillViewer._currentSkillModel;
+			action = currentSkillViewer.CurrentActionModel;
+			if (skill != null)
+			{
+				foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+					if (modsa.activationTiming != actevent) continue;
+					modsa.valueList[9] = valuevalue;
+					modsa.Enact(unit, skill, action, null, actevent, timing);
+				}
+			}
+			
+		}
+		
+		foreach (PassiveModel pasmodel in unit._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[9] = valuevalue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.Enact(unit, skill, action, null, actevent, timing);
+			}
+		}
+		foreach (EgoPassiveModel pasmodel in unit._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[9] = valuevalue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.Enact(unit, skill, action, null, actevent, timing);
+			}
+		}
+
+		__result = null;
+		return false;
+	}
+	
 	public static BattleLog battleLog_sct = null;
 	
 	[HarmonyPatch(typeof(BattleUnitView), nameof(BattleUnitView.OpenSkillInfoUI))]
