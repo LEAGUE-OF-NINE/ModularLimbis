@@ -90,7 +90,8 @@ public class MainClass : BasePlugin
 			"EnemyStartBehaviour",
 			"AfterChangeShield",
 			"AfterChangeHP",
-			"BeforeChangeSanity",
+			"OverwriteMPDMG",
+			"OverwriteChangeMP",
 			"AfterChangeSanity",
 			"CanDealTarget",
 			//timingStringList.Add("ChangeSinBuffDamage");
@@ -147,6 +148,7 @@ public class MainClass : BasePlugin
 		timingDict.Add("VisualStartCoinToss", timingDict["StartVisualCoinToss"]);
 		timingDict.Add("VisualSCT", timingDict["StartVisualCoinToss"]);
 		timingDict.Add("VisualEndBhv", timingDict["VisualEndBehaviour"]);
+		timingDict.Add("BeforeChangeSanity", timingDict["OverwriteMPDMG"]);
 		
 		FakePowerPatches.actevent_FakePower = timingDict["FakePower"];
 		FakePowerPatches.actevent_BaseCheck = timingDict["ExpectedBasePower"];
@@ -658,7 +660,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "5.1.9";
+	public const string VERSION = "5.1.10";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 

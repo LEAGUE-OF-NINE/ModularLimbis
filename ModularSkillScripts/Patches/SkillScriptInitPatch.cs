@@ -1514,7 +1514,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		ref int __result,
 		BattleUnitModel __instance)
 	{
-		int actevent = MainClass.timingDict["BeforeChangeSanity"];
+		int actevent = MainClass.timingDict["OverwriteMPDMG"];
 		
 		int mental_int = (int)mentalConditionOrNone;
 		int keyword_int = (int)keywordOrNone;
@@ -1554,6 +1554,45 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.valueList[7] = keyword_int;
 				modsa.valueList[6] = ability_int;
 				modsa.Enact(__instance, null, actionOrNull, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[9];
+			}
+		}
+	}
+	
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.ChangeMp))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_ChangeMp(
+		ref int __result,
+		BattleUnitModel __instance)
+	{
+		int actevent = MainClass.timingDict["OverwriteChangeMP"];
+		
+		foreach (BuffModel buf in __instance.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel_Fast(buf)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_buffModel = buf;
+				modsa.valueList[9] = __result;
+				modsa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[9];
+			}
+		}
+		
+		foreach (PassiveModel passiveModel in __instance._passiveDetail._passivelist) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.valueList[9] = __result;
+				modsa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				__result = modsa.valueList[9];
+			}
+		}
+
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail._egoPassiveList) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(egoPassiveModel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.valueList[9] = __result;
+				modsa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 				__result = modsa.valueList[9];
 			}
 		}
