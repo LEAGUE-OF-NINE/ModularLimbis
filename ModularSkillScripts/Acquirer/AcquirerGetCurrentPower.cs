@@ -9,7 +9,7 @@ namespace ModularSkillScripts.Acquirer
             BattleActionModel action = modular.modsa_selfAction;
             if (circles[0] != "Self") action = modular.modsa_oppoAction;
             if (action == null) return -1;
-            return action.GetFinalSkillPowerResult(modular.battleTiming);
+            return action._skillPowerResultValue;
         }
     }
 }

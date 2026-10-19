@@ -13,7 +13,11 @@ public class ConsequenceChangeSkill : IModularConsequence
 	public static void ChangeSkillOfAction(BattleActionModel action, int skill_ID, bool erase_prev_skill = true)
 	{
 		action.TryChangeSkill(skill_ID);
-		if (erase_prev_skill) action._previousSkillBeforeChanged = null;
+		if (erase_prev_skill)
+		{
+			action._previousSkillBeforeChanged = action.Skill;
+			action.ReturnPreviousSkill();
+		}
 		/*
 		StaticDataManager staticDataManager = Singleton<StaticDataManager>.Instance;
 		SkillStaticData skill_new_staticData = staticDataManager._skillList.GetData(skill_ID);
