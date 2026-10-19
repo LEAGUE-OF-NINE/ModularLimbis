@@ -27,11 +27,24 @@ internal class OnGainBuffPatches
 		BattleUnitModel gainer = __instance;
 		BattleUnitModel inflicter = giverOrNull;
 
-		if (inflicter != null)
-		{
+		if (inflicter != null) {
 			int actevent = MainClass.timingDict["OverwriteGiveBuf"];
-			foreach (PassiveModel passiveModel in inflicter._passiveDetail._passivelist.CopyList()) {
-				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel)) {
+			
+			foreach (BuffModel buf in inflicter.GetActivatedBuffModels()) {
+				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModbaFromBuffModel_Fast(buf)) {
+					if (modsa.activationTiming != actevent) continue;
+					modsa.valueList[6] = srcType_int;
+					modsa.valueList[7] = stack;
+					modsa.valueList[8] = turn;
+					modsa.valueList[9] = key_int;
+					modsa.modsa_victimModel = gainer;
+					modsa.modsa_buffModel = buf;
+					modsa.Enact(inflicter, null, null, null, actevent, timing);
+				}
+			}
+			
+			foreach (PassiveModel passiveModel in inflicter._passiveDetail._passivelist) {
+				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(passiveModel)) {
 					if (modsa.activationTiming != actevent) continue;
 					modsa.valueList[6] = srcType_int;
 					modsa.valueList[7] = stack;
@@ -49,8 +62,8 @@ internal class OnGainBuffPatches
 				}
 			}
 
-			foreach (EgoPassiveModel egoPassiveModel in inflicter._passiveDetail._egoPassiveList.CopyList()) {
-				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+			foreach (EgoPassiveModel egoPassiveModel in inflicter._passiveDetail._egoPassiveList) {
+				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(egoPassiveModel, false)) {
 					if (modsa.activationTiming != actevent) continue;
 					modsa.valueList[6] = srcType_int;
 					modsa.valueList[7] = stack;
@@ -72,8 +85,22 @@ internal class OnGainBuffPatches
 
 		if (gainer != null) {
 			int actevent = MainClass.timingDict["OverwriteGainBuf"];
-			foreach (PassiveModel passiveModel in gainer._passiveDetail._passivelist.CopyList()) {
-				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel)) {
+			
+			foreach (BuffModel buf in gainer.GetActivatedBuffModels()) {
+				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModbaFromBuffModel_Fast(buf)) {
+					if (modsa.activationTiming != actevent) continue;
+					modsa.valueList[6] = srcType_int;
+					modsa.valueList[7] = stack;
+					modsa.valueList[8] = turn;
+					modsa.valueList[9] = key_int;
+					modsa.modsa_killerModel = inflicter;
+					modsa.modsa_buffModel = buf;
+					modsa.Enact(gainer, null, null, null, actevent, timing);
+				}
+			}
+			
+			foreach (PassiveModel passiveModel in gainer._passiveDetail._passivelist) {
+				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(passiveModel)) {
 					if (modsa.activationTiming != actevent) continue;
 					modsa.valueList[6] = srcType_int;
 					modsa.valueList[7] = stack;
@@ -91,8 +118,8 @@ internal class OnGainBuffPatches
 				}
 			}
 
-			foreach (EgoPassiveModel egoPassiveModel in gainer._passiveDetail._egoPassiveList.CopyList()) {
-				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+			foreach (EgoPassiveModel egoPassiveModel in gainer._passiveDetail._egoPassiveList) {
+				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(egoPassiveModel, false)) {
 					if (modsa.activationTiming != actevent) continue;
 					modsa.valueList[6] = srcType_int;
 					modsa.valueList[7] = stack;
