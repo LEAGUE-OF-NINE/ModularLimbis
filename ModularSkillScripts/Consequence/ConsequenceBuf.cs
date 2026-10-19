@@ -37,48 +37,23 @@ public class ConsequenceBuf : IModularConsequence
 
 			if (stack_temp <= 0 && turn_temp <= 0) continue;
 			//AbilityTriggeredData_GiveBuff triggerData = new AbilityTriggeredData_GiveBuff(buf_keyword, stack_temp, turn_temp, activeRound, false, true, targetModel.InstanceID, battleTiming, BUF_TYPE.Neutral);
-			if (activeRound == 2)
+			
+			switch (modular.abilityMode)
 			{
-				switch (modular.abilityMode)
-				{
-					case 2:
-						modular.dummyPassiveAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, 0, modular.battleTiming,
-							modular.modsa_selfAction);
-						modular.dummyPassiveAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, 1, modular.battleTiming,
-							modular.modsa_selfAction);
-						break;
-					case 1:
-						modular.dummyCoinAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, 0, modular.battleTiming,
-							modular.modsa_selfAction);
-						modular.dummyCoinAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, 1, modular.battleTiming,
-							modular.modsa_selfAction);
-						break;
-					default:
-						modular.dummySkillAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, 0, modular.battleTiming,
-							modular.modsa_selfAction);
-						modular.dummySkillAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, 1, modular.battleTiming,
-							modular.modsa_selfAction);
-						break;
-				}
+				case 2:
+					modular.dummyPassiveAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound,
+						modular.battleTiming, modular.modsa_selfAction);
+					break;
+				case 1:
+					modular.dummyCoinAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound, modular.battleTiming,
+						modular.modsa_selfAction);
+					break;
+				default:
+					modular.dummySkillAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound, modular.battleTiming,
+						modular.modsa_selfAction);
+					break;
 			}
-			else
-			{
-				switch (modular.abilityMode)
-				{
-					case 2:
-						modular.dummyPassiveAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound,
-							modular.battleTiming, modular.modsa_selfAction);
-						break;
-					case 1:
-						modular.dummyCoinAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound, modular.battleTiming,
-							modular.modsa_selfAction);
-						break;
-					default:
-						modular.dummySkillAbility.GiveBuff_Self(targetModel, buf_keyword, stack_temp, turn_temp, activeRound, modular.battleTiming,
-							modular.modsa_selfAction);
-						break;
-				}
-			}
+			
 		}
 	}
 }
