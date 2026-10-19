@@ -12,20 +12,25 @@ public class ConsequenceChangeSkill : IModularConsequence
 
 	public static void ChangeSkillOfAction(BattleActionModel action, int skill_ID, bool erase_prev_skill = true)
 	{
-		action.TryChangeSkill(skill_ID);
 		if (erase_prev_skill)
 		{
-			action._previousSkillBeforeChanged = action.Skill;
-			action.ReturnPreviousSkill();
+			StaticDataManager staticDataManager = Singleton<StaticDataManager>.Instance;
+			SkillStaticData skill_new_staticData = staticDataManager._skillList.GetData(skill_ID);
+			if (skill_new_staticData != null) {
+				SkillModel skill_new = new SkillModel(skill_new_staticData, action._model.GetLevel(), 5);
+				//action.ChangeSkill(skill_new, false);
+				//action._previousSkillBeforeChanged = null;
+				action._skill = skill_new;
+			}
 		}
-		/*
-		StaticDataManager staticDataManager = Singleton<StaticDataManager>.Instance;
-		SkillStaticData skill_new_staticData = staticDataManager._skillList.GetData(skill_ID);
-		if (skill_new_staticData != null) {
-			SkillModel skill_new = new SkillModel(skill_new_staticData, action._model.GetLevel(), 5);
-			action.ChangeSkill(skill_new, false);
-			action._previousSkillBeforeChanged = null;
+		else
+		{
+			action.TryChangeSkill(skill_ID);
+			//action._previousSkillBeforeChanged = action.Skill;
+			//action.ReturnPreviousSkill();
 		}
-		*/
+		
+		
+		
 	}
 }

@@ -9,6 +9,9 @@ public class AcquirerEGORisk : IModularAcquirer
 		if (targetAction == null) return -1;
 		SkillModel skill = targetAction._skill;
 		if (!skill.IsEgoSkill()) return -1;
-		return -1;
+		BattleEgoModel ego = targetAction._model.GetEgoModel(skill.GetID());
+		if (ego == null) return -1;
+		EGO_TYPE ego_risk = ego.GetEgoType();
+		return (int)ego_risk;
 	}
 }
