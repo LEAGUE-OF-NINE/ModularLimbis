@@ -118,7 +118,9 @@ public class MainClass : BasePlugin
 			"SkillStaggerVictim",
 			"OnFieldedFromBackup",
 			"OnReturnFromRetreat",
-			"TrigData"
+			"TrigData",
+			"OverwriteGainBuf",
+			"OverwriteGiveBuf"
 		];
 		//timingStringList.Add("ChangeSinBuffDamage");
 
@@ -656,7 +658,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "5.1.8";
+	public const string VERSION = "5.1.9";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 

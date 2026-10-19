@@ -9,6 +9,117 @@ namespace ModularSkillScripts.Patches;
 
 internal class OnGainBuffPatches
 {
+	[HarmonyPatch(typeof(BattleUnitModel),nameof(BattleUnitModel.CheckOverwriteGettingBuff))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_CheckOverwriteGettingBuff(
+		ABILITY_SOURCE_TYPE abilitySrcType,
+		BATTLE_EVENT_TIMING timing,
+		BattleUnitModel giverOrNull,
+		ref BUFF_UNIQUE_KEYWORD keyword,
+		ref int stack,
+		ref int turn,
+		ref int activeRound,
+		BattleUnitModel __instance)
+	{
+		int key_int = (int)keyword;
+		int srcType_int = (int)abilitySrcType;
+		int actevent = MainClass.timingDict["OverwriteGainBuf"];
+		foreach (PassiveModel passiveModel in __instance._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[6] = srcType_int;
+				modsa.valueList[7] = stack;
+				modsa.valueList[8] = turn;
+				modsa.valueList[9] = key_int;
+				modsa.modsa_killerModel = giverOrNull;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.Enact(__instance, null, null, null, actevent, timing);
+				if (modsa.valueList[9] != key_int) {
+					key_int = modsa.valueList[9];
+					keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+				}
+				stack = modsa.valueList[7];
+				turn = modsa.valueList[8];
+			}
+		}
+
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[6] = srcType_int;
+				modsa.valueList[7] = stack;
+				modsa.valueList[8] = turn;
+				modsa.valueList[9] = key_int;
+				modsa.modsa_killerModel = giverOrNull;
+				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.Enact(__instance, null, null, null, actevent, timing);
+				if (modsa.valueList[9] != key_int) {
+					key_int = modsa.valueList[9];
+					keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+				}
+				stack = modsa.valueList[7];
+				turn = modsa.valueList[8];
+			}
+		}
+	}
+	
+	[HarmonyPatch(typeof(BattleUnitModel),nameof(BattleUnitModel.CheckOverwriteGivingBuff))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_CheckOverwriteGivingBuff(
+		ABILITY_SOURCE_TYPE abilitySrcType,
+		BATTLE_EVENT_TIMING timing,
+		BattleUnitModel target,
+		ref BUFF_UNIQUE_KEYWORD keyword,
+		ref int stack,
+		ref int turn,
+		ref int activeRound,
+		BattleUnitModel __instance)
+	{
+		int key_int = (int)keyword;
+		int srcType_int = (int)abilitySrcType;
+		
+		int actevent = MainClass.timingDict["OverwriteGiveBuf"];
+		foreach (PassiveModel passiveModel in __instance._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[6] = srcType_int;
+				modsa.valueList[7] = stack;
+				modsa.valueList[8] = turn;
+				modsa.valueList[9] = key_int;
+				modsa.modsa_victimModel = target;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.Enact(__instance, null, null, null, actevent, timing);
+				if (modsa.valueList[9] != key_int) {
+					key_int = modsa.valueList[9];
+					keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+				}
+				stack = modsa.valueList[7];
+				turn = modsa.valueList[8];
+			}
+		}
+
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[6] = srcType_int;
+				modsa.valueList[7] = stack;
+				modsa.valueList[8] = turn;
+				modsa.valueList[9] = key_int;
+				modsa.gainbuff_source = abilitySrcType;
+				modsa.modsa_killerModel = target;
+				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.Enact(__instance, null, null, null, actevent, timing);
+				if (modsa.valueList[9] != key_int) {
+					key_int = modsa.valueList[9];
+					keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+				}
+				stack = modsa.valueList[7];
+				turn = modsa.valueList[8];
+			}
+		}
+	}
+	
+	
 	public static BUFF_UNIQUE_KEYWORD ongainbuf_keyword = BUFF_UNIQUE_KEYWORD.None;
 	
 	[HarmonyPatch(typeof(BattleUnitModel),nameof(BattleUnitModel.RightAfterGetAnyBuff))]
@@ -46,4 +157,5 @@ internal class OnGainBuffPatches
 		}
 		
 	}
+	
 }
