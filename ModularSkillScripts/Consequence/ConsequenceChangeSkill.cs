@@ -14,6 +14,13 @@ public class ConsequenceChangeSkill : IModularConsequence
 	{
 		if (erase_prev_skill)
 		{
+			if (action.TryChangeSkill(skill_ID))
+			{
+				action._sin._overwrited = false;
+				action._previousSkillBeforeChanged = action._skill;
+			}
+			
+			/*
 			StaticDataManager staticDataManager = Singleton<StaticDataManager>.Instance;
 			SkillStaticData skill_new_staticData = staticDataManager._skillList.GetData(skill_ID);
 			if (skill_new_staticData != null) {
@@ -21,7 +28,7 @@ public class ConsequenceChangeSkill : IModularConsequence
 				//action.ChangeSkill(skill_new, false);
 				//action._previousSkillBeforeChanged = null;
 				action._skill = skill_new;
-			}
+			}*/
 		}
 		else
 		{
