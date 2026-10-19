@@ -23,46 +23,96 @@ internal class OnGainBuffPatches
 	{
 		int key_int = (int)keyword;
 		int srcType_int = (int)abilitySrcType;
-		int actevent = MainClass.timingDict["OverwriteGainBuf"];
-		foreach (PassiveModel passiveModel in __instance._passiveDetail._passivelist.CopyList()) {
-			foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel)) {
-				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[6] = srcType_int;
-				modsa.valueList[7] = stack;
-				modsa.valueList[8] = turn;
-				modsa.valueList[9] = key_int;
-				modsa.modsa_killerModel = giverOrNull;
-				modsa.modsa_passiveModel = passiveModel;
-				modsa.Enact(__instance, null, null, null, actevent, timing);
-				if (modsa.valueList[9] != key_int) {
-					key_int = modsa.valueList[9];
-					keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+
+		BattleUnitModel gainer = __instance;
+		BattleUnitModel inflicter = giverOrNull;
+
+		if (inflicter != null)
+		{
+			int actevent = MainClass.timingDict["OverwriteGiveBuf"];
+			foreach (PassiveModel passiveModel in inflicter._passiveDetail._passivelist.CopyList()) {
+				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel)) {
+					if (modsa.activationTiming != actevent) continue;
+					modsa.valueList[6] = srcType_int;
+					modsa.valueList[7] = stack;
+					modsa.valueList[8] = turn;
+					modsa.valueList[9] = key_int;
+					modsa.modsa_victimModel = gainer;
+					modsa.modsa_passiveModel = passiveModel;
+					modsa.Enact(inflicter, null, null, null, actevent, timing);
+					if (modsa.valueList[9] != key_int) {
+						key_int = modsa.valueList[9];
+						keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+					}
+					stack = modsa.valueList[7];
+					turn = modsa.valueList[8];
 				}
-				stack = modsa.valueList[7];
-				turn = modsa.valueList[8];
+			}
+
+			foreach (EgoPassiveModel egoPassiveModel in inflicter._passiveDetail._egoPassiveList.CopyList()) {
+				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+					if (modsa.activationTiming != actevent) continue;
+					modsa.valueList[6] = srcType_int;
+					modsa.valueList[7] = stack;
+					modsa.valueList[8] = turn;
+					modsa.valueList[9] = key_int;
+					modsa.gainbuff_source = abilitySrcType;
+					modsa.modsa_victimModel = gainer;
+					modsa.modsa_passiveModel = egoPassiveModel;
+					modsa.Enact(inflicter, null, null, null, actevent, timing);
+					if (modsa.valueList[9] != key_int) {
+						key_int = modsa.valueList[9];
+						keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+					}
+					stack = modsa.valueList[7];
+					turn = modsa.valueList[8];
+				}
 			}
 		}
 
-		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail._egoPassiveList.CopyList()) {
-			foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false)) {
-				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[6] = srcType_int;
-				modsa.valueList[7] = stack;
-				modsa.valueList[8] = turn;
-				modsa.valueList[9] = key_int;
-				modsa.modsa_killerModel = giverOrNull;
-				modsa.modsa_passiveModel = egoPassiveModel;
-				modsa.Enact(__instance, null, null, null, actevent, timing);
-				if (modsa.valueList[9] != key_int) {
-					key_int = modsa.valueList[9];
-					keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+		if (gainer != null) {
+			int actevent = MainClass.timingDict["OverwriteGainBuf"];
+			foreach (PassiveModel passiveModel in gainer._passiveDetail._passivelist.CopyList()) {
+				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel(passiveModel)) {
+					if (modsa.activationTiming != actevent) continue;
+					modsa.valueList[6] = srcType_int;
+					modsa.valueList[7] = stack;
+					modsa.valueList[8] = turn;
+					modsa.valueList[9] = key_int;
+					modsa.modsa_killerModel = inflicter;
+					modsa.modsa_passiveModel = passiveModel;
+					modsa.Enact(gainer, null, null, null, actevent, timing);
+					if (modsa.valueList[9] != key_int) {
+						key_int = modsa.valueList[9];
+						keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+					}
+					stack = modsa.valueList[7];
+					turn = modsa.valueList[8];
 				}
-				stack = modsa.valueList[7];
-				turn = modsa.valueList[8];
+			}
+
+			foreach (EgoPassiveModel egoPassiveModel in gainer._passiveDetail._egoPassiveList.CopyList()) {
+				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+					if (modsa.activationTiming != actevent) continue;
+					modsa.valueList[6] = srcType_int;
+					modsa.valueList[7] = stack;
+					modsa.valueList[8] = turn;
+					modsa.valueList[9] = key_int;
+					modsa.modsa_killerModel = inflicter;
+					modsa.modsa_passiveModel = egoPassiveModel;
+					modsa.Enact(gainer, null, null, null, actevent, timing);
+					if (modsa.valueList[9] != key_int) {
+						key_int = modsa.valueList[9];
+						keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+					}
+					stack = modsa.valueList[7];
+					turn = modsa.valueList[8];
+				}
 			}
 		}
 	}
 	
+	/*
 	[HarmonyPatch(typeof(BattleUnitModel),nameof(BattleUnitModel.CheckOverwriteGivingBuff))]
 	[HarmonyPostfix]
 	private static void Postfix_BattleUnitModel_CheckOverwriteGivingBuff(
@@ -117,7 +167,7 @@ internal class OnGainBuffPatches
 				turn = modsa.valueList[8];
 			}
 		}
-	}
+	}*/
 	
 	
 	public static BUFF_UNIQUE_KEYWORD ongainbuf_keyword = BUFF_UNIQUE_KEYWORD.None;
