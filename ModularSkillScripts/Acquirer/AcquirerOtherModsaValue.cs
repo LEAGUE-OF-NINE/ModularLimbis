@@ -26,7 +26,6 @@ public class AcquirerOtherModsaValue : IModularAcquirer
 
 		int modsa_idx = modular.GetNumFromParamString(circles[1]);
 		int value_idx = modular.GetNumFromParamString(circles[2]);
-		MainClass.LogModular("modsalist count: " + modsa_list.Count.ToString(), true);
 		if (modsa_list.Count >= modsa_idx) return -1;
 		ModularSA modsa = modsa_list[modsa_idx];
 		return modsa.valueList[value_idx];
