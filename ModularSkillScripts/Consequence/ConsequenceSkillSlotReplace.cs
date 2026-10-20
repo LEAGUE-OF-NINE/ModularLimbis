@@ -35,7 +35,7 @@ public class ConsequenceSkillSlotReplace : IModularConsequence
 			int slot = modular.GetNumFromParamString(circles[0]);
 			if (slot >= sinActionList.Count || slot < 0)
 			{
-				MainClass.LogModular("skillslotreplace invalid slot");
+				MainClass.LogModular("skillslotreplace invalid slot", true);
 				return;
 			}
 

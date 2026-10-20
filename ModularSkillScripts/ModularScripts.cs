@@ -1243,7 +1243,7 @@ public class ModularSA : Il2CppSystem.Object
 		}
 		else
 		{
-			MainClass.LogModular("Invalid Consequence: " + mEth);
+			MainClass.LogModular("Invalid Consequence: " + mEth, true);
 		}
 	}
 
@@ -1293,7 +1293,7 @@ public class ModularSA : Il2CppSystem.Object
 			return acquirer.ExecuteAcquirer(this, section, circledSection, circles);
 		}
 
-		MainClass.LogModular("Invalid Getter: " + methodology);
+		MainClass.LogModular("Invalid Getter: " + methodology, true);
 		return -1;
 	}
 	
@@ -1314,7 +1314,7 @@ public class ModularSA : Il2CppSystem.Object
 			return acquirer.ExecuteAcquirer(this, section, circledSection, circles);
 		}
 
-		MainClass.LogModular("Invalid Getter: " + methodology);
+		MainClass.LogModular("Invalid Getter: " + methodology, true);
 		return -1;
 	}
 
