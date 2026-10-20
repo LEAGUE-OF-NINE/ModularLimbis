@@ -424,6 +424,7 @@ public class MainClass : BasePlugin
 		acquirerDict["abs"] = new AcquirerAbsolute();
 		acquirerDict["ispart"] = new AcquirerIsPart();
 		acquirerDict["egorisk"] = new AcquirerEGORisk();
+		acquirerDict["othermodsavalue"] = new AcquirerOtherModsaValue();
 
 		// legacy acquirers
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();
