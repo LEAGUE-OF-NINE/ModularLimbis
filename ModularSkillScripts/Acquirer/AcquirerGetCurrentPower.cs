@@ -19,9 +19,9 @@ public class AcquirerGetCurrentPower : IModularAcquirer
 		{
 			if (coin._result != COIN_RESULT.HEAD) continue;
 			OPERATOR_TYPE coin_op = coin.GetOperatorType();
-			if (coin_op == OPERATOR_TYPE.ADD) coin_total += coin.GetScale();
-			else if (coin_op == OPERATOR_TYPE.SUB) coin_total -= coin.GetScale();
-			else if (coin_op == OPERATOR_TYPE.MUL) coin_total *= coin.GetScale();
+			if (coin_op == OPERATOR_TYPE.ADD) coin_total += action.GetCoinScale(coin, true);
+			else if (coin_op == OPERATOR_TYPE.SUB) coin_total -= action.GetCoinScale(coin, true);
+			else if (coin_op == OPERATOR_TYPE.MUL) coin_total *= action.GetCoinScale(coin, true);
 		}
 			
 		return coin_total + final + clash;
