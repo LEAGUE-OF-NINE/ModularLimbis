@@ -12,7 +12,7 @@ public class AcquirerGetCurrentPower : IModularAcquirer
 
 		int final = action.GetFinalSkillPowerResult(modular.battleTiming);
 		int clash = 0;
-		if (action._oneOnOneDuelOpponentAction != null) clash = action.GetParryingAdder(action._oneOnOneDuelOpponentAction);
+		if (action._oneOnOneDuelOpponentAction != null) clash = action.GetParryingResultAdder(0, action._oneOnOneDuelOpponentAction, 0, 0);
 
 		int coin_total = action._skill.GetSkillDefaultPower();
 		foreach (CoinModel coin in action._skill.GetCoinsUsableInDuel())
