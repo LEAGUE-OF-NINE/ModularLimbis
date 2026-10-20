@@ -3343,6 +3343,137 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		__result = result_v > 0;
 	}
 
+	[HarmonyPatch(typeof(BattleActionModel), nameof(BattleActionModel.CanBeChangedTargetIgnoreSpeed))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleActionModel_CanBeChangedTargetIgnoreSpeed(
+		BattleActionModel otherAction, ref bool __result, BattleActionModel __instance)
+	{
+		if (__result) return;
+		int actevent = MainClass.timingDict["IsFreeRedirect"];
+		
+		BattleUnitModel unit = __instance._model;
+		BattleActionModel action = __instance;
+		SkillModel skill = __instance._skill;
+		
+		BattleUnitModel otherUnit = otherAction._model;
+		SkillModel otherSkill = otherAction._skill;
+		
+		foreach (BuffModel buf in unit.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buf)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_buffModel = buf;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(otherUnit);
+				modsa.valueList[9] = 0;
+				modsa.Enact(unit, skill, action, otherAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modsa.valueList[9] == 1) {
+					__result = true;
+					return;
+				}
+			}
+		}
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.modsa_target_list.Clear();
+			modsa.modsa_target_list.Add(otherUnit);
+			modsa.valueList[9] = 0;
+			modsa.Enact(unit, skill, action, otherAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			if (modsa.valueList[9] == 1) {
+				__result = true;
+				return;
+			}
+		}
+		
+		foreach (PassiveModel pasmodel in unit._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(otherUnit);
+				modsa.valueList[9] = 0;
+				modsa.Enact(unit, skill, action, otherAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modsa.valueList[9] == 1) {
+					__result = true;
+					return;
+				}
+			}
+		}
+		foreach (EgoPassiveModel pasmodel in unit._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(otherUnit);
+				modsa.valueList[9] = 0;
+				modsa.Enact(unit, skill, action, otherAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modsa.valueList[9] == 1) {
+					__result = true;
+					return;
+				}
+			}
+		}
+		
+		
+		actevent = MainClass.timingDict["CanFreeRedirectOther"];
+		
+		foreach (BuffModel buf in otherUnit.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buf)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_buffModel = buf;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(unit);
+				modsa.valueList[9] = 0;
+				modsa.Enact(otherUnit, otherSkill, otherAction, action, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modsa.valueList[9] == 1) {
+					__result = true;
+					return;
+				}
+			}
+		}
+		
+		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.modsa_target_list.Clear();
+			modsa.modsa_target_list.Add(unit);
+			modsa.valueList[9] = 0;
+			modsa.Enact(otherUnit, otherSkill, otherAction, action, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+			if (modsa.valueList[9] == 1) {
+				__result = true;
+				return;
+			}
+		}
+		
+		foreach (PassiveModel pasmodel in otherUnit._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(unit);
+				modsa.valueList[9] = 0;
+				modsa.Enact(otherUnit, otherSkill, otherAction, action, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modsa.valueList[9] == 1) {
+					__result = true;
+					return;
+				}
+			}
+		}
+		foreach (EgoPassiveModel pasmodel in otherUnit._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel, false)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.modsa_passiveModel = pasmodel;
+				modsa.modsa_target_list.Clear();
+				modsa.modsa_target_list.Add(unit);
+				modsa.valueList[9] = 0;
+				modsa.Enact(otherUnit, otherSkill, otherAction, action, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				if (modsa.valueList[9] == 1) {
+					__result = true;
+					return;
+				}
+			}
+		}
+	}
+
 	[HarmonyPatch(typeof(BattleActionModel), nameof(BattleActionModel.OnAttackConfirmed))]
 	[HarmonyPostfix]
 	private static void Postfix_BattleActionModel_OnAttackConfirmed(CoinModel coin, BattleUnitModel target, BATTLE_EVENT_TIMING timing, bool isCritical, BattleActionModel __instance)
