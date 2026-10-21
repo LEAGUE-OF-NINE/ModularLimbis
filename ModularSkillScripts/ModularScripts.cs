@@ -193,7 +193,7 @@ public class ModularSA : Il2CppSystem.Object
 		modsa_loopString = "";
 		modsa_luaScript = null;
 		modsa_luaScriptMain = null;
-		modsa_motionDetail = null;
+		//modsa_motionDetail = null;
 		modsa_expected_sinaction = null;
 		
 		SpecialKey = KeyCode.LeftControl;
@@ -241,7 +241,7 @@ public class ModularSA : Il2CppSystem.Object
 	public LuaScript modsa_luaScript = null;
 	public string modsa_luaScriptMain = null;
 	public string[] modsa_luaScriptMainArgs = null;
-	public ConsequenceChangeMotion.MotionDetail modsa_motionDetail = null;
+	public MOTION_DETAIL modsa_motionDetail = MOTION_DETAIL.Default;
 	public bool EXPECTED = false;
 	public SinActionModel modsa_expected_sinaction = null;
 

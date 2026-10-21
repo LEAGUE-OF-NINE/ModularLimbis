@@ -4842,23 +4842,58 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	
 	[HarmonyPatch(typeof(CharacterAppearance), nameof(CharacterAppearance.ChangeMotion))]
 	[HarmonyPrefix]
-	private static void ChangeMotion(CharacterAppearance __instance, ref MOTION_DETAIL motiondetail, ref int index)
+	private static void Prefix_CharApp_ChangeMotion(
+		ref MOTION_DETAIL motiondetail,
+		bool forcely,
+		ref int index,
+		ref bool isOverKill,
+		Il2CppSystem.Action changeGroup,
+		bool muteSound,
+		CharacterAppearance __instance)
 	{
-		if (motiondetail != MOTION_DETAIL.Parrying && motiondetail.ToString()[0] != 'S')
-			return;
-		
-		var log = __instance._battleUnitView.CurrentActionLog?._systemLog;
-		if (log == null) return;
-		
-		if (__instance._battleUnitView._currentDuelViewer != null || __instance._battleUnitView.CurrentActionLog == null)
-			return;
-		
-		foreach (var behavior in log.GetAllBehaviourLog_Start())
+		BattleUnitView unitView = __instance._battleUnitView;
+		if (!unitView) return;
+		BattleUnitModel unit = unitView._unitModel;
+		if (unit == null) return;
+		/*
+		BattleActionLog actionLog = unitView.CurrentActionLog;
+		if (actionLog == null) return;
+		BattleLog battleLog = actionLog._systemLog;
+		if (battleLog == null) return;
+		BattleDuelViewer duelViewer = unitView._currentDuelViewer;
+		if (!duelViewer) return;
+		*/
+		int actevent = MainClass.timingDict["ChangeMotion"];
+		BattleSkillViewer skillViewer = unitView.GetCurrentSkillViewer();
+		SkillModel skill = skillViewer?.GetSkillModel();
+		if (skill != null)
 		{
-			var actor = log.GetCharacterInfo(behavior._instanceID); //get actor
+			foreach (ModularSA modsa in GetAllModsaFromSkillModel_Fast(skill)) {
+				if (modsa.activationTiming != actevent) continue;
+				modsa.valueList[7] = (int)motiondetail;
+				modsa.valueList[8] = isOverKill ? 1 : 0;
+				modsa.valueList[9] = index;
+				modsa.modsa_motionDetail = motiondetail;
+				modsa.Enact(unit, skill, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+				motiondetail = modsa.modsa_motionDetail;
+				index = modsa.valueList[9];
+				isOverKill = modsa.valueList[8] > 0;
+				/*if (modca.modsa_motionDetail == null) continue;
+				motiondetail = modca.modsa_motionDetail.Detail;
+				index = modca.modsa_motionDetail.Index;
+				__instance._currentMotiondetail = modca.modsa_motionDetail.Detail;
+				modca.modsa_motionDetail = null;*/
+			}
+		}
+		
+		
+		/*
+		foreach (var behavior in battleLog.GetAllBehaviourLog_Start())
+		{
+			var actor = battleLog.GetCharacterInfo(behavior._instanceID); //get actor
 
 			var skillID = behavior._skillID;
-			var skillViewer = __instance._battleUnitView.GetSkillViewer(skillID);
+			var skillViewer = unitView.GetSkillViewer(skillID);
 			if (skillViewer == null) return;
 			var coinIdx = skillViewer.CurCoinLogIndex;
 			var model = __instance._battleUnitView._unitModel;
@@ -4884,6 +4919,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modca.modsa_motionDetail = null;
 			}
 		}
+		*/
 	}
 	
 	// Added to during Combat Start in Consq tagforsort
