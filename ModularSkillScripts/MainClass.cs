@@ -425,6 +425,7 @@ public class MainClass : BasePlugin
 		acquirerDict["ispart"] = new AcquirerIsPart();
 		acquirerDict["egorisk"] = new AcquirerEGORisk();
 		acquirerDict["othermodsavalue"] = new AcquirerOtherModsaValue();
+		acquirerDict["skillviewer"] = new AcquirerSkillViewer();
 
 		// legacy acquirers
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();
@@ -664,7 +665,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "5.1.14";
+	public const string VERSION = "5.1.15";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 

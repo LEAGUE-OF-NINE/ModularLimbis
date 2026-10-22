@@ -4855,14 +4855,15 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		if (!unitView) return;
 		BattleUnitModel unit = unitView._unitModel;
 		if (unit == null) return;
-		/*
+		
 		BattleActionLog actionLog = unitView.CurrentActionLog;
 		if (actionLog == null) return;
 		BattleLog battleLog = actionLog._systemLog;
 		if (battleLog == null) return;
 		BattleDuelViewer duelViewer = unitView._currentDuelViewer;
-		if (!duelViewer) return;
-		*/
+		//if (!duelViewer) return;
+		MainClass.LogModular("DuelViewer null: " + !duelViewer, true);
+		MainClass.LogModular("GetRemainedCoinCount: " + battleLog.GetRemainedCoinCount(), true);
 		int actevent = MainClass.timingDict["ChangeMotion"];
 		BattleSkillViewer skillViewer = unitView.GetCurrentSkillViewer();
 		SkillModel skill = skillViewer?.GetSkillModel();
