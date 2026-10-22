@@ -15,6 +15,26 @@ public class AcquirerOtherModsaValue : IModularAcquirer
 			case "skill":
 				modsa_list = SkillScriptInitPatch.GetAllModsaFromSkillModel(modular.modsa_skillModel);
 				break;
+			case "realskill": {
+				BattleObjectManager objManager = SingletonBehavior<BattleObjectManager>.Instance;
+				BattleUnitView view = objManager.GetView(modular.modsa_unitModel);
+				if (!view) return -1;
+		
+				BattleSkillViewer skillViewer = view.GetCurrentSkillViewer();
+				SkillModel skill = skillViewer?.CurrentSkillModel;
+				if (skill == null) return -1;
+				modsa_list = SkillScriptInitPatch.GetAllModsaFromSkillModel(skill);
+			} break;
+			case "skinskill": {
+				BattleObjectManager objManager = SingletonBehavior<BattleObjectManager>.Instance;
+				BattleUnitView view = objManager.GetView(modular.modsa_unitModel);
+				if (!view) return -1;
+		
+				BattleSkillViewer skillViewer = view.GetCurrentSkillViewer();
+				SkillModel skill = skillViewer?.CurrentSkinSkillModel;
+				if (skill == null) return -1;
+				modsa_list = SkillScriptInitPatch.GetAllModsaFromSkillModel(skill);
+			} break;
 			case "passive":
 				modsa_list = SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(modular.modsa_passiveModel, false);
 				break;
