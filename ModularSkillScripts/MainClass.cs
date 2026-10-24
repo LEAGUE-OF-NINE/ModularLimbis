@@ -309,6 +309,7 @@ public class MainClass : BasePlugin
 		consequenceDict["updatemaxbuf"] = new ConsequenceUpdateMaxBuf();
 		consequenceDict["refreshsinresourcevisual"] = new ConsequenceRefreshSinResourceVisual();
 		consequenceDict["BETAtrigdata"] = new ConsequenceTrigData();
+		consequenceDict["unitcutscene"] = new ConsequenceUnitCutscene();
 		// legacy consequences
 		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
 		consequenceDict["buf"] = new ConsequenceBuf();
