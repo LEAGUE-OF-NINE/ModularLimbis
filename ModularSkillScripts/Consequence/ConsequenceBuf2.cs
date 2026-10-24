@@ -66,7 +66,7 @@ public class ConsequenceBufTwo : IModularConsequence
 						turn_temp = 0;
 					} break;
 					case "passive":
-					case "unit": {
+					default: {
 						if (use) targetModel.UseBuffStack(buf_keyword, stack_temp * -1, modular.battleTiming);
 						else {
 							foreach (int activeRound in activeRound_list) {
@@ -93,7 +93,7 @@ public class ConsequenceBufTwo : IModularConsequence
 						if (use) modular.dummyPassiveAbility.UseBuffTurnByPassive(targetModel, buf_keyword, turn_temp * -1, timing);
 						else targetModel.LoseBuffTurn(buf_keyword, turn_temp * -1, modular.battleTiming);
 					} break;
-					case "unit": {
+					default: {
 						if (use) targetModel.UseBuffTurn(buf_keyword, turn_temp * -1, modular.battleTiming);
 						else targetModel.LoseBuffTurn(buf_keyword, turn_temp * -1, modular.battleTiming);
 					} break;
@@ -120,7 +120,7 @@ public class ConsequenceBufTwo : IModularConsequence
 						modular.modsa_buffModel._abilityList[0].GiveBuff_Giver(targetModel, buf_keyword, giver, stack_temp, turn_temp, activeRound, timing, action);
 					}
 				} break;
-				case "unit": {
+				default: {
 					foreach (int activeRound in activeRound_list) {
 						targetModel.AddBuff_Giver(buf_keyword, stack_temp, giver, timing, turn_temp, activeRound,
 							ABILITY_SOURCE_TYPE.UNIT, action,
