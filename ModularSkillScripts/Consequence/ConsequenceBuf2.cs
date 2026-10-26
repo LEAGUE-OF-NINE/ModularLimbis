@@ -17,7 +17,7 @@ public class ConsequenceBufTwo : IModularConsequence
 		BattleUnitModel giver = modular.GetTargetModel(giver_s);
 
 		string mode_s = circles[2];
-
+		
 		BUFF_UNIQUE_KEYWORD buf_keyword = CustomBuffs.ParseBuffUniqueKeyword(circles[3]);
 		int stack = modular.GetNumFromParamString(circles[4]);
 		int turn = modular.GetNumFromParamString(circles[5]);
@@ -29,7 +29,6 @@ public class ConsequenceBufTwo : IModularConsequence
 			int activeRound = modular.GetNumFromParamString(s);
 			activeRound_list.Add(activeRound);
 		}
-
 
 		bool use = false;
 		BattleActionModel action = modular.modsa_selfAction;
@@ -53,6 +52,14 @@ public class ConsequenceBufTwo : IModularConsequence
 				{
 					case "skill": {
 						if (use) modular.dummySkillAbility.UseBuffStack(targetModel, action, buf_keyword, timing, stack_temp * -1);
+						else {
+							foreach (int activeRound in activeRound_list) {
+								targetModel.LoseBuffStack(buf_keyword, stack_temp * -1, modular.battleTiming, activeRound);
+							}
+						}
+					} break;
+					case "coin": {
+						if (use) modular.modsa_coinModel._coinAbilityList[0].UseBuffStack(targetModel, action, buf_keyword, timing, stack_temp * -1);
 						else {
 							foreach (int activeRound in activeRound_list) {
 								targetModel.LoseBuffStack(buf_keyword, stack_temp * -1, modular.battleTiming, activeRound);
@@ -86,6 +93,10 @@ public class ConsequenceBufTwo : IModularConsequence
 						if (use) modular.dummySkillAbility.UseBuffTurn(targetModel, action, buf_keyword, timing, turn_temp * -1);
 						else targetModel.LoseBuffTurn(buf_keyword, turn_temp * -1, modular.battleTiming);
 					} break;
+					case "coin": {
+						if (use) modular.modsa_coinModel._coinAbilityList[0].UseBuffTurn(targetModel, action, buf_keyword, timing, turn_temp * -1, out _);
+						else targetModel.LoseBuffTurn(buf_keyword, turn_temp * -1, modular.battleTiming);
+					} break;
 					case "buf": {
 						modular.modsa_buffModel._abilityList[0].LoseBuff_ByBuff(targetModel, giver, 0, turn_temp * -1, timing, modular.modsa_buffModel._buffInfo);
 					} break;
@@ -108,6 +119,11 @@ public class ConsequenceBufTwo : IModularConsequence
 				case "skill": {
 					foreach (int activeRound in activeRound_list) {
 						modular.dummySkillAbility.GiveBuff_BySkill(targetModel, action, buf_keyword, stack_temp, turn_temp, activeRound, timing, modular.modsa_coinModel);
+					}
+				} break;
+				case "coin": {
+					foreach (int activeRound in activeRound_list) {
+						modular.modsa_coinModel._coinAbilityList[0].GiveBuff_BySkillCoin(targetModel, action, buf_keyword, stack_temp, turn_temp, activeRound, timing, out _, out _);
 					}
 				} break;
 				case "passive": {
