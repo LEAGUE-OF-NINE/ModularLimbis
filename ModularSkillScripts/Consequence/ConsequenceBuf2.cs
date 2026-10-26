@@ -38,6 +38,7 @@ public class ConsequenceBufTwo : IModularConsequence
 			string circle_cur = circles[i];
 			if (circle_cur == "use") use = true;
 			else if (circle_cur == "nullaction") action = null;
+			else if (circle_cur == "oppoaction") action = modular.modsa_oppoAction;
 		}
 		
 		BATTLE_EVENT_TIMING timing = modular.battleTiming;
@@ -118,12 +119,12 @@ public class ConsequenceBufTwo : IModularConsequence
 			{
 				case "skill": {
 					foreach (int activeRound in activeRound_list) {
-						modular.dummySkillAbility.GiveBuff_BySkill(targetModel, action, buf_keyword, stack_temp, turn_temp, activeRound, timing, modular.modsa_coinModel);
+						modular.dummySkillAbility.GiveBuff_Giver(targetModel, buf_keyword, giver, stack_temp, turn_temp, activeRound, timing, action);
 					}
 				} break;
 				case "coin": {
 					foreach (int activeRound in activeRound_list) {
-						modular.modsa_coinModel._coinAbilityList[0].GiveBuff_BySkillCoin(targetModel, action, buf_keyword, stack_temp, turn_temp, activeRound, timing, out _, out _);
+						modular.modsa_coinModel._coinAbilityList[0].GiveBuff_Giver(targetModel, buf_keyword, giver, stack_temp, turn_temp, activeRound, timing, action);
 					}
 				} break;
 				case "passive": {
