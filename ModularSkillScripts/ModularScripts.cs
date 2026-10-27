@@ -362,41 +362,31 @@ public class ModularSA : Il2CppSystem.Object
 			//	else if (!wasWin && _onlyClashWin) return;
 			//}
 		}
-
-
-		if (abilityMode == 2)
-		{
-			if (dummyPassiveAbility == null)
-			{
-				MainClass.LogModular("Hijacking dummy passive");
-				if (modsa_unitModel._passiveDetail.PassiveList.Count < 1)
-				{
-					const int placeholderPassiveId = 9012602;
-					modsa_unitModel.AddPassive(placeholderPassiveId);
-					MainClass.LogModular("Unit passive count = 0. Adding passive " + placeholderPassiveId);
-				}
-				foreach (PassiveModel otherPassive in modsa_unitModel._passiveDetail.PassiveList)
-				{
-					if (otherPassive._script == null) continue;
-					dummyPassiveAbility = otherPassive._script;
-					break;
-				}
+		
+		if (dummyPassiveAbility == null) {
+			MainClass.LogModular("Hijacking dummy passive");
+			if (modsa_unitModel._passiveDetail._passivelist.Count < 1) {
+				const int placeholderPassiveId = 9012602;
+				modsa_unitModel.AddPassive(placeholderPassiveId);
+				MainClass.LogModular("Unit passive count = 0. Adding passive " + placeholderPassiveId);
 			}
-			
-			if (dummyPassiveAbility == null)
-			{
-				MainClass.LogModular("Creating dummy passive Ability Script with no Parent PassiveModel (last resort)");
-				PassiveAbility pa = new();
-				pa.Init(modsa_unitModel, new List<PassiveConditionStaticData>(), new List<PassiveConditionStaticData>(), new List<int>());
-				dummyPassiveAbility = pa;
+			foreach (PassiveModel otherPassive in modsa_unitModel._passiveDetail._passivelist) {
+				if (otherPassive._script == null) continue;
+				dummyPassiveAbility = otherPassive._script;
+				break;
 			}
-			
 		}
-		else
-		{
-			if (modsa_skillModel.SkillAbilityList.Count > 0) dummySkillAbility = modsa_skillModel.SkillAbilityList.ToArray()[0];
-			if (dummySkillAbility == null)
-			{
+			
+		if (dummyPassiveAbility == null) {
+			MainClass.LogModular("Creating dummy passive Ability Script with no Parent PassiveModel (last resort)");
+			PassiveAbility pa = new();
+			pa.Init(modsa_unitModel, new List<PassiveConditionStaticData>(), new List<PassiveConditionStaticData>(), new List<int>());
+			dummyPassiveAbility = pa;
+		}
+		
+		if (modsa_skillModel != null) {
+			if (modsa_skillModel._skillAbilityList.Count > 0) dummySkillAbility = modsa_skillModel._skillAbilityList[0];
+			else {
 				MainClass.LogModular("creating dummy skillability");
 				SkillAbility_Empty sa = new();
 				sa._skillModel = modsa_skillModel;
@@ -405,11 +395,9 @@ public class ModularSA : Il2CppSystem.Object
 			}
 		}
 
-		if (abilityMode == 1)
-		{
-			if (modsa_coinModel.CoinAbilityList.Count > 0) dummyCoinAbility = modsa_coinModel.CoinAbilityList.ToArray()[0];
-			if (dummyCoinAbility == null)
-			{
+		if (modsa_coinModel != null) {
+			if (modsa_coinModel._coinAbilityList.Count > 0) dummyCoinAbility = modsa_coinModel._coinAbilityList[0];
+			else {
 				MainClass.LogModular("creating dummy coinability");
 				CoinAbility_Empty ca = new();
 				ca._coin = modsa_coinModel;
