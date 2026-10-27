@@ -310,6 +310,7 @@ public class MainClass : BasePlugin
 		consequenceDict["refreshsinresourcevisual"] = new ConsequenceRefreshSinResourceVisual();
 		consequenceDict["BETAtrigdata"] = new ConsequenceTrigData();
 		consequenceDict["unitcutscene"] = new ConsequenceUnitCutscene();
+		consequenceDict["othermodsavalue"] = new ConsequenceOtherModsaValue();
 		// legacy consequences
 		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
 		consequenceDict["buf"] = new ConsequenceBuf();
