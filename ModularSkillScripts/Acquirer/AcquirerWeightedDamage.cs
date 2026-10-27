@@ -7,7 +7,7 @@ public class AcquirerWeightedDamage : IModularAcquirer
 {
 	public int ExecuteAcquirer(ModularSA modular, string section, string circledSection, string[] circles)
 	{
-		int dmg = modular.valueList[9];
+		int dmg = modular.valueList["9"];
 		if (dmg < 2) return dmg;
 		BattleUnitModel victim = modular.modsa_victimModel;
 		if (victim == null) return dmg;
