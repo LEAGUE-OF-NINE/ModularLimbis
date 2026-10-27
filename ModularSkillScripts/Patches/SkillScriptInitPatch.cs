@@ -847,9 +847,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modsa in GetAllModbaFromBuffModel_Fast(buf)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_buffModel = buf;
-				modsa.valueList[9] = 0;
+				modsa.valueList["9"] = 0;
 				modsa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modsa.valueList[9] != 0) __result += modsa.valueList[9];
+				if (modsa.valueList["9"] != 0) __result += modsa.valueList["9"];
 			}
 		}
 		
@@ -857,18 +857,18 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = passiveModel;
-				modsa.valueList[9] = 0;
+				modsa.valueList["9"] = 0;
 				modsa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modsa.valueList[9] != 0) __result += modsa.valueList[9];
+				if (modsa.valueList["9"] != 0) __result += modsa.valueList["9"];
 			}
 		}
 		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail._egoPassiveList) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(egoPassiveModel,false)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = egoPassiveModel;
-				modsa.valueList[9] = 0;
+				modsa.valueList["9"] = 0;
 				modsa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modsa.valueList[9] != 0) __result += modsa.valueList[9];
+				if (modsa.valueList["9"] != 0) __result += modsa.valueList["9"];
 			}
 		}
 	}
@@ -885,9 +885,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modsa in GetAllModbaFromBuffModel_Fast(buf)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_buffModel = buf;
-				modsa.valueList[9] = 0;
+				modsa.valueList["9"] = 0;
 				modsa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modsa.valueList[9] != 0) __result += modsa.valueList[9];
+				if (modsa.valueList["9"] != 0) __result += modsa.valueList["9"];
 			}
 		}
 		
@@ -895,18 +895,18 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = passiveModel;
-				modsa.valueList[9] = 0;
+				modsa.valueList["9"] = 0;
 				modsa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modsa.valueList[9] != 0) __result += modsa.valueList[9];
+				if (modsa.valueList["9"] != 0) __result += modsa.valueList["9"];
 			}
 		}
 		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail._egoPassiveList) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(egoPassiveModel,false)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = egoPassiveModel;
-				modsa.valueList[9] = 0;
+				modsa.valueList["9"] = 0;
 				modsa.Enact(unit, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modsa.valueList[9] != 0) __result += modsa.valueList[9];
+				if (modsa.valueList["9"] != 0) __result += modsa.valueList["9"];
 			}
 		}
 	}
@@ -1315,27 +1315,27 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill))
 		{
 			if (modsa.activationTiming != actevent) continue;
-			modsa.valueList[9] = finalDmgChange;
+			modsa.valueList["9"] = finalDmgChange;
 			modsa.modsa_coinModel = coin;
 			modsa.wasCrit = isCritical;
 			modsa.modsa_target_list.Clear();
 			modsa.modsa_target_list.Add(target);
 			modsa.modsa_victimModel = target;
 			modsa.Enact(__instance, skill, action, null, actevent, timing);
-			finalDmgChange = modsa.valueList[9];
+			finalDmgChange = modsa.valueList["9"];
 		}
 		
 		foreach (ModularSA modsa in GetAllModcaFromCoinModel(coin))
 		{
 			if (modsa.activationTiming != actevent) continue;
-			modsa.valueList[9] = finalDmgChange;
+			modsa.valueList["9"] = finalDmgChange;
 			modsa.modsa_coinModel = coin;
 			modsa.wasCrit = isCritical;
 			modsa.modsa_target_list.Clear();
 			modsa.modsa_target_list.Add(target);
 			modsa.modsa_victimModel = target;
 			modsa.Enact(__instance, skill, action, null, actevent, timing);
-			finalDmgChange = modsa.valueList[9];
+			finalDmgChange = modsa.valueList["9"];
 		}
 		
 		foreach (BuffModel buf in __instance.GetActivatedBuffModels())
@@ -1343,7 +1343,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buf))
 			{
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = finalDmgChange;
+				modsa.valueList["9"] = finalDmgChange;
 				modsa.modsa_buffModel = buf;
 				modsa.modsa_coinModel = coin;
 				modsa.wasCrit = isCritical;
@@ -1351,7 +1351,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_target_list.Add(target);
 				modsa.modsa_victimModel = target;
 				modsa.Enact(__instance, skill, action, null, actevent, timing);
-				finalDmgChange = modsa.valueList[9];
+				finalDmgChange = modsa.valueList["9"];
 			}
 		}
 		
@@ -1360,7 +1360,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel))
 			{
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = finalDmgChange;
+				modsa.valueList["9"] = finalDmgChange;
 				modsa.modsa_passiveModel = passiveModel;
 				modsa.modsa_coinModel = coin;
 				modsa.wasCrit = isCritical;
@@ -1368,7 +1368,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_target_list.Add(target);
 				modsa.modsa_victimModel = target;
 				modsa.Enact(__instance, skill, action, null, actevent, timing);
-				finalDmgChange = modsa.valueList[9];
+				finalDmgChange = modsa.valueList["9"];
 			}
 		}
 
@@ -1377,7 +1377,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = finalDmgChange;
+				modsa.valueList["9"] = finalDmgChange;
 				modsa.modsa_passiveModel = egoPassiveModel;
 				modsa.modsa_coinModel = coin;
 				modsa.wasCrit = isCritical;
@@ -1385,7 +1385,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_target_list.Add(target);
 				modsa.modsa_victimModel = target;
 				modsa.Enact(__instance, skill, action, null, actevent, timing);
-				finalDmgChange = modsa.valueList[9];
+				finalDmgChange = modsa.valueList["9"];
 			}
 		}
 
@@ -1425,7 +1425,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modba in GetAllModbaFromBuffModel(buf))
 			{
 				if (modba.activationTiming != actevent) continue;
-				modba.valueList[9] = shield_diff;
+				modba.valueList["9"] = shield_diff;
 				modba.modsa_buffModel = buf;
 				modba.Enact(unit, null, null, null, actevent, timing);
 			}
@@ -1436,7 +1436,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
 			{
 				if (modpa.activationTiming != actevent) continue;
-				modpa.valueList[9] = shield_diff;
+				modpa.valueList["9"] = shield_diff;
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(unit, null, null, null, actevent, timing);
 			}
@@ -1447,7 +1447,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
 				if (modpa.activationTiming != actevent) continue;
-				modpa.valueList[9] = shield_diff;
+				modpa.valueList["9"] = shield_diff;
 				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.Enact(unit, null, null, null, actevent, timing);
 			}
@@ -1473,7 +1473,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modba in GetAllModbaFromBuffModel(buf))
 			{
 				if (modba.activationTiming != actevent) continue;
-				modba.valueList[9] = hpdiff;
+				modba.valueList["9"] = hpdiff;
 				modba.modsa_buffModel = buf;
 				modba.Enact(__instance, null, null, actionOrNull, actevent, timing);
 			}
@@ -1484,7 +1484,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
 			{
 				if (modpa.activationTiming != actevent) continue;
-				modpa.valueList[9] = hpdiff;
+				modpa.valueList["9"] = hpdiff;
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(__instance, null, null, actionOrNull, actevent, timing);
 			}
@@ -1495,7 +1495,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
 			{
 				if (modpa.activationTiming != actevent) continue;
-				modpa.valueList[9] = hpdiff;
+				modpa.valueList["9"] = hpdiff;
 				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.Enact(__instance, null, null, actionOrNull, actevent, timing);
 			}
@@ -1523,12 +1523,12 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buf)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_buffModel = buf;
-				modsa.valueList[9] = __result;
-				modsa.valueList[8] = mental_int;
-				modsa.valueList[7] = keyword_int;
-				modsa.valueList[6] = ability_int;
+				modsa.valueList["9"] = __result;
+				modsa.valueList["8"] = mental_int;
+				modsa.valueList["7"] = keyword_int;
+				modsa.valueList["6"] = ability_int;
 				modsa.Enact(__instance, null, actionOrNull, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[9];
+				__result = modsa.valueList["9"];
 			}
 		}
 		
@@ -1536,12 +1536,12 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = passiveModel;
-				modsa.valueList[9] = __result;
-				modsa.valueList[8] = mental_int;
-				modsa.valueList[7] = keyword_int;
-				modsa.valueList[6] = ability_int;
+				modsa.valueList["9"] = __result;
+				modsa.valueList["8"] = mental_int;
+				modsa.valueList["7"] = keyword_int;
+				modsa.valueList["6"] = ability_int;
 				modsa.Enact(__instance, null, actionOrNull, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[9];
+				__result = modsa.valueList["9"];
 			}
 		}
 
@@ -1549,12 +1549,12 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = egoPassiveModel;
-				modsa.valueList[9] = __result;
-				modsa.valueList[8] = mental_int;
-				modsa.valueList[7] = keyword_int;
-				modsa.valueList[6] = ability_int;
+				modsa.valueList["9"] = __result;
+				modsa.valueList["8"] = mental_int;
+				modsa.valueList["7"] = keyword_int;
+				modsa.valueList["6"] = ability_int;
 				modsa.Enact(__instance, null, actionOrNull, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[9];
+				__result = modsa.valueList["9"];
 			}
 		}
 	}
@@ -1571,9 +1571,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modsa in GetAllModbaFromBuffModel_Fast(buf)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_buffModel = buf;
-				modsa.valueList[9] = __result;
+				modsa.valueList["9"] = __result;
 				modsa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[9];
+				__result = modsa.valueList["9"];
 			}
 		}
 		
@@ -1581,9 +1581,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = passiveModel;
-				modsa.valueList[9] = __result;
+				modsa.valueList["9"] = __result;
 				modsa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[9];
+				__result = modsa.valueList["9"];
 			}
 		}
 
@@ -1591,9 +1591,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(egoPassiveModel, false)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = egoPassiveModel;
-				modsa.valueList[9] = __result;
+				modsa.valueList["9"] = __result;
 				modsa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[9];
+				__result = modsa.valueList["9"];
 			}
 		}
 	}
@@ -1609,7 +1609,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		foreach (BuffModel buf in __instance.GetActivatedBuffModels()) {
 			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buf)) {
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = mpdiff;
+				modsa.valueList["9"] = mpdiff;
 				modsa.modsa_buffModel = buf;
 				modsa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
@@ -1618,7 +1618,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = mpdiff;
+				modsa.valueList["9"] = mpdiff;
 				modsa.modsa_passiveModel = passiveModel;
 				modsa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
@@ -1627,7 +1627,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = mpdiff;
+				modsa.valueList["9"] = mpdiff;
 				modsa.modsa_passiveModel = egoPassiveModel;
 				modsa.Enact(__instance, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
@@ -1694,9 +1694,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		
 		foreach (ModularSA modsa in GetAllModsaFromSkillModel_Fast(skill)) {
 			if (modsa.activationTiming != actevent) continue;
-			modsa.valueList[9] = -1;
+			modsa.valueList["9"] = -1;
 			modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-			int check = modsa.valueList[9];
+			int check = modsa.valueList["9"];
 			if (check > -1) {
 				__result = check == 0 ? COIN_RESULT.TAIL : COIN_RESULT.HEAD;
 				return;
@@ -1706,10 +1706,10 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = -1;
+				modsa.valueList["9"] = -1;
 				modsa.modsa_passiveModel = passiveModel;
 				modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				int check = modsa.valueList[9];
+				int check = modsa.valueList["9"];
 				if (check > -1) {
 					__result = check == 0 ? COIN_RESULT.TAIL : COIN_RESULT.HEAD;
 					return;
@@ -1725,10 +1725,10 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
 					foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
 						if (modsa.activationTiming != actevent) continue;
-						modsa.valueList[9] = -1;
+						modsa.valueList["9"] = -1;
 						modsa.modsa_passiveModel = passiveModel;
 						modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-						int check = modsa.valueList[9];
+						int check = modsa.valueList["9"];
 						if (check > -1) {
 							__result = check == 0 ? COIN_RESULT.TAIL : COIN_RESULT.HEAD;
 							return;
@@ -2416,14 +2416,14 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 
 		foreach (ModularSA modsa in GetAllModsaFromSkillModel(__instance)) {
 			if (modsa.activationTiming != actevent) continue;
-			modsa.valueList[9] = parry_result;
+			modsa.valueList["9"] = parry_result;
 			modsa.Enact(unit, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 		
 		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = parry_result;
+				modsa.valueList["9"] = parry_result;
 				modsa.modsa_passiveModel = passiveModel;
 				modsa.Enact(unit, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
@@ -2431,7 +2431,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		foreach (EgoPassiveModel passiveModel in unit._passiveDetail._egoPassiveList.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel, false)) {
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = parry_result;
+				modsa.valueList["9"] = parry_result;
 				modsa.modsa_passiveModel = passiveModel;
 				modsa.Enact(unit, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
@@ -2440,7 +2440,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		foreach (SupporterPassiveModel supportPassive in MainClass.activeSupporterPassiveList) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodelSupport(supportPassive)) {
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = parry_result;
+				modsa.valueList["9"] = parry_result;
 				supportPassive._script._owner = unit;
 				modsa.Enact(unit, __instance, ownerAction, oppoAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
@@ -2588,10 +2588,10 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		
 		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
 			if (modsa.activationTiming != actevent) continue;
-			modsa.valueList[9] = 1;
+			modsa.valueList["9"] = 1;
 			modsa.modsa_victimModel = target;
 			modsa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-			if (modsa.valueList[9] < 1)
+			if (modsa.valueList["9"] < 1)
 			{
 				__result = false;
 				return;
@@ -2600,11 +2600,11 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		
 		foreach (ModularSA modsa in GetAllModcaFromCoinModel(coin)) {
 			if (modsa.activationTiming != actevent) continue;
-			modsa.valueList[9] = 1;
+			modsa.valueList["9"] = 1;
 			modsa.modsa_victimModel = target;
 			modsa.modsa_coinModel = coin;
 			modsa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-			if (modsa.valueList[9] < 1)
+			if (modsa.valueList["9"] < 1)
 			{
 				__result = false;
 				return;
@@ -2614,11 +2614,11 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		foreach (PassiveModel passiveModel in target._passiveDetail.PassiveList.CopyList()) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel)) {
 				if (modpa.activationTiming != actevent) continue;
-				modpa.valueList[9] = 1;
+				modpa.valueList["9"] = 1;
 				modpa.modsa_victimModel = target;
 				modpa.modsa_passiveModel = passiveModel;
 				modpa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modpa.valueList[9] < 1)
+				if (modpa.valueList["9"] < 1)
 				{
 					__result = false;
 					return;
@@ -2628,11 +2628,11 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		foreach (EgoPassiveModel egoPassiveModel in target._passiveDetail.EgoPassiveList.CopyList()) {
 			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
 				if (modpa.activationTiming != actevent) continue;
-				modpa.valueList[9] = 1;
+				modpa.valueList["9"] = 1;
 				modpa.modsa_victimModel = target;
 				modpa.modsa_passiveModel = egoPassiveModel;
 				modpa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modpa.valueList[9] < 1)
+				if (modpa.valueList["9"] < 1)
 				{
 					__result = false;
 					return;
@@ -3208,9 +3208,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
 			if (modsa.activationTiming != actevent) continue;
 			modsa.modsa_victimModel = target;
-			modsa.valueList[9] = result_v;
+			modsa.valueList["9"] = result_v;
 			modsa.Enact(attacker, skill, __instance, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-			result_v = modsa.valueList[9];
+			result_v = modsa.valueList["9"];
 		}
 		
 		foreach (BuffModel buffModel in attacker._buffDetail.GetActivatedBuffModelAll()) {
@@ -3218,9 +3218,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_buffModel = buffModel;
 				modsa.modsa_victimModel = target;
-				modsa.valueList[9] = result_v;
+				modsa.valueList["9"] = result_v;
 				modsa.Enact(attacker, skill, __instance, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				result_v = modsa.valueList[9];
+				result_v = modsa.valueList["9"];
 			}
 		}
 		
@@ -3229,9 +3229,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = passiveModel;
 				modsa.modsa_victimModel = target;
-				modsa.valueList[9] = result_v;
+				modsa.valueList["9"] = result_v;
 				modsa.Enact(attacker, skill, __instance, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				result_v = modsa.valueList[9];
+				result_v = modsa.valueList["9"];
 			}
 		}
 		
@@ -3256,9 +3256,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			if (modsa.activationTiming != actevent) continue;
 			modsa.modsa_victimModel = originTarget;
 			modsa.modsa_killerModel = supportiveDefender;
-			modsa.valueList[9] = result_v;
+			modsa.valueList["9"] = result_v;
 			modsa.Enact(attacker, skill, __instance, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-			result_v = modsa.valueList[9];
+			result_v = modsa.valueList["9"];
 		}
 		
 		foreach (BuffModel buffModel in attacker._buffDetail.GetActivatedBuffModelAll()) {
@@ -3267,9 +3267,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_buffModel = buffModel;
 				modsa.modsa_victimModel = originTarget;
 				modsa.modsa_killerModel = supportiveDefender;
-				modsa.valueList[9] = result_v;
+				modsa.valueList["9"] = result_v;
 				modsa.Enact(attacker, skill, __instance, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				result_v = modsa.valueList[9];
+				result_v = modsa.valueList["9"];
 			}
 		}
 		
@@ -3279,9 +3279,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_passiveModel = passiveModel;
 				modsa.modsa_victimModel = originTarget;
 				modsa.modsa_killerModel = supportiveDefender;
-				modsa.valueList[9] = result_v;
+				modsa.valueList["9"] = result_v;
 				modsa.Enact(attacker, skill, __instance, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				result_v = modsa.valueList[9];
+				result_v = modsa.valueList["9"];
 			}
 		}
 		
@@ -3310,9 +3310,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			modsa.modsa_victimModel = opp_unit;
 			modsa.modsa_target_list.Clear();
 			modsa.modsa_target_list.Add(opp_unit);
-			modsa.valueList[9] = result_v;
+			modsa.valueList["9"] = result_v;
 			modsa.Enact(attacker, skill, __instance, opponentAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-			result_v = modsa.valueList[9];
+			result_v = modsa.valueList["9"];
 		}
 		
 		foreach (BuffModel buffModel in attacker._buffDetail.GetActivatedBuffModelAll()) {
@@ -3322,9 +3322,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_victimModel = opp_unit;
 				modsa.modsa_target_list.Clear();
 				modsa.modsa_target_list.Add(opp_unit);
-				modsa.valueList[9] = result_v;
+				modsa.valueList["9"] = result_v;
 				modsa.Enact(attacker, skill, __instance, opponentAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				result_v = modsa.valueList[9];
+				result_v = modsa.valueList["9"];
 			}
 		}
 		
@@ -3335,9 +3335,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_victimModel = opp_unit;
 				modsa.modsa_target_list.Clear();
 				modsa.modsa_target_list.Add(opp_unit);
-				modsa.valueList[9] = result_v;
+				modsa.valueList["9"] = result_v;
 				modsa.Enact(attacker, skill, __instance, opponentAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				result_v = modsa.valueList[9];
+				result_v = modsa.valueList["9"];
 			}
 		}
 		__result = result_v > 0;
@@ -3364,9 +3364,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_buffModel = buf;
 				modsa.modsa_target_list.Clear();
 				modsa.modsa_target_list.Add(otherUnit);
-				modsa.valueList[9] = 0;
+				modsa.valueList["9"] = 0;
 				modsa.Enact(unit, skill, action, otherAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modsa.valueList[9] == 1) {
+				if (modsa.valueList["9"] == 1) {
 					__result = true;
 					return;
 				}
@@ -3377,9 +3377,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			if (modsa.activationTiming != actevent) continue;
 			modsa.modsa_target_list.Clear();
 			modsa.modsa_target_list.Add(otherUnit);
-			modsa.valueList[9] = 0;
+			modsa.valueList["9"] = 0;
 			modsa.Enact(unit, skill, action, otherAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-			if (modsa.valueList[9] == 1) {
+			if (modsa.valueList["9"] == 1) {
 				__result = true;
 				return;
 			}
@@ -3391,9 +3391,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_passiveModel = pasmodel;
 				modsa.modsa_target_list.Clear();
 				modsa.modsa_target_list.Add(otherUnit);
-				modsa.valueList[9] = 0;
+				modsa.valueList["9"] = 0;
 				modsa.Enact(unit, skill, action, otherAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modsa.valueList[9] == 1) {
+				if (modsa.valueList["9"] == 1) {
 					__result = true;
 					return;
 				}
@@ -3405,9 +3405,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_passiveModel = pasmodel;
 				modsa.modsa_target_list.Clear();
 				modsa.modsa_target_list.Add(otherUnit);
-				modsa.valueList[9] = 0;
+				modsa.valueList["9"] = 0;
 				modsa.Enact(unit, skill, action, otherAction, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modsa.valueList[9] == 1) {
+				if (modsa.valueList["9"] == 1) {
 					__result = true;
 					return;
 				}
@@ -3423,9 +3423,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_buffModel = buf;
 				modsa.modsa_target_list.Clear();
 				modsa.modsa_target_list.Add(unit);
-				modsa.valueList[9] = 0;
+				modsa.valueList["9"] = 0;
 				modsa.Enact(otherUnit, otherSkill, otherAction, action, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modsa.valueList[9] == 1) {
+				if (modsa.valueList["9"] == 1) {
 					__result = true;
 					return;
 				}
@@ -3436,9 +3436,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			if (modsa.activationTiming != actevent) continue;
 			modsa.modsa_target_list.Clear();
 			modsa.modsa_target_list.Add(unit);
-			modsa.valueList[9] = 0;
+			modsa.valueList["9"] = 0;
 			modsa.Enact(otherUnit, otherSkill, otherAction, action, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-			if (modsa.valueList[9] == 1) {
+			if (modsa.valueList["9"] == 1) {
 				__result = true;
 				return;
 			}
@@ -3450,9 +3450,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_passiveModel = pasmodel;
 				modsa.modsa_target_list.Clear();
 				modsa.modsa_target_list.Add(unit);
-				modsa.valueList[9] = 0;
+				modsa.valueList["9"] = 0;
 				modsa.Enact(otherUnit, otherSkill, otherAction, action, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modsa.valueList[9] == 1) {
+				if (modsa.valueList["9"] == 1) {
 					__result = true;
 					return;
 				}
@@ -3464,9 +3464,9 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 				modsa.modsa_passiveModel = pasmodel;
 				modsa.modsa_target_list.Clear();
 				modsa.modsa_target_list.Add(unit);
-				modsa.valueList[9] = 0;
+				modsa.valueList["9"] = 0;
 				modsa.Enact(otherUnit, otherSkill, otherAction, action, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				if (modsa.valueList[9] == 1) {
+				if (modsa.valueList["9"] == 1) {
 					__result = true;
 					return;
 				}
@@ -3695,7 +3695,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = pasmodel;
-				modsa.valueList[9] = retreatTurn;
+				modsa.valueList["9"] = retreatTurn;
 				modsa.Enact(__instance, null, null, null, actevent, timing);
 			}
 		}
@@ -3703,7 +3703,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel, false)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = pasmodel;
-				modsa.valueList[9] = retreatTurn;
+				modsa.valueList["9"] = retreatTurn;
 				modsa.Enact(__instance, null, null, null, actevent, timing);
 			}
 		}
@@ -4043,30 +4043,30 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		
 		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
 			if (modsa.activationTiming != actevent) continue;
-			modsa.valueList[9] = originUsage + __result;
-			modsa.valueList[8] = isOverclock ? 1 : 0;
+			modsa.valueList["9"] = originUsage + __result;
+			modsa.valueList["8"] = isOverclock ? 1 : 0;
 			modsa.Enact(unit, skill, actionNullable, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-			__result = modsa.valueList[9] - originUsage;
+			__result = modsa.valueList["9"] - originUsage;
 		}
 
 		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = passiveModel;
-				modsa.valueList[9] = originUsage + __result;
-				modsa.valueList[8] = isOverclock ? 1 : 0;
+				modsa.valueList["9"] = originUsage + __result;
+				modsa.valueList["8"] = isOverclock ? 1 : 0;
 				modsa.Enact(unit, skill, actionNullable, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[9] - originUsage;
+				__result = modsa.valueList["9"] - originUsage;
 			}
 		}
 		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail._egoPassiveList.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = egoPassiveModel;
-				modsa.valueList[9] = originUsage + __result;
-				modsa.valueList[8] = isOverclock ? 1 : 0;
+				modsa.valueList["9"] = originUsage + __result;
+				modsa.valueList["8"] = isOverclock ? 1 : 0;
 				modsa.Enact(unit, skill, actionNullable, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[9] - originUsage;
+				__result = modsa.valueList["9"] - originUsage;
 			}
 		}
 	}
@@ -4091,11 +4091,11 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		{
 			foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = originCost + __result;
-				modsa.valueList[8] = isOverClock ? 1 : 0;
-				modsa.valueList[7] = sintype;
+				modsa.valueList["9"] = originCost + __result;
+				modsa.valueList["8"] = isOverClock ? 1 : 0;
+				modsa.valueList["7"] = sintype;
 				modsa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[9] - originCost;
+				__result = modsa.valueList["9"] - originCost;
 			}
 		}
 
@@ -4103,22 +4103,22 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = passiveModel;
-				modsa.valueList[9] = originCost + __result;
-				modsa.valueList[8] = isOverClock ? 1 : 0;
-				modsa.valueList[7] = sintype;
+				modsa.valueList["9"] = originCost + __result;
+				modsa.valueList["8"] = isOverClock ? 1 : 0;
+				modsa.valueList["7"] = sintype;
 				modsa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[9] - originCost;
+				__result = modsa.valueList["9"] - originCost;
 			}
 		}
 		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail._egoPassiveList.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = egoPassiveModel;
-				modsa.valueList[9] = originCost + __result;
-				modsa.valueList[8] = isOverClock ? 1 : 0;
-				modsa.valueList[7] = sintype;
+				modsa.valueList["9"] = originCost + __result;
+				modsa.valueList["8"] = isOverClock ? 1 : 0;
+				modsa.valueList["7"] = sintype;
 				modsa.Enact(__instance, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				__result = modsa.valueList[9] - originCost;
+				__result = modsa.valueList["9"] - originCost;
 			}
 		}
 	}*/
@@ -4183,21 +4183,21 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		{
 			foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[0] = need_crimson;
-				modsa.valueList[1] = need_scarlet;
-				modsa.valueList[2] = need_amber;
-				modsa.valueList[3] = need_shamrock;
-				modsa.valueList[4] = need_azure;
-				modsa.valueList[5] = need_indigo;
-				modsa.valueList[6] = need_violet;
+				modsa.valueList["0"] = need_crimson;
+				modsa.valueList["1"] = need_scarlet;
+				modsa.valueList["2"] = need_amber;
+				modsa.valueList["3"] = need_shamrock;
+				modsa.valueList["4"] = need_azure;
+				modsa.valueList["5"] = need_indigo;
+				modsa.valueList["6"] = need_violet;
 				modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				need_crimson = modsa.valueList[0];
-				need_scarlet = modsa.valueList[1];
-				need_amber = modsa.valueList[2];
-				need_shamrock = modsa.valueList[3];
-				need_azure = modsa.valueList[4];
-				need_indigo = modsa.valueList[5];
-				need_violet = modsa.valueList[6];
+				need_crimson = modsa.valueList["0"];
+				need_scarlet = modsa.valueList["1"];
+				need_amber = modsa.valueList["2"];
+				need_shamrock = modsa.valueList["3"];
+				need_azure = modsa.valueList["4"];
+				need_indigo = modsa.valueList["5"];
+				need_violet = modsa.valueList["6"];
 			}
 		}
 
@@ -4205,42 +4205,42 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = passiveModel;
-				modsa.valueList[0] = need_crimson;
-				modsa.valueList[1] = need_scarlet;
-				modsa.valueList[2] = need_amber;
-				modsa.valueList[3] = need_shamrock;
-				modsa.valueList[4] = need_azure;
-				modsa.valueList[5] = need_indigo;
-				modsa.valueList[6] = need_violet;
+				modsa.valueList["0"] = need_crimson;
+				modsa.valueList["1"] = need_scarlet;
+				modsa.valueList["2"] = need_amber;
+				modsa.valueList["3"] = need_shamrock;
+				modsa.valueList["4"] = need_azure;
+				modsa.valueList["5"] = need_indigo;
+				modsa.valueList["6"] = need_violet;
 				modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				need_crimson = modsa.valueList[0];
-				need_scarlet = modsa.valueList[1];
-				need_amber = modsa.valueList[2];
-				need_shamrock = modsa.valueList[3];
-				need_azure = modsa.valueList[4];
-				need_indigo = modsa.valueList[5];
-				need_violet = modsa.valueList[6];
+				need_crimson = modsa.valueList["0"];
+				need_scarlet = modsa.valueList["1"];
+				need_amber = modsa.valueList["2"];
+				need_shamrock = modsa.valueList["3"];
+				need_azure = modsa.valueList["4"];
+				need_indigo = modsa.valueList["5"];
+				need_violet = modsa.valueList["6"];
 			}
 		}
 		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail._egoPassiveList.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
 				if (modsa.activationTiming != actevent) continue;
 				modsa.modsa_passiveModel = egoPassiveModel;
-				modsa.valueList[0] = need_crimson;
-				modsa.valueList[1] = need_scarlet;
-				modsa.valueList[2] = need_amber;
-				modsa.valueList[3] = need_shamrock;
-				modsa.valueList[4] = need_azure;
-				modsa.valueList[5] = need_indigo;
-				modsa.valueList[6] = need_violet;
+				modsa.valueList["0"] = need_crimson;
+				modsa.valueList["1"] = need_scarlet;
+				modsa.valueList["2"] = need_amber;
+				modsa.valueList["3"] = need_shamrock;
+				modsa.valueList["4"] = need_azure;
+				modsa.valueList["5"] = need_indigo;
+				modsa.valueList["6"] = need_violet;
 				modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				need_crimson = modsa.valueList[0];
-				need_scarlet = modsa.valueList[1];
-				need_amber = modsa.valueList[2];
-				need_shamrock = modsa.valueList[3];
-				need_azure = modsa.valueList[4];
-				need_indigo = modsa.valueList[5];
-				need_violet = modsa.valueList[6];
+				need_crimson = modsa.valueList["0"];
+				need_scarlet = modsa.valueList["1"];
+				need_amber = modsa.valueList["2"];
+				need_shamrock = modsa.valueList["3"];
+				need_azure = modsa.valueList["4"];
+				need_indigo = modsa.valueList["5"];
+				need_violet = modsa.valueList["6"];
 			}
 		}
 		
@@ -4325,7 +4325,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			{
 				foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
 					if (modsa.activationTiming != actevent) continue;
-					modsa.valueList[9] = valuevalue;
+					modsa.valueList["9"] = valuevalue;
 					modsa.Enact(unit, skill, action, null, actevent, timing);
 				}
 			}
@@ -4335,7 +4335,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		foreach (PassiveModel pasmodel in unit._passiveDetail._passivelist.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = valuevalue;
+				modsa.valueList["9"] = valuevalue;
 				modsa.modsa_passiveModel = pasmodel;
 				modsa.Enact(unit, skill, action, null, actevent, timing);
 			}
@@ -4343,7 +4343,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		foreach (EgoPassiveModel pasmodel in unit._passiveDetail._egoPassiveList.CopyList()) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel, false)) {
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = valuevalue;
+				modsa.valueList["9"] = valuevalue;
 				modsa.modsa_passiveModel = pasmodel;
 				modsa.Enact(unit, skill, action, null, actevent, timing);
 			}
@@ -4378,14 +4378,14 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		
 		foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
 			if (modsa.activationTiming != actevent) continue;
-			modsa.valueList[9] = v9;
+			modsa.valueList["9"] = v9;
 			modsa.Enact(unit, skill, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 		
 		foreach (PassiveModel passiveModel in unit._passiveDetail._passivelist) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(passiveModel)) {
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = v9;
+				modsa.valueList["9"] = v9;
 				modsa.modsa_passiveModel = passiveModel;
 				modsa.Enact(unit, skill, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
@@ -4394,7 +4394,7 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		foreach (EgoPassiveModel egoPassiveModel in unit._passiveDetail._egoPassiveList) {
 			foreach (ModularSA modsa in GetAllModpaFromPasmodel_Fast(egoPassiveModel, false)) {
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = v9;
+				modsa.valueList["9"] = v9;
 				modsa.modsa_passiveModel = egoPassiveModel;
 				modsa.Enact(unit, skill, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 			}
@@ -4873,14 +4873,14 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		{
 			foreach (ModularSA modsa in GetAllModsaFromSkillModel_Fast(skill)) {
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[7] = (int)motiondetail;
-				modsa.valueList[8] = isOverKill ? 1 : 0;
-				modsa.valueList[9] = index;
+				modsa.valueList["7"] = (int)motiondetail;
+				modsa.valueList["8"] = isOverKill ? 1 : 0;
+				modsa.valueList["9"] = index;
 				modsa.modsa_motionDetail = motiondetail;
 				modsa.Enact(unit, skill, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 				motiondetail = modsa.modsa_motionDetail;
-				index = modsa.valueList[9];
-				isOverKill = modsa.valueList[8] > 0;
+				index = modsa.valueList["9"];
+				isOverKill = modsa.valueList["8"] > 0;
 				/*if (modca.modsa_motionDetail == null) continue;
 				motiondetail = modca.modsa_motionDetail.Detail;
 				index = modca.modsa_motionDetail.Index;

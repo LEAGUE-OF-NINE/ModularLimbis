@@ -48,8 +48,8 @@ public class ConsequenceBufActivate : IModularConsequence
 							if (modsa.activationTiming != actevent) continue;
 							modsa.modsa_buffModel = buf;
 							modsa.modsa_killerModel = attacker;
-							modsa.valueList[9] = overwrite_amount;
-							modsa.valueList[8] = dmg_sin;
+							modsa.valueList["9"] = overwrite_amount;
+							modsa.valueList["8"] = dmg_sin;
 							modsa.Enact(targetModel, null, null, null, actevent, timing);
 						}
 					} else {
@@ -60,8 +60,8 @@ public class ConsequenceBufActivate : IModularConsequence
 							if (modsa.activationTiming != actevent) continue;
 							modsa.modsa_buffModel = buf;
 							modsa.modsa_killerModel = attacker;
-							modsa.valueList[9] = overwrite_amount;
-							modsa.valueList[8] = dmg_sin;
+							modsa.valueList["9"] = overwrite_amount;
+							modsa.valueList["8"] = dmg_sin;
 							modsa.Enact(targetModel, null, null, null, actevent, timing);
 						}
 					}

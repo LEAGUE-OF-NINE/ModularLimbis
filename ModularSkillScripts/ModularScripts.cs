@@ -158,12 +158,12 @@ public class ModularSA : Il2CppSystem.Object
 	public string originalString = "";
 	public readonly char[] parenthesisSeparator = ['(', ')'];
 
-	public int[] valueList = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+	public System.Collections.Generic.Dictionary<string, int> valueList = new System.Collections.Generic.Dictionary<string, int>();
 	public object[] mobjList = [null, null, null, null, null, null, null, null, null, null];
 	public void ResetValueList()
 	{
 		activationCounter = 0;
-		for (int i = 0; i < valueList.Length; i++) valueList[i] = 0;
+		valueList.Clear();
 	}
 
 	public void EraseAllData()
@@ -587,9 +587,8 @@ public class ModularSA : Il2CppSystem.Object
 		if (math) value = DoMath(param);
 		else if (param.StartsWith("VALUE_"))
 		{
-			int value_idx = 0;
-			int.TryParse(param[6].ToString(), out value_idx);
-			value = valueList[value_idx];
+			string value_key = param.Substring(6);
+			if (!valueList.TryGetValue(value_key, out value)) value = 0;
 		}
 		else if (acquire)
 		{
@@ -1215,8 +1214,8 @@ public class ModularSA : Il2CppSystem.Object
 			else if (thisBatch.StartsWith("IFNOT")) { if (CheckIF(thisBatch)) break; else continue; }
 			else if (thisBatch.StartsWith("IF")) { if (!CheckIF(thisBatch)) break; else continue; }
 			else if (thisBatch.StartsWith("VALUE_")) {
-				int.TryParse(thisBatch[6].ToString(), out int valueidx);
-				valueList[valueidx] = AcquireValue(batchArgs[i + 1]); // GETTERS
+				string value_key = thisBatch.Substring(6);
+				valueList[value_key] = AcquireValue(batchArgs[i + 1]); // GETTERS
 				i += 1;
 				continue;
 			} else if (thisBatch.StartsWith("MOBJ")) {

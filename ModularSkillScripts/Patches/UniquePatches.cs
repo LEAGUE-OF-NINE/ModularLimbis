@@ -134,10 +134,10 @@ public class UniquePatches
 		foreach (PassiveModel pasmodel in unit._passiveDetail._passivelist) {
 			foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(pasmodel)) {
 				if (modsa.activationTiming != actevent) continue;
-				modsa.valueList[9] = skillID;
+				modsa.valueList["9"] = skillID;
 				modsa.modsa_passiveModel = pasmodel;
 				modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
-				int checkID = modsa.valueList[9];
+				int checkID = modsa.valueList["9"];
 				if (checkID != skillID) {
 					overrideCycleWithPassive_skillID = checkID;
 					break;

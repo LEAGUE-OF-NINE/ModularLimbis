@@ -45,9 +45,11 @@ public class AcquirerOtherModsaValue : IModularAcquirer
 		}
 
 		int modsa_idx = modular.GetNumFromParamString(circles[1]);
-		int value_idx = modular.GetNumFromParamString(circles[2]);
 		if (modsa_idx >= modsa_list.Count) return -1;
 		ModularSA modsa = modsa_list[modsa_idx];
-		return modsa.valueList[value_idx];
+		string value_key = circles[2];
+		if (value_key.StartsWith("VALUE_", System.StringComparison.OrdinalIgnoreCase)) value_key = value_key.Substring(6);
+		if (!modsa.valueList.TryGetValue(value_key, out int v)) v = 0;
+		return v;
 	}
 }
