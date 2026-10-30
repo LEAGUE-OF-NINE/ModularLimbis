@@ -13,6 +13,8 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Battle;
+using ModularSkillScripts.LuaFunction;
+using ModularSkillScripts.LuaIntegration;
 using CustomBuffs = Lethe.Patches.CustomBuffs;
 
 using ModularSkillScripts.Patches;
@@ -193,6 +195,7 @@ public class ModularSA : Il2CppSystem.Object
 		modsa_loopString = "";
 		modsa_luaScript = null;
 		modsa_luaScriptMain = null;
+		modsa_luaState = null;
 		//modsa_motionDetail = null;
 		modsa_expected_sinaction = null;
 		
@@ -225,7 +228,8 @@ public class ModularSA : Il2CppSystem.Object
 	public int passiveID = 0; // 0 means skill, 1 means coin, 2 means passive
 	public long ptr_intlong;
 
-
+	public LuaState modsa_luaState = null;
+	
 	public BattleUnitModel modsa_victimModel = null;
 	public BattleUnitModel modsa_killerModel = null;
 	public BattleUnitModel modsa_unitModel = null;
@@ -434,15 +438,25 @@ public class ModularSA : Il2CppSystem.Object
 		}
 		else
 		{
-			var state = LuaState.Create();
-			InitializeLuaState(state);
+			if (modsa_luaState == null) {
+				modsa_luaState = LuaState.Create();
+				InitializeLuaState(modsa_luaState);
+			}
+			
+			if (EXPECTED && modsa_expected_sinaction != null) modsa_loopTarget = modsa_expected_sinaction.UnitModel;
+			else {
+				if (modsa_target_list.Count < 1) modsa_loopTarget = GetTargetModel("MainTarget");
+				else modsa_loopTarget = modsa_target_list[0];
+				modsa_target_list.Clear();
+			}
+			
 			try
 			{
 				var buffer = ArrayPool<LuaValue>.Shared.Rent(1024);
-				int result = state.RunAsync(modsa_luaScript.Content, buffer).GetAwaiter().GetResult();
+				int result = modsa_luaState.RunAsync(modsa_luaScript.Content, buffer).GetAwaiter().GetResult();
 				if (!String.IsNullOrWhiteSpace(modsa_luaScriptMain))
 				{
-					if (!state.Environment.TryGetValue(modsa_luaScriptMain, out var mainVal))
+					if (!modsa_luaState.Environment.TryGetValue(modsa_luaScriptMain, out var mainVal))
 					{
 						throw new LuaException("LUA main function not found: " + modsa_luaScriptMain);
 					}
@@ -454,7 +468,7 @@ public class ModularSA : Il2CppSystem.Object
 
 					MainClass.LogModular($"Invoking Lua main function: {modsa_luaScriptMain}");
 					LuaValue[] args = GetLuaValueArgs();
-					mainFunction.InvokeAsync(state, args).GetAwaiter().GetResult();
+					mainFunction.InvokeAsync(modsa_luaState, args).GetAwaiter().GetResult();
 				}
 				MainClass.LogModular($"Lua Script executed successfully: {result}");
 			}
@@ -1369,15 +1383,14 @@ public class ModularSA : Il2CppSystem.Object
 		state.OpenTableLibrary();
 
 		// Register Lua functions from the dictionary
-		foreach (var kvp in MainClass.luaFunctionDict)
+		foreach (System.Collections.Generic.KeyValuePair<string, IModularLuaFunction> kvp in MainClass.luaFunctionDict)
 		{
-			var functionName = kvp.Key;
-			var luaFunction = kvp.Value;
-			state.Environment[functionName] = new Lua.LuaFunction((context, buffer, ct) =>
-			{
-				return luaFunction.ExecuteLuaFunction(this, context, buffer.Span, ct);
-			});
+			string functionName = kvp.Key;
+			IModularLuaFunction luaFunction = kvp.Value;
+			state.Environment[functionName] = new Lua.LuaFunction((context, buffer, ct) => luaFunction.ExecuteLuaFunction(this, context, buffer.Span, ct));
 		}
+
+		state.Environment["ModsaInterface"] = new ModsaInterface(this);
 	}
 
 	public static BattleUnitModel_Abnormality AsAbnormalityModel(BattleUnitModel targetModel)
