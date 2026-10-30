@@ -436,3 +436,126 @@ public partial class EventTiming
 		return ref_timing.ToString();
 	}
 }
+
+[LuaObject]
+public partial class DamageSourceType
+{
+	public DAMAGE_SOURCE_TYPE ref_dmgSrcType = DAMAGE_SOURCE_TYPE.NONE;
+	
+	[LuaMember("CreateFromString")]
+	public static DamageSourceType CreateFromString(string s) {
+		DamageSourceType new_self = new();
+		if (Enum.TryParse(s, true, out DAMAGE_SOURCE_TYPE result)) {
+			new_self.ref_dmgSrcType = result;
+		}
+		return new_self;
+	}
+	
+	[LuaMember("CreateFromInt")]
+	public static DamageSourceType CreateFromInt(int integ) {
+		return new DamageSourceType {
+			ref_dmgSrcType = (DAMAGE_SOURCE_TYPE)integ
+		};
+	}
+	
+	[LuaMember("ToString")]
+	public string KeywordToString(int integ) {
+		return ref_dmgSrcType.ToString();
+	}
+}
+
+[LuaObject]
+public partial class ActionModel
+{
+	public BattleActionModel ref_action = null;
+	public ActionModel(BattleActionModel x) {
+		ref_action = x;
+	}
+	
+	[LuaMember("IsNull")]
+	public bool IsNull() {
+		return ref_action == null;
+	}
+	
+	[LuaMember("FetchUnitModel")]
+	public UnitModel FetchUnitModel() {
+		return new UnitModel(ref_action._model);
+	}
+	[LuaMember("FetchSkill")]
+	public SkillModel FetchSkill() {
+		return new SkillModel(ref_action._skill);
+	}
+}
+
+[LuaObject]
+public partial class CoinModel
+{
+	public global::CoinModel ref_coin = null;
+	public CoinModel(global::CoinModel x) {
+		ref_coin = x;
+	}
+	
+	[LuaMember("IsNull")]
+	public bool IsNull() {
+		return ref_coin == null;
+	}
+	
+	[LuaMember("GetRealCoinIndex")]
+	public int GetRealCoinIndex() {
+		return ref_coin.GetRealCoinIndex();
+	}
+}
+
+[LuaObject]
+public partial class SkillModel
+{
+	public global::SkillModel ref_skill = null;
+	public SkillModel(global::SkillModel x) {
+		ref_skill = x;
+	}
+	
+	[LuaMember("IsNull")]
+	public bool IsNull() {
+		return ref_skill == null;
+	}
+}
+
+[LuaObject]
+public partial class PacketChangeTakeDamage
+{
+	public BattleActionModel action = null;
+	public global::CoinModel coin = null;
+	public DAMAGE_SOURCE_TYPE dmgSrcType = DAMAGE_SOURCE_TYPE.NONE;
+	public BUFF_UNIQUE_KEYWORD keyword = BUFF_UNIQUE_KEYWORD.None;
+
+	[LuaMember("FetchAction")]
+	public ActionModel FetchAction() {
+		return new ActionModel(action);
+	}
+	[LuaMember("FetchCoin")]
+	public CoinModel FetchCoin() {
+		return new CoinModel(coin);
+	}
+	
+	[LuaMember("FetchDmgSrcType")]
+	public DamageSourceType FetchDmgSrcType() {
+		return new DamageSourceType {
+			ref_dmgSrcType = dmgSrcType
+		};
+	}
+	
+	[LuaMember("FetchBufKeyword")]
+	public BufKeyword FetchBufKeyword() {
+		return new BufKeyword {
+			ref_buf_keyword = keyword
+		};
+	}
+	
+	[LuaMember("resultDmg")]
+	public int resultDmg = 0;
+	[LuaMember("preCalculatedDmg")]
+	public int preCalculatedDmg = 0;
+	
+	[LuaMember("postfix_dmg")]
+	public int postfix_dmg = 0;
+}

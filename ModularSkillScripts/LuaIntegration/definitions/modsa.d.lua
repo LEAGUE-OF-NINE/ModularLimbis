@@ -74,6 +74,29 @@ BufPacket = {}
 ---| "buf"
 ---| "passive"
 
+--- Information Packet specific to Modular's ChangeTakeDamage TIMING.
+---@class PacketChangeTakeDamage
+---@field resultDmg integer
+---@field preCalculatedDmg integer
+---@field postfix_dmg integer Overwrite This
+PacketChangeTakeDamage = {}
+
+--- Creates and returns the current ActionModel (can be internally null).
+---@return ActionModel
+function PacketChangeTakeDamage:FetchAction() end
+
+--- Creates and returns the current CoinModel (can be internally null).
+---@return CoinModel
+function PacketChangeTakeDamage:FetchCoin() end
+
+--- Creates and returns the current DamageSourceType.
+---@return DamageSourceType
+function PacketChangeTakeDamage:FetchDmgSrcType() end
+
+--- Creates and returns the current BufKeyword.
+---@return BufKeyword
+function PacketChangeTakeDamage:FetchBufKeyword() end
+
 --- Creates and returns the current EventTiming.
 ---@return EventTiming
 function ModsaInterface:FetchEventTiming() end
@@ -113,6 +136,24 @@ function BufCategory.CreateFromInt(category_int) end
 --- Returns a string of the stored BUFF_CATEGORY_KEYWORD.
 ---@return string
 function BufCategory:ToString() end
+
+--- Can be instanced to store a DAMAGE_SOURCE_TYPE enum.
+---@class DamageSourceType
+DamageSourceType = {}
+
+--- Creates a new DamageSourceType instance that internally stores a DAMAGE_SOURCE_TYPE enum by parsing a string.
+---@param s string
+---@return DamageSourceType
+function DamageSourceType.CreateFromString(s) end
+
+--- Creates a new DamageSourceType instance that internally stores a DAMAGE_SOURCE_TYPE enum by casting an int.
+---@param integ integer
+---@return DamageSourceType
+function DamageSourceType.CreateFromInt(integ) end
+
+--- Returns a string of the stored DAMAGE_SOURCE_TYPE.
+---@return string
+function DamageSourceType:ToString() end
 
 --- Static Method Interface for BattleUnitBuffManager.
 ---@class BufManager
@@ -233,3 +274,36 @@ function BufModel:CreateSubBufKeywordList() end
 --- Returns a list of BufCategory instances for each Buf Category.
 ---@return BufCategory[]
 function BufModel:CreateCategoryKeywordList() end
+
+--- Internally Stores a BattleActionModel.
+---@class ActionModel
+ActionModel = {}
+
+--- Checks if internal BattleActionModel reference is null.
+---@return boolean
+function ActionModel:IsNull() end
+
+---@return UnitModel
+function ActionModel:FetchUnitModel() end
+
+---@return SkillModel
+function ActionModel:FetchSkill() end
+
+--- Internally Stores a vanilla SkillModel.
+---@class SkillModel
+SkillModel = {}
+
+--- Checks if internal SkillModel reference is null.
+---@return boolean
+function SkillModel:IsNull() end
+
+--- Internally Stores a vanilla CoinModel.
+---@class CoinModel
+CoinModel = {}
+
+--- Checks if internal CoinModel reference is null.
+---@return boolean
+function CoinModel:IsNull() end
+
+---@return integer
+function CoinModel:GetRealCoinIndex() end

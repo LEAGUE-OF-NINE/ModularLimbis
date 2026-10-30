@@ -6,7 +6,9 @@ using BepInEx.Unity.IL2CPP.Utils.Collections;
 using HarmonyLib;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem.Collections.Generic;
+using Lua;
 using ModularSkillScripts.Consequence;
+using ModularSkillScripts.LuaIntegration;
 using SD;
 using Utils;
 using static BattleUI.Abnormality.AbnormalityPartSkills;
@@ -1239,61 +1241,116 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		DAMAGE_SOURCE_TYPE dmgSrcType,
 		BUFF_UNIQUE_KEYWORD keyword,
 		BATTLE_EVENT_TIMING timing,
+		int preCalculatedDmg,
 		BattleUnitModel __instance,
 		ref int __result)
 	{
-		int finalDmgChange = resultDmg;
 		int actevent_ChangeTakeDamage = MainClass.timingDict["ChangeTakeDamage"];
 
-		foreach (BuffModel buf in __instance.GetActivatedBuffModels())
-		{
-			foreach (ModularSA modba in GetAllModbaFromBuffModel(buf))
-			{
-				if (modba.activationTiming != actevent_ChangeTakeDamage) continue;
-				modba.ischangedamagetaken = false;
-				modba.changedamagetaken = 0;
-				modba.lastFinalDmg = resultDmg;
-				modba.changedamage_source = dmgSrcType;
-				modba.modsa_buffModel = buf;
-				modba.modsa_coinModel = coinOrNull;
-				modba.Enact(__instance, null, null, attackActionOrNull, actevent_ChangeTakeDamage, timing);
-				if (modba.ischangedamagetaken) finalDmgChange = modba.changedamagetaken;
+		foreach (BuffModel buf in __instance.GetActivatedBuffModels()) {
+			foreach (ModularSA modsa in GetAllModbaFromBuffModel(buf)) {
+				if (modsa.activationTiming != actevent_ChangeTakeDamage) continue;
+				modsa.modsa_buffModel = buf;
+				modsa.modsa_coinModel = coinOrNull;
+				
+				if (modsa.modsa_luaState != null) {
+					bool has = modsa.modsa_luaState.Environment.TryGetValue("PacketChangeTakeDamage", out LuaValue packet_lua);
+					PacketChangeTakeDamage packet = null;
+					if (has) {
+						packet = packet_lua.Read<PacketChangeTakeDamage>();
+					} else {
+						packet = new();
+						modsa.modsa_luaState.Environment["PacketChangeTakeDamage"] = packet;
+					}
+					packet.action = attackActionOrNull;
+					packet.coin = coinOrNull;
+					packet.resultDmg = resultDmg;
+					packet.preCalculatedDmg = preCalculatedDmg;
+					packet.dmgSrcType = dmgSrcType;
+					packet.keyword = keyword;
+					packet.postfix_dmg = __result;
+					modsa.Enact(__instance, null, null, null, actevent_ChangeTakeDamage, timing);
+					__result = packet.postfix_dmg;
+				} else {
+					modsa.ischangedamagetaken = false;
+					modsa.changedamagetaken = 0;
+					modsa.lastFinalDmg = __result;
+					modsa.changedamage_source = dmgSrcType;
+					modsa.Enact(__instance, null, null, attackActionOrNull, actevent_ChangeTakeDamage, timing);
+					if (modsa.ischangedamagetaken) __result = modsa.changedamagetaken;
+				}
 			}
 		}
 		
-		foreach (PassiveModel passiveModel in __instance._passiveDetail.PassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(passiveModel))
-			{
-				if (modpa.activationTiming != actevent_ChangeTakeDamage) continue;
-				modpa.ischangedamagetaken = false;
-				modpa.changedamagetaken = 0;
-				modpa.lastFinalDmg = resultDmg;
-				modpa.modsa_passiveModel = passiveModel;
-				modpa.changedamage_source = dmgSrcType;
-				modpa.modsa_coinModel = coinOrNull;
-				modpa.Enact(__instance, null, null, attackActionOrNull, actevent_ChangeTakeDamage, timing);
-				if (modpa.ischangedamagetaken) finalDmgChange = modpa.changedamagetaken;
+		foreach (PassiveModel passiveModel in __instance._passiveDetail._passivelist.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(passiveModel)) {
+				if (modsa.activationTiming != actevent_ChangeTakeDamage) continue;
+				modsa.modsa_passiveModel = passiveModel;
+				modsa.modsa_coinModel = coinOrNull;
+				
+				if (modsa.modsa_luaState != null) {
+					bool has = modsa.modsa_luaState.Environment.TryGetValue("PacketChangeTakeDamage", out LuaValue packet_lua);
+					PacketChangeTakeDamage packet = null;
+					if (has) packet = packet_lua.Read<PacketChangeTakeDamage>();
+					else {
+						packet = new();
+						modsa.modsa_luaState.Environment["PacketChangeTakeDamage"] = packet;
+					}
+					packet.action = attackActionOrNull;
+					packet.coin = coinOrNull;
+					packet.resultDmg = resultDmg;
+					packet.preCalculatedDmg = preCalculatedDmg;
+					packet.dmgSrcType = dmgSrcType;
+					packet.keyword = keyword;
+					packet.postfix_dmg = __result;
+					modsa.Enact(__instance, null, null, null, actevent_ChangeTakeDamage, timing);
+					__result = packet.postfix_dmg;
+				} else {
+					modsa.ischangedamagetaken = false;
+					modsa.changedamagetaken = 0;
+					modsa.lastFinalDmg = __result;
+					modsa.changedamage_source = dmgSrcType;
+					modsa.Enact(__instance, null, null, attackActionOrNull, actevent_ChangeTakeDamage, timing);
+					if (modsa.ischangedamagetaken) __result = modsa.changedamagetaken;
+				}
+				
 			}
 		}
 
-		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail.EgoPassiveList.CopyList())
-		{
-			foreach (ModularSA modpa in GetAllModpaFromPasmodel(egoPassiveModel, false))
-			{
-				if (modpa.activationTiming != actevent_ChangeTakeDamage) continue;
-				modpa.ischangedamagetaken = false;
-				modpa.changedamagetaken = 0;
-				modpa.lastFinalDmg = resultDmg;
-				modpa.modsa_passiveModel = egoPassiveModel;
-				modpa.changedamage_source = dmgSrcType;
-				modpa.modsa_coinModel = coinOrNull;
-				modpa.Enact(__instance, null, null, attackActionOrNull, actevent_ChangeTakeDamage, timing);
-				if (modpa.ischangedamagetaken) finalDmgChange = modpa.changedamagetaken;
+		foreach (EgoPassiveModel egoPassiveModel in __instance._passiveDetail._egoPassiveList.CopyList()) {
+			foreach (ModularSA modsa in GetAllModpaFromPasmodel(egoPassiveModel, false)) {
+				if (modsa.activationTiming != actevent_ChangeTakeDamage) continue;
+				modsa.modsa_passiveModel = egoPassiveModel;
+				modsa.modsa_coinModel = coinOrNull;
+				
+				if (modsa.modsa_luaState != null) {
+					bool has = modsa.modsa_luaState.Environment.TryGetValue("PacketChangeTakeDamage", out LuaValue packet_lua);
+					PacketChangeTakeDamage packet = null;
+					if (has) packet = packet_lua.Read<PacketChangeTakeDamage>();
+					else {
+						packet = new();
+						modsa.modsa_luaState.Environment["PacketChangeTakeDamage"] = packet;
+					}
+					packet.action = attackActionOrNull;
+					packet.coin = coinOrNull;
+					packet.resultDmg = resultDmg;
+					packet.preCalculatedDmg = preCalculatedDmg;
+					packet.dmgSrcType = dmgSrcType;
+					packet.keyword = keyword;
+					packet.postfix_dmg = __result;
+					modsa.Enact(__instance, null, null, null, actevent_ChangeTakeDamage, timing);
+					__result = packet.postfix_dmg;
+				} else {
+					modsa.ischangedamagetaken = false;
+					modsa.changedamagetaken = 0;
+					modsa.lastFinalDmg = __result;
+					modsa.changedamage_source = dmgSrcType;
+					modsa.Enact(__instance, null, null, attackActionOrNull, actevent_ChangeTakeDamage, timing);
+					if (modsa.ischangedamagetaken) __result = modsa.changedamagetaken;
+				}
 			}
 		}
 
-		if (finalDmgChange != resultDmg) __result = finalDmgChange;
 	}
 	
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.ChangeAttackDamage))]

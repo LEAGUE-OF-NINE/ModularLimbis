@@ -438,11 +438,6 @@ public class ModularSA : Il2CppSystem.Object
 		}
 		else
 		{
-			if (modsa_luaState == null) {
-				modsa_luaState = LuaState.Create();
-				InitializeLuaState(modsa_luaState);
-			}
-			
 			if (EXPECTED && modsa_expected_sinaction != null) modsa_loopTarget = modsa_expected_sinaction.UnitModel;
 			else {
 				if (modsa_target_list.Count < 1) modsa_loopTarget = GetTargetModel("MainTarget");
@@ -1155,6 +1150,10 @@ public class ModularSA : Il2CppSystem.Object
 					return;
 				}
 				luaFound = true;
+				if (modsa_luaState == null) {
+					modsa_luaState = LuaState.Create();
+					InitializeLuaState(modsa_luaState);
+				}
 			}
 			else if (batch.StartsWith("LOOP:", StringComparison.OrdinalIgnoreCase))
 			{
@@ -1381,7 +1380,7 @@ public class ModularSA : Il2CppSystem.Object
 		state.OpenModuleLibrary();
 		state.OpenStringLibrary();
 		state.OpenTableLibrary();
-
+		
 		// Register Lua functions from the dictionary
 		foreach (System.Collections.Generic.KeyValuePair<string, IModularLuaFunction> kvp in MainClass.luaFunctionDict)
 		{
