@@ -1391,6 +1391,9 @@ public class ModularSA : Il2CppSystem.Object
 		}
 
 		state.Environment["ModsaInterface"] = new ModsaInterface(this);
+		state.Environment["BufKeyword"] = new BufKeyword();
+		state.Environment["BufCategory"] = new BufCategory();
+		state.Environment["BufManager"] = new BufManager();
 	}
 
 	public static BattleUnitModel_Abnormality AsAbnormalityModel(BattleUnitModel targetModel)

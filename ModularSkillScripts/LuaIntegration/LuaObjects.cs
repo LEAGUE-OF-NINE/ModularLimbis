@@ -1,3 +1,4 @@
+using Il2CppSystem;
 using Il2CppSystem.Collections.Generic;
 using Lethe.EnumInjections;
 using Lua;
@@ -33,12 +34,12 @@ public partial class ModsaInterface
 	}
 	
 	[LuaMember("Buf")]
-	public void Buf(UnitModel targetModel, UnitModel giver, string keyword_s, int stack, int turn, LuaTable activeRound_list, BufPacket bufPacket) {
+	public void Buf(UnitModel targetModel, UnitModel giver, BufKeyword lua_bufKeyword, int stack, int turn, LuaTable activeRound_list, BufPacket bufPacket) {
 		BattleUnitModel targetModel_unit = targetModel?.ref_unitModel;
 		if (targetModel == null) return;
 		
 		BattleUnitModel giver_unit = giver?.ref_unitModel;
-		BUFF_UNIQUE_KEYWORD buf_keyword = CustomBuffs.ParseBuffUniqueKeyword(keyword_s);
+		BUFF_UNIQUE_KEYWORD buf_keyword = lua_bufKeyword.ref_buf_keyword;
 		BATTLE_EVENT_TIMING timing = ref_modsa.battleTiming;
 
 		BattleActionModel action = ref_modsa.modsa_selfAction;
@@ -178,5 +179,78 @@ public partial class UnitModel
 		return ref_unitModel.GetIntegerOfOriginSpeed();
 	}
 	
+	
+}
+
+[LuaObject]
+public partial class BufKeyword
+{
+	public BUFF_UNIQUE_KEYWORD ref_buf_keyword = BUFF_UNIQUE_KEYWORD.None;
+	
+	[LuaMember("CreateFromString")]
+	public static BufKeyword CreateFromString(string keyword_s) {
+		BufKeyword new_self = new();
+		BUFF_UNIQUE_KEYWORD new_buf_keyword = CustomBuffs.ParseBuffUniqueKeyword(keyword_s);
+		new_self.ref_buf_keyword = new_buf_keyword;
+		return new_self;
+	}
+	
+	[LuaMember("CreateFromInt")]
+	public static BufKeyword CreateFromInt(int keyword_int) {
+		BufKeyword new_self = new();
+		new_self.ref_buf_keyword = (BUFF_UNIQUE_KEYWORD)keyword_int;
+		return new_self;
+	}
+	
+	[LuaMember("ToString")]
+	public string KeywordToString(int integ) {
+		return ref_buf_keyword.ToString();
+	}
+}
+
+[LuaObject]
+public partial class BufCategory
+{
+	public BUFF_CATEGORY_KEYWORD ref_buf_category = BUFF_CATEGORY_KEYWORD.NONE;
+	
+	[LuaMember("CreateFromString")]
+	public static BufCategory CreateFromString(string s) {
+		BufCategory new_self = new();
+		if (Enum.TryParse<BUFF_CATEGORY_KEYWORD>(s, true, out BUFF_CATEGORY_KEYWORD result)) {
+			new_self.ref_buf_category = result;
+		}
+		return new_self;
+	}
+	
+	[LuaMember("CreateFromInt")]
+	public static BufCategory CreateFromInt(int integ) {
+		BufCategory new_self = new();
+		new_self.ref_buf_category = (BUFF_CATEGORY_KEYWORD)integ;
+		return new_self;
+	}
+	
+	[LuaMember("ToString")]
+	public string KeywordToString(int integ) {
+		return ref_buf_category.ToString();
+	}
+}
+
+[LuaObject]
+public partial class BufManager
+{
+	[LuaMember("CompareBufKeyword")]
+	public static bool CompareBufKeyword(BufKeyword keyword_main, BufKeyword keyword_another, string mode_s) {
+		if (mode_s == "main_and_sub") {
+			BattleUnitBuffManager bufManager = Singleton<BattleUnitBuffManager>.Instance;
+			return bufManager.HasKeyword(keyword_main.ref_buf_keyword, keyword_another.ref_buf_keyword);
+		}
+		return keyword_main.ref_buf_keyword == keyword_another.ref_buf_keyword;
+	}
+	
+	[LuaMember("KeywordHasCategory")]
+	public static bool KeywordHasCategory(BufKeyword keyword_main, BufCategory category_another, string mode_s) {
+		BattleUnitBuffManager bufManager = Singleton<BattleUnitBuffManager>.Instance;
+		return bufManager.HasCategory(keyword_main.ref_buf_keyword, category_another.ref_buf_category);
+	}
 	
 }
