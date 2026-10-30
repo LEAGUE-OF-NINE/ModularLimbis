@@ -2,6 +2,7 @@ using Il2CppSystem;
 using Il2CppSystem.Collections.Generic;
 using Lethe.EnumInjections;
 using Lua;
+using ModularSkillScripts.Patches;
 
 namespace ModularSkillScripts.LuaIntegration;
 
@@ -11,6 +12,24 @@ public partial class ModsaInterface
 	public ModularSA ref_modsa = null;
 	public ModsaInterface(ModularSA x) {
 		ref_modsa = x;
+	}
+	
+	[LuaMember("GetVALUE")]
+	public int GetVALUE(int idx) {
+		return ref_modsa.valueList[idx];
+	}
+	[LuaMember("SetVALUE")]
+	public void SetVALUE(int idx, int value) {
+		ref_modsa.valueList[idx] = value;
+	}
+	
+	[LuaMember("GetUnitData")]
+	public int GetUnitData(UnitModel unit, int dataID) {
+		return SkillScriptInitPatch.GetModUnitData(unit.ref_unitModel.Pointer.ToInt64(), dataID);
+	}
+	[LuaMember("SetUnitData")]
+	public void SetUnitData(UnitModel unit, int dataID, int value) {
+		SkillScriptInitPatch.SetModUnitData(unit.ref_unitModel.Pointer.ToInt64(), dataID, value);
 	}
 	
 	[LuaMember("FetchSingleUnit")]
@@ -129,6 +148,12 @@ public partial class ModsaInterface
 	public static BufPacket CreateBufPacket() {
 		return new BufPacket();
 	}
+	[LuaMember("FetchEventTiming")]
+	public EventTiming FetchEventTiming() {
+		return new EventTiming {
+			ref_timing = ref_modsa.battleTiming
+		};
+	}
 }
 
 [LuaObject]
@@ -164,6 +189,16 @@ public partial class UnitModel
 		return part == null ? 1 : 2;
 	}
 	
+	[LuaMember("UnitID")]
+	public int GetUnitID() {
+		return ref_unitModel.GetUnitID();
+	}
+	
+	[LuaMember("InstanceID")]
+	public int GetInstanceID() {
+		return ref_unitModel.InstanceID;
+	}
+	
 	[LuaMember("HP")]
 	public int HPCheck() {
 		return ref_unitModel.Hp;
@@ -174,12 +209,125 @@ public partial class UnitModel
 		return ref_unitModel.MaxHp;
 	}
 	
-	[LuaMember("Speed")]
-	public int Speed() {
-		return ref_unitModel.GetIntegerOfOriginSpeed();
+	[LuaMember("GetPatternIdx")]
+	public int GetPatternIdx() {
+		PatternScript_Abnormality pattern = ModularSA.AsAbnormalityModel(ref_unitModel)?.PatternScript;
+		if (pattern == null) return -1;
+		return pattern.currPatternIdx;
 	}
 	
+	[LuaMember("SetPatternIdx")]
+	public void SetPatternIdx(int pickedPattern_idx) {
+		PatternScript_Abnormality pattern = ModularSA.AsAbnormalityModel(ref_unitModel)?.PatternScript;
+		if (pattern == null) return;
+		pattern.currPatternIdx = pickedPattern_idx;
+	}
 	
+	[LuaMember("FetchCore")]
+	public UnitModel FetchCore() {
+		BattleUnitModel_Abnormality_Part part = ref_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
+		return part == null ? this : new UnitModel(part._abnormality);
+	}
+	
+	[LuaMember("FetchParts")]
+	public LuaTable FetchParts() {
+		LuaTable luaTable = null;
+		BattleUnitModel_Abnormality_Part part = ref_unitModel.TryCast<BattleUnitModel_Abnormality_Part>();
+		if (part != null) {
+			List<BattleUnitModel_Abnormality_Part> partList = part._abnormality._partList;
+			int count = partList.Count;
+			luaTable = new (count, 0);
+			for (int i = 0; i < count; i++) {
+				luaTable[i + 1] = new UnitModel(partList[i]);
+			}
+			return luaTable;
+		}
+		
+		BattleUnitModel_Abnormality core = ref_unitModel.TryCast<BattleUnitModel_Abnormality>();
+		if (core != null) {
+			List<BattleUnitModel_Abnormality_Part> partList = core._partList;
+			int count = partList.Count;
+			luaTable = new (count, 0);
+			for (int i = 0; i < count; i++) {
+				luaTable[i + 1] = new UnitModel(partList[i]);
+			}
+			return luaTable;
+		}
+
+		luaTable = new(1, 0);
+		luaTable[1] = this;
+		return luaTable;
+	}
+	
+	[LuaMember("FetchBufList")]
+	public LuaTable FetchBufList() {
+		List<BuffModel> buf_list = ref_unitModel.GetActivatedBuffModels();
+		int count = buf_list.Count;
+		
+		LuaTable luaTable = new (count, 0);
+		for (int i = 0; i < count; i++) {
+			luaTable[i + 1] = new BufModel(buf_list[i]);
+		}
+		
+		return luaTable;
+	}
+}
+
+[LuaObject]
+public partial class BufModel
+{
+	public BuffModel ref_buffModel = null;
+	public BufModel(BuffModel x) {
+		ref_buffModel = x;
+	}
+	
+	[LuaMember("IsNull")]
+	public bool IsNull() {
+		return ref_buffModel == null;
+	}
+	
+	[LuaMember("GetStack")]
+	public int GetStack(int activeRound) {
+		return ref_buffModel.GetStack(activeRound);
+	}
+	
+	[LuaMember("GetTurn")]
+	public int GetTurn(int activeRound) {
+		return ref_buffModel.GetTurn(activeRound);
+	}
+	
+	[LuaMember("CreateMainBufKeyword")]
+	public BufKeyword CreateMainBufKeyword() {
+		return new BufKeyword {
+			ref_buf_keyword = ref_buffModel._buffKeyword._mainUniqueKeyword
+		};
+	}
+	
+	[LuaMember("CreateSubBufKeywordList")]
+	public LuaTable CreateSubBufKeywordList() {
+		List<BUFF_UNIQUE_KEYWORD> keyword_list = ref_buffModel.GetSubKeywordList();
+		int count = keyword_list.Count;
+		LuaTable luaTable = new (count, 0);
+		for (int i = 0; i < count; i++) {
+			luaTable[i+1] = new BufKeyword {
+				ref_buf_keyword = keyword_list[i]
+			};
+		}
+		return luaTable;
+	}
+	
+	[LuaMember("CreateCategoryKeywordList")]
+	public LuaTable CreateCategoryKeywordList() {
+		List<BUFF_CATEGORY_KEYWORD> keyword_list = ref_buffModel.GetBuffCategoryKeywords();
+		int count = keyword_list.Count;
+		LuaTable luaTable = new (count, 0);
+		for (int i = 0; i < count; i++) {
+			luaTable[i+1] = new BufCategory {
+				ref_buf_category = keyword_list[i]
+			};
+		}
+		return luaTable;
+	}
 }
 
 [LuaObject]
@@ -197,6 +345,13 @@ public partial class BufKeyword
 	
 	[LuaMember("CreateFromInt")]
 	public static BufKeyword CreateFromInt(int keyword_int) {
+		BufKeyword new_self = new();
+		new_self.ref_buf_keyword = (BUFF_UNIQUE_KEYWORD)keyword_int;
+		return new_self;
+	}
+	
+	[LuaMember("CreateFromEventFeed")]
+	public static BufKeyword CreateFromEventFeed(int keyword_int) {
 		BufKeyword new_self = new();
 		new_self.ref_buf_keyword = (BUFF_UNIQUE_KEYWORD)keyword_int;
 		return new_self;
@@ -253,4 +408,31 @@ public partial class BufManager
 		return bufManager.HasCategory(keyword_main.ref_buf_keyword, category_another.ref_buf_category);
 	}
 	
+}
+
+[LuaObject]
+public partial class EventTiming
+{
+	public BATTLE_EVENT_TIMING ref_timing = BATTLE_EVENT_TIMING.ALL_TIMING;
+	
+	[LuaMember("CreateFromString")]
+	public static EventTiming CreateFromString(string s) {
+		EventTiming new_self = new();
+		if (Enum.TryParse<BATTLE_EVENT_TIMING>(s, true, out BATTLE_EVENT_TIMING result)) {
+			new_self.ref_timing = result;
+		}
+		return new_self;
+	}
+	
+	[LuaMember("CreateFromInt")]
+	public static EventTiming CreateFromInt(int integ) {
+		return new EventTiming {
+			ref_timing = (BATTLE_EVENT_TIMING)integ
+		};
+	}
+	
+	[LuaMember("ToString")]
+	public string KeywordToString(int integ) {
+		return ref_timing.ToString();
+	}
 }

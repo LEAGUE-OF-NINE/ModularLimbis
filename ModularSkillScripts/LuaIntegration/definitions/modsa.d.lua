@@ -4,6 +4,30 @@
 ModsaInterface = {}
 
 
+--- Returns the requested modsa VALUE.
+---@param idx integer
+---@return integer
+function ModsaInterface:GetVALUE(idx) end
+
+--- Sets the modsa VALUE to the given value.
+---@param idx integer
+---@param value integer
+---@return nil
+function ModsaInterface:SetVALUE(idx, value) end
+
+--- Returns the requested ModUnitData.
+---@param unit UnitModel
+---@param dataID integer
+---@return integer
+function ModsaInterface:GetUnitData(unit, dataID) end
+
+--- Sets ModUnitData to the given value.
+---@param unit UnitModel
+---@param dataID integer
+---@param value integer
+---@return integer
+function ModsaInterface:SetUnitData(unit, dataID, value) end
+
 ---@param find_instruction string
 ---@return UnitModel
 function ModsaInterface:FetchSingleUnit(find_instruction) end
@@ -24,7 +48,7 @@ function ModsaInterface:Buf(targetModel, giver, bufKeyword, stack, turn, activeR
 
 --- Creates and returns a default BufPacket.
 ---@return BufPacket
-function ModsaInterface:CreateBufPacket() end
+function ModsaInterface.CreateBufPacket() end
 
 --- Stores information and settings for ModsaInterface.Buf().
 ---@class BufPacket
@@ -49,6 +73,10 @@ BufPacket = {}
 ---| "coin"
 ---| "buf"
 ---| "passive"
+
+--- Creates and returns the current EventTiming.
+---@return EventTiming
+function ModsaInterface:FetchEventTiming() end
 
 --- Can be instanced to store a BUFF_UNIQUE_KEYWORD enum.
 ---@class BufKeyword
@@ -108,8 +136,25 @@ function BufManager.CompareBufKeyword(keyword_main, keyword_another, mode_s) end
 ---@return boolean
 function BufManager.KeywordHasCategory(keyword_main, category_another) end
 
+--- Can be instanced to store a BATTLE_EVENT_TIMING enum.
+---@class EventTiming
+EventTiming = {}
+
+--- Creates a new EventTiming instance that internally stores a BATTLE_EVENT_TIMING enum by parsing a string.
+---@param s string
+---@return EventTiming
+function EventTiming.CreateFromString(s) end
+
+--- Creates a new EventTiming instance that internally stores a BATTLE_EVENT_TIMING enum by casting an int.
+---@param integ integer
+---@return EventTiming
+function EventTiming.CreateFromInt(integ) end
+
+--- Returns a string of the stored BATTLE_EVENT_TIMING.
+---@return string
+function EventTiming:ToString() end
+
 ---@class UnitModel
----@field name string
 UnitModel = {}
 
 --- Checks if internal BattleUnitModel reference is null.
@@ -121,6 +166,12 @@ function UnitModel:IsNull() end
 function UnitModel:WhatAmI() end
 
 ---@return integer
+function UnitModel:UnitID() end
+
+---@return integer
+function UnitModel:InstanceID() end
+
+---@return integer
 function UnitModel:HP() end
 
 ---@return integer
@@ -128,3 +179,57 @@ function UnitModel:MaxHP() end
 
 ---@return integer
 function UnitModel:Speed() end
+
+--- Retruns the pattern idx. Please for the love of god make sure this is an abno core OR part (at least for now)
+---@return integer
+function UnitModel:GetPatternIdx() end
+
+--- Sets the pattern idx. Please for the love of god make sure this is an abno core OR part (at least for now)
+---@param idx integer
+---@return nil
+function UnitModel:SetPatternIdx(idx) end
+
+--- Attempts to retrieve a new UnitModel representing the abno core.
+--- If this fails for any reason, like "it's not an abno" or "it's not a part", it returns itself and does not create anything.
+---@return UnitModel
+function UnitModel:FetchCore() end
+
+--- Attempts to retrieve a list of UnitModel representing the abno's parts.
+--- Also works if called on a Part.
+--- If this fails for any reason, like "it's not an abno", it returns a list containing itself and does not create anything.
+---@return UnitModel[]
+function UnitModel:FetchParts() end
+
+--- Retrieves a list of Active BufModel on this unit.
+---@return BufModel[]
+function UnitModel:FetchBufList() end
+
+--- Internally Stores a BuffModel.
+---@class BufModel
+BufModel = {}
+
+--- Checks if internal BuffModel reference is null.
+---@return boolean
+function BufModel:IsNull() end
+
+--- Returns the Stack depending on the given activeRound
+---@param activeRound integer
+---@return integer
+function BufModel:GetStack(activeRound) end
+
+--- Returns the Turn depending on the given activeRound
+---@param activeRound integer
+---@return integer
+function BufModel:GetTurn(activeRound) end
+
+--- Returns a new BufKeyword that matches the bufModel's Main Keyword.
+---@return BufKeyword
+function BufModel:CreateMainBufKeyword() end
+
+--- Returns a list of BufKeyword instances for each SubList Keyword.
+---@return BufKeyword[]
+function BufModel:CreateSubBufKeywordList() end
+
+--- Returns a list of BufCategory instances for each Buf Category.
+---@return BufCategory[]
+function BufModel:CreateCategoryKeywordList() end
