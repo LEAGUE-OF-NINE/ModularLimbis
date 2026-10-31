@@ -270,6 +270,26 @@ function UnitModel:FetchParts() end
 ---@return BufModel[]
 function UnitModel:FetchBufList() end
 
+---@param bufKeyword BufKeyword
+---@param main_only boolean
+---@return integer
+function UnitModel:BufCheckStack(bufKeyword, main_only) end
+
+---@param bufCategory BufCategory
+---@param exception_keywords BufKeyword[]
+---@return integer
+function UnitModel:BufCheckStackByCategory(bufCategory, exception_keywords) end
+
+---@param bufKeyword BufKeyword
+---@param main_only boolean
+---@return integer
+function UnitModel:BufCheckTurn(bufKeyword, main_only) end
+
+---@param bufCategory BufCategory
+---@param exception_keywords BufKeyword[]
+---@return integer
+function UnitModel:BufCheckTurnByCategory(bufCategory, exception_keywords) end
+
 --- Internally Stores a BuffModel.
 ---@class BufModel
 BufModel = {}

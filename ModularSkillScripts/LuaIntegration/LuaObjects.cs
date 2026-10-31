@@ -1,3 +1,4 @@
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem;
 using Il2CppSystem.Collections.Generic;
 using Lethe.EnumInjections;
@@ -275,6 +276,42 @@ public partial class UnitModel
 		}
 		
 		return luaTable;
+	}
+	
+	[LuaMember("BufCheckStack")]
+	public int BufCheckStack(BufKeyword bufKeyword, bool main_only) {
+		return ref_unitModel.GetActivatedBuffStack(bufKeyword.ref_buf_keyword, main_only);
+	}
+	
+	[LuaMember("BufCheckStackByCategory")]
+	public int BufCheckStackByCategory(BufCategory bufCategory, LuaTable exception_table)
+	{
+		List<BUFF_UNIQUE_KEYWORD> exception_list = new();
+		for (int i = 1; i < exception_table.ArrayLength + 1; i++) {
+			BufKeyword exception = exception_table[i].Read<BufKeyword>();
+			exception_list.Add(exception.ref_buf_keyword);
+		}
+		
+		Il2CppStructArray<BUFF_UNIQUE_KEYWORD> exception_struct = new(exception_list.ToArray());
+		return ref_unitModel.GetActivatedBuffStack(bufCategory.ref_buf_category, exception_struct);
+	}
+	
+	[LuaMember("BufCheckTurn")]
+	public int BufCheckTurn(BufKeyword bufKeyword, bool main_only) {
+		return ref_unitModel.GetActivatedBuffTurn(bufKeyword.ref_buf_keyword, main_only);
+	}
+	
+	[LuaMember("BufCheckTurnByCategory")]
+	public int BufCheckTurnByCategory(BufCategory bufCategory, LuaTable exception_table)
+	{
+		List<BUFF_UNIQUE_KEYWORD> exception_list = new();
+		for (int i = 1; i < exception_table.ArrayLength + 1; i++) {
+			BufKeyword exception = exception_table[i].Read<BufKeyword>();
+			exception_list.Add(exception.ref_buf_keyword);
+		}
+		
+		Il2CppStructArray<BUFF_UNIQUE_KEYWORD> exception_struct = new(exception_list.ToArray());
+		return ref_unitModel.GetActivatedBuffTurn(bufCategory.ref_buf_category, exception_struct);
 	}
 }
 
