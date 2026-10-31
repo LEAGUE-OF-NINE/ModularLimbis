@@ -62,7 +62,6 @@ public partial class ModsaInterface
 	public UnitModel FetchSingleUnit(string find_instruction)
 	{
 		BattleUnitModel unit = ref_modsa.GetTargetModel(find_instruction);
-		if (unit == null) return null;
 		return new UnitModel(unit);
 	}
 	
