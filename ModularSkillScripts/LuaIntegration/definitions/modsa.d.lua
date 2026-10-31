@@ -28,6 +28,21 @@ function ModsaInterface:GetUnitData(unit, dataID) end
 ---@return integer
 function ModsaInterface:SetUnitData(unit, dataID, value) end
 
+---@return UnitModel
+function ModsaInterface:FetchModsaUnitModel() end
+
+---@return BufModel
+function ModsaInterface:FetchModsaBufModel() end
+
+---@return SkillModel
+function ModsaInterface:FetchModsaSkillModel() end
+
+---@return ActionModel
+function ModsaInterface:FetchModsaActionModel() end
+
+---@return CoinModel
+function ModsaInterface:FetchModsaCoinModel() end
+
 ---@param find_instruction string
 ---@return UnitModel
 function ModsaInterface:FetchSingleUnit(find_instruction) end

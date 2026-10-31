@@ -33,6 +33,31 @@ public partial class ModsaInterface
 		SkillScriptInitPatch.SetModUnitData(unit.ref_unitModel.Pointer.ToInt64(), dataID, value);
 	}
 	
+	[LuaMember("FetchModsaUnitModel")]
+	public UnitModel FetchModsaUnitModel() {
+		return new UnitModel(ref_modsa.modsa_unitModel);
+	}
+	
+	[LuaMember("FetchModsaBufModel")]
+	public BufModel FetchModsaBufModel() {
+		return new BufModel(ref_modsa.modsa_buffModel);
+	}
+	
+	[LuaMember("FetchModsaSkillModel")]
+	public SkillModel FetchModsaSkillModel() {
+		return new SkillModel(ref_modsa.modsa_skillModel);
+	}
+	
+	[LuaMember("FetchModsaActionModel")]
+	public ActionModel FetchModsaActionModel() {
+		return new ActionModel(ref_modsa.modsa_selfAction);
+	}
+	
+	[LuaMember("FetchModsaCoinModel")]
+	public CoinModel FetchModsaCoinModel() {
+		return new CoinModel(ref_modsa.modsa_coinModel);
+	}
+	
 	[LuaMember("FetchSingleUnit")]
 	public UnitModel FetchSingleUnit(string find_instruction)
 	{
