@@ -337,6 +337,28 @@ public partial class UnitModel
 		Il2CppStructArray<BUFF_UNIQUE_KEYWORD> exception_struct = new(exception_list.ToArray());
 		return ref_unitModel.GetActivatedBuffTurn(bufCategory.ref_buf_category, exception_struct);
 	}
+	
+	[LuaMember("FetchActionModelList")]
+	public LuaTable FetchActionModelList(bool sorted) {
+		List<BattleActionModel> action_list = sorted ? ref_unitModel.GetSortedActionList() : ref_unitModel._actionList;
+		int count = action_list.Count;
+		LuaTable table = new(count,0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = new ActionModel(action_list[i]);
+		}
+		return table;
+	}
+	
+	[LuaMember("FetchSinActionList")]
+	public LuaTable FetchSinActionList(bool permanent_only) {
+		List<SinActionModel> sinAction_list = ref_unitModel.GetSinActionList();
+		int count = permanent_only ? ref_unitModel.GetPermanentSinActionListCount() : sinAction_list.Count;
+		LuaTable table = new(count,0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = new LuaSinActionModel(sinAction_list[i]);
+		}
+		return table;
+	}
 }
 
 [LuaObject]
@@ -582,6 +604,11 @@ public partial class ActionModel
 	public SkillModel FetchSkill() {
 		return new SkillModel(ref_action._skill);
 	}
+	
+	[LuaMember("FetchSinAction")]
+	public LuaSinActionModel FetchSinAction() {
+		return new LuaSinActionModel(ref_action._sinAction);
+	}
 }
 
 [LuaObject]
@@ -614,6 +641,77 @@ public partial class SkillModel
 	[LuaMember("IsNull")]
 	public bool IsNull() {
 		return ref_skill == null;
+	}
+}
+
+[LuaObject]
+public partial class LuaSinActionModel
+{
+	public SinActionModel ref_sinAction = null;
+	public LuaSinActionModel(SinActionModel x) {
+		ref_sinAction = x;
+	}
+	
+	[LuaMember("IsNull")]
+	public bool IsNull() {
+		return ref_sinAction == null;
+	}
+	
+	[LuaMember("GetSlotIndex")]
+	public int GetSlotIndex() {
+		return ref_sinAction.GetSlotIndex();
+	}
+	
+	[LuaMember("FetchUnitModel")]
+	public UnitModel FetchUnitModel() {
+		return new UnitModel(ref_sinAction._unitModel);
+	}
+	
+	[LuaMember("FetchUnitSinList")]
+	public LuaTable FetchUnitSinList(string mode) {
+		
+		List<UnitSinModel> sin_list = new();
+		switch (mode)
+		{
+			case "sinList": sin_list = ref_sinAction.currentSinList; break;
+			case "readySinList": sin_list = ref_sinAction.readySinList; break;
+			case "replacedSinListByErode": sin_list = ref_sinAction._replacedSinListByErode; break;
+			case "currentSelectSin": sin_list.Add(ref_sinAction.currentSelectSin); break;
+			case "readySin": sin_list.Add(ref_sinAction.readySin); break;
+			case "replacedReadySinByErode": sin_list.Add(ref_sinAction._replacedReadySinByErode); break;
+			case "replacedSinByDefenseSkill": sin_list.Add(ref_sinAction._replacedSinByDefenseSkill); break;
+		}
+
+		int count = sin_list.Count;
+		LuaTable table = new(count, 0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = new LuaUnitSinModel(sin_list[i]);
+		}
+		return table;
+	}
+}
+
+[LuaObject]
+public partial class LuaUnitSinModel
+{
+	public UnitSinModel ref_unitSin = null;
+	public LuaUnitSinModel(UnitSinModel x) {
+		ref_unitSin = x;
+	}
+	
+	[LuaMember("IsNull")]
+	public bool IsNull() {
+		return ref_unitSin == null;
+	}
+	
+	[LuaMember("FetchCurrentAction")]
+	public ActionModel FetchCurrentAction() {
+		return new ActionModel(ref_unitSin._currentAction);
+	}
+	
+	[LuaMember("SetCurrentAction")]
+	public void SetCurrentAction(ActionModel actionModel) {
+		ref_unitSin._currentAction = actionModel.ref_action;
 	}
 }
 

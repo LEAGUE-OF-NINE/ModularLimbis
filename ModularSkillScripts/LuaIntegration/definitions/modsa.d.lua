@@ -305,6 +305,14 @@ function UnitModel:BufCheckTurn(bufKeyword, main_only) end
 ---@return integer
 function UnitModel:BufCheckTurnByCategory(bufCategory, exception_keywords) end
 
+---@param sorted boolean
+---@return ActionModel[]
+function UnitModel:FetchActionModelList(sorted) end
+
+---@param permanent_only boolean
+---@return SinActionModel[]
+function UnitModel:FetchSinActionList(permanent_only) end
+
 --- Internally Stores a BuffModel.
 ---@class BufModel
 BufModel = {}
@@ -349,6 +357,9 @@ function ActionModel:FetchUnitModel() end
 ---@return SkillModel
 function ActionModel:FetchSkill() end
 
+---@return SinActionModel
+function ActionModel:FetchSinAction() end
+
 --- Internally Stores a vanilla SkillModel.
 ---@class SkillModel
 SkillModel = {}
@@ -367,3 +378,47 @@ function CoinModel:IsNull() end
 
 ---@return integer
 function CoinModel:GetRealCoinIndex() end
+
+--- Internally Stores a vanilla SinActionModel.
+---@class SinActionModel
+SinActionModel = {}
+
+--- Checks if internal SinActionModel reference is null.
+---@return boolean
+function SinActionModel:IsNull() end
+
+---@return integer
+function SinActionModel:GetSlotIndex() end
+
+---@return UnitModel
+function SinActionModel:FetchUnitModel() end
+
+--- Returns a list of requested UnitSinModel. Can be empty, can also be only 1.
+---@param mode SinActionFetchUnitSinMode
+---@return UnitSinModel[]
+function SinActionModel:FetchUnitSinList(mode) end
+
+---@alias SinActionFetchUnitSinMode
+---| "sinList" Normal upper-lower UnitSinModel in the dashboard (normally 2).
+---| "readySinList" List of Upcoming Skills (UnitSinModel).
+---| "replacedSinListByErode" Covered list of UnitSinModel, in case of corrosion.
+---| "currentSelectSin" Selected UnitSinModel.
+---| "readySin" Upcoming UnitSinModel.
+---| "replacedReadySinByErode" The COVERED Upcoming UnitSinModel, in case of corrosion.
+---| "replacedSinByDefenseSkill" The COVERED UnitSinModel under the Defense Skill.
+
+
+--- Internally Stores a vanilla UnitSinModel.
+---@class UnitSinModel
+UnitSinModel = {}
+
+--- Checks if internal UnitSinModel reference is null.
+---@return boolean
+function UnitSinModel:IsNull() end
+
+---@return ActionModel
+function UnitSinModel:FetchCurrentAction() end
+
+---@param action ActionModel
+---@return nil
+function UnitSinModel:SetCurrentAction(action) end
