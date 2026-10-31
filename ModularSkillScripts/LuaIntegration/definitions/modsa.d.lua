@@ -155,6 +155,12 @@ function DamageSourceType.CreateFromInt(integ) end
 ---@return string
 function DamageSourceType:ToString() end
 
+--- 0 = "Player", 1 = "Enemy", 2 = "None".
+---@alias UnitFaction
+---| 0
+---| 1
+---| 2
+
 --- Static Method Interface for BattleUnitBuffManager.
 ---@class BufManager
 BufManager = {}
@@ -176,6 +182,22 @@ function BufManager.CompareBufKeyword(keyword_main, keyword_another, mode_s) end
 ---@param category_another BufCategory
 ---@return boolean
 function BufManager.KeywordHasCategory(keyword_main, category_another) end
+
+--- Static Method Interface for BattleObjectManager.
+---@class BattleObjectManager
+BattleObjectManager = {}
+
+---@param include_assistance boolean
+---@param faction UnitFaction Use "None" for no filtering.
+---@return UnitModel[]
+function BattleObjectManager.GetAliveList(include_assistance, faction) end
+
+---@param bufKeyword BufKeyword
+---@param activeRound integer
+---@param include_assistance boolean
+---@param faction UnitFaction Use "None" for no filtering.
+---@return UnitModel[]
+function BattleObjectManager.GetAliveListByBuff(bufKeyword, activeRound, include_assistance, faction) end
 
 --- Can be instanced to store a BATTLE_EVENT_TIMING enum.
 ---@class EventTiming
@@ -211,6 +233,9 @@ function UnitModel:UnitID() end
 
 ---@return integer
 function UnitModel:InstanceID() end
+
+---@return UnitFaction
+function UnitModel:Faction() end
 
 ---@return integer
 function UnitModel:HP() end

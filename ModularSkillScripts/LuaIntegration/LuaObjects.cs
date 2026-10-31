@@ -199,6 +199,11 @@ public partial class UnitModel
 		return ref_unitModel.InstanceID;
 	}
 	
+	[LuaMember("Faction")]
+	public int GetFaction() {
+		return (int)ref_unitModel.Faction;
+	}
+	
 	[LuaMember("HP")]
 	public int HPCheck() {
 		return ref_unitModel.Hp;
@@ -407,7 +412,38 @@ public partial class BufManager
 		BattleUnitBuffManager bufManager = Singleton<BattleUnitBuffManager>.Instance;
 		return bufManager.HasCategory(keyword_main.ref_buf_keyword, category_another.ref_buf_category);
 	}
+}
+
+
+[LuaObject]
+public partial class LuaBattleObjectManager
+{
+	[LuaMember("GetAliveList")]
+	public static LuaTable GetAliveList(bool include_assistance, int faction_int) {
+		UNIT_FACTION faction = (UNIT_FACTION)faction_int;
+		BattleObjectManager objManager = SingletonBehavior<BattleObjectManager>.Instance;
+		List<BattleUnitModel> unit_list = objManager.GetAliveList(include_assistance, faction);
+		int count = unit_list.Count;
+		LuaTable table = new(count,0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = new UnitModel(unit_list[i]);
+		}
+		return table;
+	}
 	
+	[LuaMember("GetAliveListByBuf")]
+	public static LuaTable GetAliveListByBuf(BufKeyword bufKeyword, int activeRound, bool include_assistance, int faction_int) {
+		BUFF_UNIQUE_KEYWORD keyword = bufKeyword.ref_buf_keyword;
+		UNIT_FACTION faction = (UNIT_FACTION)faction_int;
+		BattleObjectManager objManager = SingletonBehavior<BattleObjectManager>.Instance;
+		List<BattleUnitModel> unit_list = objManager.GetAliveList(keyword, activeRound, include_assistance, faction);
+		int count = unit_list.Count;
+		LuaTable table = new(count,0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = new UnitModel(unit_list[i]);
+		}
+		return table;
+	}
 }
 
 [LuaObject]

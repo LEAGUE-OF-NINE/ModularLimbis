@@ -1388,11 +1388,12 @@ public class ModularSA : Il2CppSystem.Object
 			IModularLuaFunction luaFunction = kvp.Value;
 			state.Environment[functionName] = new Lua.LuaFunction((context, buffer, ct) => luaFunction.ExecuteLuaFunction(this, context, buffer.Span, ct));
 		}
-
+		
 		state.Environment["ModsaInterface"] = new ModsaInterface(this);
 		state.Environment["BufKeyword"] = new BufKeyword();
 		state.Environment["BufCategory"] = new BufCategory();
 		state.Environment["BufManager"] = new BufManager();
+		state.Environment["BattleObjectManager"] = new LuaBattleObjectManager();
 		state.Environment["EventTiming"] = new EventTiming();
 	}
 
