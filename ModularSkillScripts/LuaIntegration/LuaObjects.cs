@@ -530,6 +530,91 @@ public partial class LuaBattleObjectManager
 }
 
 [LuaObject]
+public partial class LuaActionModelManager
+{
+	[LuaMember("FetchActionList")]
+	public static LuaTable FetchActionList() {
+		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
+		List<BattleActionModel> action_list = actionManager._actionList;
+		int count = action_list.Count;
+		LuaTable table = new(count,0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = new ActionModel(action_list[i]);
+		}
+		return table;
+	}
+
+	[LuaMember("SetActionList")]
+	public static void SetActionList(LuaTable actionList_table)
+	{
+		int count = actionList_table.ArrayLength;
+		List<BattleActionModel> actionList_overwrite = new(count);
+		for (int i = 0; i < count; i++) {
+			ActionModel actionModel = actionList_table[i + 1].Read<ActionModel>();
+			if (actionModel.IsNull()) continue;
+			actionList_overwrite.Add(actionModel.ref_action);
+		}
+		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
+		actionManager._actionList = actionList_overwrite;
+	}
+	
+	[LuaMember("RemoveAction")]
+	public static void RemoveAction(ActionModel action_remove) {
+		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
+		actionManager.RemoveAction(action_remove.ref_action);
+	}
+	
+	[LuaMember("FetchDuelList")]
+	public static LuaTable FetchDuelList() {
+		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
+		List<BattleDuelModel> duel_list = actionManager._duelList;
+		int count = duel_list.Count;
+		LuaTable table = new(count,0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = new LuaDuelModel(duel_list[i]);
+		}
+		return table;
+	}
+	
+	[LuaMember("SetDuelList")]
+	public static void SetDuelList(LuaTable duelList_table)
+	{
+		int count = duelList_table.ArrayLength;
+		List<BattleDuelModel> duelList_overwrite = new(count);
+		for (int i = 0; i < count; i++) {
+			LuaDuelModel duelModel = duelList_table[i + 1].Read<LuaDuelModel>();
+			if (duelModel.IsNull()) continue;
+			duelList_overwrite.Add(duelModel.ref_duel);
+		}
+		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
+		actionManager._duelList = duelList_overwrite;
+	}
+	
+	[LuaMember("IsDuelForThisOne")]
+	public static bool IsDuelForThisOne(ActionModel action) {
+		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
+		return actionManager.IsDuel(action.ref_action);
+	}
+	[LuaMember("IsDuelBetweenTheseTwo")]
+	public static bool IsDuelBetweenTheseTwo(ActionModel action1, ActionModel action2) {
+		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
+		return actionManager.IsDuel(action1.ref_action, action2.ref_action);
+	}
+	
+	[LuaMember("FetchDuelFromAction")]
+	public static LuaDuelModel FetchDuelFromAction(ActionModel action) {
+		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
+		return new LuaDuelModel(actionManager.GetDuelModel(action.ref_action));
+	}
+	
+	[LuaMember("RemoveDuelByAction")]
+	public static void RemoveDuelByAction(ActionModel action) {
+		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
+		actionManager.RemoveDuel(action.ref_action);
+	}
+}
+
+[LuaObject]
 public partial class EventTiming
 {
 	public BATTLE_EVENT_TIMING ref_timing = BATTLE_EVENT_TIMING.ALL_TIMING;
@@ -607,6 +692,44 @@ public partial class AbilitySourceType
 	[LuaMember("ToString")]
 	public string KeywordToString(int integ) {
 		return ref_abilitySrcType.ToString();
+	}
+}
+
+[LuaObject]
+public partial class LuaDuelModel
+{
+	public BattleDuelModel ref_duel = null;
+	public LuaDuelModel(BattleDuelModel x) {
+		ref_duel = x;
+	}
+	
+	[LuaMember("IsNull")]
+	public bool IsNull() {
+		return ref_duel == null;
+	}
+	
+	[LuaMember("HasAction")]
+	public bool HasAction(ActionModel action) {
+		return ref_duel.IsDuel(action.ref_action);
+	}
+	
+	[LuaMember("FetchAction")]
+	public ActionModel FetchAction(int action_number) {
+		if (action_number == 1) return new ActionModel(ref_duel._action1);
+		if (action_number == 2) return new ActionModel(ref_duel._action2);
+		return new ActionModel(null);
+	}
+	
+	[LuaMember("SetAction")]
+	public void SetAction(int action_number, ActionModel action_set) {
+		//ref_duel.IsDuel()
+		if (action_number == 1) ref_duel._action1 = action_set.ref_action;
+		else if (action_number == 2) ref_duel._action2 = action_set.ref_action;
+	}
+	
+	[LuaMember("FetchOpponentAction")]
+	public ActionModel FetchOpponentAction(ActionModel fromAction) {
+		return new ActionModel(ref_duel.GetOpponentAction(fromAction.ref_action));
 	}
 }
 

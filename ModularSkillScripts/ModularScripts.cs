@@ -1394,6 +1394,7 @@ public class ModularSA : Il2CppSystem.Object
 		state.Environment["BufCategory"] = new BufCategory();
 		state.Environment["BufManager"] = new BufManager();
 		state.Environment["BattleObjectManager"] = new LuaBattleObjectManager();
+		state.Environment["ActionModelManager"] = new LuaActionModelManager();
 		state.Environment["EventTiming"] = new EventTiming();
 	}
 

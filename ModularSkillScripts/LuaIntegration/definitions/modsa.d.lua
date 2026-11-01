@@ -241,6 +241,51 @@ function BattleObjectManager.GetAliveList(include_assistance, faction) end
 ---@return UnitModel[]
 function BattleObjectManager.GetAliveListByBuff(bufKeyword, activeRound, include_assistance, faction) end
 
+--- Static Method Interface for BattleActionModelManager.
+---@class ActionModelManager
+ActionModelManager = {}
+
+--- Returns a COPIED list (not reference) of all actions during battle. Modifying this list does NOT modify the original. Use SetActionList instead.
+---@return ActionModel[]
+function ActionModelManager.FetchActionList() end
+
+--- Overwrites the manager's actionList.
+---@param actionList ActionModel[]
+---@return nil
+function ActionModelManager.SetActionList(actionList) end
+
+--- Remove the action through the manager.
+---@param action_remove ActionModel
+---@return nil
+function ActionModelManager.RemoveAction(action_remove) end
+
+--- Returns a COPIED list (not reference) of all duels during battle. Modifying this list does NOT modify the original. Use SetDuelList instead.
+---@return DuelModel[]
+function ActionModelManager.FetchDuelList() end
+
+--- Overwrites the manager's duelList.
+---@param duelList DuelModel[]
+---@return nil
+function ActionModelManager.SetDuelList(duelList) end
+
+---@param action ActionModel
+---@return boolean
+function ActionModelManager.IsDuelForThisOne(action) end
+
+---@param action1 ActionModel
+---@param action2 ActionModel
+---@return boolean
+function ActionModelManager.IsDuelBetweenTheseTwo(action1, action2) end
+
+--- Check the returned value by using DuelModel:IsNull()
+---@param action ActionModel
+---@return DuelModel
+function ActionModelManager.FetchDuelFromAction(action) end
+
+---@param action ActionModel
+---@return nil
+function ActionModelManager.RemoveDuelByAction(action) end
+
 --- Can be instanced to store a BATTLE_EVENT_TIMING enum.
 ---@class EventTiming
 EventTiming = {}
@@ -369,6 +414,38 @@ function BufModel:CreateSubBufKeywordList() end
 --- Returns a list of BufCategory instances for each Buf Category.
 ---@return BufCategory[]
 function BufModel:CreateCategoryKeywordList() end
+
+--- Internally Stores a BattleDuelModel.
+---@class DuelModel
+DuelModel = {}
+
+--- Checks if internal BattleDuelModel reference is null.
+---@return boolean
+function DuelModel:IsNull() end
+
+---@param action ActionModel
+---@return boolean
+function DuelModel:HasAction(action) end
+
+--- Fetches the requested action, either 1 or 2.
+---@param action_number DuelActionNumber
+---@return ActionModel
+function DuelModel:FetchAction(action_number) end
+
+--- Sets the requested action, either 1 or 2.
+---@param action_number DuelActionNumber
+---@param action_set ActionModel
+---@return nil
+function DuelModel:SetAction(action_number, action_set) end
+
+---@alias DuelActionNumber
+---| 1 Fetch _action1
+---| 2 Fetch _action2
+
+--- Fetches the opponent action of the provided action within this Duel.
+---@param fromAction ActionModel
+---@return ActionModel
+function DuelModel:FetchOpponentAction(fromAction) end
 
 --- Internally Stores a BattleActionModel.
 ---@class ActionModel
