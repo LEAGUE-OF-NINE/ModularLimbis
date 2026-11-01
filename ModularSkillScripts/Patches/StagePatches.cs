@@ -24,25 +24,50 @@ internal class StagePatches
 		forceSlotGain = false;
 		MainClass.LogModular("Prefix_StageModel_Init");
 
+
+		foreach (ModularSA modsa in stage_modsa_list) {
+			modsa.EraseAllData();
+		}
+		stage_modsa_list.Clear();
+
+		foreach (string stage_modsa_string in stage_modsa_string_list) {
+			TryMakeNewStageModsa(stage_modsa_string);
+		}
+		
 		List<string> stageScriptList = stageinfo.stageScriptList;
 		foreach (string stageScript_string in stageScriptList)
 		{
 			MainClass.LogModular("Looping stage scriptnames: " + stageScript_string);
-			if (!stageScript_string.StartsWith("Modular/")) continue;
-			MainClass.LogModular("Found Modular/");
-			string instruction = stageScript_string.Remove(0, 8);
-			string[] batches = instruction.Split('/');
+			if (TryMakeNewStageModsa(stageScript_string)) continue;
+			if (stageScript_string.StartsWith("Modular/")) {
+				string instruction = stageScript_string.Remove(0, 8);
+				string[] batches = instruction.Split('/');
 
-			foreach (string batch in batches)
-			{
-				MainClass.LogModular("Batches loop: " + batch);
-				if (batch.StartsWith("extraslot:")) int.TryParse(batch.Remove(0, 10), out extraSlot);
-				else if (batch == "instantslot") instantslot = true;
-				else if (batch == "forceslotgain") forceSlotGain = true;
+				foreach (string batch in batches)
+				{
+					MainClass.LogModular("Batches loop: " + batch);
+					if (batch.StartsWith("extraslot:")) int.TryParse(batch.Remove(0, 10), out extraSlot);
+					else if (batch == "instantslot") instantslot = true;
+					else if (batch == "forceslotgain") forceSlotGain = true;
+				}
 			}
+			
 		}
 
 	}
+
+	public static bool TryMakeNewStageModsa(string script_string)
+	{
+		if (!script_string.StartsWith("StageModular/")) return false;
+		ModularSA modsa = new ModularSA();
+		modsa.originalString = script_string;
+		modsa.SetupModular(script_string.Remove(0, 13));
+		stage_modsa_list.Add(modsa);
+		return true;
+	}
+
+	public static List<ModularSA> stage_modsa_list = new();
+	public static List<string> stage_modsa_string_list = new();
 	
 	[HarmonyPatch(typeof(StageModel), nameof(StageModel.Init))]
 	[HarmonyPostfix]
@@ -66,7 +91,6 @@ internal class StagePatches
 				}
 			}
 		}
-
 	}
 
 	[HarmonyPatch(typeof(StageController), nameof(StageController.StartRound))]
@@ -187,6 +211,10 @@ internal class StagePatches
 			}
 		}
 			
+		int actevent = MainClass.timingDict["RoundStart"];
+		foreach (ModularSA modsa in stage_modsa_list) {
+			modsa.Enact(null, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
+		}
 	}
 
 	[HarmonyPatch(typeof(StageController), nameof(StageController.StartStage))]
@@ -210,6 +238,11 @@ internal class StagePatches
 				MainClass.LogModular("gave slot i: " + i);
 				sinManager_inst.CheckAddSinActionmodel(stageModel.StageType != STAGE_TYPE.STORY_DUNGEON, UNIT_FACTION.PLAYER);
 			}
+		}
+		
+		int actevent = MainClass.timingDict["EncounterStart"];
+		foreach (ModularSA modsa in stage_modsa_list) {
+			modsa.Enact(null, null, null, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 		}
 	}
 

@@ -19,12 +19,12 @@ public class ReloadPatches
 	{
 		LuaScript.loadedScripts.Clear();
 		MainClass.LogModular("PostMainUILoad - Reloading Modular Lua Scripts");
-		foreach (var modPath in Directory.GetDirectories(LetheMain.modsPath.FullPath))
+		foreach (string modPath in Directory.GetDirectories(LetheMain.modsPath.FullPath))
 		{
-			var expectedPath = Path.Combine(modPath, "modular_lua");
+			string expectedPath = Path.Combine(modPath, "modular_lua");
 			if (!Directory.Exists(expectedPath)) continue;
 
-			foreach (var luaPath in Directory.GetFiles(expectedPath, "*.lua", SearchOption.AllDirectories))
+			foreach (string luaPath in Directory.GetFiles(expectedPath, "*.lua", SearchOption.AllDirectories))
 			{
 				var name = Path.GetFileNameWithoutExtension(luaPath);
 				if (LuaScript.loadedScripts.ContainsKey(name))
@@ -50,6 +50,20 @@ public class ReloadPatches
 				{
 					MainClass.Logg.LogError($"Failed to load Modular Lua Script '{name}' from '{luaPath}': {ex.Message}");
 				}
+			}
+			
+			StagePatches.stage_modsa_string_list.Clear();
+			expectedPath = Path.Combine(modPath, "modular_stagescripts");
+			if (!Directory.Exists(expectedPath)) continue;
+
+			foreach (string filePath in Directory.GetFiles(expectedPath, "*.txt", SearchOption.AllDirectories))
+			{
+				string content = File.ReadAllText(filePath);
+				if (string.IsNullOrWhiteSpace(content)) {
+					MainClass.Logg.LogWarning($"Modular Stage Script in '{filePath}' is empty. Skipping.");
+					continue;
+				}
+				StagePatches.stage_modsa_string_list.Add(content);
 			}
 		}
 	}
