@@ -22,49 +22,55 @@ public class ReloadPatches
 		foreach (string modPath in Directory.GetDirectories(LetheMain.modsPath.FullPath))
 		{
 			string expectedPath = Path.Combine(modPath, "modular_lua");
-			if (!Directory.Exists(expectedPath)) continue;
-
-			foreach (string luaPath in Directory.GetFiles(expectedPath, "*.lua", SearchOption.AllDirectories))
+			if (Directory.Exists(expectedPath))
 			{
-				var name = Path.GetFileNameWithoutExtension(luaPath);
-				if (LuaScript.loadedScripts.ContainsKey(name))
-				{
-					MainClass.Logg.LogError($"Duplicate Modular Lua Script name '{name}' found in '{luaPath}'. Skipping.");
-					continue;
-				}
-				var content = File.ReadAllText(luaPath);
-				if (string.IsNullOrWhiteSpace(content))
-				{
-					MainClass.Logg.LogWarning($"Modular Lua Script '{name}' in '{luaPath}' is empty. Skipping.");
-					continue;
-				}
 
-				try
+				foreach (string luaPath in Directory.GetFiles(expectedPath, "*.lua", SearchOption.AllDirectories))
 				{
-					var syntaxTree = LuaSyntaxTree.Parse(content, name);
-					var script = LuaCompiler.Default.Compile(syntaxTree, name);
-					LuaScript.loadedScripts[name] = new LuaScript { Body = content, Content = script, Name = name };
-					MainClass.LogModular($"Loaded Modular Lua Script '{name}' from '{luaPath}'.");
-				}
-				catch (Exception ex)
-				{
-					MainClass.Logg.LogError($"Failed to load Modular Lua Script '{name}' from '{luaPath}': {ex.Message}");
+					var name = Path.GetFileNameWithoutExtension(luaPath);
+					if (LuaScript.loadedScripts.ContainsKey(name))
+					{
+						MainClass.Logg.LogError($"Duplicate Modular Lua Script name '{name}' found in '{luaPath}'. Skipping.");
+						continue;
+					}
+
+					var content = File.ReadAllText(luaPath);
+					if (string.IsNullOrWhiteSpace(content))
+					{
+						MainClass.Logg.LogWarning($"Modular Lua Script '{name}' in '{luaPath}' is empty. Skipping.");
+						continue;
+					}
+
+					try
+					{
+						var syntaxTree = LuaSyntaxTree.Parse(content, name);
+						var script = LuaCompiler.Default.Compile(syntaxTree, name);
+						LuaScript.loadedScripts[name] = new LuaScript { Body = content, Content = script, Name = name };
+						MainClass.LogModular($"Loaded Modular Lua Script '{name}' from '{luaPath}'.");
+					}
+					catch (Exception ex)
+					{
+						MainClass.Logg.LogError($"Failed to load Modular Lua Script '{name}' from '{luaPath}': {ex.Message}");
+					}
 				}
 			}
-			
+
 			StagePatches.stage_modsa_string_list.Clear();
 			expectedPath = Path.Combine(modPath, "modular_stagescripts");
-			if (!Directory.Exists(expectedPath)) continue;
-
-			foreach (string filePath in Directory.GetFiles(expectedPath, "*.txt", SearchOption.AllDirectories))
+			if (Directory.Exists(expectedPath))
 			{
-				string content = File.ReadAllText(filePath);
-				if (string.IsNullOrWhiteSpace(content)) {
-					MainClass.Logg.LogWarning($"Modular Stage Script in '{filePath}' is empty. Skipping.");
-					continue;
+				foreach (string filePath in Directory.GetFiles(expectedPath, "*.txt", SearchOption.AllDirectories))
+				{
+					string content = File.ReadAllText(filePath);
+					if (string.IsNullOrWhiteSpace(content)) {
+						MainClass.Logg.LogWarning($"Modular Stage Script in '{filePath}' is empty. Skipping.");
+						continue;
+					}
+					StagePatches.stage_modsa_string_list.Add(content);
 				}
-				StagePatches.stage_modsa_string_list.Add(content);
 			}
+
+			
 		}
 	}
 	
