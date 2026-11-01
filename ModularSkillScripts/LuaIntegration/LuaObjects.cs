@@ -584,6 +584,33 @@ public partial class DamageSourceType
 }
 
 [LuaObject]
+public partial class AbilitySourceType
+{
+	public ABILITY_SOURCE_TYPE ref_abilitySrcType = ABILITY_SOURCE_TYPE.NONE;
+	
+	[LuaMember("CreateFromString")]
+	public static AbilitySourceType CreateFromString(string s) {
+		AbilitySourceType new_self = new();
+		if (Enum.TryParse(s, true, out ABILITY_SOURCE_TYPE result)) {
+			new_self.ref_abilitySrcType = result;
+		}
+		return new_self;
+	}
+	
+	[LuaMember("CreateFromInt")]
+	public static AbilitySourceType CreateFromInt(int integ) {
+		return new AbilitySourceType {
+			ref_abilitySrcType = (ABILITY_SOURCE_TYPE)integ
+		};
+	}
+	
+	[LuaMember("ToString")]
+	public string KeywordToString(int integ) {
+		return ref_abilitySrcType.ToString();
+	}
+}
+
+[LuaObject]
 public partial class ActionModel
 {
 	public BattleActionModel ref_action = null;
@@ -753,4 +780,19 @@ public partial class PacketChangeTakeDamage
 	
 	[LuaMember("postfix_dmg")]
 	public int postfix_dmg = 0;
+}
+
+[LuaObject]
+public partial class PacketOverwriteGiveBuf
+{
+	[LuaMember("info_abilitySrcType")]
+	public AbilitySourceType info_abilitySrcType = new();
+	[LuaMember("postfix_stack")]
+	public int postfix_stack = 0;
+	[LuaMember("postfix_turn")]
+	public int postfix_turn = 0;
+	[LuaMember("postfix_activeRound")]
+	public int postfix_activeRound = 0;
+	[LuaMember("postfix_bufKeyword")]
+	public BufKeyword postfix_bufKeyword = new();
 }

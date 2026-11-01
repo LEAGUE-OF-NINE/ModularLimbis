@@ -2,7 +2,9 @@ using BattleUI.Operation;
 using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
 using BepInEx.Unity.IL2CPP.UnityEngine;
+using Lua;
 using ModularSkillScripts;
+using ModularSkillScripts.LuaIntegration;
 using Utils;
 
 namespace ModularSkillScripts.Patches;
@@ -33,52 +35,123 @@ internal class OnGainBuffPatches
 			foreach (BuffModel buf in inflicter.GetActivatedBuffModels()) {
 				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModbaFromBuffModel_Fast(buf)) {
 					if (modsa.activationTiming != actevent) continue;
-					modsa.valueList[6] = srcType_int;
-					modsa.valueList[7] = stack;
-					modsa.valueList[8] = turn;
-					modsa.valueList[9] = key_int;
 					modsa.modsa_victimModel = gainer;
 					modsa.modsa_buffModel = buf;
-					modsa.Enact(inflicter, null, null, null, actevent, timing);
+
+					if (modsa.modsa_luaState != null)
+					{
+						bool has = modsa.modsa_luaState.Environment.TryGetValue("PacketOverwriteGiveBuf", out LuaValue packet_lua);
+						PacketOverwriteGiveBuf packet = null;
+						if (has) packet = packet_lua.Read<PacketOverwriteGiveBuf>();
+						else {
+							packet = new();
+							modsa.modsa_luaState.Environment["PacketOverwriteGiveBuf"] = packet;
+						}
+						packet.info_abilitySrcType.ref_abilitySrcType = abilitySrcType;
+						packet.postfix_stack = stack;
+						packet.postfix_turn = turn;
+						packet.postfix_activeRound = activeRound;
+						packet.postfix_bufKeyword.ref_buf_keyword = keyword;
+						modsa.Enact(__instance, null, null, null, actevent, timing);
+						stack = packet.postfix_stack;
+						turn = packet.postfix_turn;
+						activeRound = packet.postfix_activeRound;
+						keyword = packet.postfix_bufKeyword.ref_buf_keyword;
+					} else {
+						modsa.valueList[6] = srcType_int;
+						modsa.valueList[7] = stack;
+						modsa.valueList[8] = turn;
+						modsa.valueList[9] = key_int;
+						modsa.Enact(inflicter, null, null, null, actevent, timing);
+						if (modsa.valueList[9] != key_int) {
+							key_int = modsa.valueList[9];
+							keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+						}
+						stack = modsa.valueList[7];
+						turn = modsa.valueList[8];
+					}
+
+					
 				}
 			}
 			
 			foreach (PassiveModel passiveModel in inflicter._passiveDetail._passivelist) {
 				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(passiveModel)) {
 					if (modsa.activationTiming != actevent) continue;
-					modsa.valueList[6] = srcType_int;
-					modsa.valueList[7] = stack;
-					modsa.valueList[8] = turn;
-					modsa.valueList[9] = key_int;
 					modsa.modsa_victimModel = gainer;
 					modsa.modsa_passiveModel = passiveModel;
-					modsa.Enact(inflicter, null, null, null, actevent, timing);
-					if (modsa.valueList[9] != key_int) {
-						key_int = modsa.valueList[9];
-						keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+					
+					if (modsa.modsa_luaState != null) {
+						bool has = modsa.modsa_luaState.Environment.TryGetValue("PacketOverwriteGiveBuf", out LuaValue packet_lua);
+						PacketOverwriteGiveBuf packet = null;
+						if (has) packet = packet_lua.Read<PacketOverwriteGiveBuf>();
+						else {
+							packet = new();
+							modsa.modsa_luaState.Environment["PacketOverwriteGiveBuf"] = packet;
+						}
+						packet.info_abilitySrcType.ref_abilitySrcType = abilitySrcType;
+						packet.postfix_stack = stack;
+						packet.postfix_turn = turn;
+						packet.postfix_activeRound = activeRound;
+						packet.postfix_bufKeyword.ref_buf_keyword = keyword;
+						modsa.Enact(__instance, null, null, null, actevent, timing);
+						stack = packet.postfix_stack;
+						turn = packet.postfix_turn;
+						activeRound = packet.postfix_activeRound;
+						keyword = packet.postfix_bufKeyword.ref_buf_keyword;
+					} else {
+						modsa.valueList[6] = srcType_int;
+						modsa.valueList[7] = stack;
+						modsa.valueList[8] = turn;
+						modsa.valueList[9] = key_int;
+						modsa.Enact(inflicter, null, null, null, actevent, timing);
+						if (modsa.valueList[9] != key_int) {
+							key_int = modsa.valueList[9];
+							keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+						}
+						stack = modsa.valueList[7];
+						turn = modsa.valueList[8];
 					}
-					stack = modsa.valueList[7];
-					turn = modsa.valueList[8];
 				}
 			}
 
 			foreach (EgoPassiveModel egoPassiveModel in inflicter._passiveDetail._egoPassiveList) {
 				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(egoPassiveModel, false)) {
 					if (modsa.activationTiming != actevent) continue;
-					modsa.valueList[6] = srcType_int;
-					modsa.valueList[7] = stack;
-					modsa.valueList[8] = turn;
-					modsa.valueList[9] = key_int;
-					modsa.gainbuff_source = abilitySrcType;
 					modsa.modsa_victimModel = gainer;
 					modsa.modsa_passiveModel = egoPassiveModel;
-					modsa.Enact(inflicter, null, null, null, actevent, timing);
-					if (modsa.valueList[9] != key_int) {
-						key_int = modsa.valueList[9];
-						keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+					
+					if (modsa.modsa_luaState != null) {
+						bool has = modsa.modsa_luaState.Environment.TryGetValue("PacketOverwriteGiveBuf", out LuaValue packet_lua);
+						PacketOverwriteGiveBuf packet = null;
+						if (has) packet = packet_lua.Read<PacketOverwriteGiveBuf>();
+						else {
+							packet = new();
+							modsa.modsa_luaState.Environment["PacketOverwriteGiveBuf"] = packet;
+						}
+						packet.info_abilitySrcType.ref_abilitySrcType = abilitySrcType;
+						packet.postfix_stack = stack;
+						packet.postfix_turn = turn;
+						packet.postfix_activeRound = activeRound;
+						packet.postfix_bufKeyword.ref_buf_keyword = keyword;
+						modsa.Enact(__instance, null, null, null, actevent, timing);
+						stack = packet.postfix_stack;
+						turn = packet.postfix_turn;
+						activeRound = packet.postfix_activeRound;
+						keyword = packet.postfix_bufKeyword.ref_buf_keyword;
+					} else {
+						modsa.valueList[6] = srcType_int;
+						modsa.valueList[7] = stack;
+						modsa.valueList[8] = turn;
+						modsa.valueList[9] = key_int;
+						modsa.Enact(inflicter, null, null, null, actevent, timing);
+						if (modsa.valueList[9] != key_int) {
+							key_int = modsa.valueList[9];
+							keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+						}
+						stack = modsa.valueList[7];
+						turn = modsa.valueList[8];
 					}
-					stack = modsa.valueList[7];
-					turn = modsa.valueList[8];
 				}
 			}
 		}
@@ -89,51 +162,120 @@ internal class OnGainBuffPatches
 			foreach (BuffModel buf in gainer.GetActivatedBuffModels()) {
 				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModbaFromBuffModel_Fast(buf)) {
 					if (modsa.activationTiming != actevent) continue;
-					modsa.valueList[6] = srcType_int;
-					modsa.valueList[7] = stack;
-					modsa.valueList[8] = turn;
-					modsa.valueList[9] = key_int;
 					modsa.modsa_killerModel = inflicter;
 					modsa.modsa_buffModel = buf;
-					modsa.Enact(gainer, null, null, null, actevent, timing);
+					
+					if (modsa.modsa_luaState != null) {
+						bool has = modsa.modsa_luaState.Environment.TryGetValue("PacketOverwriteGiveBuf", out LuaValue packet_lua);
+						PacketOverwriteGiveBuf packet = null;
+						if (has) packet = packet_lua.Read<PacketOverwriteGiveBuf>();
+						else {
+							packet = new();
+							modsa.modsa_luaState.Environment["PacketOverwriteGiveBuf"] = packet;
+						}
+						packet.info_abilitySrcType.ref_abilitySrcType = abilitySrcType;
+						packet.postfix_stack = stack;
+						packet.postfix_turn = turn;
+						packet.postfix_activeRound = activeRound;
+						packet.postfix_bufKeyword.ref_buf_keyword = keyword;
+						modsa.Enact(gainer, null, null, null, actevent, timing);
+						stack = packet.postfix_stack;
+						turn = packet.postfix_turn;
+						activeRound = packet.postfix_activeRound;
+						keyword = packet.postfix_bufKeyword.ref_buf_keyword;
+					} else {
+						modsa.valueList[6] = srcType_int;
+						modsa.valueList[7] = stack;
+						modsa.valueList[8] = turn;
+						modsa.valueList[9] = key_int;
+						modsa.Enact(gainer, null, null, null, actevent, timing);
+						if (modsa.valueList[9] != key_int) {
+							key_int = modsa.valueList[9];
+							keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+						}
+						stack = modsa.valueList[7];
+						turn = modsa.valueList[8];
+					}
 				}
 			}
 			
 			foreach (PassiveModel passiveModel in gainer._passiveDetail._passivelist) {
 				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(passiveModel)) {
 					if (modsa.activationTiming != actevent) continue;
-					modsa.valueList[6] = srcType_int;
-					modsa.valueList[7] = stack;
-					modsa.valueList[8] = turn;
-					modsa.valueList[9] = key_int;
 					modsa.modsa_killerModel = inflicter;
 					modsa.modsa_passiveModel = passiveModel;
-					modsa.Enact(gainer, null, null, null, actevent, timing);
-					if (modsa.valueList[9] != key_int) {
-						key_int = modsa.valueList[9];
-						keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+					
+					if (modsa.modsa_luaState != null) {
+						bool has = modsa.modsa_luaState.Environment.TryGetValue("PacketOverwriteGiveBuf", out LuaValue packet_lua);
+						PacketOverwriteGiveBuf packet = null;
+						if (has) packet = packet_lua.Read<PacketOverwriteGiveBuf>();
+						else {
+							packet = new();
+							modsa.modsa_luaState.Environment["PacketOverwriteGiveBuf"] = packet;
+						}
+						packet.info_abilitySrcType.ref_abilitySrcType = abilitySrcType;
+						packet.postfix_stack = stack;
+						packet.postfix_turn = turn;
+						packet.postfix_activeRound = activeRound;
+						packet.postfix_bufKeyword.ref_buf_keyword = keyword;
+						modsa.Enact(gainer, null, null, null, actevent, timing);
+						stack = packet.postfix_stack;
+						turn = packet.postfix_turn;
+						activeRound = packet.postfix_activeRound;
+						keyword = packet.postfix_bufKeyword.ref_buf_keyword;
+					} else {
+						modsa.valueList[6] = srcType_int;
+						modsa.valueList[7] = stack;
+						modsa.valueList[8] = turn;
+						modsa.valueList[9] = key_int;
+						modsa.Enact(gainer, null, null, null, actevent, timing);
+						if (modsa.valueList[9] != key_int) {
+							key_int = modsa.valueList[9];
+							keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+						}
+						stack = modsa.valueList[7];
+						turn = modsa.valueList[8];
 					}
-					stack = modsa.valueList[7];
-					turn = modsa.valueList[8];
 				}
 			}
 
 			foreach (EgoPassiveModel egoPassiveModel in gainer._passiveDetail._egoPassiveList) {
 				foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(egoPassiveModel, false)) {
 					if (modsa.activationTiming != actevent) continue;
-					modsa.valueList[6] = srcType_int;
-					modsa.valueList[7] = stack;
-					modsa.valueList[8] = turn;
-					modsa.valueList[9] = key_int;
 					modsa.modsa_killerModel = inflicter;
 					modsa.modsa_passiveModel = egoPassiveModel;
-					modsa.Enact(gainer, null, null, null, actevent, timing);
-					if (modsa.valueList[9] != key_int) {
-						key_int = modsa.valueList[9];
-						keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+					
+					if (modsa.modsa_luaState != null) {
+						bool has = modsa.modsa_luaState.Environment.TryGetValue("PacketOverwriteGiveBuf", out LuaValue packet_lua);
+						PacketOverwriteGiveBuf packet = null;
+						if (has) packet = packet_lua.Read<PacketOverwriteGiveBuf>();
+						else {
+							packet = new();
+							modsa.modsa_luaState.Environment["PacketOverwriteGiveBuf"] = packet;
+						}
+						packet.info_abilitySrcType.ref_abilitySrcType = abilitySrcType;
+						packet.postfix_stack = stack;
+						packet.postfix_turn = turn;
+						packet.postfix_activeRound = activeRound;
+						packet.postfix_bufKeyword.ref_buf_keyword = keyword;
+						modsa.Enact(gainer, null, null, null, actevent, timing);
+						stack = packet.postfix_stack;
+						turn = packet.postfix_turn;
+						activeRound = packet.postfix_activeRound;
+						keyword = packet.postfix_bufKeyword.ref_buf_keyword;
+					} else {
+						modsa.valueList[6] = srcType_int;
+						modsa.valueList[7] = stack;
+						modsa.valueList[8] = turn;
+						modsa.valueList[9] = key_int;
+						modsa.Enact(gainer, null, null, null, actevent, timing);
+						if (modsa.valueList[9] != key_int) {
+							key_int = modsa.valueList[9];
+							keyword = (BUFF_UNIQUE_KEYWORD)key_int;
+						}
+						stack = modsa.valueList[7];
+						turn = modsa.valueList[8];
 					}
-					stack = modsa.valueList[7];
-					turn = modsa.valueList[8];
 				}
 			}
 		}

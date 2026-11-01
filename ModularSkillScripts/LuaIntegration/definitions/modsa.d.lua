@@ -112,6 +112,15 @@ function PacketChangeTakeDamage:FetchDmgSrcType() end
 ---@return BufKeyword
 function PacketChangeTakeDamage:FetchBufKeyword() end
 
+--- Information Packet specific to Modular's OverwriteGiveBuf and OverwriteGainBuf TIMINGs.
+---@class PacketOverwriteGiveBuf
+---@field info_abilitySrcType AbilitySourceType Display Only
+---@field postfix_stack integer Overwrite This
+---@field postfix_turn integer Overwrite This
+---@field postfix_activeRound integer Overwrite This
+---@field postfix_bufKeyword BufKeyword Overwrite This
+PacketOverwriteGiveBuf = {}
+
 --- Creates and returns the current EventTiming.
 ---@return EventTiming
 function ModsaInterface:FetchEventTiming() end
@@ -169,6 +178,24 @@ function DamageSourceType.CreateFromInt(integ) end
 --- Returns a string of the stored DAMAGE_SOURCE_TYPE.
 ---@return string
 function DamageSourceType:ToString() end
+
+--- Can be instanced to store a ABILITY_SOURCE_TYPE enum.
+---@class AbilitySourceType
+AbilitySourceType = {}
+
+--- Creates a new AbilitySourceType instance that internally stores a ABILITY_SOURCE_TYPE enum by parsing a string.
+---@param s string
+---@return AbilitySourceType
+function AbilitySourceType.CreateFromString(s) end
+
+--- Creates a new AbilitySourceType instance that internally stores a ABILITY_SOURCE_TYPE enum by casting an int.
+---@param integ integer
+---@return AbilitySourceType
+function AbilitySourceType.CreateFromInt(integ) end
+
+--- Returns a string of the stored ABILITY_SOURCE_TYPE.
+---@return string
+function AbilitySourceType:ToString() end
 
 --- 0 = "Player", 1 = "Enemy", 2 = "None".
 ---@alias UnitFaction
