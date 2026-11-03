@@ -214,9 +214,7 @@ public partial class UnitModel
 	}
 	
 	[LuaMember("IsNull")]
-	public bool IsNull() {
-		return ref_unitModel == null;
-	}
+	public bool IsNull() => ref_unitModel == null;
 	
 	[LuaMember("WhatAmI")]
 	public int WhatAmI() {
@@ -226,9 +224,7 @@ public partial class UnitModel
 	}
 	
 	[LuaMember("UnitID")]
-	public int GetUnitID() {
-		return ref_unitModel.GetUnitID();
-	}
+	public int GetUnitID() => ref_unitModel.GetUnitID();
 	
 	[LuaMember("InstanceID")]
 	public int GetInstanceID() {
@@ -236,19 +232,16 @@ public partial class UnitModel
 	}
 	
 	[LuaMember("Faction")]
-	public int GetFaction() {
-		return (int)ref_unitModel.Faction;
-	}
+	public int GetFaction() => (int)ref_unitModel.Faction;
 	
 	[LuaMember("HP")]
-	public int HPCheck() {
-		return ref_unitModel.Hp;
-	}
+	public int HPCheck() => ref_unitModel.Hp;
 	
 	[LuaMember("MaxHP")]
-	public int MaxHPCheck() {
-		return ref_unitModel.MaxHp;
-	}
+	public int MaxHPCheck() => ref_unitModel.MaxHp;
+	
+	[LuaMember("Speed")]
+	public int Speed() => ref_unitModel.GetIntegerOfOriginSpeed();
 	
 	[LuaMember("GetPatternIdx")]
 	public int GetPatternIdx() {
@@ -931,9 +924,10 @@ public partial class LuaPassiveModel
 	}
 	
 	[LuaMember("IsNull")]
-	public bool IsNull() {
-		return ref_passive == null;
-	}
+	public bool IsNull() => ref_passive == null;
+	
+	[LuaMember("PassiveID")]
+	public int PassiveID() => ref_passive.GetID();
 	
 	[LuaMember("FetchAllModsa")]
 	public LuaTable FetchAllModsa(bool fast_no_copy, bool check_active) {

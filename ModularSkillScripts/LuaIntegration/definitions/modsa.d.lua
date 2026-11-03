@@ -559,7 +559,12 @@ PassiveModel = {}
 
 --- Checks if internal PassiveModel reference is null.
 ---@return boolean
+---@nodiscard
 function PassiveModel:IsNull() end
+
+---@return integer
+---@nodiscard
+function PassiveModel:PassiveID() end
 
 --- Returns all of this thing's modsas.
 ---@param fast_no_copy boolean (Default = false)
