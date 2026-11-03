@@ -356,6 +356,7 @@ public class SkillScriptInitPatch
 		MainClass.activeSupporterPassiveList.Clear();
 		MainClass.SupportPasInit = false;
 		unitMod_list.Clear();
+		complex_lua_encounter_data.Clear();
 		skillPtrsRoundStart.Clear();
 		//speed_dict.Clear();
 	}
@@ -365,6 +366,7 @@ public class SkillScriptInitPatch
 	public static Dictionary<long, List<ModularSA>> modcaDict = new();
 	public static Dictionary<long, List<ModularSA>> modbaDict = new();
 	public static Dictionary<long, ModUnitData> unitMod_list = new();
+	public static LuaTable complex_lua_encounter_data = new();
 	public static List<long> skillPtrsRoundStart = new();
 
 

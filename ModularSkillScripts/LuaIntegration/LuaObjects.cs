@@ -44,6 +44,22 @@ public partial class ModsaInterface
 		SkillScriptInitPatch.SetModUnitData(unit.ref_unitModel.Pointer.ToInt64(), dataID, value);
 	}
 	
+	[LuaMember("ADDERSet")]
+	public void ADDERSet(string adder_type, int amount_set) {
+		switch (adder_type)
+		{
+			case "base": ref_modsa.skillPowerAdder = amount_set; break;
+			case "clash": ref_modsa.parryingResultAdder = amount_set; break;
+			case "scale": ref_modsa.coinScaleAdder = amount_set; break;
+			case "final": ref_modsa.skillPowerResultAdder = amount_set; break;
+			case "dmgmult": ref_modsa.atkMultAdder = amount_set; break;
+			case "dmgadd": ref_modsa.atkDmgAdder = amount_set; break;
+			case "critmult": ref_modsa.critRatioAdder = amount_set; break;
+			case "critchance": ref_modsa.critAdder = amount_set; break;
+			case "headschance": ref_modsa.headsChanceAdder = amount_set; break;
+		}
+	}
+	
 	[LuaMember("FetchModsaUnitModel")]
 	public UnitModel FetchModsaUnitModel() {
 		return new UnitModel(ref_modsa.modsa_unitModel);

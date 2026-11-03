@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Lua;
 using Lua.Standard;
+using ModularSkillScripts.Patches;
 
 
 namespace ModularSkillScripts.LuaIntegration;
@@ -18,7 +19,8 @@ public sealed class LuaFunctions
 	  F_Util =
     [
 	    new Lua.LuaFunction("ShuffleList", ShuffleList),
-	    new Lua.LuaFunction("GetterRandom", GetterRandom)
+	    new Lua.LuaFunction("GetterRandom", GetterRandom),
+	    new Lua.LuaFunction("FetchComplexEncounterData", FetchComplexEncounterData)
     ];
 	  F_BufManager =
 	  [
@@ -58,6 +60,15 @@ public sealed class LuaFunctions
 		int minRoll = context.GetArgument<int>(0);
 		int maxRoll = context.GetArgument<int>(1);
 		buffer.Span[0] = (LuaValue) MainClass.rng.Next(minRoll, maxRoll + 1);
+		return new ValueTask<int>(1);
+	}
+	
+	public ValueTask<int> FetchComplexEncounterData(
+		LuaFunctionExecutionContext context,
+		Memory<LuaValue> buffer,
+		CancellationToken cancellationToken)
+	{
+		buffer.Span[0] = SkillScriptInitPatch.complex_lua_encounter_data;
 		return new ValueTask<int>(1);
 	}
 	
