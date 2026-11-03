@@ -33,7 +33,7 @@ function ModsaInterface:GetVALUE(idx) end
 --- Sets the modsa VALUE to the given value.
 ---@param idx integer
 ---@param value integer
----@nodiscard
+---@return nil
 function ModsaInterface:SetVALUE(idx, value) end
 
 --- Returns the requested ModUnitData.
@@ -95,7 +95,7 @@ function ModsaInterface:FetchUnitList(find_instruction) end
 ---@param turn integer
 ---@param activeRound_list integer[]
 ---@param bufPacket BufPacket
----@nodiscard
+---@return nil
 function ModsaInterface:Buf(targetModel, giver, bufKeyword, stack, turn, activeRound_list, bufPacket) end
 
 --- Creates and returns a default BufPacket.
@@ -253,7 +253,7 @@ function ReserveCutInActionType.CreateFromInt(integ) end
 function ReserveCutInActionType:ToString() end
 
 --- Prints all in-game RESERVE_CUT_IN_ACTION_TYPE enum values to the Console.
----@nodiscard
+---@return nil
 function ReserveCutInActionType:PrintAllEnumValues() end
 
 --- Can be instanced to store a SKILL_TARGET_TYPE enum.
@@ -275,7 +275,7 @@ function SkillTargetType.CreateFromInt(integ) end
 function SkillTargetType:ToString() end
 
 --- Prints all in-game SKILL_TARGET_TYPE enum values to the Console.
----@nodiscard
+---@return nil
 function SkillTargetType:PrintAllEnumValues() end
 
 --- Can be instanced to store an ATTRIBUTE_TYPE enum.
@@ -301,7 +301,7 @@ function AttributeType:ToString() end
 function AttributeType:ToInt() end
 
 --- Prints all in-game ATTRIBUTE_TYPE enum values to the Console.
----@nodiscard
+---@return nil
 function AttributeType:PrintAllEnumValues() end
 
 --- Compares this and another.
@@ -332,7 +332,7 @@ function AtkType:ToString() end
 function AtkType:ToInt() end
 
 --- Prints all in-game ATK_BEHAVIOUR enum values to the Console.
----@nodiscard
+---@return nil
 function AtkType:PrintAllEnumValues() end
 
 --- Compares this and another.
@@ -394,12 +394,12 @@ function ActionModelManager.FetchActionList() end
 
 --- Overwrites the manager's actionList.
 ---@param actionList ActionModel[]
----@nodiscard
+---@return nil
 function ActionModelManager.SetActionList(actionList) end
 
 --- Remove the action through the manager.
 ---@param action_remove ActionModel
----@nodiscard
+---@return nil
 function ActionModelManager.RemoveAction(action_remove) end
 
 --- Returns a COPIED list (not reference) of all duels during battle. Modifying this list does NOT modify the original. Use SetDuelList instead.
@@ -408,7 +408,7 @@ function ActionModelManager.FetchDuelList() end
 
 --- Overwrites the manager's duelList.
 ---@param duelList DuelModel[]
----@nodiscard
+---@return nil
 function ActionModelManager.SetDuelList(duelList) end
 
 ---@param action ActionModel
@@ -426,22 +426,22 @@ function ActionModelManager.IsDuelBetweenTheseTwo(action1, action2) end
 function ActionModelManager.FetchDuelFromAction(action) end
 
 ---@param action ActionModel
----@nodiscard
+---@return nil
 function ActionModelManager.RemoveDuelByAction(action) end
 
 ---@param action1 ActionModel
 ---@param action2 ActionModel
----@nodiscard
+---@return nil
 function ActionModelManager.AddDuel(action1, action2) end
 
 ---@param action ActionModel
----@nodiscard
+---@return nil
 function ActionModelManager.AddAction(action) end
 
 ---@param action ActionModel
 ---@param skillTargetType SkillTargetType
 ---@param lastOrFirst ModeLastOrFirst
----@nodiscard
+---@return nil
 function ActionModelManager.CutInAction(action, skillTargetType, lastOrFirst) end
 
 ---@alias ModeLastOrFirst
@@ -451,17 +451,17 @@ function ActionModelManager.CutInAction(action, skillTargetType, lastOrFirst) en
 ---@param action ActionModel
 ---@param otherAction ActionModel
 ---@param skillTargetType SkillTargetType
----@nodiscard
+---@return nil
 function ActionModelManager.CutInActionPrevOtherAction(action, otherAction, skillTargetType) end
 
 ---@param action ActionModel
 ---@param first boolean
----@nodiscard
+---@return nil
 function ActionModelManager.CutInDefenseActionForcely(action, first) end
 
 ---@param uniqueCutIn UniqueCutInTiming
 ---@param action ActionModel
----@nodiscard
+---@return nil
 function ActionModelManager.AddUniqueCutIn(uniqueCutIn, action) end
 
 ---@alias UniqueCutInTiming
@@ -471,7 +471,7 @@ function ActionModelManager.AddUniqueCutIn(uniqueCutIn, action) end
 ---@param reserveType ReserveCutInActionType
 ---@param action ActionModel
 ---@param removeDuel boolean Default: false
----@nodiscard
+---@return nil
 function ActionModelManager.ReserveToCutInActionUntilStartRunBattle(reserveType, action, removeDuel) end
 
 --- Can be instanced to store a BATTLE_EVENT_TIMING enum.
@@ -527,7 +527,7 @@ function UnitModel:GetPatternIdx() end
 
 --- Sets the pattern idx. Please for the love of god make sure this is an abno core OR part (at least for now)
 ---@param idx integer
----@nodiscard
+---@return nil
 function UnitModel:SetPatternIdx(idx) end
 
 --- Attempts to retrieve a new UnitModel representing the abno core.
@@ -651,7 +651,7 @@ function DuelModel:FetchAction(action_number) end
 --- Sets the requested action, either 1 or 2.
 ---@param action_number DuelActionNumber
 ---@param action_set ActionModel
----@nodiscard
+---@return nil
 function DuelModel:SetAction(action_number, action_set) end
 
 ---@alias DuelActionNumber
@@ -775,5 +775,5 @@ function UnitSinModel:IsNull() end
 function UnitSinModel:FetchCurrentAction() end
 
 ---@param action ActionModel
----@nodiscard
+---@return nil
 function UnitSinModel:SetCurrentAction(action) end
