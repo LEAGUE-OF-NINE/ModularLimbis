@@ -612,6 +612,25 @@ public partial class LuaActionModelManager
 		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
 		actionManager.RemoveDuel(action.ref_action);
 	}
+	
+	[LuaMember("AddDuel")]
+	public static void AddDuel(ActionModel action1, ActionModel action2) {
+		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
+		actionManager.AddDuel(action1.ref_action, action2.ref_action);
+	}
+	
+	[LuaMember("AddAction")]
+	public static void AddAction(ActionModel action) {
+		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
+		actionManager.AddAction(action.ref_action);
+	}
+	
+	[LuaMember("AddUniqueCutIn")]
+	public static void AddUniqueCutIn(string uniqueCutIn, ActionModel action) {
+		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
+		if (uniqueCutIn == "None") actionManager.AddUniqueCutIn(UniqueCutInTiming.None, action.ref_action);
+		else if (uniqueCutIn == "JudgeDuelResult") actionManager.AddUniqueCutIn(UniqueCutInTiming.JudgeDuelResult, action.ref_action);
+	}
 }
 
 [LuaObject]

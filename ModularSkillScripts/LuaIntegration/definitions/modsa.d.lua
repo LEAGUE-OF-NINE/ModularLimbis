@@ -286,6 +286,24 @@ function ActionModelManager.FetchDuelFromAction(action) end
 ---@return nil
 function ActionModelManager.RemoveDuelByAction(action) end
 
+---@param action1 ActionModel
+---@param action2 ActionModel
+---@return nil
+function ActionModelManager.AddDuel(action1, action2) end
+
+---@param action ActionModel
+---@return nil
+function ActionModelManager.AddAction(action) end
+
+---@param uniqueCutIn UniqueCutInTiming
+---@param action ActionModel
+---@return nil
+function ActionModelManager.AddUniqueCutIn(uniqueCutIn, action) end
+
+---@alias UniqueCutInTiming
+---| "main_only"
+---| "main_and_sub"
+
 --- Can be instanced to store a BATTLE_EVENT_TIMING enum.
 ---@class EventTiming
 EventTiming = {}
