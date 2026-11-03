@@ -487,6 +487,24 @@ function UnitModel:FetchActionModelList(sorted) end
 ---@return SinActionModel[]
 function UnitModel:FetchSinActionList(permanent_only) end
 
+---@param include_ego boolean
+---@return PassiveModel[]
+function UnitModel:FetchPassives(include_ego) end
+
+--- Internally Stores a vanilla PassiveModel.
+---@class PassiveModel
+PassiveModel = {}
+
+--- Checks if internal PassiveModel reference is null.
+---@return boolean
+function PassiveModel:IsNull() end
+
+--- Returns all of this thing's modsas.
+---@param fast_no_copy boolean (Default = false)
+---@param check_active boolean (Default = true for checking if the passive's requirements are fulfilled)
+---@return ModsaInterface[]
+function PassiveModel:FetchAllModsa(fast_no_copy, check_active) end
+
 --- Internally Stores a BuffModel.
 ---@class BufModel
 BufModel = {}
@@ -494,6 +512,11 @@ BufModel = {}
 --- Checks if internal BuffModel reference is null.
 ---@return boolean
 function BufModel:IsNull() end
+
+--- Returns all of this thing's modsas.
+---@param fast_no_copy boolean (Default = false)
+---@return ModsaInterface[]
+function BufModel:FetchAllModsa(fast_no_copy) end
 
 --- Returns the Stack depending on the given activeRound
 ---@param activeRound integer
@@ -574,6 +597,11 @@ SkillModel = {}
 ---@return boolean
 function SkillModel:IsNull() end
 
+--- Returns all of this thing's modsas.
+---@param fast_no_copy boolean (Default = false)
+---@return ModsaInterface[]
+function SkillModel:FetchAllModsa(fast_no_copy) end
+
 --- Internally Stores a vanilla CoinModel.
 ---@class CoinModel
 CoinModel = {}
@@ -581,6 +609,11 @@ CoinModel = {}
 --- Checks if internal CoinModel reference is null.
 ---@return boolean
 function CoinModel:IsNull() end
+
+--- Returns all of this thing's modsas.
+---@param fast_no_copy boolean (Default = false)
+---@return ModsaInterface[]
+function CoinModel:FetchAllModsa(fast_no_copy) end
 
 ---@return integer
 function CoinModel:GetRealCoinIndex() end

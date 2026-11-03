@@ -5,6 +5,7 @@ using Il2CppSystem.Collections.Generic;
 using Lethe.EnumInjections;
 using Lua;
 using ModularSkillScripts.Patches;
+using Unity.Collections;
 
 namespace ModularSkillScripts.LuaIntegration;
 
@@ -369,6 +370,26 @@ public partial class UnitModel
 		}
 		return table;
 	}
+	
+	[LuaMember("FetchPassives")]
+	public LuaTable FetchPassives(bool include_ego) {
+		List<PassiveModel> passive_list = ref_unitModel._passiveDetail._passivelist;
+		int count = passive_list.Count;
+		LuaTable table = new(count,0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = new LuaPassiveModel(passive_list[i]);
+		}
+
+		if (include_ego) {
+			List<EgoPassiveModel> egoPassive_list = ref_unitModel._passiveDetail._egoPassiveList;
+			count = passive_list.Count;
+			for (int i = 0; i < count; i++) {
+				table[i + 1] = new LuaPassiveModel(egoPassive_list[i]);
+			}
+		}
+		
+		return table;
+	}
 }
 
 [LuaObject]
@@ -382,6 +403,20 @@ public partial class BufModel
 	[LuaMember("IsNull")]
 	public bool IsNull() {
 		return ref_buffModel == null;
+	}
+	
+	[LuaMember("FetchAllModsa")]
+	public LuaTable FetchAllModsa(bool fast_no_copy) {
+		List<ModularSA> modsa_list = null;
+		if (fast_no_copy) modsa_list = SkillScriptInitPatch.GetAllModbaFromBuffModel_Fast(ref_buffModel);
+		else modsa_list = SkillScriptInitPatch.GetAllModbaFromBuffModel(ref_buffModel);
+		
+		int count = modsa_list.Count;
+		LuaTable table = new(count,0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = new ModsaInterface(modsa_list[i]);
+		}
+		return table;
 	}
 	
 	[LuaMember("GetStack")]
@@ -820,6 +855,34 @@ public partial class LuaSkillTargetType
 }
 
 [LuaObject]
+public partial class LuaPassiveModel
+{
+	public PassiveModel ref_passive = null;
+	public LuaPassiveModel(PassiveModel x) {
+		ref_passive = x;
+	}
+	
+	[LuaMember("IsNull")]
+	public bool IsNull() {
+		return ref_passive == null;
+	}
+	
+	[LuaMember("FetchAllModsa")]
+	public LuaTable FetchAllModsa(bool fast_no_copy, bool check_active) {
+		List<ModularSA> modsa_list = null;
+		if (fast_no_copy) modsa_list = SkillScriptInitPatch.GetAllModpaFromPasmodel_Fast(ref_passive, check_active);
+		else modsa_list = SkillScriptInitPatch.GetAllModpaFromPasmodel(ref_passive, check_active);
+		
+		int count = modsa_list.Count;
+		LuaTable table = new(count,0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = new ModsaInterface(modsa_list[i]);
+		}
+		return table;
+	}
+}
+
+[LuaObject]
 public partial class LuaDuelModel
 {
 	public BattleDuelModel ref_duel = null;
@@ -898,6 +961,20 @@ public partial class CoinModel
 		return ref_coin == null;
 	}
 	
+	[LuaMember("FetchAllModsa")]
+	public LuaTable FetchAllModsa(bool fast_no_copy) {
+		List<ModularSA> modsa_list = null;
+		if (fast_no_copy) modsa_list = SkillScriptInitPatch.GetAllModcaFromCoinModel(ref_coin);
+		else modsa_list = SkillScriptInitPatch.GetAllModcaFromCoinModel(ref_coin);
+		
+		int count = modsa_list.Count;
+		LuaTable table = new(count,0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = new ModsaInterface(modsa_list[i]);
+		}
+		return table;
+	}
+	
 	[LuaMember("GetRealCoinIndex")]
 	public int GetRealCoinIndex() {
 		return ref_coin.GetRealCoinIndex();
@@ -915,6 +992,20 @@ public partial class SkillModel
 	[LuaMember("IsNull")]
 	public bool IsNull() {
 		return ref_skill == null;
+	}
+	
+	[LuaMember("FetchAllModsa")]
+	public LuaTable FetchAllModsa(bool fast_no_copy) {
+		List<ModularSA> modsa_list = null;
+		if (fast_no_copy) modsa_list = SkillScriptInitPatch.GetAllModsaFromSkillModel_Fast(ref_skill);
+		else modsa_list = SkillScriptInitPatch.GetAllModsaFromSkillModel(ref_skill);
+		
+		int count = modsa_list.Count;
+		LuaTable table = new(count,0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = new ModsaInterface(modsa_list[i]);
+		}
+		return table;
 	}
 }
 
