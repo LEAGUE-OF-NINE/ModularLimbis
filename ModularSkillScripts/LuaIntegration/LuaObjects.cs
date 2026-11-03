@@ -9,6 +9,15 @@ using ModularSkillScripts.Patches;
 namespace ModularSkillScripts.LuaIntegration;
 
 [LuaObject]
+public partial class LuaModularUtil
+{
+	[LuaMember("GetterRandom")]
+	public static int GetterRandom(int minRoll, int maxRoll) {
+		return MainClass.rng.Next(minRoll, maxRoll + 1);
+	}
+}
+
+[LuaObject]
 public partial class ModsaInterface
 {
 	public ModularSA ref_modsa = null;
@@ -479,6 +488,7 @@ public partial class BufCategory
 	}
 }
 
+/*
 [LuaObject]
 public partial class BufManager
 {
@@ -492,11 +502,11 @@ public partial class BufManager
 	}
 	
 	[LuaMember("KeywordHasCategory")]
-	public static bool KeywordHasCategory(BufKeyword keyword_main, BufCategory category_another, string mode_s) {
+	public static bool KeywordHasCategory(BufKeyword keyword_main, BufCategory category_another) {
 		BattleUnitBuffManager bufManager = Singleton<BattleUnitBuffManager>.Instance;
 		return bufManager.HasCategory(keyword_main.ref_buf_keyword, category_another.ref_buf_category);
 	}
-}
+}*/
 
 
 [LuaObject]

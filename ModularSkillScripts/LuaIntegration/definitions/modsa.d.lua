@@ -1,8 +1,21 @@
 ---@meta
 
+---@class ModularUtil
+ModularUtil = {}
+
+--- Randomizes a LuaTable's items (by reference).
+---@param table table
+function ModularUtil.ShuffleList(table) end
+
+---Functionally identical to Modular's random() Getter method.
+---@param minRoll integer (inclusive)
+---@param maxRoll integer (inclusive)
+---@return integer
+---@nodiscard
+function ModularUtil.GetterRandom(minRoll, maxRoll) end
+
 ---@class ModsaInterface
 ModsaInterface = {}
-
 
 --- Returns the requested modsa VALUE.
 ---@param idx integer
