@@ -1401,6 +1401,8 @@ public class ModularSA : Il2CppSystem.Object
 		state.Environment["AbilitySourceType"] = new AbilitySourceType();
 		state.Environment["ReserveCutInActionType"] = new ReserveCutInActionType();
 		state.Environment["SkillTargetType"] = new LuaSkillTargetType();
+		state.Environment["AttributeType"] = new LuaAttributeType();
+		state.Environment["AtkType"] = new LuaAtkType();
 		
 		LuaFunctions.MergeFunctionArrayToLuaState("ModularUtil", state, LuaFunctions.Instance.F_Util);
 		LuaFunctions.MergeFunctionArrayToLuaState("BufManager", state, LuaFunctions.Instance.F_BufManager);

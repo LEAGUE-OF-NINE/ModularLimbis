@@ -254,6 +254,68 @@ function SkillTargetType:ToString() end
 ---@return nil
 function SkillTargetType:PrintAllEnumValues() end
 
+--- Can be instanced to store an ATTRIBUTE_TYPE enum.
+---@class AttributeType
+AttributeType = {}
+
+--- Creates a new AttributeType instance that internally stores a ATTRIBUTE_TYPE enum by parsing a string.
+---@param s string
+---@return AttributeType
+function AttributeType.CreateFromString(s) end
+
+--- Creates a new AttributeType instance that internally stores a ATTRIBUTE_TYPE enum by casting an int.
+---@param integ integer
+---@return AttributeType
+function AttributeType.CreateFromInt(integ) end
+
+--- Returns a string of the stored ATTRIBUTE_TYPE.
+---@return string
+function AttributeType:ToString() end
+
+--- Returns an integer of the stored ATTRIBUTE_TYPE enum value.
+---@return integer
+function AttributeType:ToInt() end
+
+--- Prints all in-game ATTRIBUTE_TYPE enum values to the Console.
+---@return nil
+function AttributeType:PrintAllEnumValues() end
+
+--- Compares this and another.
+---@param other AttributeType
+---@return boolean
+function AttributeType:IsEqualTo(other) end
+
+--- Can be instanced to store an ATK_BEHAVIOUR enum.
+---@class AtkType
+AtkType = {}
+
+--- Creates a new AtkType instance that internally stores a ATK_BEHAVIOUR enum by parsing a string.
+---@param s string
+---@return AtkType
+function AtkType.CreateFromString(s) end
+
+--- Creates a new AtkType instance that internally stores a ATK_BEHAVIOUR enum by casting an int.
+---@param integ integer
+---@return AtkType
+function AtkType.CreateFromInt(integ) end
+
+--- Returns a string of the stored ATK_BEHAVIOUR.
+---@return string
+function AtkType:ToString() end
+
+--- Returns an integer of the stored ATK_BEHAVIOUR enum value.
+---@return integer
+function AtkType:ToInt() end
+
+--- Prints all in-game ATK_BEHAVIOUR enum values to the Console.
+---@return nil
+function AtkType:PrintAllEnumValues() end
+
+--- Compares this and another.
+---@param other AtkType
+---@return boolean
+function AtkType:IsEqualTo(other) end
+
 --- 0 = "Player", 1 = "Enemy", 2 = "None".
 ---@alias UnitFaction
 ---| 0
@@ -589,6 +651,15 @@ function ActionModel:FetchSkill() end
 ---@return SinActionModel
 function ActionModel:FetchSinAction() end
 
+---@param skillID integer
+---@return boolean
+function ActionModel:TryChangeSkillByID(skillID) end
+
+---@param skill SkillModel
+---@param saveOriginSkill boolean (Default = true)
+---@return boolean
+function ActionModel:TryChangeSkillByModel(skill, saveOriginSkill) end
+
 --- Internally Stores a vanilla SkillModel.
 ---@class SkillModel
 SkillModel = {}
@@ -601,6 +672,22 @@ function SkillModel:IsNull() end
 ---@param fast_no_copy boolean (Default = false)
 ---@return ModsaInterface[]
 function SkillModel:FetchAllModsa(fast_no_copy) end
+
+---@return integer
+---@nodiscard
+function SkillModel:SkillID() end
+
+---@return integer
+---@nodiscard
+function SkillModel:SkillTier() end
+
+---@return AttributeType
+---@nodiscard
+function SkillModel:FetchAttribute() end
+
+---@return AtkType
+---@nodiscard
+function SkillModel:FetchAtkType() end
 
 --- Internally Stores a vanilla CoinModel.
 ---@class CoinModel

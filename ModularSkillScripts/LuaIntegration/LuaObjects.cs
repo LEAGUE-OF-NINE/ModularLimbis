@@ -55,8 +55,8 @@ public partial class ModsaInterface
 	}
 	
 	[LuaMember("FetchModsaSkillModel")]
-	public SkillModel FetchModsaSkillModel() {
-		return new SkillModel(ref_modsa.modsa_skillModel);
+	public LuaSkillModel FetchModsaSkillModel() {
+		return new LuaSkillModel(ref_modsa.modsa_skillModel);
 	}
 	
 	[LuaMember("FetchModsaActionModel")]
@@ -855,6 +855,74 @@ public partial class LuaSkillTargetType
 }
 
 [LuaObject]
+public partial class LuaAttributeType
+{
+	public ATTRIBUTE_TYPE ref_enum = ATTRIBUTE_TYPE.NONE;
+	
+	[LuaMember("CreateFromString")]
+	public static LuaAttributeType CreateFromString(string s) {
+		LuaAttributeType new_self = new();
+		if (Enum.TryParse(s, true, out ATTRIBUTE_TYPE result)) {
+			new_self.ref_enum = result;
+		}
+		return new_self;
+	}
+	
+	[LuaMember("CreateFromInt")]
+	public static LuaAttributeType CreateFromInt(int integ) => new LuaAttributeType { ref_enum = (ATTRIBUTE_TYPE)integ };
+	
+	[LuaMember("ToString")]
+	public string KeywordToString() => ref_enum.ToString();
+	
+	[LuaMember("ToInt")]
+	public int KeywordToInt() => (int)ref_enum;
+	
+	[LuaMember("PrintAllEnumValues")]
+	public void PrintAllEnumValues() {
+		foreach (string keyname in Il2CppSystem.Enum.GetNames(Il2CppType.Of<ATTRIBUTE_TYPE>())) {
+			MainClass.LogModular("ATTRIBUTE_TYPE: " + keyname, true);
+		}
+	}
+
+	[LuaMember("IsEqualTo")]
+	public bool IsEqualTo(LuaAttributeType other) => ref_enum == other.ref_enum;
+}
+
+[LuaObject]
+public partial class LuaAtkType
+{
+	public ATK_BEHAVIOUR ref_enum = ATK_BEHAVIOUR.NONE;
+	
+	[LuaMember("CreateFromString")]
+	public static LuaAtkType CreateFromString(string s) {
+		LuaAtkType new_self = new();
+		if (Enum.TryParse(s, true, out ATK_BEHAVIOUR result)) {
+			new_self.ref_enum = result;
+		}
+		return new_self;
+	}
+	
+	[LuaMember("CreateFromInt")]
+	public static LuaAtkType CreateFromInt(int integ) => new LuaAtkType { ref_enum = (ATK_BEHAVIOUR)integ };
+	
+	[LuaMember("ToString")]
+	public string KeywordToString() => ref_enum.ToString();
+	
+	[LuaMember("ToInt")]
+	public int KeywordToInt() => (int)ref_enum;
+	
+	[LuaMember("PrintAllEnumValues")]
+	public void PrintAllEnumValues() {
+		foreach (string keyname in Il2CppSystem.Enum.GetNames(Il2CppType.Of<ATK_BEHAVIOUR>())) {
+			MainClass.LogModular("ATK_BEHAVIOUR: " + keyname, true);
+		}
+	}
+
+	[LuaMember("IsEqualTo")]
+	public bool IsEqualTo(LuaAtkType other) => ref_enum == other.ref_enum;
+}
+
+[LuaObject]
 public partial class LuaPassiveModel
 {
 	public PassiveModel ref_passive = null;
@@ -929,23 +997,22 @@ public partial class ActionModel
 	}
 	
 	[LuaMember("IsNull")]
-	public bool IsNull() {
-		return ref_action == null;
-	}
+	public bool IsNull() => ref_action == null;
 	
 	[LuaMember("FetchUnitModel")]
-	public UnitModel FetchUnitModel() {
-		return new UnitModel(ref_action._model);
-	}
+	public UnitModel FetchUnitModel() => new UnitModel(ref_action._model);
+	
 	[LuaMember("FetchSkill")]
-	public SkillModel FetchSkill() {
-		return new SkillModel(ref_action._skill);
-	}
+	public LuaSkillModel FetchSkill() => new LuaSkillModel(ref_action._skill);
 	
 	[LuaMember("FetchSinAction")]
-	public LuaSinActionModel FetchSinAction() {
-		return new LuaSinActionModel(ref_action._sinAction);
-	}
+	public LuaSinActionModel FetchSinAction() => new LuaSinActionModel(ref_action._sinAction);
+
+	[LuaMember("TryChangeSkillByID")]
+	public bool TryChangeSkillByID(int skillID) => ref_action.TryChangeSkill(skillID);
+	[LuaMember("ChangeSkillByModel")]
+	public bool TryChangeSkillByModel(LuaSkillModel skill, bool saveOriginSkill) => ref_action.ChangeSkill(skill.ref_skill, saveOriginSkill);
+	
 }
 
 [LuaObject]
@@ -982,10 +1049,10 @@ public partial class CoinModel
 }
 
 [LuaObject]
-public partial class SkillModel
+public partial class LuaSkillModel
 {
-	public global::SkillModel ref_skill = null;
-	public SkillModel(global::SkillModel x) {
+	public SkillModel ref_skill = null;
+	public LuaSkillModel(SkillModel x) {
 		ref_skill = x;
 	}
 	
@@ -1007,6 +1074,18 @@ public partial class SkillModel
 		}
 		return table;
 	}
+	
+	[LuaMember("SkillID")]
+	public int SkillID() => ref_skill.GetID();
+	
+	[LuaMember("SkillTier")]
+	public int SkillTier() => ref_skill.GetSkillTier();
+	
+	[LuaMember("FetchAttribute")]
+	public LuaAttributeType FetchAttribute() => new LuaAttributeType{ ref_enum = ref_skill.GetAttributeType()};
+	
+	[LuaMember("FetchAtkType")]
+	public LuaAtkType FetchAtkType() => new LuaAtkType{ ref_enum = ref_skill.GetAttackType()};
 }
 
 [LuaObject]
