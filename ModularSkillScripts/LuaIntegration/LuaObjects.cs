@@ -1,3 +1,4 @@
+using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem;
 using Il2CppSystem.Collections.Generic;
@@ -446,7 +447,7 @@ public partial class BufKeyword
 	}
 	
 	[LuaMember("ToString")]
-	public string KeywordToString(int integ) {
+	public string KeywordToString() {
 		return ref_buf_keyword.ToString();
 	}
 }
@@ -473,7 +474,7 @@ public partial class BufCategory
 	}
 	
 	[LuaMember("ToString")]
-	public string KeywordToString(int integ) {
+	public string KeywordToString() {
 		return ref_buf_category.ToString();
 	}
 }
@@ -625,11 +626,37 @@ public partial class LuaActionModelManager
 		actionManager.AddAction(action.ref_action);
 	}
 	
+	[LuaMember("CutInAction")]
+	public static void CutInAction(ActionModel action, LuaSkillTargetType skillTargetType, string lastOrFirst) {
+		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
+		BattleActionModelManager.CUT_IN_ACTION_TYPE cutInType = lastOrFirst == "Last" ? BattleActionModelManager.CUT_IN_ACTION_TYPE.LAST_APPEND : BattleActionModelManager
+			.CUT_IN_ACTION_TYPE.ZERO_INDEX;
+		actionManager.CutInAction(action.ref_action, skillTargetType.ref_enum, cutInType);
+	}
+	
+	[LuaMember("CutInActionPrevOtherAction")]
+	public static void CutInActionPrevOtherAction(ActionModel action, ActionModel otherAction, LuaSkillTargetType skillTargetType) {
+		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
+		actionManager.CutInActionPrevOtherAction(action.ref_action, skillTargetType.ref_enum, otherAction.ref_action);
+	}
+	
+	[LuaMember("CutInDefenseActionForcely")]
+	public static void CutInDefenseActionForcely(ActionModel action, bool first) {
+		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
+		actionManager.CutInDefenseActionForcely(action.ref_action, first);
+	}
+	
 	[LuaMember("AddUniqueCutIn")]
 	public static void AddUniqueCutIn(string uniqueCutIn, ActionModel action) {
 		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
 		if (uniqueCutIn == "None") actionManager.AddUniqueCutIn(UniqueCutInTiming.None, action.ref_action);
 		else if (uniqueCutIn == "JudgeDuelResult") actionManager.AddUniqueCutIn(UniqueCutInTiming.JudgeDuelResult, action.ref_action);
+	}
+	
+	[LuaMember("ReserveToCutInActionUntilStartRunBattle")]
+	public static void ReserveToCutInActionUntilStartRunBattle(ReserveCutInActionType reserveType, ActionModel action, bool removeDuel) {
+		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
+		actionManager.ReserveToCutInActionUntilStartRunBattle(action.ref_action, reserveType.ref_enum, removeDuel);
 	}
 }
 
@@ -655,7 +682,7 @@ public partial class EventTiming
 	}
 	
 	[LuaMember("ToString")]
-	public string KeywordToString(int integ) {
+	public string KeywordToString() {
 		return ref_timing.ToString();
 	}
 }
@@ -682,7 +709,7 @@ public partial class DamageSourceType
 	}
 	
 	[LuaMember("ToString")]
-	public string KeywordToString(int integ) {
+	public string KeywordToString() {
 		return ref_dmgSrcType.ToString();
 	}
 }
@@ -709,8 +736,76 @@ public partial class AbilitySourceType
 	}
 	
 	[LuaMember("ToString")]
-	public string KeywordToString(int integ) {
+	public string KeywordToString() {
 		return ref_abilitySrcType.ToString();
+	}
+}
+
+[LuaObject]
+public partial class ReserveCutInActionType
+{
+	public BattleActionModelManager.RESERVE_CUT_IN_ACTION_TYPE ref_enum = BattleActionModelManager.RESERVE_CUT_IN_ACTION_TYPE.NONE;
+	
+	[LuaMember("CreateFromString")]
+	public static ReserveCutInActionType CreateFromString(string s) {
+		ReserveCutInActionType new_self = new();
+		if (Enum.TryParse(s, true, out BattleActionModelManager.RESERVE_CUT_IN_ACTION_TYPE result)) {
+			new_self.ref_enum = result;
+		}
+		return new_self;
+	}
+	
+	[LuaMember("CreateFromInt")]
+	public static ReserveCutInActionType CreateFromInt(int integ) {
+		return new ReserveCutInActionType {
+			ref_enum = (BattleActionModelManager.RESERVE_CUT_IN_ACTION_TYPE)integ
+		};
+	}
+	
+	[LuaMember("ToString")]
+	public string KeywordToString() {
+		return ref_enum.ToString();
+	}
+	
+	[LuaMember("PrintAllEnumValues")]
+	public void PrintAllEnumValues() {
+		foreach (string keyname in Il2CppSystem.Enum.GetNames(Il2CppType.Of<BattleActionModelManager.RESERVE_CUT_IN_ACTION_TYPE>())) {
+			MainClass.LogModular("RESERVE_CUT_IN_ACTION_TYPE: " + keyname, true);
+		}
+	}
+}
+
+[LuaObject]
+public partial class LuaSkillTargetType
+{
+	public SKILL_TARGET_TYPE ref_enum = SKILL_TARGET_TYPE.NONE;
+	
+	[LuaMember("CreateFromString")]
+	public static LuaSkillTargetType CreateFromString(string s) {
+		LuaSkillTargetType new_self = new();
+		if (Enum.TryParse(s, true, out SKILL_TARGET_TYPE result)) {
+			new_self.ref_enum = result;
+		}
+		return new_self;
+	}
+	
+	[LuaMember("CreateFromInt")]
+	public static LuaSkillTargetType CreateFromInt(int integ) {
+		return new LuaSkillTargetType {
+			ref_enum = (SKILL_TARGET_TYPE)integ
+		};
+	}
+	
+	[LuaMember("ToString")]
+	public string KeywordToString() {
+		return ref_enum.ToString();
+	}
+	
+	[LuaMember("PrintAllEnumValues")]
+	public void PrintAllEnumValues() {
+		foreach (string keyname in Il2CppSystem.Enum.GetNames(Il2CppType.Of<SKILL_TARGET_TYPE>())) {
+			MainClass.LogModular("SKILL_TARGET_TYPE: " + keyname, true);
+		}
 	}
 }
 

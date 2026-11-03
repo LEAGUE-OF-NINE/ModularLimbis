@@ -197,6 +197,50 @@ function AbilitySourceType.CreateFromInt(integ) end
 ---@return string
 function AbilitySourceType:ToString() end
 
+--- Can be instanced to store a RESERVE_CUT_IN_ACTION_TYPE enum.
+---@class ReserveCutInActionType
+ReserveCutInActionType = {}
+
+--- Creates a new ReserveCutInActionType instance that internally stores a RESERVE_CUT_IN_ACTION_TYPE enum by parsing a string.
+---@param s string
+---@return ReserveCutInActionType
+function ReserveCutInActionType.CreateFromString(s) end
+
+--- Creates a new ReserveCutInActionType instance that internally stores a RESERVE_CUT_IN_ACTION_TYPE enum by casting an int.
+---@param integ integer
+---@return ReserveCutInActionType
+function ReserveCutInActionType.CreateFromInt(integ) end
+
+--- Returns a string of the stored RESERVE_CUT_IN_ACTION_TYPE.
+---@return string
+function ReserveCutInActionType:ToString() end
+
+--- Prints all in-game RESERVE_CUT_IN_ACTION_TYPE enum values to the Console.
+---@return nil
+function ReserveCutInActionType:PrintAllEnumValues() end
+
+--- Can be instanced to store a SKILL_TARGET_TYPE enum.
+---@class SkillTargetType
+SkillTargetType = {}
+
+--- Creates a new SkillTargetType instance that internally stores a SKILL_TARGET_TYPE enum by parsing a string.
+---@param s string
+---@return SkillTargetType
+function SkillTargetType.CreateFromString(s) end
+
+--- Creates a new SkillTargetType instance that internally stores a SKILL_TARGET_TYPE enum by casting an int.
+---@param integ integer
+---@return SkillTargetType
+function SkillTargetType.CreateFromInt(integ) end
+
+--- Returns a string of the stored SKILL_TARGET_TYPE.
+---@return string
+function SkillTargetType:ToString() end
+
+--- Prints all in-game SKILL_TARGET_TYPE enum values to the Console.
+---@return nil
+function SkillTargetType:PrintAllEnumValues() end
+
 --- 0 = "Player", 1 = "Enemy", 2 = "None".
 ---@alias UnitFaction
 ---| 0
@@ -295,14 +339,41 @@ function ActionModelManager.AddDuel(action1, action2) end
 ---@return nil
 function ActionModelManager.AddAction(action) end
 
+---@param action ActionModel
+---@param skillTargetType SkillTargetType
+---@param lastOrFirst ModeLastOrFirst
+---@return nil
+function ActionModelManager.CutInAction(action, skillTargetType, lastOrFirst) end
+
+---@alias ModeLastOrFirst
+---| "Last"
+---| "First"
+
+---@param action ActionModel
+---@param otherAction ActionModel
+---@param skillTargetType SkillTargetType
+---@return nil
+function ActionModelManager.CutInActionPrevOtherAction(action, otherAction, skillTargetType) end
+
+---@param action ActionModel
+---@param first boolean
+---@return nil
+function ActionModelManager.CutInDefenseActionForcely(action, first) end
+
 ---@param uniqueCutIn UniqueCutInTiming
 ---@param action ActionModel
 ---@return nil
 function ActionModelManager.AddUniqueCutIn(uniqueCutIn, action) end
 
 ---@alias UniqueCutInTiming
----| "main_only"
----| "main_and_sub"
+---| "None"
+---| "JudgeDuelResult"
+
+---@param reserveType ReserveCutInActionType
+---@param action ActionModel
+---@param removeDuel boolean Default: false
+---@return nil
+function ActionModelManager.ReserveToCutInActionUntilStartRunBattle(reserveType, action, removeDuel) end
 
 --- Can be instanced to store a BATTLE_EVENT_TIMING enum.
 ---@class EventTiming

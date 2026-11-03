@@ -1396,6 +1396,10 @@ public class ModularSA : Il2CppSystem.Object
 		state.Environment["BattleObjectManager"] = new LuaBattleObjectManager();
 		state.Environment["ActionModelManager"] = new LuaActionModelManager();
 		state.Environment["EventTiming"] = new EventTiming();
+		state.Environment["DamageSourceType"] = new DamageSourceType();
+		state.Environment["AbilitySourceType"] = new AbilitySourceType();
+		state.Environment["ReserveCutInActionType"] = new ReserveCutInActionType();
+		state.Environment["SkillTargetType"] = new LuaSkillTargetType();
 	}
 
 	public static BattleUnitModel_Abnormality AsAbnormalityModel(BattleUnitModel targetModel)
