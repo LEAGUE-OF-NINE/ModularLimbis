@@ -694,9 +694,7 @@ public partial class EventTiming
 	}
 	
 	[LuaMember("ToString")]
-	public string KeywordToString() {
-		return ref_timing.ToString();
-	}
+	public string KeywordToString() => ref_timing.ToString();
 }
 
 [LuaObject]
@@ -1020,21 +1018,16 @@ public partial class LuaCoinModel
 public partial class LuaSkillModel
 {
 	public SkillModel ref_skill = null;
-	public LuaSkillModel(SkillModel x) {
-		ref_skill = x;
-	}
+	public LuaSkillModel(SkillModel x) => ref_skill = x;
 	
 	[LuaMember("IsNull")]
-	public bool IsNull() {
-		return ref_skill == null;
-	}
+	public bool IsNull() => ref_skill == null;
 	
 	[LuaMember("FetchAllModsa")]
 	public LuaTable FetchAllModsa(bool fast_no_copy) {
 		List<ModularSA> modsa_list = null;
 		if (fast_no_copy) modsa_list = SkillScriptInitPatch.GetAllModsaFromSkillModel_Fast(ref_skill);
 		else modsa_list = SkillScriptInitPatch.GetAllModsaFromSkillModel(ref_skill);
-		
 		int count = modsa_list.Count;
 		LuaTable table = new(count,0);
 		for (int i = 0; i < count; i++) {
@@ -1054,6 +1047,11 @@ public partial class LuaSkillModel
 	
 	[LuaMember("FetchAtkType")]
 	public LuaAtkType FetchAtkType() => new LuaAtkType{ ref_enum = ref_skill.GetAttackType()};
+	
+	[LuaMember("ReRollCoin")]
+	public void ReRollCoin(ActionModel action, LuaCoinModel coin, EventTiming timing) {
+		ref_skill.ReRollCoin(action.ref_action, coin.ref_coin, timing.ref_timing);
+	}
 }
 
 [LuaObject]
