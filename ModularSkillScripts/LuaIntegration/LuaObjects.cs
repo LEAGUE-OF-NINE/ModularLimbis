@@ -360,6 +360,9 @@ public partial class UnitModel
 		return ref_unitModel.GetActivatedBuffTurn(bufCategory.ref_buf_category, exception_struct);
 	}
 	
+	[LuaMember("FetchResistDetail")]
+	public LuaResistDetail FetchResistDetail() => new(ref_unitModel._resistDetail);
+	
 	[LuaMember("FetchActionModelList")]
 	public LuaTable FetchActionModelList(bool sorted) {
 		List<BattleActionModel> action_list = sorted ? ref_unitModel.GetSortedActionList() : ref_unitModel._actionList;
@@ -1116,6 +1119,99 @@ public partial class LuaUnitSinModel
 	[LuaMember("SetCurrentAction")]
 	public void SetCurrentAction(ActionModel actionModel) {
 		ref_unitSin._currentAction = actionModel.ref_action;
+	}
+}
+
+[LuaObject]
+public partial class LuaResistDetail
+{
+	public ResistDetail ref_resdet = null;
+	public LuaResistDetail(ResistDetail x) => ref_resdet = x;
+	
+	[LuaMember("atkResistList")]
+	public LuaTable atkResistList {
+		get
+		{
+			List<ATKResistData> list = ref_resdet._atkResist;
+			int count = list.Count;
+			LuaTable table = new LuaTable(count, 0);
+			for (int i = 0; i < count; i++) {
+				table[i + 1] = new LuaATKResistData(list[i]);
+			}
+			return table;
+		}
+		set
+		{
+			int count = value.ArrayLength;
+			List<ATKResistData> list = new(count);
+			for (int i = 0; i < count; i++) {
+				LuaATKResistData luaval = value[i + 1].Read<LuaATKResistData>();
+				list.Add(luaval.ref_data);
+			}
+			ref_resdet._atkResist = list;
+		}
+	}
+	
+	[LuaMember("attributeResistList")]
+	public LuaTable attributeResistList {
+		get
+		{
+			List<AttributeResistData> list = ref_resdet._attributeResist;
+			int count = list.Count;
+			LuaTable table = new LuaTable(count, 0);
+			for (int i = 0; i < count; i++) {
+				table[i + 1] = new LuaAttributeResistData(list[i]);
+			}
+			return table;
+		}
+		set
+		{
+			int count = value.ArrayLength;
+			List<AttributeResistData> list = new(count);
+			for (int i = 0; i < count; i++) {
+				LuaAttributeResistData luaval = value[i + 1].Read<LuaAttributeResistData>();
+				list.Add(luaval.ref_data);
+			}
+			ref_resdet._attributeResist = list;
+		}
+	}
+}
+
+[LuaObject]
+public partial class LuaATKResistData
+{
+	public ATKResistData ref_data = null;
+	public LuaATKResistData(ATKResistData x) => ref_data = x;
+	
+	[LuaMember("atkType")]
+	public LuaAtkType atkType {
+		get => new() { ref_enum = ref_data._type};
+		set => ref_data._type = value.ref_enum;
+	}
+	
+	[LuaMember("resistanceValue")]
+	public double resistanceValue {
+		get => ref_data.value;
+		set => ref_data.value = (float)value;
+	}
+}
+
+[LuaObject]
+public partial class LuaAttributeResistData
+{
+	public AttributeResistData ref_data = null;
+	public LuaAttributeResistData(AttributeResistData x) => ref_data = x;
+	
+	[LuaMember("sinType")]
+	public LuaAttributeType sinType {
+		get => new() { ref_enum = ref_data._type};
+		set => ref_data._type = value.ref_enum;
+	}
+	
+	[LuaMember("resistanceValue")]
+	public double resistanceValue {
+		get => ref_data.value;
+		set => ref_data.value = (float)value;
 	}
 }
 

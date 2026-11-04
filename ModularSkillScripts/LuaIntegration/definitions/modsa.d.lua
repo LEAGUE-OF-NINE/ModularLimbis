@@ -783,6 +783,24 @@ function UnitSinModel:FetchCurrentAction() end
 ---@return nil
 function UnitSinModel:SetCurrentAction(action) end
 
+--- Internally Stores a vanilla ResistDetail.
+---@class ResistDetail
+---@field atkResistList ATKResistData[]
+---@field attributeResistList AttributeResistData[]
+ResistDetail = {}
+
+--- Internally Stores a vanilla ATKResistData.
+---@class ATKResistData
+---@field atkType AtkType
+---@field resistanceValue number
+ATKResistData = {}
+
+--- Internally Stores a vanilla AttributeResistData.
+---@class AttributeResistData
+---@field sinType AttributeType
+---@field resistanceValue number
+AttributeResistData = {}
+
 --- Internally Stores a vanilla BattleUnitView.
 ---@class UnitView
 UnitView = {}

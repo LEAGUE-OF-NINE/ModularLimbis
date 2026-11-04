@@ -33,6 +33,7 @@ public class ConsequenceOverwriteAtkResist : IModularConsequence
         foreach (BattleUnitModel targetModel in modelList)
         {
             var currentRes = targetModel._resistDetail._atkResist;
+            targetModel._resistDetail.
             foreach (var res in currentRes)
             {
                 if (res.Type == atkType)
