@@ -365,6 +365,7 @@ public class SkillScriptInitPatch
 	public static Dictionary<long, List<ModularSA>> modpaDict = new();
 	public static Dictionary<long, List<ModularSA>> modcaDict = new();
 	public static Dictionary<long, List<ModularSA>> modbaDict = new();
+	public static System.Collections.Generic.Dictionary<int, (int Min, int Max)> gateSPDict = new();
 	public static Dictionary<long, ModUnitData> unitMod_list = new();
 	public static LuaTable complex_lua_encounter_data = new();
 	public static List<long> skillPtrsRoundStart = new();
