@@ -311,6 +311,8 @@ public class MainClass : BasePlugin
 		consequenceDict["BETAtrigdata"] = new ConsequenceTrigData();
 		consequenceDict["unitcutscene"] = new ConsequenceUnitCutscene();
 		consequenceDict["othermodsavalue"] = new ConsequenceOtherModsaValue();
+		consequenceDict["worldposition"] = new ConsequenceSetPosition();
+		consequenceDict["gatesp"] = new ConsequenceGateSP();
 		// legacy consequences
 		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
 		consequenceDict["buf"] = new ConsequenceBuf();
