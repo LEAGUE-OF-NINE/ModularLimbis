@@ -524,7 +524,12 @@ function UnitModel:HP() end
 function UnitModel:MaxHP() end
 
 ---@return integer
+---@nodiscard
 function UnitModel:Speed() end
+
+function UnitModel:RefreshSpeed() end
+
+function UnitModel:RefreshState() end
 
 --- Retruns the pattern idx. Please for the love of god make sure this is an abno core OR part (at least for now)
 ---@return integer
