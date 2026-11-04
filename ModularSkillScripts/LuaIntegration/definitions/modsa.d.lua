@@ -837,9 +837,6 @@ function UTransform:SetParent(parent, worldPositionStays) end
 ---@field x number
 ---@field y number
 ---@field z number
----@operator add(Vec3): Vec3
----@operator sub(Vec3): Vec3
----@operator mul(number): Vec3
 Vec3 = {}
 
 ---@param x number
@@ -853,6 +850,24 @@ function Vec3.CreateFromFloats(x, y, z) end
 ---@return Vec3
 ---@nodiscard
 function Vec3.CreateNormalized(vec) end
+
+---@param a Vec3
+---@param b Vec3
+---@return Vec3
+---@nodiscard
+function Vec3.Add(a, b) end
+
+---@param a Vec3
+---@param b Vec3
+---@return Vec3
+---@nodiscard
+function Vec3.Sub(a, b) end
+
+---@param a Vec3
+---@param scalar number
+---@return Vec3
+---@nodiscard
+function Vec3.Mul(a, scalar) end
 
 --- Unlike every other Vec3 method or operation, this directly modifies the reference you're using.
 function Vec3:Normalize() end

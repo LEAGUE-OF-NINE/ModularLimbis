@@ -1236,11 +1236,11 @@ public partial class LuaVector3
 		ref_vec = Vector3.Normalize(ref_vec);
 	}
 	
-	[LuaMetamethod(LuaObjectMetamethod.Add)]
+	[LuaMember("Add")]
 	public static LuaVector3 Add(LuaVector3 a, LuaVector3 b) => new(a.ref_vec + b.ref_vec);
-	[LuaMetamethod(LuaObjectMetamethod.Sub)]
+	[LuaMember("Sub")]
 	public static LuaVector3 Sub(LuaVector3 a, LuaVector3 b) => new(a.ref_vec - b.ref_vec);
-	[LuaMetamethod(LuaObjectMetamethod.Mul)]
+	[LuaMember("Mul")]
 	public static LuaVector3 Mul(LuaVector3 a, double scalar) => new(a.ref_vec * (float)scalar);
 	
 }
