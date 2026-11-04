@@ -17,7 +17,8 @@ internal class StagePatches
 	{
 		MainClass.CheckLoggingBoolean();
 		SkillScriptInitPatch.ResetAllModsa();
-
+		SkillScriptInitPatch.gateSPDict.Clear();
+		
 		extraSlot = 0;
 		instantslot = false;
 		doubleslotterIDList.Clear();
