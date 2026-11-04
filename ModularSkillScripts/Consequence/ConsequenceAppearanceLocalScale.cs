@@ -22,7 +22,7 @@ public class ConsequenceAppearanceLocalScale : IModularConsequence
 			
 		BattleObjectManager objManager = SingletonBehavior<BattleObjectManager>.Instance;
 		CharacterAppearance aper = objManager.GetViewAppaearance(unit);
-		aper.transform.localScale = vec3;
+		aper.transform.scale = vec3;
 			
 		/*
 		MainClass.Logg.LogInfo("rot1: " + aper.transform.localEulerAngles);

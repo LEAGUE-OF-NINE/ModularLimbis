@@ -5,7 +5,9 @@ using Il2CppSystem.Collections.Generic;
 using Lethe.EnumInjections;
 using Lua;
 using ModularSkillScripts.Patches;
+using SD;
 using Unity.Collections;
+using UnityEngine;
 
 namespace ModularSkillScripts.LuaIntegration;
 
@@ -529,58 +531,6 @@ public partial class BufCategory
 	[LuaMember("ToString")]
 	public string KeywordToString() {
 		return ref_buf_category.ToString();
-	}
-}
-
-/*
-[LuaObject]
-public partial class BufManager
-{
-	[LuaMember("CompareBufKeyword")]
-	public static bool CompareBufKeyword(BufKeyword keyword_main, BufKeyword keyword_another, string mode_s) {
-		if (mode_s == "main_and_sub") {
-			BattleUnitBuffManager bufManager = Singleton<BattleUnitBuffManager>.Instance;
-			return bufManager.HasKeyword(keyword_main.ref_buf_keyword, keyword_another.ref_buf_keyword);
-		}
-		return keyword_main.ref_buf_keyword == keyword_another.ref_buf_keyword;
-	}
-	
-	[LuaMember("KeywordHasCategory")]
-	public static bool KeywordHasCategory(BufKeyword keyword_main, BufCategory category_another) {
-		BattleUnitBuffManager bufManager = Singleton<BattleUnitBuffManager>.Instance;
-		return bufManager.HasCategory(keyword_main.ref_buf_keyword, category_another.ref_buf_category);
-	}
-}*/
-
-
-[LuaObject]
-public partial class LuaBattleObjectManager
-{
-	[LuaMember("GetAliveList")]
-	public static LuaTable GetAliveList(bool include_assistance, int faction_int) {
-		UNIT_FACTION faction = (UNIT_FACTION)faction_int;
-		BattleObjectManager objManager = SingletonBehavior<BattleObjectManager>.Instance;
-		List<BattleUnitModel> unit_list = objManager.GetAliveList(include_assistance, faction);
-		int count = unit_list.Count;
-		LuaTable table = new(count,0);
-		for (int i = 0; i < count; i++) {
-			table[i + 1] = new UnitModel(unit_list[i]);
-		}
-		return table;
-	}
-	
-	[LuaMember("GetAliveListByBuf")]
-	public static LuaTable GetAliveListByBuf(BufKeyword bufKeyword, int activeRound, bool include_assistance, int faction_int) {
-		BUFF_UNIQUE_KEYWORD keyword = bufKeyword.ref_buf_keyword;
-		UNIT_FACTION faction = (UNIT_FACTION)faction_int;
-		BattleObjectManager objManager = SingletonBehavior<BattleObjectManager>.Instance;
-		List<BattleUnitModel> unit_list = objManager.GetAliveList(keyword, activeRound, include_assistance, faction);
-		int count = unit_list.Count;
-		LuaTable table = new(count,0);
-		for (int i = 0; i < count; i++) {
-			table[i + 1] = new UnitModel(unit_list[i]);
-		}
-		return table;
 	}
 }
 
@@ -1167,6 +1117,132 @@ public partial class LuaUnitSinModel
 	public void SetCurrentAction(ActionModel actionModel) {
 		ref_unitSin._currentAction = actionModel.ref_action;
 	}
+}
+
+[LuaObject]
+public partial class LuaUnitView
+{
+	public BattleUnitView ref_view = null;
+	public LuaUnitView(BattleUnitView x) {
+		ref_view = x;
+	}
+	[LuaMember("IsNull")]
+	public bool IsNull() => !ref_view;
+	[LuaMember("FetchTransform")]
+	public LuaUnityTransform FetchTransform() => new(ref_view.transform);
+	
+	[LuaMember("FetchAppearance")]
+	public LuaCharAppearance FetchAppearance() => new(ref_view.Appearance);
+}
+
+[LuaObject]
+public partial class LuaCharAppearance
+{
+	public CharacterAppearance ref_appear = null;
+	public LuaCharAppearance(CharacterAppearance x) {
+		ref_appear = x;
+	}
+	[LuaMember("IsNull")]
+	public bool IsNull() => !ref_appear;
+	[LuaMember("FetchTransform")]
+	public LuaUnityTransform FetchTransform() => new(ref_appear.transform);
+}
+
+[LuaObject]
+public partial class LuaUnityTransform
+{
+	public Transform ref_transform = null;
+	public LuaUnityTransform(Transform x) {
+		ref_transform = x;
+	}
+	[LuaMember("IsNull")]
+	public bool IsNull() => !ref_transform;
+	
+	[LuaMember("FetchParent")]
+	public LuaUnityTransform FetchParent() => new(ref_transform.parent);
+	[LuaMember("SetParent")]
+	public void SetParent(LuaUnityTransform parent, bool worldPositionStays) {
+		ref_transform.SetParent(parent.ref_transform, worldPositionStays);
+	}
+	
+	[LuaMember("localEuler")]
+	public LuaVector3 localEuler {
+		get => new(ref_transform.localEulerAngles);
+		set => ref_transform.localEulerAngles = value.ref_vec;
+	}
+	[LuaMember("globalEuler")]
+	public LuaVector3 globalEuler {
+		get => new(ref_transform.eulerAngles);
+		set => ref_transform.eulerAngles = value.ref_vec;
+	}
+	
+	[LuaMember("localScale")]
+	public LuaVector3 localScale {
+		get => new(ref_transform.localScale);
+		set => ref_transform.localScale = value.ref_vec;
+	}
+	
+	[LuaMember("localPos")]
+	public LuaVector3 localPos {
+		get => new(ref_transform.localPosition);
+		set => ref_transform.localPosition = value.ref_vec;
+	}
+	[LuaMember("globalPos")]
+	public LuaVector3 globalPos {
+		get => new(ref_transform.position);
+		set => ref_transform.position = value.ref_vec;
+	}
+}
+
+[LuaObject]
+public partial class LuaVector3
+{
+	public Vector3 ref_vec;
+
+	public LuaVector3(Vector3 fromVec) {
+		ref_vec = fromVec;
+	}
+
+	public LuaVector3(float x, float y, float z) {
+		ref_vec = new Vector3(x, y, z);
+	}	
+	
+	[LuaMember("x")]
+	public float x {
+		get => ref_vec.x;
+		set => ref_vec = ref_vec with { x = value };
+	}
+
+	[LuaMember("y")]
+	public float y {
+		get => ref_vec.y;
+		set => ref_vec = ref_vec with { y = value };
+	}
+
+	[LuaMember("z")]
+	public float z {
+		get => ref_vec.z;
+		set => ref_vec = ref_vec with { z = value };
+	}
+
+	[LuaMember("CreateFromFloats")]
+	public static LuaVector3 CreateFromFloats(double x, double y, double z) => new((float)x, (float)y, (float)z);
+
+	[LuaMember("CreateNormalized")]
+	public static LuaVector3 CreateNormalized(LuaVector3 vec) => new(Vector3.Normalize(vec.ref_vec));
+	
+	[LuaMember("Normalize")]
+	public void Normalize() {
+		ref_vec = Vector3.Normalize(ref_vec);
+	}
+	
+	[LuaMetamethod(LuaObjectMetamethod.Add)]
+	public static LuaVector3 Add(LuaVector3 a, LuaVector3 b) => new(a.ref_vec + b.ref_vec);
+	[LuaMetamethod(LuaObjectMetamethod.Sub)]
+	public static LuaVector3 Sub(LuaVector3 a, LuaVector3 b) => new(a.ref_vec - b.ref_vec);
+	[LuaMetamethod(LuaObjectMetamethod.Mul)]
+	public static LuaVector3 Mul(LuaVector3 a, double scalar) => new(a.ref_vec * (float)scalar);
+	
 }
 
 [LuaObject]

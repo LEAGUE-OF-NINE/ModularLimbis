@@ -1393,8 +1393,6 @@ public class ModularSA : Il2CppSystem.Object
 		state.Environment["ModularUtil"] = new LuaModularUtil();
 		state.Environment["BufKeyword"] = new BufKeyword();
 		state.Environment["BufCategory"] = new BufCategory();
-		//state.Environment["BufManager"] = new BufManager();
-		state.Environment["BattleObjectManager"] = new LuaBattleObjectManager();
 		state.Environment["ActionModelManager"] = new LuaActionModelManager();
 		state.Environment["EventTiming"] = new EventTiming();
 		state.Environment["DamageSourceType"] = new DamageSourceType();
@@ -1403,9 +1401,11 @@ public class ModularSA : Il2CppSystem.Object
 		state.Environment["SkillTargetType"] = new LuaSkillTargetType();
 		state.Environment["AttributeType"] = new LuaAttributeType();
 		state.Environment["AtkType"] = new LuaAtkType();
+		state.Environment["Vec3"] = new LuaVector3(0,0,0);
 		
 		LuaFunctions.MergeFunctionArrayToLuaState("ModularUtil", state, LuaFunctions.Instance.F_Util);
 		LuaFunctions.MergeFunctionArrayToLuaState("BufManager", state, LuaFunctions.Instance.F_BufManager);
+		LuaFunctions.MergeFunctionArrayToLuaState("BattleObjectManager", state, LuaFunctions.Instance.F_BattleObjManager);
 	}
 
 	public static BattleUnitModel_Abnormality AsAbnormalityModel(BattleUnitModel targetModel)

@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Il2CppSystem.Collections.Generic;
 using Lua;
 using Lua.Standard;
 using ModularSkillScripts.Patches;
@@ -13,6 +14,7 @@ public sealed class LuaFunctions
 	public static LuaFunctions Instance = new();
 	public readonly Lua.LuaFunction[] F_Util;
 	public readonly Lua.LuaFunction[] F_BufManager;
+	public readonly Lua.LuaFunction[] F_BattleObjManager;
 
   public LuaFunctions()
   {
@@ -26,6 +28,12 @@ public sealed class LuaFunctions
 	  [
 		  new Lua.LuaFunction("CompareBufKeyword", BufManager_CompareBufKeyword),
 		  new Lua.LuaFunction("KeywordHasCategory", BufManager_KeywordHasCategory)
+	  ];
+	  F_BattleObjManager =
+	  [
+		  new Lua.LuaFunction("GetAliveList", BattleObjectManager_GetAliveList),
+		  new Lua.LuaFunction("GetAliveListByBuf", BattleObjectManager_GetAliveListByBuf),
+		  new Lua.LuaFunction("GetView", BattleObjectManager_GetView)
 	  ];
   }
 
@@ -99,6 +107,67 @@ public sealed class LuaFunctions
 		
 		BattleUnitBuffManager bufManager = Singleton<BattleUnitBuffManager>.Instance;
 		buffer.Span[0] = bufManager.HasCategory(keyword_main.ref_buf_keyword, category_another.ref_buf_category);
+		return new ValueTask<int>(1);
+	}
+	
+	public ValueTask<int> BattleObjectManager_GetAliveList(
+		LuaFunctionExecutionContext context,
+		Memory<LuaValue> buffer,
+		CancellationToken cancellationToken)
+	{
+		bool include_assistance = context.GetArgument<bool>(0);
+		int faction_int = context.GetArgument<int>(1);
+		
+		UNIT_FACTION faction = (UNIT_FACTION)faction_int;
+		BattleObjectManager objManager = SingletonBehavior<BattleObjectManager>.Instance;
+		List<BattleUnitModel> unit_list = objManager.GetAliveList(include_assistance, faction);
+		int count = unit_list.Count;
+		LuaTable table = new(count,0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = new UnitModel(unit_list[i]);
+		}
+		buffer.Span[0] = table;
+		return new ValueTask<int>(1);
+	}
+	
+	public ValueTask<int> BattleObjectManager_GetAliveListByBuf(
+		LuaFunctionExecutionContext context,
+		Memory<LuaValue> buffer,
+		CancellationToken cancellationToken)
+	{
+		BufKeyword bufKeyword = context.GetArgument<BufKeyword>(0);
+		int activeRound = context.GetArgument<int>(1);
+		bool include_assistance = context.GetArgument<bool>(2);
+		int faction_int = context.GetArgument<int>(3);
+		
+		BUFF_UNIQUE_KEYWORD keyword = bufKeyword.ref_buf_keyword;
+		UNIT_FACTION faction = (UNIT_FACTION)faction_int;
+		BattleObjectManager objManager = SingletonBehavior<BattleObjectManager>.Instance;
+		List<BattleUnitModel> unit_list = objManager.GetAliveList(keyword, activeRound, include_assistance, faction);
+		int count = unit_list.Count;
+		LuaTable table = new(count,0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = new UnitModel(unit_list[i]);
+		}
+		buffer.Span[0] = table;
+		return new ValueTask<int>(1);
+	}
+	
+	public ValueTask<int> BattleObjectManager_GetView(
+		LuaFunctionExecutionContext context,
+		Memory<LuaValue> buffer,
+		CancellationToken cancellationToken)
+	{
+		BattleObjectManager objManager = SingletonBehavior<BattleObjectManager>.Instance;
+		BattleUnitView view = null;
+		LuaValue arg = context.GetArgument(0);
+		if (arg.TryRead(out int instID)) {
+			view = objManager.GetView(instID);
+		} else if (arg.TryRead(out UnitModel unit)) {
+			view = objManager.GetView(unit.ref_unitModel);
+		}
+		LuaUnitView luaView = new(view);
+		buffer.Span[0] = luaView;
 		return new ValueTask<int>(1);
 	}
 	

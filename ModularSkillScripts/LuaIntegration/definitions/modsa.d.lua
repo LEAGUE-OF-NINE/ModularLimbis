@@ -384,6 +384,11 @@ function BattleObjectManager.GetAliveList(include_assistance, faction) end
 ---@return UnitModel[]
 function BattleObjectManager.GetAliveListByBuff(bufKeyword, activeRound, include_assistance, faction) end
 
+---@param unitOrInstID UnitModel|integer
+---@return UnitView
+---@nodiscard
+function BattleObjectManager.GetView(unitOrInstID) end
+
 --- Static Method Interface for BattleActionModelManager.
 ---@class ActionModelManager
 ActionModelManager = {}
@@ -777,3 +782,77 @@ function UnitSinModel:FetchCurrentAction() end
 ---@param action ActionModel
 ---@return nil
 function UnitSinModel:SetCurrentAction(action) end
+
+--- Internally Stores a vanilla BattleUnitView.
+---@class UnitView
+UnitView = {}
+
+--- Checks if internal BattleUnitView reference is null.
+---@return boolean
+function UnitView:IsNull() end
+
+---@return UTransform
+---@nodiscard
+function UnitView:FetchTransform() end
+
+---@return CharAppearance
+---@nodiscard
+function UnitView:FetchAppearance() end
+
+--- Internally Stores a vanilla CharacterAppearance.
+---@class CharAppearance
+CharAppearance = {}
+
+--- Checks if internal CharacterAppearance reference is null.
+---@return boolean
+function CharAppearance:IsNull() end
+
+---@return UTransform
+---@nodiscard
+function CharAppearance:FetchTransform() end
+
+--- Internally Stores a Unity Transform object.
+---@class UTransform
+---@field localEuler Vec3
+---@field globalEuler Vec3
+---@field localScale Vec3
+---@field localPos Vec3
+---@field globalPos Vec3
+UTransform = {}
+
+--- Checks if internal Transform reference is null.
+---@return boolean
+function UTransform:IsNull() end
+
+---@return UTransform
+function UTransform:FetchParent() end
+
+---@param parent UTransform
+---@param worldPositionStays boolean
+---@return UTransform
+function UTransform:SetParent(parent, worldPositionStays) end
+
+--- Internally Stores a Unity Vector3.
+---@class Vec3
+---@field x number
+---@field y number
+---@field z number
+---@operator add(Vec3): Vec3
+---@operator sub(Vec3): Vec3
+---@operator mul(number): Vec3
+Vec3 = {}
+
+---@param x number
+---@param y number
+---@param z number
+---@return Vec3
+---@nodiscard
+function Vec3.CreateFromFloats(x, y, z) end
+
+---@param vec Vec3
+---@return Vec3
+---@nodiscard
+function Vec3.CreateNormalized(vec) end
+
+--- Unlike every other Vec3 method or operation, this directly modifies the reference you're using.
+function Vec3:Normalize() end
