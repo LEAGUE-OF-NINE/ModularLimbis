@@ -261,6 +261,11 @@ public partial class UnitModel
 	[LuaMember("Speed")]
 	public int Speed() => ref_unitModel.GetIntegerOfOriginSpeed();
 	
+	[LuaMember("RefreshSpeed")]
+	public void RefreshSpeed() => ref_unitModel.RefreshSpeed();
+	[LuaMember("RefreshState")]
+	public void RefreshState() => ref_unitModel.RefreshState();
+	
 	[LuaMember("GetPatternIdx")]
 	public int GetPatternIdx() {
 		PatternScript_Abnormality pattern = ModularSA.AsAbnormalityModel(ref_unitModel)?.PatternScript;
