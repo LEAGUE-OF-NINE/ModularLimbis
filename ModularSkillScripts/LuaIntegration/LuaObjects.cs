@@ -83,8 +83,8 @@ public partial class ModsaInterface
 	}
 	
 	[LuaMember("FetchModsaCoinModel")]
-	public CoinModel FetchModsaCoinModel() {
-		return new CoinModel(ref_modsa.modsa_coinModel);
+	public LuaCoinModel FetchModsaCoinModel() {
+		return new LuaCoinModel(ref_modsa.modsa_coinModel);
 	}
 	
 	[LuaMember("FetchSingleUnit")]
@@ -984,10 +984,10 @@ public partial class ActionModel
 }
 
 [LuaObject]
-public partial class CoinModel
+public partial class LuaCoinModel
 {
-	public global::CoinModel ref_coin = null;
-	public CoinModel(global::CoinModel x) {
+	public CoinModel ref_coin = null;
+	public LuaCoinModel(CoinModel x) {
 		ref_coin = x;
 	}
 	
@@ -1350,7 +1350,7 @@ public partial class LuaVector3
 public partial class PacketChangeTakeDamage
 {
 	public BattleActionModel action = null;
-	public global::CoinModel coin = null;
+	public CoinModel coin = null;
 	public DAMAGE_SOURCE_TYPE dmgSrcType = DAMAGE_SOURCE_TYPE.NONE;
 	public BUFF_UNIQUE_KEYWORD keyword = BUFF_UNIQUE_KEYWORD.None;
 
@@ -1359,8 +1359,8 @@ public partial class PacketChangeTakeDamage
 		return new ActionModel(action);
 	}
 	[LuaMember("FetchCoin")]
-	public CoinModel FetchCoin() {
-		return new CoinModel(coin);
+	public LuaCoinModel FetchCoin() {
+		return new LuaCoinModel(coin);
 	}
 	
 	[LuaMember("FetchDmgSrcType")]
