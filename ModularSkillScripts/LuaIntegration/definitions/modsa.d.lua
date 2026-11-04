@@ -575,8 +575,13 @@ function UnitModel:BufCheckTurn(bufKeyword, main_only) end
 ---@return integer
 function UnitModel:BufCheckTurnByCategory(bufCategory, exception_keywords) end
 
+---@return ResistDetail
+---@nodiscard
+function UnitModel:FetchResistDetail() end
+
 ---@param sorted boolean
 ---@return ActionModel[]
+---@nodiscard
 function UnitModel:FetchActionModelList(sorted) end
 
 ---@param permanent_only boolean
