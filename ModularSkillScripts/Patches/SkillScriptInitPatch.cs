@@ -1656,6 +1656,40 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 			}
 		}
 	}
+
+
+	[HarmonyPatch(typeof(ChangeStatExceptMp), nameof(ChangeStatExceptMp.ChangeMp))]
+	[HarmonyPrefix]
+	static void Prefix_ChangeMp_ExceptMp(ChangeStatExceptMp __instance, ref int newMp) => ClampChangeStat(__instance, ref newMp);
+
+	[HarmonyPatch(typeof(ChangeStatIncludeMp), nameof(ChangeStatIncludeMp.ChangeMp))]
+	[HarmonyPrefix]
+	static void Prefix_ChangeMp_IncludeMp(ChangeStatIncludeMp __instance, ref int newMp) => ClampChangeStat(__instance, ref newMp);
+
+	[HarmonyPatch(typeof(ChangeStatPart), nameof(ChangeStatPart.ChangeMp))]
+	[HarmonyPrefix]
+	static void Prefix_ChangeMp_Part(ChangeStatPart __instance, ref int newMp) => ClampChangeStat(__instance, ref newMp);
+
+	[HarmonyPatch(typeof(ChangeStatPlayer), nameof(ChangeStatPlayer.ChangeMp))]
+	[HarmonyPrefix]
+	static void Prefix_ChangeMp_Player(ChangeStatPlayer __instance, ref int newMp) => ClampChangeStat(__instance, ref newMp);
+
+	static void ClampChangeStat(ChangeStat cs, ref int newMp)
+	{
+		var u = cs._targetModel;
+		if (u == null) return;
+
+		int id = u.InstanceID;
+		if (!gateSPDict.TryGetValue(id, out var g))
+		{
+			return;
+		}
+		int before = newMp;
+		if (newMp > g.Max) newMp = g.Max;
+		if (newMp < g.Min) newMp = g.Min;
+	}
+
+
 	
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnChangeMp))]
 	[HarmonyPostfix]
