@@ -78,9 +78,10 @@ public partial class ModsaInterface
 	}
 	
 	[LuaMember("FetchModsaActionModel")]
-	public ActionModel FetchModsaActionModel() {
-		return new ActionModel(ref_modsa.modsa_selfAction);
-	}
+	public ActionModel FetchModsaActionModel() => new(ref_modsa.modsa_selfAction);
+	
+	[LuaMember("FetchModsaActionModelOpponent")]
+	public ActionModel FetchModsaActionModelOpponent() => new(ref_modsa.modsa_oppoAction);
 	
 	[LuaMember("FetchModsaCoinModel")]
 	public LuaCoinModel FetchModsaCoinModel() {
@@ -88,11 +89,7 @@ public partial class ModsaInterface
 	}
 	
 	[LuaMember("FetchSingleUnit")]
-	public UnitModel FetchSingleUnit(string find_instruction)
-	{
-		BattleUnitModel unit = ref_modsa.GetTargetModel(find_instruction);
-		return new UnitModel(unit);
-	}
+	public UnitModel FetchSingleUnit(string find_instruction) => new(ref_modsa.GetTargetModel(find_instruction));
 	
 	[LuaMember("FetchUnitList")]
 	public LuaTable FetchUnitList(string find_instruction)
@@ -365,6 +362,9 @@ public partial class UnitModel
 		return ref_unitModel.GetActivatedBuffTurn(bufCategory.ref_buf_category, exception_struct);
 	}
 	
+	[LuaMember("FetchDataModel")]
+	public LuaUnitDataModel FetchDataModel() => new(ref_unitModel._unitDataModel);
+	
 	[LuaMember("FetchResistDetail")]
 	public LuaResistDetail FetchResistDetail() => new(ref_unitModel._resistDetail);
 	
@@ -409,6 +409,45 @@ public partial class UnitModel
 		
 		return table;
 	}
+}
+
+[LuaObject]
+public partial class LuaUnitDataModel
+{
+	public UnitDataModel ref_data = null;
+	public LuaUnitDataModel(UnitDataModel x) => ref_data = x;
+	
+	[LuaMember("IsNull")]
+	public bool IsNull() => ref_data == null;
+	
+	[LuaMember("FetchStatic")]
+	public LuaUnitStatic FetchStatic() => new(ref_data._classInfo);
+
+	[LuaMember("FetchSkillModel")]
+	public LuaSkillModel FetchSkillModel(int skillID) => new(ref_data.GetSkillModel(skillID));
+
+	[LuaMember("FetchAllSkillID")]
+	public LuaTable FetchAllSkillID()
+	{
+		List<int> list = ref_data.GetSkillIds();
+		int count = list.Count;
+		LuaTable table = new(count,0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = list[i];
+		}
+		return table;
+	}
+}
+
+[LuaObject]
+public partial class LuaUnitStatic
+{
+	public UnitStaticData ref_data = null;
+	public LuaUnitStatic(UnitStaticData x) => ref_data = x;
+	
+	[LuaMember("IsNull")]
+	public bool IsNull() => ref_data == null;
+	
 }
 
 [LuaObject]
@@ -985,14 +1024,44 @@ public partial class ActionModel
 public partial class LuaCoinModel
 {
 	public CoinModel ref_coin = null;
-	public LuaCoinModel(CoinModel x) {
-		ref_coin = x;
-	}
+	public LuaCoinModel(CoinModel x) => ref_coin = x;
 	
 	[LuaMember("IsNull")]
-	public bool IsNull() {
-		return ref_coin == null;
+	public bool IsNull() => ref_coin == null;
+
+	public static LuaTable MakeTable(List<CoinModel> list) {
+		int count = list.Count;
+		LuaTable table = new LuaTable(count, 0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = new LuaCoinModel(list[i]);
+		}
+		return table;
 	}
+	
+	public static List<CoinModel> UnpackTable(LuaTable table) {
+		int count = table.ArrayLength;
+		List<CoinModel> list = new(count);
+		for (int i = 0; i < count; i++) {
+			LuaCoinModel luaval = table[i + 1].Read<LuaCoinModel>();
+			list.Add(luaval.ref_coin);
+		}
+		return list;
+	}
+	
+	[LuaMember("CreateFromCoinModel")]
+	public static LuaCoinModel CreateFromCoinModel(LuaCoinModel fromCoin, bool as_reroll) {
+		CoinModel vanilla_coin = new(fromCoin.ref_coin, as_reroll);
+		return new LuaCoinModel(vanilla_coin);
+	}
+	
+	[LuaMember("CreateFromCoinData")]
+	public static LuaCoinModel CreateFromCoinData(LuaSkillCoinData fromCoin, int originCoinIndex) {
+		CoinModel vanilla_coin = new(fromCoin.ref_data, originCoinIndex);
+		return new LuaCoinModel(vanilla_coin);
+	}
+
+	[LuaMember("LuaSkillCoinData")]
+	public LuaSkillCoinData FetchData() => new(ref_coin._classInfo);
 	
 	[LuaMember("FetchAllModsa")]
 	public LuaTable FetchAllModsa(bool fast_no_copy) {
@@ -1009,8 +1078,76 @@ public partial class LuaCoinModel
 	}
 	
 	[LuaMember("GetRealCoinIndex")]
-	public int GetRealCoinIndex() {
-		return ref_coin.GetRealCoinIndex();
+	public int GetRealCoinIndex() => ref_coin.GetRealCoinIndex();
+	
+	[LuaMember("isActive")]
+	public bool isActive {
+		get => ref_coin._isActive;
+		set => ref_coin._isActive = value;
+	}
+	
+	[LuaMember("isUsableInDuel")]
+	public bool isUsableInDuel {
+		get => ref_coin._isUsableInDuel;
+		set => ref_coin._isUsableInDuel = value;
+	}
+	
+	[LuaMember("isReRolled")]
+	public bool isReRolled {
+		get => ref_coin._isReRolled;
+		set => ref_coin._isReRolled = value;
+	}
+	
+	[LuaMember("result")]
+	public int result {
+		get => (int)ref_coin._result;
+		set => ref_coin._result = (COIN_RESULT)value;
+	}
+	
+	[LuaMember("grade")]
+	public int GetGrade() => ref_coin.GetCoinGrade();
+	
+	[LuaMember("scale")]
+	public int scale {
+		get => ref_coin._scale;
+		set => ref_coin._scale = value;
+	}
+	
+	[LuaMember("operatorType")]
+	public int operatorType {
+		get => (int)ref_coin._operatorType;
+		set => ref_coin._operatorType = (OPERATOR_TYPE)value;
+	}
+}
+
+[LuaObject]
+public partial class LuaSkillCoinData
+{
+	public SkillCoinData ref_data = null;
+	public LuaSkillCoinData(SkillCoinData x) => ref_data = x;
+	
+	[LuaMember("actionIndex")]
+	public int actionIndex {
+		get => ref_data.actionIndex;
+		set => ref_data.actionIndex = value;
+	}
+	
+	[LuaMember("grade")]
+	public int grade {
+		get => ref_data.grade;
+		set => ref_data.grade = value;
+	}
+	
+	[LuaMember("scale")]
+	public int scale {
+		get => ref_data.scale;
+		set => ref_data.scale = value;
+	}
+	
+	[LuaMember("operatorType")]
+	public int operatorType {
+		get => (int)ref_data._operatorType;
+		set => ref_data._operatorType = (OPERATOR_TYPE)value;
 	}
 }
 
@@ -1048,6 +1185,18 @@ public partial class LuaSkillModel
 	[LuaMember("FetchAtkType")]
 	public LuaAtkType FetchAtkType() => new LuaAtkType{ ref_enum = ref_skill.GetAttackType()};
 	
+	[LuaMember("coinList")]
+	public LuaTable coinList {
+		get => LuaCoinModel.MakeTable(ref_skill._coinList);
+		set => ref_skill._coinList = LuaCoinModel.UnpackTable(value);
+	}
+	
+	[LuaMember("FetchCoinsUsableInDuel")]
+	public LuaTable FetchCoinsUsableInDuel() => LuaCoinModel.MakeTable(ref_skill.GetCoinsUsableInDuel());
+	
+	[LuaMember("FetchAliveCoins")]
+	public LuaTable FetchAliveCoins() => LuaCoinModel.MakeTable(ref_skill.GetAliveCoins());
+	
 	[LuaMember("ReRollCoin")]
 	public void ReRollCoin(ActionModel action, LuaCoinModel coin, EventTiming timing) {
 		ref_skill.ReRollCoin(action.ref_action, coin.ref_coin, timing.ref_timing);
@@ -1056,6 +1205,12 @@ public partial class LuaSkillModel
 	[LuaMember("CopyCoin")]
 	public void CopyCoin(ActionModel action, int idx, EventTiming timing) {
 		ref_skill.CopyCoin(action.ref_action, idx, timing.ref_timing);
+	}
+	
+	[LuaMember("AddCoin")]
+	public void AddCoin(LuaCoinModel coin, bool forcibly) {
+		if (forcibly) ref_skill.ForcelyAddCoin(coin.ref_coin);
+		else ref_skill.AddCoin(coin.ref_coin);
 	}
 }
 

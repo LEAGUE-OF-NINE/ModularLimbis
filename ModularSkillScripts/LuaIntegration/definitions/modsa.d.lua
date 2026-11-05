@@ -66,18 +66,27 @@ function ModsaInterface:ADDERSet(adder_type, amount_set) end
 ---| "headschance"
 
 ---@return UnitModel
+---@nodiscard
 function ModsaInterface:FetchModsaUnitModel() end
 
 ---@return BufModel
+---@nodiscard
 function ModsaInterface:FetchModsaBufModel() end
 
 ---@return SkillModel
+---@nodiscard
 function ModsaInterface:FetchModsaSkillModel() end
 
 ---@return ActionModel
+---@nodiscard
 function ModsaInterface:FetchModsaActionModel() end
 
+---@return ActionModel
+---@nodiscard
+function ModsaInterface:FetchModsaActionModelOpponent() end
+
 ---@return CoinModel
+---@nodiscard
 function ModsaInterface:FetchModsaCoinModel() end
 
 ---@param find_instruction string
@@ -575,6 +584,9 @@ function UnitModel:BufCheckTurn(bufKeyword, main_only) end
 ---@return integer
 function UnitModel:BufCheckTurnByCategory(bufCategory, exception_keywords) end
 
+---@return UnitDataModel
+function UnitModel:FetchDataModel() end
+
 ---@return ResistDetail
 ---@nodiscard
 function UnitModel:FetchResistDetail() end
@@ -586,11 +598,42 @@ function UnitModel:FetchActionModelList(sorted) end
 
 ---@param permanent_only boolean
 ---@return SinActionModel[]
+---@nodiscard
 function UnitModel:FetchSinActionList(permanent_only) end
 
 ---@param include_ego boolean
 ---@return PassiveModel[]
+---@nodiscard
 function UnitModel:FetchPassives(include_ego) end
+
+---@class UnitDataModel
+UnitDataModel = {}
+
+--- Checks if internal UnitDataModel reference is null.
+---@return boolean
+function UnitDataModel:IsNull() end
+
+---@return UnitStatic
+---@nodiscard
+function UnitDataModel:FetchStatic() end
+
+---@param skillID integer
+---@return SkillModel[]
+---@nodiscard
+function UnitDataModel:FetchSkillModel(skillID) end
+
+---@return integer[]
+---@nodiscard
+function UnitDataModel:FetchAllSkillID() end
+
+--- Internally Stores a vanilla UnitStaticData.
+---@class UnitStatic
+UnitStatic = {}
+
+--- Checks if internal UnitStatic reference is null.
+---@return boolean
+---@nodiscard
+function UnitStatic:IsNull() end
 
 --- Internally Stores a vanilla PassiveModel.
 ---@class PassiveModel
@@ -706,6 +749,7 @@ function ActionModel:TryChangeSkillByModel(skill, saveOriginSkill) end
 
 --- Internally Stores a vanilla SkillModel.
 ---@class SkillModel
+---@field coinList CoinModel[]
 SkillModel = {}
 
 --- Checks if internal SkillModel reference is null.
@@ -733,6 +777,14 @@ function SkillModel:FetchAttribute() end
 ---@nodiscard
 function SkillModel:FetchAtkType() end
 
+---@return CoinModel[]
+---@nodiscard
+function SkillModel:FetchCoinsUsableInDuel() end
+
+---@return CoinModel[]
+---@nodiscard
+function SkillModel:FetchAliveCoins() end
+
 ---@param action ActionModel
 ---@param coin CoinModel
 ---@param timing EventTiming
@@ -743,21 +795,72 @@ function SkillModel:ReRollCoin(action, coin, timing) end
 ---@param timing EventTiming
 function SkillModel:CopyCoin(action, idx, timing) end
 
+---@param coin CoinModel
+---@param forcibly boolean
+function SkillModel:AddCoin(coin, forcibly) end
+
 --- Internally Stores a vanilla CoinModel.
 ---@class CoinModel
+---@field isActive boolean
+---@field isUsableInDuel boolean
+---@field isReRolled boolean
+---@field result CoinResultAlias
+---@field scale integer
+---@field operatorType CoinOpTypeAlias
 CoinModel = {}
 
 --- Checks if internal CoinModel reference is null.
 ---@return boolean
 function CoinModel:IsNull() end
 
+--- Makes a new CoinModel.
+---@param fromCoin CoinModel
+---@param as_reroll boolean (Default = false)
+---@return CoinModel
+---@nodiscard
+function CoinModel.CreateFromCoinModel(fromCoin, as_reroll) end
+
+--- Makes a new CoinModel.
+---@param fromCoin CoinData
+---@param originCoinIndex integer
+---@return CoinModel
+---@nodiscard
+function CoinModel.CreateFromCoinData(fromCoin, originCoinIndex) end
+
+---@return CoinData
+---@nodiscard
+function CoinModel:FetchData() end
+
 --- Returns all of this thing's modsas.
 ---@param fast_no_copy boolean (Default = false)
 ---@return ModsaInterface[]
+---@nodiscard
 function CoinModel:FetchAllModsa(fast_no_copy) end
 
 ---@return integer
 function CoinModel:GetRealCoinIndex() end
+
+---@return integer
+function CoinModel:GetGrade() end
+
+--- Internally Stores a vanilla SkillCoinData.
+---@class CoinData
+---@field actionIndex integer
+---@field grade integer
+---@field scale integer
+---@field operatorType CoinOpTypeAlias
+CoinData = {}
+
+---@alias CoinOpTypeAlias
+---| 0 ADD
+---| 1 SUB
+---| 2 MUL
+---| 3 NONE
+
+---@alias CoinResultAlias
+---| 0 NONE
+---| 1 HEAD
+---| 2 TAIL
 
 --- Internally Stores a vanilla SinActionModel.
 ---@class SinActionModel
