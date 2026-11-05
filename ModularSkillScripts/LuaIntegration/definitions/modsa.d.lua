@@ -738,6 +738,11 @@ function SkillModel:FetchAtkType() end
 ---@param timing EventTiming
 function SkillModel:ReRollCoin(action, coin, timing) end
 
+---@param action ActionModel
+---@param idx integer
+---@param timing EventTiming
+function SkillModel:CopyCoin(action, idx, timing) end
+
 --- Internally Stores a vanilla CoinModel.
 ---@class CoinModel
 CoinModel = {}

@@ -1052,6 +1052,11 @@ public partial class LuaSkillModel
 	public void ReRollCoin(ActionModel action, LuaCoinModel coin, EventTiming timing) {
 		ref_skill.ReRollCoin(action.ref_action, coin.ref_coin, timing.ref_timing);
 	}
+	
+	[LuaMember("CopyCoin")]
+	public void CopyCoin(ActionModel action, int idx, EventTiming timing) {
+		ref_skill.CopyCoin(action.ref_action, idx, timing.ref_timing);
+	}
 }
 
 [LuaObject]
