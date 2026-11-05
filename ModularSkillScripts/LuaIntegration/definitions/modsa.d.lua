@@ -695,7 +695,7 @@ function BufModel:CreateCategoryKeywordList() end
 ---@param loseTurn integer
 ---@param timing EventTiming
 ---@param sinType AttributeType
----@param overwrite_amount integer
+---@param overwrite_amount integer (Default: -1)
 function BufModel:TriggerBuf(victim, attacker, loseStack, loseTurn, timing, sinType, overwrite_amount) end
 
 --- Internally Stores a BattleDuelModel.

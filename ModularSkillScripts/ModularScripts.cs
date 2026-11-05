@@ -1403,9 +1403,10 @@ public class ModularSA : Il2CppSystem.Object
 		state.Environment["AtkType"] = new LuaAtkType();
 		state.Environment["Vec3"] = new LuaVector3(0,0,0);
 		
-		LuaFunctions.MergeFunctionArrayToLuaState("ModularUtil", state, LuaFunctions.Instance.F_Util);
-		LuaFunctions.MergeFunctionArrayToLuaState("BufManager", state, LuaFunctions.Instance.F_BufManager);
-		LuaFunctions.MergeFunctionArrayToLuaState("BattleObjectManager", state, LuaFunctions.Instance.F_BattleObjManager);
+		LuaFunctions.MergeTableToLuaState("ModularUtil", state, LuaFunctions.Instance.F_Util_table);
+		LuaFunctions.MergeTableToLuaState("BufManager", state, LuaFunctions.Instance.F_BufManager_table);
+		LuaFunctions.MergeTableToLuaState("BattleObjectManager", state, LuaFunctions.Instance.F_BattleObjManager_table);
+		LuaFunctions.MergeTableToLuaState("BattleObjectManager", state, LuaFunctions.Instance.F_BattleObjManager_table);
 	}
 
 	public static BattleUnitModel_Abnormality AsAbnormalityModel(BattleUnitModel targetModel)

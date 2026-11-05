@@ -13,8 +13,13 @@ public sealed class LuaFunctions
 {
 	public static LuaFunctions Instance = new();
 	public readonly Lua.LuaFunction[] F_Util;
+	public readonly LuaTable F_Util_table;
 	public readonly Lua.LuaFunction[] F_BufManager;
+	public readonly LuaTable F_BufManager_table;
 	public readonly Lua.LuaFunction[] F_BattleObjManager;
+	public readonly LuaTable F_BattleObjManager_table;
+	public readonly Lua.LuaFunction[] F_CoinModel;
+	public readonly LuaTable F_CoinModel_table;
 
   public LuaFunctions()
   {
@@ -35,16 +40,33 @@ public sealed class LuaFunctions
 		  new Lua.LuaFunction("GetAliveListByBuf", BattleObjectManager_GetAliveListByBuf),
 		  new Lua.LuaFunction("GetView", BattleObjectManager_GetView)
 	  ];
+	  F_CoinModel =
+	  [
+		  new Lua.LuaFunction("GetAliveList", BattleObjectManager_GetAliveList),
+		  new Lua.LuaFunction("GetAliveListByBuf", BattleObjectManager_GetAliveListByBuf),
+		  new Lua.LuaFunction("GetView", BattleObjectManager_GetView)
+	  ];
+	  
+	  F_Util_table = InstantiateLuaTableForFunctions(F_Util);
+	  F_BufManager_table = InstantiateLuaTableForFunctions(F_BufManager);
+	  F_BattleObjManager_table = InstantiateLuaTableForFunctions(F_BattleObjManager);
+	  F_CoinModel_table = InstantiateLuaTableForFunctions(F_BattleObjManager);
+	  
   }
 
-  public static void MergeFunctionArrayToLuaState(string funnyName, LuaState state, Lua.LuaFunction[] f_array)
+  public static LuaTable InstantiateLuaTableForFunctions(Lua.LuaFunction[] f_array)
   {
 	  LuaTable luaTable = new (0, f_array.Length);
 	  foreach (Lua.LuaFunction function in f_array) {
 		  luaTable[(LuaValue) function.Name] = (LuaValue) function;
 	  }
-	  state.Environment[(LuaValue) funnyName] = (LuaValue) luaTable;
-	  state.LoadedModules[(LuaValue) funnyName] = (LuaValue) luaTable;
+	  return luaTable;
+  }
+  
+  public static void MergeTableToLuaState(string funnyName, LuaState state, LuaTable table)
+  {
+	  state.Environment[(LuaValue) funnyName] = (LuaValue) table;
+	  state.LoadedModules[(LuaValue) funnyName] = (LuaValue) table;
   }
 	
 	public ValueTask<int> ShuffleList(
