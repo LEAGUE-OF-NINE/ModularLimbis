@@ -1065,18 +1065,6 @@ public partial class LuaCoinModel
 		}
 		return list;
 	}
-	
-	[LuaMember("CreateFromCoinModel")]
-	public static LuaCoinModel CreateFromCoinModel(LuaCoinModel fromCoin, bool as_reroll) {
-		CoinModel vanilla_coin = new(fromCoin.ref_coin, as_reroll);
-		return new LuaCoinModel(vanilla_coin);
-	}
-	
-	[LuaMember("CreateFromCoinData")]
-	public static LuaCoinModel CreateFromCoinData(LuaSkillCoinData fromCoin, int originCoinIndex) {
-		CoinModel vanilla_coin = new(fromCoin.ref_data, originCoinIndex);
-		return new LuaCoinModel(vanilla_coin);
-	}
 
 	[LuaMember("LuaSkillCoinData")]
 	public LuaSkillCoinData FetchData() => new(ref_coin._classInfo);

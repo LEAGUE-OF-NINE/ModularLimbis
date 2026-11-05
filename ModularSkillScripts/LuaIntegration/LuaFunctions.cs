@@ -42,15 +42,14 @@ public sealed class LuaFunctions
 	  ];
 	  F_CoinModel =
 	  [
-		  new Lua.LuaFunction("GetAliveList", BattleObjectManager_GetAliveList),
-		  new Lua.LuaFunction("GetAliveListByBuf", BattleObjectManager_GetAliveListByBuf),
-		  new Lua.LuaFunction("GetView", BattleObjectManager_GetView)
+		  new Lua.LuaFunction("CreateFromCoinModel", CoinModel_CreateFromCoinModel),
+		  new Lua.LuaFunction("CreateFromCoinData", CoinModel_CreateFromCoinData)
 	  ];
 	  
 	  F_Util_table = InstantiateLuaTableForFunctions(F_Util);
 	  F_BufManager_table = InstantiateLuaTableForFunctions(F_BufManager);
 	  F_BattleObjManager_table = InstantiateLuaTableForFunctions(F_BattleObjManager);
-	  F_CoinModel_table = InstantiateLuaTableForFunctions(F_BattleObjManager);
+	  F_CoinModel_table = InstantiateLuaTableForFunctions(F_CoinModel);
 	  
   }
 
@@ -190,6 +189,30 @@ public sealed class LuaFunctions
 		}
 		LuaUnitView luaView = new(view);
 		buffer.Span[0] = luaView;
+		return new ValueTask<int>(1);
+	}
+	
+	public ValueTask<int> CoinModel_CreateFromCoinModel(
+		LuaFunctionExecutionContext context,
+		Memory<LuaValue> buffer,
+		CancellationToken cancellationToken)
+	{
+		LuaCoinModel fromCoin = context.GetArgument<LuaCoinModel>(0);
+		bool as_reroll = context.GetArgument<bool>(1);
+		CoinModel vanilla_coin = new(fromCoin.ref_coin, as_reroll);
+		buffer.Span[0] = new LuaCoinModel(vanilla_coin);
+		return new ValueTask<int>(1);
+	}
+	
+	public ValueTask<int> CoinModel_CreateFromCoinData(
+		LuaFunctionExecutionContext context,
+		Memory<LuaValue> buffer,
+		CancellationToken cancellationToken)
+	{
+		LuaSkillCoinData fromCoin = context.GetArgument<LuaSkillCoinData>(0);
+		int originCoinIndex = context.GetArgument<int>(1);
+		CoinModel vanilla_coin = new(fromCoin.ref_data, originCoinIndex);
+		buffer.Span[0] = new LuaCoinModel(vanilla_coin);
 		return new ValueTask<int>(1);
 	}
 	
