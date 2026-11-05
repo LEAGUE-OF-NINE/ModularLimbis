@@ -454,14 +454,10 @@ public partial class LuaUnitStatic
 public partial class BufModel
 {
 	public BuffModel ref_buffModel = null;
-	public BufModel(BuffModel x) {
-		ref_buffModel = x;
-	}
+	public BufModel(BuffModel x) => ref_buffModel = x;
 	
 	[LuaMember("IsNull")]
-	public bool IsNull() {
-		return ref_buffModel == null;
-	}
+	public bool IsNull() => ref_buffModel == null;
 	
 	[LuaMember("FetchAllModsa")]
 	public LuaTable FetchAllModsa(bool fast_no_copy) {
@@ -518,6 +514,28 @@ public partial class BufModel
 			};
 		}
 		return luaTable;
+	}
+	
+	[LuaMember("TriggerBuf")]
+	public void TriggerBuf(UnitModel unit, UnitModel attacker, int loseStack, int loseTurn, EventTiming timing, LuaAttributeType sinType, int ov_amount)
+	{
+		BattleUnitModel van_unit = unit.ref_unitModel;
+		BattleUnitModel van_attacker = attacker.ref_unitModel;
+		Il2CppSystem.Nullable<int> nulint = new((int)999);
+		BATTLE_EVENT_TIMING van_timing = timing.ref_timing;
+		ATTRIBUTE_TYPE van_sinType = sinType.ref_enum;
+		
+		int actevent = MainClass.timingDict["BufActivate"];
+		
+		ref_buffModel.ForceToActivateBuffEffect(van_unit, van_attacker, loseStack, loseTurn, nulint, van_timing, van_sinType, ov_amount);
+		foreach (ModularSA modsa in SkillScriptInitPatch.GetAllModbaFromBuffModel(ref_buffModel)) {
+			if (modsa.activationTiming != actevent) continue;
+			modsa.modsa_buffModel = ref_buffModel;
+			modsa.modsa_killerModel = van_attacker;
+			modsa.valueList[9] = ov_amount;
+			modsa.valueList[8] = sinType.KeywordToInt();
+			modsa.Enact(van_unit, null, null, null, actevent, van_timing);
+		}
 	}
 }
 
