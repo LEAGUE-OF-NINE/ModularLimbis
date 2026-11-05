@@ -231,6 +231,25 @@ public partial class UnitModel
 	[LuaMember("IsNull")]
 	public bool IsNull() => ref_unitModel == null;
 	
+	public static LuaTable MakeTable(List<BattleUnitModel> list) {
+		int count = list.Count;
+		LuaTable table = new LuaTable(count, 0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = new UnitModel(list[i]);
+		}
+		return table;
+	}
+	
+	public static List<BattleUnitModel> UnpackTable(LuaTable table) {
+		int count = table.ArrayLength;
+		List<BattleUnitModel> list = new(count);
+		for (int i = 0; i < count; i++) {
+			UnitModel luaval = table[i + 1].Read<UnitModel>();
+			list.Add(luaval.ref_unitModel);
+		}
+		return list;
+	}
+	
 	[LuaMember("WhatAmI")]
 	public int WhatAmI() {
 		if (!ref_unitModel.IsAbnormalityOrPart) return 0;
