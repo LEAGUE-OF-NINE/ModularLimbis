@@ -1,3 +1,4 @@
+#nullable enable
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem;
@@ -379,6 +380,44 @@ public partial class UnitModel
 		
 		Il2CppStructArray<BUFF_UNIQUE_KEYWORD> exception_struct = new(exception_list.ToArray());
 		return ref_unitModel.GetActivatedBuffTurn(bufCategory.ref_buf_category, exception_struct);
+	}
+	
+	[LuaMember("GiveAbsHpDamage")]
+	public LuaTable GiveAbsHpDamage(UnitModel target, int value, EventTiming timing, DamageSourceType dmgSrcType, ActionModel? actionOrNull = null, LuaCoinModel? coinOrNull = null)
+	{
+		int dmg_return = ref_unitModel.GiveAbsHpDamage(target.ref_unitModel, value, out int hpDamage, out int damageToShield, timing.ref_timing, dmgSrcType.ref_dmgSrcType,
+			actionOrNull?.ref_action, coinOrNull?.ref_coin);
+
+		LuaTable table = new(3, 0)
+		{
+			[1] = dmg_return,
+			[2] = hpDamage,
+			[3] = damageToShield
+		};
+		return table;
+	}
+	
+	[LuaMember("TakeAbsHpDamage")]
+	public LuaTable TakeAbsHpDamage(UnitModel? attackerOrNull, int value, EventTiming timing, DamageSourceType dmgSrcType,
+		ActionModel? actionOrNull = null, LuaCoinModel? coinOrNull = null,
+		LuaTable? relatedUnits_table = null, BufKeyword? bufKeyword = null,
+		bool? deactivePassedBreakSection = false, bool? ignoreShield = false, bool? ignorePassedBreakSection = false)
+	{
+		List<BattleUnitModel>? relatedUnits_list = null;
+		if (relatedUnits_table != null) relatedUnits_list = UnpackTable(relatedUnits_table);
+		
+		int dmg_return = ref_unitModel.TakeAbsHpDamage(attackerOrNull?.ref_unitModel, value, out int hpDamage, out int damageToShield, timing.ref_timing, dmgSrcType.ref_dmgSrcType,
+			actionOrNull?.ref_action, coinOrNull?.ref_coin,
+			relatedUnits_list, bufKeyword?.ref_buf_keyword ?? BUFF_UNIQUE_KEYWORD.None,
+			deactivePassedBreakSection ?? false, ignoreShield ?? false, ignorePassedBreakSection ?? false);
+
+		LuaTable table = new(3, 0)
+		{
+			[1] = dmg_return,
+			[2] = hpDamage,
+			[3] = damageToShield
+		};
+		return table;
 	}
 	
 	[LuaMember("FetchDataModel")]

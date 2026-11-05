@@ -584,6 +584,40 @@ function UnitModel:BufCheckTurn(bufKeyword, main_only) end
 ---@return integer
 function UnitModel:BufCheckTurnByCategory(bufCategory, exception_keywords) end
 
+--- Damages another unit and returns a list of integer values.
+---* [1] = The damage return value.
+---* [2] = out hpDamage.
+---* [3] = out damageToShield.
+---@param target UnitModel
+---@param value integer
+---@param timing EventTiming
+---@param dmgSrcType DamageSourceType
+---@param actionOrNull ActionModel?
+---@param coinOrNull CoinModel?
+---@return integer[]
+function UnitModel:GiveAbsHpDamage(target, value, timing, dmgSrcType, actionOrNull, coinOrNull) end
+
+--- Damages THIS unit (with optional attacker) and returns a list of integer values.
+---* [1] = The damage return value.
+---* [2] = out hpDamage.
+---* [3] = out damageToShield.
+---@param attackerOrNull UnitModel?
+---@param value integer
+---@param timing EventTiming
+---@param dmgSrcType DamageSourceType
+---@param actionOrNull ActionModel?
+---@param coinOrNull CoinModel?
+---@param relatedUnits UnitModel[]?
+---@param bufKeyword BufKeyword?
+---@param deactivePassedBreakSection boolean? (Default = false)
+---@param ignoreShield boolean? (Default = false)
+---@param ignorePassedBreakSection boolean? (Default = false)
+---@return integer[]
+function UnitModel:TakeAbsHpDamage(attackerOrNull, value, timing, dmgSrcType, actionOrNull, coinOrNull, bufKeyword,
+                                   relatedUnits, deactivePassedBreakSection, ignoreShield, ignorePassedBreakSection)
+  ---@diagnostic disable-next-line: missing-return
+end
+
 ---@return UnitDataModel
 function UnitModel:FetchDataModel() end
 
