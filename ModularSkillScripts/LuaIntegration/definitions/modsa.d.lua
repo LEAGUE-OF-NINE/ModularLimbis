@@ -843,7 +843,7 @@ function ActionModel:FetchMainTargetSinAction() end
 ---@param modsa ModsaInterface
 ---@return SinActionModel
 ---@nodiscard
-function ActionModel:FetchExpectedMainTargetSinAction(modsa) end
+function ActionModel.FetchExpectedMainTargetSinAction(modsa) end
 
 --- Internally Stores a vanilla SkillModel.
 ---@class SkillModel

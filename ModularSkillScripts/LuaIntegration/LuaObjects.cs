@@ -1134,7 +1134,7 @@ public partial class ActionModel
 	[LuaMember("FetchMainTargetSinAction")]
 	public LuaSinActionModel FetchMainTargetSinAction() => new(ref_action.GetMainTargetSinAction());
 	[LuaMember("FetchExpectedMainTargetSinAction")]
-	public LuaSinActionModel FetchExpectedMainTargetSinAction(ModsaInterface modsa) => new(modsa.ref_modsa.modsa_expected_sinaction);
+	public static LuaSinActionModel FetchExpectedMainTargetSinAction(ModsaInterface modsa) => new(modsa.ref_modsa.modsa_expected_sinaction);
 	
 }
 
