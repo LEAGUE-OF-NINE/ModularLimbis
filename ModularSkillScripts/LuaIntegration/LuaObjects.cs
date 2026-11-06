@@ -1282,47 +1282,59 @@ public partial class LuaSkillModel
 public partial class LuaSinActionModel
 {
 	public SinActionModel ref_sinAction = null;
-	public LuaSinActionModel(SinActionModel x) {
-		ref_sinAction = x;
-	}
+	public LuaSinActionModel(SinActionModel x) => ref_sinAction = x;
 	
 	[LuaMember("IsNull")]
-	public bool IsNull() {
-		return ref_sinAction == null;
-	}
+	public bool IsNull() => ref_sinAction == null;
 	
 	[LuaMember("GetSlotIndex")]
-	public int GetSlotIndex() {
-		return ref_sinAction.GetSlotIndex();
-	}
+	public int GetSlotIndex() => ref_sinAction.GetSlotIndex();
 	
 	[LuaMember("FetchUnitModel")]
-	public UnitModel FetchUnitModel() {
-		return new UnitModel(ref_sinAction._unitModel);
+	public UnitModel FetchUnitModel() => new UnitModel(ref_sinAction._unitModel);
+	
+	[LuaMember("currentSinList")]
+	public LuaTable currentSinList {
+		get => LuaUnitSinModel.MakeTable(ref_sinAction.currentSinList);
+		set => ref_sinAction.currentSinList = LuaUnitSinModel.UnpackTable(value);
 	}
 	
-	[LuaMember("FetchUnitSinList")]
-	public LuaTable FetchUnitSinList(string mode) {
-		
-		List<UnitSinModel> sin_list = new();
-		switch (mode)
-		{
-			case "sinList": sin_list = ref_sinAction.currentSinList; break;
-			case "readySinList": sin_list = ref_sinAction.readySinList; break;
-			case "replacedSinListByErode": sin_list = ref_sinAction._replacedSinListByErode; break;
-			case "currentSelectSin": sin_list.Add(ref_sinAction.currentSelectSin); break;
-			case "readySin": sin_list.Add(ref_sinAction.readySin); break;
-			case "replacedReadySinByErode": sin_list.Add(ref_sinAction._replacedReadySinByErode); break;
-			case "replacedSinByDefenseSkill": sin_list.Add(ref_sinAction._replacedSinByDefenseSkill); break;
-		}
-
-		int count = sin_list.Count;
-		LuaTable table = new(count, 0);
-		for (int i = 0; i < count; i++) {
-			table[i + 1] = new LuaUnitSinModel(sin_list[i]);
-		}
-		return table;
+	[LuaMember("readySinList")]
+	public LuaTable readySinList {
+		get => LuaUnitSinModel.MakeTable(ref_sinAction.readySinList);
+		set => ref_sinAction.readySinList = LuaUnitSinModel.UnpackTable(value);
 	}
+	
+	[LuaMember("replacedSinListByErode")]
+	public LuaTable replacedSinListByErode {
+		get => LuaUnitSinModel.MakeTable(ref_sinAction._replacedSinListByErode);
+		set => ref_sinAction._replacedSinListByErode = LuaUnitSinModel.UnpackTable(value);
+	}
+	
+	[LuaMember("currentSelectSin")]
+	public LuaUnitSinModel currentSelectSin {
+		get => new(ref_sinAction.currentSelectSin);
+		set => ref_sinAction.currentSelectSin = value.ref_unitSin;
+	}
+	
+	[LuaMember("readySin")]
+	public LuaUnitSinModel readySin {
+		get => new(ref_sinAction.readySin);
+		set => ref_sinAction.readySin = value.ref_unitSin;
+	}
+	
+	[LuaMember("replacedReadySinByErode")]
+	public LuaUnitSinModel replacedReadySinByErode {
+		get => new(ref_sinAction._replacedReadySinByErode);
+		set => ref_sinAction._replacedReadySinByErode = value.ref_unitSin;
+	}
+	
+	[LuaMember("replacedSinByDefenseSkill")]
+	public LuaUnitSinModel replacedSinByDefenseSkill {
+		get => new(ref_sinAction._replacedSinByDefenseSkill);
+		set => ref_sinAction._replacedSinByDefenseSkill = value.ref_unitSin;
+	}
+	
 }
 
 [LuaObject]

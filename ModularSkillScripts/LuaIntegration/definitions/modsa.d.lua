@@ -907,7 +907,13 @@ CoinData = {}
 
 --- Internally Stores a vanilla SinActionModel.
 ---@class SinActionModel
----@field
+---@field currentSinList UnitSinModel[] Normal upper-lower UnitSinModel in the dashboard (normally 2).
+---@field readySinList UnitSinModel[] List of Upcoming Skills (UnitSinModel).
+---@field replacedSinListByErode UnitSinModel[] Covered list of UnitSinModel, in case of corrosion.
+---@field currentSelectSin UnitSinModel Selected UnitSinModel.
+---@field readySin UnitSinModel Upcoming UnitSinModel.
+---@field replacedReadySinByErode UnitSinModel The COVERED Upcoming UnitSinModel, in case of corrosion.
+---@field replacedSinByDefenseSkill UnitSinModel The COVERED UnitSinModel under the Defense Skill.
 SinActionModel = {}
 
 --- Checks if internal SinActionModel reference is null.
@@ -919,21 +925,6 @@ function SinActionModel:GetSlotIndex() end
 
 ---@return UnitModel
 function SinActionModel:FetchUnitModel() end
-
---- Returns a list of requested UnitSinModel. Can be empty, can also be only 1.
----@param mode SinActionFetchUnitSinMode
----@return UnitSinModel[]
-function SinActionModel:FetchUnitSinList(mode) end
-
----@alias SinActionFetchUnitSinMode
----| "sinList" Normal upper-lower UnitSinModel in the dashboard (normally 2).
----| "readySinList" List of Upcoming Skills (UnitSinModel).
----| "replacedSinListByErode" Covered list of UnitSinModel, in case of corrosion.
----| "currentSelectSin" Selected UnitSinModel.
----| "readySin" Upcoming UnitSinModel.
----| "replacedReadySinByErode" The COVERED Upcoming UnitSinModel, in case of corrosion.
----| "replacedSinByDefenseSkill" The COVERED UnitSinModel under the Defense Skill.
-
 
 --- Internally Stores a vanilla UnitSinModel.
 ---@class UnitSinModel
