@@ -653,6 +653,10 @@ function UnitModel:AddNewSinActionModelWithSkillID(skillID) end
 ---@nodiscard
 function UnitModel:FetchPassives(include_ego) end
 
+---@param passiveID integer
+---@param allow_duplicate boolean
+function UnitModel:AddPassive(passiveID, allow_duplicate) end
+
 ---@class UnitDataModel
 UnitDataModel = {}
 

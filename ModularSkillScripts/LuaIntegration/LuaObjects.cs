@@ -476,6 +476,12 @@ public partial class UnitModel
 		
 		return table;
 	}
+	
+	[LuaMember("AddPassive")]
+	public void AddPassive(int passiveID, bool allow_duplicate) {
+		if (!allow_duplicate && ref_unitModel.HasPassive(passiveID)) return;
+		ref_unitModel.AddPassive(passiveID);
+	}
 }
 
 [LuaObject]
