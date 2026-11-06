@@ -233,8 +233,8 @@ public sealed class LuaFunctions
 		UnitModel unit = context.GetArgument<UnitModel>(1);
 		LuaSinActionModel sinAction = context.GetArgument<LuaSinActionModel>(2);
 		LuaSkillModel skill = null;
-		if (context.ArgumentCount >= 4) {
-			skill = context.GetArgument<LuaSkillModel>(3);
+		if (context.ArgumentCount >= 4 && context.GetArgument(3).TryRead(out LuaSkillModel out_skill)) {
+			skill = out_skill;
 		}
 		buffer.Span[0] = ActionModel.CreateNew(unitSin, unit, sinAction, skill);
 		return new ValueTask<int>(1);
