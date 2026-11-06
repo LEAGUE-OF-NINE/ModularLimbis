@@ -53,6 +53,7 @@ public sealed class LuaFunctions
 	  ];
 	  F_ActionModel =
 	  [
+		  new Lua.LuaFunction("CreateNull", ActionModel_CreateNull),
 		  new Lua.LuaFunction("CreateNew", ActionModel_CreateNew),
 		  new Lua.LuaFunction("CreateCopy", ActionModel_CreateCopy)
 	  ];
