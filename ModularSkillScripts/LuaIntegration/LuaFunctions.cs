@@ -20,6 +20,8 @@ public sealed class LuaFunctions
 	public readonly LuaTable F_BattleObjManager_table;
 	public readonly Lua.LuaFunction[] F_CoinModel;
 	public readonly LuaTable F_CoinModel_table;
+	public readonly Lua.LuaFunction[] F_ActionModel;
+	public readonly LuaTable F_ActionModel_table;
 
   public LuaFunctions()
   {
@@ -45,11 +47,17 @@ public sealed class LuaFunctions
 		  new Lua.LuaFunction("CreateFromCoinModel", CoinModel_CreateFromCoinModel),
 		  new Lua.LuaFunction("CreateFromCoinData", CoinModel_CreateFromCoinData)
 	  ];
+	  F_ActionModel =
+	  [
+		  new Lua.LuaFunction("CreateNew", ActionModel_CreateNew),
+		  new Lua.LuaFunction("CreateCopy", ActionModel_CreateCopy)
+	  ];
 	  
 	  F_Util_table = InstantiateLuaTableForFunctions(F_Util);
 	  F_BufManager_table = InstantiateLuaTableForFunctions(F_BufManager);
 	  F_BattleObjManager_table = InstantiateLuaTableForFunctions(F_BattleObjManager);
 	  F_CoinModel_table = InstantiateLuaTableForFunctions(F_CoinModel);
+	  F_ActionModel_table = InstantiateLuaTableForFunctions(F_ActionModel);
 	  
   }
 
@@ -213,6 +221,35 @@ public sealed class LuaFunctions
 		int originCoinIndex = context.GetArgument<int>(1);
 		CoinModel vanilla_coin = new(fromCoin.ref_data, originCoinIndex);
 		buffer.Span[0] = new LuaCoinModel(vanilla_coin);
+		return new ValueTask<int>(1);
+	}
+	
+	public ValueTask<int> ActionModel_CreateNew(
+		LuaFunctionExecutionContext context,
+		Memory<LuaValue> buffer,
+		CancellationToken cancellationToken)
+	{
+		LuaUnitSinModel unitSin = context.GetArgument<LuaUnitSinModel>(0);
+		UnitModel unit = context.GetArgument<UnitModel>(1);
+		LuaSinActionModel sinAction = context.GetArgument<LuaSinActionModel>(2);
+		LuaSkillModel skill = null;
+		if (context.ArgumentCount >= 4) {
+			skill = context.GetArgument<LuaSkillModel>(3);
+		}
+		buffer.Span[0] = ActionModel.CreateNew(unitSin, unit, sinAction, skill);
+		return new ValueTask<int>(1);
+	}
+	
+	public ValueTask<int> ActionModel_CreateCopy(
+		LuaFunctionExecutionContext context,
+		Memory<LuaValue> buffer,
+		CancellationToken cancellationToken)
+	{
+		ActionModel action = context.GetArgument<ActionModel>(0);
+		if (context.ArgumentCount >= 2 && context.GetArgument(1).TryRead(out bool canDuel)) {
+			buffer.Span[0] = ActionModel.CreateCopy(action, canDuel);
+		}
+		else buffer.Span[0] = ActionModel.CreateCopy(action);
 		return new ValueTask<int>(1);
 	}
 	

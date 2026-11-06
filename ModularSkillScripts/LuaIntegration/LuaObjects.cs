@@ -1080,6 +1080,23 @@ public partial class ActionModel
 	[LuaMember("IsNull")]
 	public bool IsNull() => ref_action == null;
 	
+	[LuaMember("CreateNew")]
+	public static ActionModel CreateNew(LuaUnitSinModel unitSin, UnitModel unit, LuaSinActionModel sinAction, LuaSkillModel? skill = null)
+	{
+		UnitSinModel van_unitSin = unitSin.ref_unitSin;
+		BattleUnitModel van_unit = unit.ref_unitModel;
+		SinActionModel van_skillAction = sinAction.ref_sinAction;
+		BattleActionModel action_new = new(van_unitSin, van_unit, van_skillAction, -1, skill?.ref_skill);
+		return new ActionModel(action_new);
+	}
+	
+	[LuaMember("CreateCopy")]
+	public static ActionModel CreateCopy(ActionModel action, bool? canDuel = null)
+	{
+		if (canDuel != null) return new ActionModel(new BattleActionModel(action.ref_action, (bool)canDuel));
+		return new ActionModel(new BattleActionModel(action.ref_action));
+	}
+	
 	[LuaMember("FetchUnitModel")]
 	public UnitModel FetchUnitModel() => new UnitModel(ref_action._model);
 	

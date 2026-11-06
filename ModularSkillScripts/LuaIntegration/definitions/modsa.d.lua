@@ -772,6 +772,24 @@ ActionModel = {}
 ---@return boolean
 function ActionModel:IsNull() end
 
+---@overload fun(self:ActionModel, unitSin:UnitSinModel, unit:UnitModel, sinAction:SinActionModel):ActionModel
+---@param unitSin UnitSinModel
+---@param unit UnitModel
+---@param sinAction SinActionModel
+---@param skill SkillModel? Optional
+---@return ActionModel
+---@nodiscard
+function ActionModel:CreateNew(unitSin, unit, sinAction, skill) end
+
+---* `ActionModel:CreateNew()`: Returns a newly created Action.
+---* `ActionModel:CreateNew(canDuel)`: Overwrites the original Action's "canDuel".
+---
+---@overload fun(self:ActionModel):ActionModel
+---@param canDuel boolean?
+---@return ActionModel
+---@nodiscard
+function ActionModel:CreateCopy(canDuel) end
+
 ---@return UnitModel
 function ActionModel:FetchUnitModel() end
 
