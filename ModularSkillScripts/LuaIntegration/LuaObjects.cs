@@ -1329,24 +1329,35 @@ public partial class LuaSinActionModel
 public partial class LuaUnitSinModel
 {
 	public UnitSinModel ref_unitSin = null;
-	public LuaUnitSinModel(UnitSinModel x) {
-		ref_unitSin = x;
-	}
-	
+	public LuaUnitSinModel(UnitSinModel x) => ref_unitSin = x;
+
 	[LuaMember("IsNull")]
-	public bool IsNull() {
-		return ref_unitSin == null;
-	}
+	public bool IsNull() => ref_unitSin == null;
 	
-	[LuaMember("FetchCurrentAction")]
-	public ActionModel FetchCurrentAction() {
-		return new ActionModel(ref_unitSin._currentAction);
-	}
+	public static LuaTable MakeTable(List<UnitSinModel> list) {
+  	int count = list.Count;
+  	LuaTable table = new LuaTable(count, 0);
+  	for (int i = 0; i < count; i++) {
+  		table[i + 1] = new LuaUnitSinModel(list[i]);
+  	}
+  	return table;
+  }
+  
+  public static List<UnitSinModel> UnpackTable(LuaTable table) {
+  	int count = table.ArrayLength;
+  	List<UnitSinModel> list = new(count);
+  	for (int i = 0; i < count; i++) {
+		  LuaUnitSinModel luaval = table[i + 1].Read<LuaUnitSinModel>();
+  		list.Add(luaval.ref_unitSin);
+  	}
+  	return list;
+  }
 	
-	[LuaMember("SetCurrentAction")]
-	public void SetCurrentAction(ActionModel actionModel) {
-		ref_unitSin._currentAction = actionModel.ref_action;
-	}
+  [LuaMember("currentAction")]
+  public ActionModel currentAction {
+	  get => new ActionModel(ref_unitSin._currentAction);
+	  set => ref_unitSin._currentAction = value.ref_action;
+  }
 }
 
 [LuaObject]

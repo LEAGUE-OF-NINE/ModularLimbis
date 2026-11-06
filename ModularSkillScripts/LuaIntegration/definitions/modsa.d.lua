@@ -907,6 +907,7 @@ CoinData = {}
 
 --- Internally Stores a vanilla SinActionModel.
 ---@class SinActionModel
+---@field
 SinActionModel = {}
 
 --- Checks if internal SinActionModel reference is null.
@@ -936,18 +937,12 @@ function SinActionModel:FetchUnitSinList(mode) end
 
 --- Internally Stores a vanilla UnitSinModel.
 ---@class UnitSinModel
+---@field currentAction ActionModel
 UnitSinModel = {}
 
 --- Checks if internal UnitSinModel reference is null.
 ---@return boolean
 function UnitSinModel:IsNull() end
-
----@return ActionModel
-function UnitSinModel:FetchCurrentAction() end
-
----@param action ActionModel
----@return nil
-function UnitSinModel:SetCurrentAction(action) end
 
 --- Internally Stores a vanilla ResistDetail.
 ---@class ResistDetail
