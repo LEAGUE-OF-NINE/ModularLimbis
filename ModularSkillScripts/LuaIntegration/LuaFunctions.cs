@@ -24,6 +24,8 @@ public sealed class LuaFunctions
 	public readonly LuaTable F_ActionModel_table;
 	public readonly Lua.LuaFunction[] F_UnitSinModel;
 	public readonly LuaTable F_UnitSinModel_table;
+	public readonly Lua.LuaFunction[] F_TargetSinActionData;
+	public readonly LuaTable F_TargetSinActionData_table;
 
   public LuaFunctions()
   {
@@ -59,6 +61,10 @@ public sealed class LuaFunctions
 		  new Lua.LuaFunction("CreateNewNormal", UnitSinModel_CreateNewNormal),
 		  new Lua.LuaFunction("CreateNewEGO", UnitSinModel_CreateNewEGO)
 	  ];
+	  F_TargetSinActionData =
+	  [
+		  new Lua.LuaFunction("CreateNew", TargetSinActionData_CreateNew),
+	  ];
 	  
 	  F_Util_table = InstantiateLuaTableForFunctions(F_Util);
 	  F_BufManager_table = InstantiateLuaTableForFunctions(F_BufManager);
@@ -66,6 +72,7 @@ public sealed class LuaFunctions
 	  F_CoinModel_table = InstantiateLuaTableForFunctions(F_CoinModel);
 	  F_ActionModel_table = InstantiateLuaTableForFunctions(F_ActionModel);
 	  F_UnitSinModel_table = InstantiateLuaTableForFunctions(F_UnitSinModel);
+	  F_TargetSinActionData_table = InstantiateLuaTableForFunctions(F_TargetSinActionData);
 	  
   }
 
@@ -285,6 +292,16 @@ public sealed class LuaFunctions
 		bool alreadyUsedCost = context.GetArgument<bool>(3);
 		bool overwrited = context.GetArgument<bool>(4);
 		buffer.Span[0] = LuaUnitSinModel.CreateNewEGO(skillID, unit, sinAction, alreadyUsedCost, overwrited);
+		return new ValueTask<int>(1);
+	}
+	
+	public ValueTask<int> TargetSinActionData_CreateNew(
+		LuaFunctionExecutionContext context,
+		Memory<LuaValue> buffer,
+		CancellationToken cancellationToken)
+	{
+		LuaSinActionModel sinAction = context.GetArgument<LuaSinActionModel>(0);
+		buffer.Span[0] = LuaTargetSinActionData.CreateNew(sinAction);
 		return new ValueTask<int>(1);
 	}
 	

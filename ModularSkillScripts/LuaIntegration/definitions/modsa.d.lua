@@ -788,10 +788,12 @@ function DuelModel:FetchOpponentAction(fromAction) end
 
 --- Internally Stores a BattleActionModel.
 ---@class ActionModel
+---@field targetDataDetail TargetDetail
 ActionModel = {}
 
 --- Checks if internal BattleActionModel reference is null.
 ---@return boolean
+---@nodiscard
 function ActionModel:IsNull() end
 
 ---@overload fun(self:ActionModel, unitSin:UnitSinModel, unit:UnitModel, sinAction:SinActionModel):ActionModel
@@ -853,6 +855,49 @@ function ActionModel:FetchMainTargetSinAction() end
 ---@return SinActionModel
 ---@nodiscard
 function ActionModel.FetchExpectedMainTargetSinAction(modsa) end
+
+--- Internally Stores a TargetDataDetail.
+---@class TargetDetail
+TargetDetail = {}
+
+--- Checks if internal TargetDataDetail reference is null.
+---@return boolean
+---@nodiscard
+function TargetDetail:IsNull() end
+
+---@return TargetSet
+---@nodiscard
+function TargetDetail:FetchCurrentTargetSet() end
+
+---@return TargetSet
+---@nodiscard
+function TargetDetail:FetchOriginTargetSet() end
+
+--- Internally Stores a TargetDataSet.
+---@class TargetSet
+---@field mainTarget TargetSinActionData
+---@field subTargetList TargetSinActionData[]
+TargetSet = {}
+
+--- Checks if internal TargetDataSet reference is null.
+---@return boolean
+---@nodiscard
+function TargetSet:IsNull() end
+
+--- Internally Stores a TargetSinActionData.
+---@class TargetSinActionData
+---@field targetSinAction SinActionModel
+TargetSinActionData = {}
+
+--- Checks if internal TargetSinActionData reference is null.
+---@return boolean
+---@nodiscard
+function TargetSinActionData:IsNull() end
+
+---@param sinAction SinActionModel
+---@return TargetSinActionData
+---@nodiscard
+function TargetSinActionData.CreateNew(sinAction) end
 
 --- Internally Stores a vanilla SkillModel.
 ---@class SkillModel

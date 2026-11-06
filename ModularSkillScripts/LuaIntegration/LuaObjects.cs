@@ -1091,9 +1091,7 @@ public partial class LuaDuelModel
 public partial class ActionModel
 {
 	public BattleActionModel ref_action = null;
-	public ActionModel(BattleActionModel x) {
-		ref_action = x;
-	}
+	public ActionModel(BattleActionModel x) => ref_action = x;
 	
 	[LuaMember("IsNull")]
 	public bool IsNull() => ref_action == null;
@@ -1128,7 +1126,14 @@ public partial class ActionModel
 	public bool TryChangeSkillByID(int skillID) => ref_action.TryChangeSkill(skillID);
 	[LuaMember("ChangeSkillByModel")]
 	public bool TryChangeSkillByModel(LuaSkillModel skill, bool saveOriginSkill) => ref_action.ChangeSkill(skill.ref_skill, saveOriginSkill);
-	
+
+
+	[LuaMember("targetDataDetail")]
+	public LuaTargetDetail targetDataDetail
+	{
+		get => new(ref_action._targetDataDetail);
+		set => ref_action._targetDataDetail = value.ref_obj;
+	} 
 	
 	[LuaMember("ResetAllTargetData")]
 	public void ResetAllTargetData() => ref_action.ResetAllTargetData();
@@ -1145,6 +1150,87 @@ public partial class ActionModel
 	[LuaMember("FetchExpectedMainTargetSinAction")]
 	public static LuaSinActionModel FetchExpectedMainTargetSinAction(ModsaInterface modsa) => new(modsa.ref_modsa.modsa_expected_sinaction);
 	
+}
+
+[LuaObject]
+public partial class LuaTargetDetail
+{
+	public BattleActionModel.TargetDataDetail ref_obj = null;
+
+	public LuaTargetDetail(BattleActionModel.TargetDataDetail x) => ref_obj = x;
+
+	[LuaMember("IsNull")]
+	public bool IsNull() => ref_obj == null;
+	
+	[LuaMember("FetchCurrentTargetSet")]
+	public LuaTargetSet FetchCurrentTargetSet() => new(ref_obj.GetCurrentTargetSet());
+	[LuaMember("FetchOriginTargetSet")]
+	public LuaTargetSet FetchOriginTargetSet() => new(ref_obj.GetOriginTargetSet());
+	
+}
+
+[LuaObject]
+public partial class LuaTargetSet
+{
+	public BattleActionModel.TargetDataDetail.TargetDataSet ref_obj = null;
+
+	public LuaTargetSet(BattleActionModel.TargetDataDetail.TargetDataSet x) => ref_obj = x;
+
+	[LuaMember("IsNull")]
+	public bool IsNull() => ref_obj == null;
+	
+	[LuaMember("mainTarget")]
+	public LuaTargetSinActionData mainTarget
+	{
+		get => new(ref_obj._mainTarget);
+		set => ref_obj._mainTarget = value.ref_obj;
+	}
+	
+	[LuaMember("subTargetList")]
+	public LuaTable subTargetList
+	{
+		get => LuaTargetSinActionData.MakeTable(ref_obj._subTargetList);
+		set => ref_obj._subTargetList = LuaTargetSinActionData.UnpackTable(value);
+	}
+}
+
+[LuaObject]
+public partial class LuaTargetSinActionData
+{
+	public TargetSinActionData ref_obj = null;
+
+	public LuaTargetSinActionData(TargetSinActionData x) => ref_obj = x;
+
+	public static LuaTable MakeTable(List<TargetSinActionData> list) {
+		int count = list.Count;
+		LuaTable table = new LuaTable(count, 0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = new LuaTargetSinActionData(list[i]);
+		}
+		return table;
+	}
+	
+	public static List<TargetSinActionData> UnpackTable(LuaTable table) {
+		int count = table.ArrayLength;
+		List<TargetSinActionData> list = new(count);
+		for (int i = 0; i < count; i++) {
+			LuaTargetSinActionData luaval = table[i + 1].Read<LuaTargetSinActionData>();
+			list.Add(luaval.ref_obj);
+		}
+		return list;
+	}
+	
+	[LuaMember("IsNull")]
+	public bool IsNull() => ref_obj == null;
+	
+	[LuaMember("CreateNew")]
+	public static LuaTargetSinActionData CreateNew(LuaSinActionModel sinAction) => new(new TargetSinActionData(sinAction.ref_sinAction));
+	
+	[LuaMember("targetSinAction")]
+	public LuaSinActionModel targetSinAction {
+		get => new(ref_obj._targetSinAction);
+		set => ref_obj._targetSinAction = value.ref_sinAction;
+	}
 }
 
 [LuaObject]
