@@ -796,14 +796,15 @@ ActionModel = {}
 ---@nodiscard
 function ActionModel:IsNull() end
 
----@overload fun(self:ActionModel, unitSin:UnitSinModel, unit:UnitModel, sinAction:SinActionModel):ActionModel
+--- Check Overload to set a Skill
+---@overload fun(unitSin:UnitSinModel, unit:UnitModel, sinAction:SinActionModel):ActionModel
 ---@param unitSin UnitSinModel
 ---@param unit UnitModel
 ---@param sinAction SinActionModel
 ---@param skill SkillModel? Optional
 ---@return ActionModel
 ---@nodiscard
-function ActionModel:CreateNew(unitSin, unit, sinAction, skill) end
+function ActionModel.CreateNew(unitSin, unit, sinAction, skill) end
 
 ---* `ActionModel:CreateNew()`: Returns a newly created Action.
 ---* `ActionModel:CreateNew(canDuel)`: Overwrites the original Action's "canDuel".
