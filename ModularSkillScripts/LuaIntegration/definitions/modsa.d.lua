@@ -842,6 +842,9 @@ function SkillModel:CopyCoin(action, idx, timing) end
 ---@param forcibly boolean
 function SkillModel:AddCoin(coin, forcibly) end
 
+---@param idx integer
+function SkillModel:RemoveCoinModelFromListByIndex(idx) end
+
 --- Internally Stores a vanilla CoinModel.
 ---@class CoinModel
 ---@field isActive boolean

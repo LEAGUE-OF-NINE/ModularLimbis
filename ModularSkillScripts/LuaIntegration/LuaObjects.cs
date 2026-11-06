@@ -1276,6 +1276,9 @@ public partial class LuaSkillModel
 		if (forcibly) ref_skill.ForcelyAddCoin(coin.ref_coin);
 		else ref_skill.AddCoin(coin.ref_coin);
 	}
+	
+	[LuaMember("RemoveCoinModelFromListByIndex")]
+	public void RemoveCoinModelFromListByIndex(int idx) => ref_skill.RemoveCoinModelFromListByIndex(idx);
 }
 
 [LuaObject]
