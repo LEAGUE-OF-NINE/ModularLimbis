@@ -245,14 +245,7 @@ public sealed class LuaFunctions
 		Memory<LuaValue> buffer,
 		CancellationToken cancellationToken)
 	{
-		LuaUnitSinModel unitSin = context.GetArgument<LuaUnitSinModel>(0);
-		UnitModel unit = context.GetArgument<UnitModel>(1);
-		LuaSinActionModel sinAction = context.GetArgument<LuaSinActionModel>(2);
-		LuaSkillModel skill = null;
-		if (context.ArgumentCount >= 4 && context.GetArgument(3).TryRead(out LuaSkillModel out_skill)) {
-			skill = out_skill;
-		}
-		buffer.Span[0] = ActionModel.CreateNew(unitSin, unit, sinAction, skill);
+		buffer.Span[0] = ActionModel.CreateNull();
 		return new ValueTask<int>(1);
 	}
 	
@@ -261,7 +254,14 @@ public sealed class LuaFunctions
 		Memory<LuaValue> buffer,
 		CancellationToken cancellationToken)
 	{
-		buffer.Span[0] = ActionModel.CreateNull();
+		LuaUnitSinModel unitSin = context.GetArgument<LuaUnitSinModel>(0);
+		UnitModel unit = context.GetArgument<UnitModel>(1);
+		LuaSinActionModel sinAction = context.GetArgument<LuaSinActionModel>(2);
+		LuaSkillModel skill = null;
+		if (context.ArgumentCount >= 4 && context.GetArgument(3).TryRead(out LuaSkillModel out_skill)) {
+			skill = out_skill;
+		}
+		buffer.Span[0] = ActionModel.CreateNew(unitSin, unit, sinAction, skill);
 		return new ValueTask<int>(1);
 	}
 	
