@@ -635,6 +635,18 @@ function UnitModel:FetchActionModelList(sorted) end
 ---@nodiscard
 function UnitModel:FetchSinActionList(permanent_only) end
 
+---@param sinAction SinActionModel
+function UnitModel:AddSinAction(sinAction) end
+
+---@return SinActionModel
+---@nodiscard
+function UnitModel:AddNewSinActionModel() end
+
+---@param skillID integer
+---@return ActionModel
+---@nodiscard
+function UnitModel:AddNewSinActionModelWithSkillID(skillID) end
+
 ---@param include_ego boolean
 ---@return PassiveModel[]
 ---@nodiscard

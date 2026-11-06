@@ -448,6 +448,15 @@ public partial class UnitModel
 		return table;
 	}
 	
+	[LuaMember("AddSinAction")]
+	public void AddSinAction(LuaSinActionModel sinAction) => ref_unitModel.AddSinAction(sinAction.ref_sinAction);
+	
+	[LuaMember("AddNewSinActionModel")]
+	public LuaSinActionModel AddNewSinActionModel() => new(ref_unitModel.AddNewSinActionModel());
+	
+	[LuaMember("AddNewSinActionModelWithSkillID")]
+	public ActionModel AddNewSinActionModelWithSkillID(int skillID) => new(ref_unitModel.AddNewSinActionModelWithSkill(skillID));
+	
 	[LuaMember("FetchPassives")]
 	public LuaTable FetchPassives(bool include_ego) {
 		List<PassiveModel> passive_list = ref_unitModel._passiveDetail._passivelist;
