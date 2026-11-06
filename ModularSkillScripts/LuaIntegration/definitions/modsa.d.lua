@@ -969,6 +969,23 @@ UnitSinModel = {}
 ---@return boolean
 function UnitSinModel:IsNull() end
 
+---@param skillID integer
+---@param unit UnitModel
+---@param sinAction SinActionModel
+---@param overwrited boolean
+---@return UnitSinModel
+---@nodiscard
+function UnitSinModel.CreateNewNormal(skillID, unit, sinAction, overwrited) end
+
+---@param skillID integer
+---@param unit UnitModel
+---@param sinAction SinActionModel
+---@param alreadyUsedCost boolean
+---@param overwrited boolean
+---@return UnitSinModel
+---@nodiscard
+function UnitSinModel.CreateNewEGO(skillID, unit, sinAction, alreadyUsedCost, overwrited) end
+
 --- Internally Stores a vanilla ResistDetail.
 ---@class ResistDetail
 ---@field atkResistList ATKResistData[]
