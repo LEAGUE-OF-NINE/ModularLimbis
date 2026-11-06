@@ -1141,9 +1141,6 @@ public partial class LuaCoinModel
 		return table;
 	}
 	
-	[LuaMember("GetRealCoinIndex")]
-	public int GetRealCoinIndex() => ref_coin.GetRealCoinIndex();
-	
 	[LuaMember("isActive")]
 	public bool isActive {
 		get => ref_coin._isActive;
@@ -1162,10 +1159,28 @@ public partial class LuaCoinModel
 		set => ref_coin._isReRolled = value;
 	}
 	
+	[LuaMember("isDestroyed")]
+	public bool isDestroyed {
+		get => ref_coin._isDestroyed;
+		set => ref_coin._isDestroyed = value;
+	}
+	
 	[LuaMember("result")]
 	public int result {
 		get => (int)ref_coin._result;
 		set => ref_coin._result = (COIN_RESULT)value;
+	}
+	
+	[LuaMember("originCoinIndex")]
+	public int originCoinIndex {
+		get => ref_coin._originCoinIndex;
+		set => ref_coin._originCoinIndex = value;
+	}
+	
+	[LuaMember("currentRealCoinIndex")]
+	public int currentRealCoinIndex {
+		get => ref_coin._currentRealCoinIndex;
+		set => ref_coin._currentRealCoinIndex = value;
 	}
 	
 	[LuaMember("grade")]

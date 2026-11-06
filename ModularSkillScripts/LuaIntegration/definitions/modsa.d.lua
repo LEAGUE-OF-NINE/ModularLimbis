@@ -850,7 +850,10 @@ function SkillModel:RemoveCoinModelFromListByIndex(idx) end
 ---@field isActive boolean
 ---@field isUsableInDuel boolean
 ---@field isReRolled boolean
+---@field isDestroyed boolean
 ---@field result CoinResultAlias
+---@field originCoinIndex integer
+---@field currentRealCoinIndex integer
 ---@field scale integer
 ---@field operatorType CoinOpTypeAlias
 CoinModel = {}
@@ -882,9 +885,6 @@ function CoinModel:FetchData() end
 ---@return ModsaInterface[]
 ---@nodiscard
 function CoinModel:FetchAllModsa(fast_no_copy) end
-
----@return integer
-function CoinModel:GetRealCoinIndex() end
 
 ---@return integer
 function CoinModel:GetGrade() end
