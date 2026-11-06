@@ -657,6 +657,11 @@ function UnitModel:FetchPassives(include_ego) end
 ---@param allow_duplicate boolean
 function UnitModel:AddPassive(passiveID, allow_duplicate) end
 
+---@param passiveID integer
+---@return boolean
+---@nodiscard
+function UnitModel:HasPassive(passiveID) end
+
 ---@class UnitDataModel
 UnitDataModel = {}
 

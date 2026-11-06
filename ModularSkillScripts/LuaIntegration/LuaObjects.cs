@@ -482,6 +482,9 @@ public partial class UnitModel
 		if (!allow_duplicate && ref_unitModel.HasPassive(passiveID)) return;
 		ref_unitModel.AddPassive(passiveID);
 	}
+
+	[LuaMember("HasPassive")]
+	public bool HasPassive(int passiveID) => ref_unitModel.HasPassive(passiveID);
 }
 
 [LuaObject]
