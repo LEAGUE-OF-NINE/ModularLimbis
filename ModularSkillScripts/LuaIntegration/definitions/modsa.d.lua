@@ -642,6 +642,7 @@ function UnitModel:AddSinAction(sinAction) end
 ---@nodiscard
 function UnitModel:AddNewSinActionModel() end
 
+---@deprecated Seems to not work or return a null ActionModel from testing. Use at your own discretion.
 ---@param skillID integer
 ---@return ActionModel
 ---@nodiscard

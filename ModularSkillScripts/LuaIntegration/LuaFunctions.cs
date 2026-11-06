@@ -22,6 +22,8 @@ public sealed class LuaFunctions
 	public readonly LuaTable F_CoinModel_table;
 	public readonly Lua.LuaFunction[] F_ActionModel;
 	public readonly LuaTable F_ActionModel_table;
+	public readonly Lua.LuaFunction[] F_UnitSinModel;
+	public readonly LuaTable F_UnitSinModel_table;
 
   public LuaFunctions()
   {
@@ -52,12 +54,18 @@ public sealed class LuaFunctions
 		  new Lua.LuaFunction("CreateNew", ActionModel_CreateNew),
 		  new Lua.LuaFunction("CreateCopy", ActionModel_CreateCopy)
 	  ];
+	  F_UnitSinModel =
+	  [
+		  new Lua.LuaFunction("CreateNewNormal", UnitSinModel_CreateNewNormal),
+		  new Lua.LuaFunction("CreateNewEGO", UnitSinModel_CreateNewEGO)
+	  ];
 	  
 	  F_Util_table = InstantiateLuaTableForFunctions(F_Util);
 	  F_BufManager_table = InstantiateLuaTableForFunctions(F_BufManager);
 	  F_BattleObjManager_table = InstantiateLuaTableForFunctions(F_BattleObjManager);
 	  F_CoinModel_table = InstantiateLuaTableForFunctions(F_CoinModel);
 	  F_ActionModel_table = InstantiateLuaTableForFunctions(F_ActionModel);
+	  F_UnitSinModel_table = InstantiateLuaTableForFunctions(F_UnitSinModel);
 	  
   }
 
@@ -250,6 +258,33 @@ public sealed class LuaFunctions
 			buffer.Span[0] = ActionModel.CreateCopy(action, canDuel);
 		}
 		else buffer.Span[0] = ActionModel.CreateCopy(action);
+		return new ValueTask<int>(1);
+	}
+	
+	public ValueTask<int> UnitSinModel_CreateNewNormal(
+		LuaFunctionExecutionContext context,
+		Memory<LuaValue> buffer,
+		CancellationToken cancellationToken)
+	{
+		int skillID = context.GetArgument<int>(0);
+		UnitModel unit = context.GetArgument<UnitModel>(1);
+		LuaSinActionModel sinAction = context.GetArgument<LuaSinActionModel>(2);
+		bool overwrited = context.GetArgument<bool>(3);
+		buffer.Span[0] = LuaUnitSinModel.CreateNewNormal(skillID, unit, sinAction, overwrited);
+		return new ValueTask<int>(1);
+	}
+	
+	public ValueTask<int> UnitSinModel_CreateNewEGO(
+		LuaFunctionExecutionContext context,
+		Memory<LuaValue> buffer,
+		CancellationToken cancellationToken)
+	{
+		int skillID = context.GetArgument<int>(0);
+		UnitModel unit = context.GetArgument<UnitModel>(1);
+		LuaSinActionModel sinAction = context.GetArgument<LuaSinActionModel>(2);
+		bool alreadyUsedCost = context.GetArgument<bool>(3);
+		bool overwrited = context.GetArgument<bool>(4);
+		buffer.Span[0] = LuaUnitSinModel.CreateNewEGO(skillID, unit, sinAction, alreadyUsedCost, overwrited);
 		return new ValueTask<int>(1);
 	}
 	

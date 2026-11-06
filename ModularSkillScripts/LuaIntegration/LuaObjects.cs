@@ -1408,7 +1408,17 @@ public partial class LuaUnitSinModel
   	}
   	return list;
   }
-	
+
+  [LuaMember("CreateNewNormal")]
+  public static LuaUnitSinModel CreateNewNormal(int skillID, UnitModel unit, LuaSinActionModel sinAction, bool overwrited) {
+	  return new LuaUnitSinModel(new UnitSinModel(skillID, unit.ref_unitModel, sinAction.ref_sinAction, overwrited));
+  }
+  
+  [LuaMember("CreateNewEGO")]
+  public static LuaUnitSinModel CreateNewEGO(int skillID, UnitModel unit, LuaSinActionModel sinAction, bool alreadyUsedCost, bool overwrited) {
+	  return new LuaUnitSinModel(new UnitSinModel(unit.ref_unitModel, skillID, sinAction.ref_sinAction, alreadyUsedCost, overwrited));
+  }
+  
   [LuaMember("currentAction")]
   public ActionModel currentAction {
 	  get => new ActionModel(ref_unitSin._currentAction);
