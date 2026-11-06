@@ -618,6 +618,25 @@ function UnitModel:TakeAbsHpDamage(attackerOrNull, value, timing, dmgSrcType, ac
   ---@diagnostic disable-next-line: missing-return
 end
 
+---@param action ActionModel
+---@param overwrite_skillTargetType SkillTargetType (Use "NONE" for no overwrite)
+---@param lastOrFirst ModeLastOrFirst
+function UnitModel:CutInAction(action, overwrite_skillTargetType, lastOrFirst) end
+
+---@param action ActionModel
+---@param otherAction ActionModel
+---@param overwrite_skillTargetType SkillTargetType (Use "NONE" for no overwrite)
+function UnitModel:CutInActionPrevOtherAction(action, otherAction, overwrite_skillTargetType) end
+
+---@param action ActionModel
+---@param first boolean (Default = false)
+function UnitModel:CutInDefenseActionForcely(action, first) end
+
+---@param reserveType ReserveCutInActionType
+---@param action ActionModel
+---@param removeDuel boolean
+function UnitModel:ReservateToCutInAction(reserveType, action, removeDuel) end
+
 ---@return UnitDataModel
 function UnitModel:FetchDataModel() end
 
@@ -796,6 +815,11 @@ ActionModel = {}
 ---@nodiscard
 function ActionModel:IsNull() end
 
+--- Intentionally creates a null reference ActionModel.
+---@return ActionModel
+---@nodiscard
+function ActionModel.CreateNull() end
+
 --- Check Overload to set a Skill
 ---@overload fun(unitSin:UnitSinModel, unit:UnitModel, sinAction:SinActionModel):ActionModel
 ---@param unitSin UnitSinModel
@@ -806,8 +830,8 @@ function ActionModel:IsNull() end
 ---@nodiscard
 function ActionModel.CreateNew(unitSin, unit, sinAction, skill) end
 
----* `ActionModel:CreateNew()`: Returns a newly created Action.
----* `ActionModel:CreateNew(canDuel)`: Overwrites the original Action's "canDuel".
+---* `ActionModel:CreateCopy()`: Returns a newly created Action.
+---* `ActionModel:CreateCopy(canDuel)`: Overwrites the original Action's "canDuel".
 ---
 ---@overload fun(self:ActionModel):ActionModel
 ---@param canDuel boolean?
@@ -841,10 +865,7 @@ function ActionModel:ResetAllTargetData() end
 function ActionModel:SetTargetAfterBattleStart_CutIn(canDuel, attackEnemyOnly, overwrite_skillTargetType) end
 
 ---@param sinAction SinActionModel
----@param action_opponent ActionModel
----@param forcibly boolean (Set false if unsure)
-function ActionModel:ChangeMainTargetSinAction(sinAction, action_opponent, forcibly) end
-
+---@param action_opponent ActionModel|nil Can be nil
 ---@param forcibly boolean (Set false if unsure)
 function ActionModel:ChangeMainTargetSinAction(sinAction, action_opponent, forcibly) end
 

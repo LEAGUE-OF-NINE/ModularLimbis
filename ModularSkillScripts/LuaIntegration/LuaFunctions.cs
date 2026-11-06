@@ -239,7 +239,7 @@ public sealed class LuaFunctions
 		return new ValueTask<int>(1);
 	}
 	
-	public ValueTask<int> ActionModel_CreateNew(
+	public ValueTask<int> ActionModel_CreateNull(
 		LuaFunctionExecutionContext context,
 		Memory<LuaValue> buffer,
 		CancellationToken cancellationToken)
@@ -252,6 +252,15 @@ public sealed class LuaFunctions
 			skill = out_skill;
 		}
 		buffer.Span[0] = ActionModel.CreateNew(unitSin, unit, sinAction, skill);
+		return new ValueTask<int>(1);
+	}
+	
+	public ValueTask<int> ActionModel_CreateNew(
+		LuaFunctionExecutionContext context,
+		Memory<LuaValue> buffer,
+		CancellationToken cancellationToken)
+	{
+		buffer.Span[0] = ActionModel.CreateNull();
 		return new ValueTask<int>(1);
 	}
 	

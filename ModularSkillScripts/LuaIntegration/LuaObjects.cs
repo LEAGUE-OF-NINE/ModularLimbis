@@ -420,6 +420,30 @@ public partial class UnitModel
 		return table;
 	}
 	
+	[LuaMember("CutInAction")]
+	public void CutInAction(ActionModel action, LuaSkillTargetType overwrite_skillTargetType, string lastOrFirst) {
+		BattleActionModelManager.CUT_IN_ACTION_TYPE cutInType = lastOrFirst == "Last" ? BattleActionModelManager.CUT_IN_ACTION_TYPE.LAST_APPEND : BattleActionModelManager
+			.CUT_IN_ACTION_TYPE.ZERO_INDEX;
+		ref_unitModel.CutInAction(action.ref_action, overwrite_skillTargetType.ref_enum, cutInType);
+	}
+	
+	[LuaMember("CutInActionPrevOtherAction")]
+	public void CutInActionPrevOtherAction(ActionModel action, ActionModel otherAction, LuaSkillTargetType overwrite_skillTargetType) {
+		ref_unitModel.CutInActionPrevOtherAction(action.ref_action, otherAction.ref_action, overwrite_skillTargetType.ref_enum);
+	}
+	
+	[LuaMember("CutInDefenseActionForcely")]
+	public void CutInDefenseActionForcely(ActionModel action, bool first) {
+		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
+		ref_unitModel.CutInDefenseActionForcely(action.ref_action, first);
+	}
+	
+	[LuaMember("ReservateToCutInAction")]
+	public void ReservateToCutInAction(ReserveCutInActionType reserveType, ActionModel action, bool removeDuel) {
+		BattleActionModelManager actionManager = Singleton<BattleActionModelManager>.Instance;
+		ref_unitModel.ReservateToCutInAction(action.ref_action, reserveType.ref_enum, removeDuel);
+	}
+	
 	[LuaMember("FetchDataModel")]
 	public LuaUnitDataModel FetchDataModel() => new(ref_unitModel._unitDataModel);
 	
@@ -1096,6 +1120,9 @@ public partial class ActionModel
 	[LuaMember("IsNull")]
 	public bool IsNull() => ref_action == null;
 	
+	[LuaMember("CreateNull")]
+	public static ActionModel CreateNull() => new(null);
+	
 	[LuaMember("CreateNew")]
 	public static ActionModel CreateNew(LuaUnitSinModel unitSin, UnitModel unit, LuaSinActionModel sinAction, LuaSkillModel? skill = null)
 	{
@@ -1142,8 +1169,8 @@ public partial class ActionModel
 		ref_action.SetTargetAfterBattleStart_CutIn(canDuel, attackEnemyOnly, overwrite_skillTargetType.ref_enum);
 	
 	[LuaMember("ChangeMainTargetSinAction")]
-	public void ChangeMainTargetSinAction(LuaSinActionModel sinAction, ActionModel action_opponent, bool forcibly) =>
-		ref_action.ChangeMainTargetSinAction(sinAction.ref_sinAction, action_opponent.ref_action, forcibly);
+	public void ChangeMainTargetSinAction(LuaSinActionModel sinAction, ActionModel? action_opponent = null, bool forcibly = false) =>
+		ref_action.ChangeMainTargetSinAction(sinAction.ref_sinAction, action_opponent?.ref_action, forcibly);
 	
 	[LuaMember("FetchMainTargetSinAction")]
 	public LuaSinActionModel FetchMainTargetSinAction() => new(ref_action.GetMainTargetSinAction());
