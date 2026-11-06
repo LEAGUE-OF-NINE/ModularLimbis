@@ -821,6 +821,30 @@ function ActionModel:TryChangeSkillByID(skillID) end
 ---@return boolean
 function ActionModel:TryChangeSkillByModel(skill, saveOriginSkill) end
 
+function ActionModel:ResetAllTargetData() end
+
+---@param canDuel boolean
+---@param attackEnemyOnly boolean
+---@param overwrite_skillTargetType SkillTargetType (Use "NONE" for no overwrite)
+function ActionModel:SetTargetAfterBattleStart_CutIn(canDuel, attackEnemyOnly, overwrite_skillTargetType) end
+
+---@param sinAction SinActionModel
+---@param action_opponent ActionModel
+---@param forcibly boolean (Set false if unsure)
+function ActionModel:ChangeMainTargetSinAction(sinAction, action_opponent, forcibly) end
+
+---@param forcibly boolean (Set false if unsure)
+function ActionModel:ChangeMainTargetSinAction(sinAction, action_opponent, forcibly) end
+
+---@return SinActionModel
+---@nodiscard
+function ActionModel:FetchMainTargetSinAction() end
+
+---@param modsa ModsaInterface
+---@return SinActionModel
+---@nodiscard
+function ActionModel:FetchExpectedMainTargetSinAction(modsa) end
+
 --- Internally Stores a vanilla SkillModel.
 ---@class SkillModel
 ---@field coinList CoinModel[]

@@ -1120,6 +1120,22 @@ public partial class ActionModel
 	[LuaMember("ChangeSkillByModel")]
 	public bool TryChangeSkillByModel(LuaSkillModel skill, bool saveOriginSkill) => ref_action.ChangeSkill(skill.ref_skill, saveOriginSkill);
 	
+	
+	[LuaMember("ResetAllTargetData")]
+	public void ResetAllTargetData() => ref_action.ResetAllTargetData();
+	[LuaMember("SetTargetAfterBattleStart_CutIn")]
+	public void SetTargetAfterBattleStart_CutIn(bool canDuel, bool attackEnemyOnly, LuaSkillTargetType overwrite_skillTargetType) =>
+		ref_action.SetTargetAfterBattleStart_CutIn(canDuel, attackEnemyOnly, overwrite_skillTargetType.ref_enum);
+	
+	[LuaMember("ChangeMainTargetSinAction")]
+	public void ChangeMainTargetSinAction(LuaSinActionModel sinAction, ActionModel action_opponent, bool forcibly) =>
+		ref_action.ChangeMainTargetSinAction(sinAction.ref_sinAction, action_opponent.ref_action, forcibly);
+	
+	[LuaMember("FetchMainTargetSinAction")]
+	public LuaSinActionModel FetchMainTargetSinAction() => new(ref_action.GetMainTargetSinAction());
+	[LuaMember("FetchExpectedMainTargetSinAction")]
+	public LuaSinActionModel FetchExpectedMainTargetSinAction(ModsaInterface modsa) => new(modsa.ref_modsa.modsa_expected_sinaction);
+	
 }
 
 [LuaObject]
