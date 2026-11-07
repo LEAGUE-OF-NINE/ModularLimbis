@@ -1837,3 +1837,16 @@ public partial class PacketOverwriteGiveBuf
 	[LuaMember("postfix_bufKeyword")]
 	public BufKeyword postfix_bufKeyword = new();
 }
+
+[LuaObject]
+public partial class PacketActionWheel
+{
+	[LuaMember("info_wheelTiming")]
+	public int info_wheelTiming = 0;
+	[LuaMember("out_actionType")]
+	public int out_actionType = 0;
+	[LuaMember("out_skillIDList")]
+	public LuaTable out_skillIDList = null;
+	[LuaMember("carry_uniqueInfo")]
+	public LuaTable carry_uniqueInfo = new();
+}

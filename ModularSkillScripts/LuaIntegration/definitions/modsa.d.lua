@@ -167,6 +167,22 @@ function PacketChangeTakeDamage:FetchBufKeyword() end
 ---@field postfix_bufKeyword BufKeyword Overwrite This
 PacketOverwriteGiveBuf = {}
 
+--- Information Packet specific to Modular's ActionWheel activation.
+---@class PacketActionWheel
+---@field info_wheelTiming ActionWheelTiming
+---@field out_actionType ActionWheelType
+---@field out_skillIDList table Options for Wheel Request.
+---@field carry_uniqueInfo table Carried over to this same script
+PacketActionWheel = {}
+
+---@alias ActionWheelTiming
+---| 0 request
+---| 1 end select
+
+---@alias ActionWheelType
+---| 0 changeskill
+---| 1 on play
+
 --- Creates and returns the current EventTiming.
 ---@return EventTiming
 function ModsaInterface:FetchEventTiming() end

@@ -123,7 +123,8 @@ public class MainClass : BasePlugin
 			"OverwriteGainBuf",
 			"OverwriteGiveBuf",
 			"IsFreeRedirect",
-			"CanFreeRedirectOther"
+			"CanFreeRedirectOther",
+			"ActionWheel"
 		];
 		//timingStringList.Add("ChangeSinBuffDamage");
 
