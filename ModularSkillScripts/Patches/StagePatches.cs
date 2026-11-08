@@ -211,6 +211,8 @@ internal class StagePatches
 				highestSlotter += 1;
 			}
 		}
+		
+		TheWheel.InputChecker.Instance.Obliterate(true);
 			
 		int actevent = MainClass.timingDict["RoundStart"];
 		foreach (ModularSA modsa in stage_modsa_list) {

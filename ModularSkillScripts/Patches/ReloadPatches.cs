@@ -17,6 +17,8 @@ public class ReloadPatches
 	[HarmonyPostfix]
 	private static void PostMainUILoad()
 	{
+		TheWheel.InputChecker.Instance.Obliterate();
+		
 		LuaScript.loadedScripts.Clear();
 		MainClass.LogModular("PostMainUILoad - Reloading Modular Lua Scripts");
 		foreach (string modPath in Directory.GetDirectories(LetheMain.modsPath.FullPath))

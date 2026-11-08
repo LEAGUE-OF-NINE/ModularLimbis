@@ -50,35 +50,53 @@ public class TheWheel
 		private const float tau_fast = pi_fast*2;
 		
 		public int option_selected_idx = -1;
-
-		private Vector3 mousePos_last = new();
-
+		
 		public WheelVis ref_wheelVis = null;
 		public bool wantWheel_last = false;
 		public int options = 0;
 		public List<ActionWheelOption> option_list = new();
 		
+		public void Obliterate(bool enable_instead = false)
+		{
+			option_selected_idx = -1;
+			options = 0;
+			option_list.Clear();
+			if (enable_instead) {
+				gameObject.SetActive(true);
+			} else {
+				gameObject.SetActive(false);
+				Destroy(ref_wheelVis);
+			}
+			
+		}
+		
+		public void EnableWheel()
+		{
+			
+		}
+			
 		void Update()
 		{
-			Vector3 mousePos = Input.mousePosition;
-			mousePos_last = mousePos;
-			Vector2 screenSize = new Vector2(Screen.width, Screen.height);
-			float shortest = Mathf.Min(Screen.width, Screen.height);
-			Vector2 mouseVecFromCenter = new Vector2(mousePos.x, mousePos.y) - (screenSize/2);
-			float mouseDist = mouseVecFromCenter.magnitude;
-			float mouseDist_percentage = mouseDist / shortest;
-			bool in_cancel_range = mouseDist_percentage <= 0.1f || mouseDist_percentage >= 0.45f;
-			Vector2 mouseNormFromCenter = mouseVecFromCenter.normalized;
-			float aimRot = Mathf.Atan2(mouseNormFromCenter.y, mouseNormFromCenter.x);
-			if (aimRot < 0) aimRot += tau_fast;
-			float wheelPercentage = aimRot / tau_fast;
 			BattleUIRoot battleUIRoot = SingletonBehavior<BattleUIRoot>.Instance;
 			if (!battleUIRoot) return;
 			Canvas canvas = battleUIRoot.PerspectiveUICanvas;
 			if (!canvas) return;
 			AbnormalityUIController uiController = battleUIRoot._abUIController;
 			
-			bool isDrag = uiController.IsDragginSin();
+			Vector3 mousePos = Input.mousePosition;
+			Vector2 screenSize = new(Screen.width, Screen.height);
+			float shortest = Mathf.Min(Screen.width, Screen.height);
+			Vector2 mouseVecFromCenter = new Vector2(mousePos.x, mousePos.y) - (screenSize/2);
+			float mouseDist = mouseVecFromCenter.magnitude;
+			float mouseDist_percentage = mouseDist / shortest;
+			bool in_cancel_range = mouseDist_percentage <= 0.1f || mouseDist_percentage >= 0.55f;
+			Vector2 mouseNormFromCenter = mouseVecFromCenter.normalized;
+			float aimRot = Mathf.Atan2(mouseNormFromCenter.y, mouseNormFromCenter.x);
+			if (aimRot < 0) aimRot += tau_fast;
+			float wheelPercentage = aimRot / tau_fast;
+			
+			UnitSinModel unitSin = uiController.GetDragginSin() ?? uiController.GetClickedSin();
+			bool isDrag = unitSin != null;
 			bool wantWheel = Input.GetKey(KeyCode.W) && isDrag;
 			bool wantWheel_changed = wantWheel_last != wantWheel;
 			wantWheel_last = wantWheel;
@@ -91,7 +109,6 @@ public class TheWheel
 				
 				int actevent = MainClass.timingDict["ActionWheel"];
 				if (wantWheel) {
-					UnitSinModel unitSin = uiController.GetDragginSin();
 					BattleUnitModel unit = unitSin._model;
 					BattleActionModel action = unitSin.GetBattleActionModel();
 					SkillModel skill = unitSin.GetSkill();
@@ -162,8 +179,7 @@ public class TheWheel
 				}
 				else
 				{
-					if (isDrag && option_selected_idx >= 0) {
-						UnitSinModel unitSin = uiController.GetDragginSin();
+					if (isDrag && option_selected_idx >= 0 && option_list[option_selected_idx].can_select) {
 						BattleUnitModel unit = unitSin._model;
 						BattleActionModel action = unitSin.GetBattleActionModel();
 						SkillModel skill = unitSin.GetSkill();
@@ -234,14 +250,8 @@ public class TheWheel
 
 					for (int i = 0; i < options; i++) {
 						WheelOptionCenter center = ref_wheelVis.center_list[i];
-						center.SetSelected(i == option_selected_idx);
+						center.SetSelected(i == option_selected_idx && center.option.can_select);
 					}
-					
-					/*SoundManager soundManager = SoundGenerator._soundManager;
-					if (soundManager) {
-						GUID parsed_guid = GUID.Parse("014929a9-0639-4e7c-ac44-61a00d7c97a5");
-						soundManager.PlayOnShot(parsed_guid);
-					}*/
 				}
 			}
 			
@@ -384,10 +394,11 @@ public class TheWheel
 				if (!b) modulate = new Color(0.7f, 0.7f, 0.7f, 0.9f);
 			} else {
 				rect.localScale = Vector3.one;
-				modulate = new Color(0.9f, 0.4f, 0.4f, 0.9f);
+				modulate = new Color(1.0f, 0.4f, 0.4f, 0.9f);
 			}
 			
 			skillIcon.color = modulate;
+			modulate.a = 1.0f;
 			if (text1) text1.SetModulate(modulate);
 			if (text2) text2.SetModulate(modulate);
 		}

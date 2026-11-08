@@ -179,9 +179,6 @@ public class MainClass : BasePlugin
 		ClassInjector.RegisterTypeInIl2Cpp<TheWheel.WheelOptionText>();
 		ClassInjector.RegisterTypeInIl2Cpp<ActionWheelOption>();
 		
-		TheWheel.InputChecker checker = TheWheel.InputChecker.Instance;
-		checker.option_selected_idx = -1;
-		
 		//ClassInjector.RegisterTypeInIl2Cpp<ModularSA.BattleUnitComparer>();
 		harmony.PatchAll(typeof(SkillScriptInitPatch));
 		// BLACK MAGIC
@@ -681,7 +678,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "5.3.0";
+	public const string VERSION = "5.3.1";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
