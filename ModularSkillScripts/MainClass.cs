@@ -442,6 +442,7 @@ public class MainClass : BasePlugin
 		acquirerDict["egorisk"] = new AcquirerEGORisk();
 		acquirerDict["othermodsavalue"] = new AcquirerOtherModsaValue();
 		acquirerDict["skillviewer"] = new AcquirerSkillViewer();
+		acquirerDict["hasequippedfacade"] new AcquirerHasEquippedFacade();
 
 		// legacy acquirers
 		acquirerDict["hpcheck"] = new AcquirerHpCheck();
