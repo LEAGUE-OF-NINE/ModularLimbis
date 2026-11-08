@@ -22,6 +22,13 @@ function ModularUtil.GetterRandom(minRoll, maxRoll) end
 ---@nodiscard
 function ModularUtil.FetchComplexEncounterData() end
 
+---@overload fun(soundName:string, vol:integer)
+---@overload fun(soundName:string)
+---@param soundName string
+---@param vol integer Add this to change the volume (0~100)
+---@param loop boolean Add this to set to loop (Default=false)
+function ModularUtil.PlayCustomSound(soundName, vol, loop) end
+
 ---@class ModsaInterface
 ModsaInterface = {}
 

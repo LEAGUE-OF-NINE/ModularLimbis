@@ -33,7 +33,8 @@ public sealed class LuaFunctions
     [
 	    new Lua.LuaFunction("ShuffleList", ShuffleList),
 	    new Lua.LuaFunction("GetterRandom", GetterRandom),
-	    new Lua.LuaFunction("FetchComplexEncounterData", FetchComplexEncounterData)
+	    new Lua.LuaFunction("FetchComplexEncounterData", FetchComplexEncounterData),
+	    new Lua.LuaFunction("PlayCustomSound", PlayCustomSound)
     ];
 	  F_BufManager =
 	  [
@@ -123,6 +124,22 @@ public sealed class LuaFunctions
 	{
 		buffer.Span[0] = SkillScriptInitPatch.complex_lua_encounter_data;
 		return new ValueTask<int>(1);
+	}
+	
+	public ValueTask<int> PlayCustomSound(
+		LuaFunctionExecutionContext context,
+		Memory<LuaValue> buffer,
+		CancellationToken cancellationToken)
+	{
+		int argCount = context.ArgumentCount;
+		string soundName = context.GetArgument<string>(0);
+		int vol = -1;
+		if (argCount >= 2) vol = context.GetArgument<int>(1);
+		bool loop = false;
+		if (argCount >= 3) loop = context.GetArgument<bool>(2);
+		
+		Lethe.Patches.CustomAudio.Play(soundName, vol, loop);
+		return new ValueTask<int>(0);
 	}
 	
 	public ValueTask<int> BufManager_CompareBufKeyword(
