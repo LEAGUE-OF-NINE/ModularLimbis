@@ -838,6 +838,9 @@ function DuelModel:FetchOpponentAction(fromAction) end
 ---@class ActionModel
 ---@field targetDataDetail TargetDetail
 ---@field skill SkillModel
+---@field unitSinModel UnitSinModel
+---@field expectedToEarnMap table
+---@field expectedToEarnMapForInit table
 ActionModel = {}
 
 --- Checks if internal BattleActionModel reference is null.

@@ -1150,7 +1150,7 @@ public partial class ActionModel
 	
 	[LuaMember("FetchSinAction")]
 	public LuaSinActionModel FetchSinAction() => new LuaSinActionModel(ref_action._sinAction);
-
+	
 	[LuaMember("TryChangeSkillByID")]
 	public bool TryChangeSkillByID(int skillID) => ref_action.TryChangeSkill(skillID);
 	[LuaMember("ChangeSkillByModel")]
@@ -1161,6 +1161,66 @@ public partial class ActionModel
 		get => new(ref_action._skill);
 		set => ref_action._skill = value.ref_skill;
 	} 
+	
+	[LuaMember("unitSinModel")]
+	public LuaUnitSinModel unitSinModel {
+		get => new(ref_action._sin);
+		set => ref_action._sin = value.ref_unitSin;
+	} 
+	
+	[LuaMember("expectedToEarnMap")]
+	public LuaTable expectedToEarnMap {
+		get
+		{
+			Dictionary<ATTRIBUTE_TYPE, int> dict = ref_action._expectedToEarnMap;
+			LuaTable table = new(0, dict.Count);
+			foreach (KeyValuePair<ATTRIBUTE_TYPE, int> kvp in dict) {
+				string sinType_s = kvp.Key.ToString();
+				table[sinType_s] = kvp.Value;
+			}
+			return table;
+		}
+		set
+		{
+			Dictionary<ATTRIBUTE_TYPE, int> dict = new();
+			for (int i = 0; i < 7; i++) {
+				ATTRIBUTE_TYPE sinType = (ATTRIBUTE_TYPE)i;
+				string sinType_s = sinType.ToString();
+				if (value.TryGetValue(sinType_s, out LuaValue luaval)) {
+					int amount = luaval.Read<int>();
+					dict[sinType] = amount;
+				}
+			}
+			ref_action._expectedToEarnMap = dict;
+		}
+	}
+	
+	[LuaMember("expectedToEarnMapForInit")]
+	public LuaTable expectedToEarnMapForInit {
+		get
+		{
+			Dictionary<ATTRIBUTE_TYPE, int> dict = ref_action._expectedToEarnMapForInit;
+			LuaTable table = new(0, dict.Count);
+			foreach (KeyValuePair<ATTRIBUTE_TYPE, int> kvp in dict) {
+				string sinType_s = kvp.Key.ToString();
+				table[sinType_s] = kvp.Value;
+			}
+			return table;
+		}
+		set
+		{
+			Dictionary<ATTRIBUTE_TYPE, int> dict = new();
+			for (int i = 0; i < 7; i++) {
+				ATTRIBUTE_TYPE sinType = (ATTRIBUTE_TYPE)i;
+				string sinType_s = sinType.ToString();
+				if (value.TryGetValue(sinType_s, out LuaValue luaval)) {
+					int amount = luaval.Read<int>();
+					dict[sinType] = amount;
+				}
+			}
+			ref_action._expectedToEarnMapForInit = dict;
+		}
+	}
 
 	[LuaMember("targetDataDetail")]
 	public LuaTargetDetail targetDataDetail
