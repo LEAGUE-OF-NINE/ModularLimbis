@@ -170,8 +170,9 @@ PacketOverwriteGiveBuf = {}
 --- Information Packet specific to Modular's ActionWheel activation.
 ---@class PacketActionWheel
 ---@field info_wheelTiming ActionWheelTiming
+---@field info_selection integer Handled by the Lua script
 ---@field out_actionType ActionWheelType
----@field out_skillIDList table Options for Wheel Request.
+---@field out_optionList ActionWheelOption[] Options for Wheel Request.
 ---@field carry_uniqueInfo table Carried over to this same script
 PacketActionWheel = {}
 
@@ -182,6 +183,18 @@ PacketActionWheel = {}
 ---@alias ActionWheelType
 ---| 0 changeskill
 ---| 1 on play
+
+---@class ActionWheelOption
+---@field skillID integer
+---@field can_select boolean Default = true
+---@field icon_string string Set this to override with a custom icon's name.
+---@field icon_scale boolean Default = 1.0
+---@field option_desc string
+ActionWheelOption = {}
+
+---@return ActionWheelOption
+---@nodiscard
+function ActionWheelOption.CreateNew() end
 
 --- Creates and returns the current EventTiming.
 ---@return EventTiming

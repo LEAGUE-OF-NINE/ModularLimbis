@@ -1,5 +1,6 @@
 #nullable enable
 using Il2CppInterop.Runtime;
+using Il2CppInterop.Runtime.Injection;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem;
 using Il2CppSystem.Collections.Generic;
@@ -9,6 +10,7 @@ using ModularSkillScripts.Patches;
 using SD;
 using Unity.Collections;
 using UnityEngine;
+using IntPtr = System.IntPtr;
 
 namespace ModularSkillScripts.LuaIntegration;
 
@@ -1843,10 +1845,86 @@ public partial class PacketActionWheel
 {
 	[LuaMember("info_wheelTiming")]
 	public int info_wheelTiming = 0;
+	[LuaMember("info_selection")]
+	public int info_selection = -1;
 	[LuaMember("out_actionType")]
 	public int out_actionType = 0;
-	[LuaMember("out_skillIDList")]
-	public LuaTable out_skillIDList = null;
+	[LuaMember("out_optionList")]
+	public LuaTable out_optionList = new();
 	[LuaMember("carry_uniqueInfo")]
 	public LuaTable carry_uniqueInfo = new();
+}
+
+[LuaObject]
+public partial class LuaActionWheelOption
+{
+	public ActionWheelOption ref_obj = null;
+	public LuaActionWheelOption(ActionWheelOption x) => ref_obj = x;
+
+	[LuaMember("CreateNew")]
+	public static LuaActionWheelOption CreateNew() => new(new ActionWheelOption());
+	
+	public static LuaTable MakeTable(List<ActionWheelOption> list) {
+		int count = list.Count;
+		LuaTable table = new LuaTable(count, 0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = new LuaActionWheelOption(list[i]);
+		}
+		return table;
+	}
+	
+	public static List<ActionWheelOption> UnpackTable(LuaTable table) {
+		int count = table.ArrayLength;
+		List<ActionWheelOption> list = new(count);
+		for (int i = 0; i < count; i++) {
+			LuaActionWheelOption luaval = table[i + 1].Read<LuaActionWheelOption>();
+			list.Add(luaval.ref_obj);
+		}
+		return list;
+	}
+	
+	[LuaMember("skillID")]
+	public int skillID {
+		get => ref_obj.skillID;
+		set => ref_obj.skillID = value;
+	} 
+	
+	[LuaMember("can_select")]
+	public bool can_select {
+		get => ref_obj.can_select;
+		set => ref_obj.can_select = value;
+	} 
+	
+	[LuaMember("icon_string")]
+	public string icon_string {
+		get => ref_obj.icon_string;
+		set => ref_obj.icon_string = value;
+	} 
+	
+	[LuaMember("icon_scale")]
+	public double icon_scale {
+		get => ref_obj.icon_scale;
+		set => ref_obj.icon_scale = value;
+	} 
+	
+	[LuaMember("option_desc")]
+	public string option_desc {
+		get => ref_obj.option_desc;
+		set => ref_obj.option_desc = value;
+	} 
+}
+
+public class ActionWheelOption : Il2CppSystem.Object
+{
+	public ActionWheelOption(IntPtr ptr) : base(ptr) { }
+
+	public ActionWheelOption() : base(ClassInjector.DerivedConstructorPointer<DataMod>())
+	{
+		ClassInjector.DerivedConstructorBody(this);
+	}
+	public int skillID = 0;
+	public bool can_select = true;
+	public string icon_string = "";
+	public double icon_scale = 1.0;
+	public string option_desc = "";
 }

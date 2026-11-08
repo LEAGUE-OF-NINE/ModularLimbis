@@ -14,6 +14,7 @@ using ModularSkillScripts.Patches;
 using Il2CppSystem.Text.RegularExpressions;
 using StringSplitOptions = System.StringSplitOptions;
 using CSound;
+using ModularSkillScripts.LuaIntegration;
 using ModularSkillScripts.MObjGetter;
 
 //using Antlr4.Runtime;
@@ -172,6 +173,15 @@ public class MainClass : BasePlugin
 		ClassInjector.RegisterTypeInIl2Cpp<BlackMagic.Orb>();
 		ClassInjector.RegisterTypeInIl2Cpp<BlackMagic.OrbOrbiter>();
 
+		ClassInjector.RegisterTypeInIl2Cpp<TheWheel.InputChecker>();
+		ClassInjector.RegisterTypeInIl2Cpp<TheWheel.WheelVis>();
+		ClassInjector.RegisterTypeInIl2Cpp<TheWheel.WheelOptionCenter>();
+		ClassInjector.RegisterTypeInIl2Cpp<TheWheel.WheelOptionText>();
+		ClassInjector.RegisterTypeInIl2Cpp<ActionWheelOption>();
+		
+		TheWheel.InputChecker checker = TheWheel.InputChecker.Instance;
+		checker.option_selected_idx = -1;
+		
 		//ClassInjector.RegisterTypeInIl2Cpp<ModularSA.BattleUnitComparer>();
 		harmony.PatchAll(typeof(SkillScriptInitPatch));
 		// BLACK MAGIC
@@ -671,7 +681,7 @@ public class MainClass : BasePlugin
 	public static bool logEnabled = false; // for useless logs
 
 	public const string NAME = "ModularSkillScripts";
-	public const string VERSION = "5.2.16";
+	public const string VERSION = "5.3.0";
 	public const string AUTHOR = "GlitchGames";
 	public const string GUID = $"{AUTHOR}.{NAME}";
 
