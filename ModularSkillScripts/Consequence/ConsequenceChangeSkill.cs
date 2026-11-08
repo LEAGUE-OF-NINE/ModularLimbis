@@ -1,3 +1,5 @@
+using Il2CppSystem.Collections.Generic;
+
 namespace ModularSkillScripts.Consequence;
 
 public class ConsequenceChangeSkill : IModularConsequence
@@ -14,10 +16,24 @@ public class ConsequenceChangeSkill : IModularConsequence
 	{
 		if (erase_prev_skill)
 		{
+			ATTRIBUTE_TYPE sinType_before = action._skill.GetAttributeType();
+			bool hadSin = action._expectedToEarnMap.TryGetValue(sinType_before, out int amount_before);
+			
 			if (action.TryChangeSkill(skill_ID))
 			{
 				action._sin._overwrited = false;
-				action._previousSkillBeforeChanged = action._skill;
+				action._previousSkillBeforeChanged = null;
+
+				if (hadSin) {
+					ATTRIBUTE_TYPE sinType_after = action._skill.GetAttributeType();
+					if (sinType_before != sinType_after) {
+						action._expectedToEarnMap[sinType_before] = 0;
+						bool hasSin = action._expectedToEarnMap.TryGetValue(sinType_before, out int amount_after);
+						if (hasSin) action._expectedToEarnMap[sinType_after] = amount_before + amount_after;
+						else action._expectedToEarnMap[sinType_after] = amount_before;
+					}
+				}
+				
 			}
 			
 			/*
