@@ -837,6 +837,7 @@ function DuelModel:FetchOpponentAction(fromAction) end
 --- Internally Stores a BattleActionModel.
 ---@class ActionModel
 ---@field targetDataDetail TargetDetail
+---@field skill SkillModel
 ActionModel = {}
 
 --- Checks if internal BattleActionModel reference is null.
@@ -1092,6 +1093,7 @@ function SinActionModel:FetchUnitModel() end
 --- Internally Stores a vanilla UnitSinModel.
 ---@class UnitSinModel
 ---@field currentAction ActionModel
+---@field skillId integer
 UnitSinModel = {}
 
 --- Checks if internal UnitSinModel reference is null.

@@ -1155,7 +1155,12 @@ public partial class ActionModel
 	public bool TryChangeSkillByID(int skillID) => ref_action.TryChangeSkill(skillID);
 	[LuaMember("ChangeSkillByModel")]
 	public bool TryChangeSkillByModel(LuaSkillModel skill, bool saveOriginSkill) => ref_action.ChangeSkill(skill.ref_skill, saveOriginSkill);
-
+	
+	[LuaMember("skill")]
+	public LuaSkillModel skill {
+		get => new(ref_action._skill);
+		set => ref_action._skill = value.ref_skill;
+	} 
 
 	[LuaMember("targetDataDetail")]
 	public LuaTargetDetail targetDataDetail
@@ -1564,6 +1569,12 @@ public partial class LuaUnitSinModel
 	  get => new ActionModel(ref_unitSin._currentAction);
 	  set => ref_unitSin._currentAction = value.ref_action;
   }
+  
+  [LuaMember("skillId")]
+  public int skillId {
+	  get => ref_unitSin._skillId;
+	  set => ref_unitSin._skillId = value;
+  } 
 }
 
 [LuaObject]
