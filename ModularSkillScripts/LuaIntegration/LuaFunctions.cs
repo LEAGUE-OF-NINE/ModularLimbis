@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Il2CppSystem.Collections.Generic;
 using Lua;
 using Lua.Standard;
+using ModularSkillScripts.Consequence;
 using ModularSkillScripts.Patches;
 
 
@@ -34,7 +35,8 @@ public sealed class LuaFunctions
 	    new Lua.LuaFunction("ShuffleList", ShuffleList),
 	    new Lua.LuaFunction("GetterRandom", GetterRandom),
 	    new Lua.LuaFunction("FetchComplexEncounterData", FetchComplexEncounterData),
-	    new Lua.LuaFunction("PlayCustomSound", PlayCustomSound)
+	    new Lua.LuaFunction("PlayCustomSound", PlayCustomSound),
+	    new Lua.LuaFunction("VisualRefreshAllSkillSlot", VisualRefreshAllSkillSlot)
     ];
 	  F_BufManager =
 	  [
@@ -139,6 +141,15 @@ public sealed class LuaFunctions
 		if (argCount >= 3) loop = context.GetArgument<bool>(2);
 		
 		Lethe.Patches.CustomAudio.Play(soundName, vol, loop);
+		return new ValueTask<int>(0);
+	}
+	
+	public ValueTask<int> VisualRefreshAllSkillSlot(
+		LuaFunctionExecutionContext context,
+		Memory<LuaValue> buffer,
+		CancellationToken cancellationToken)
+	{
+		ConsequenceRefreshAllSlotVisual.ActivateRefresh();
 		return new ValueTask<int>(0);
 	}
 	

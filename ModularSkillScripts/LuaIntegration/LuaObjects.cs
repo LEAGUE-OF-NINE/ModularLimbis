@@ -6,6 +6,7 @@ using Il2CppSystem;
 using Il2CppSystem.Collections.Generic;
 using Lethe.EnumInjections;
 using Lua;
+using ModularSkillScripts.Consequence;
 using ModularSkillScripts.Patches;
 using SD;
 using Unity.Collections;
@@ -1152,7 +1153,7 @@ public partial class ActionModel
 	public LuaSinActionModel FetchSinAction() => new LuaSinActionModel(ref_action._sinAction);
 	
 	[LuaMember("TryChangeSkillByID")]
-	public bool TryChangeSkillByID(int skillID) => ref_action.TryChangeSkill(skillID);
+	public void TryChangeSkillByID(int skillID, bool erase_prev_skill) => ConsequenceChangeSkill.ChangeSkillOfAction(ref_action, skillID, erase_prev_skill);
 	[LuaMember("ChangeSkillByModel")]
 	public bool TryChangeSkillByModel(LuaSkillModel skill, bool saveOriginSkill) => ref_action.ChangeSkill(skill.ref_skill, saveOriginSkill);
 	

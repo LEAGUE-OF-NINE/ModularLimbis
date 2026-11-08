@@ -29,6 +29,8 @@ function ModularUtil.FetchComplexEncounterData() end
 ---@param loop boolean Add this to set to loop (Default=false)
 function ModularUtil.PlayCustomSound(soundName, vol, loop) end
 
+function ModularUtil.VisualRefreshAllSkillSlot() end
+
 ---@class ModsaInterface
 ModsaInterface = {}
 
@@ -889,8 +891,8 @@ function ActionModel:FetchSkill() end
 function ActionModel:FetchSinAction() end
 
 ---@param skillID integer
----@return boolean
-function ActionModel:TryChangeSkillByID(skillID) end
+---@param erase_prev_skill boolean
+function ActionModel:TryChangeSkillByID(skillID, erase_prev_skill) end
 
 ---@param skill SkillModel
 ---@param saveOriginSkill boolean (Default = true)
