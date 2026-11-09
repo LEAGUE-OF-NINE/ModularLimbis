@@ -1745,6 +1745,12 @@ public partial class LuaUnitView
 	
 	[LuaMember("FetchAppearance")]
 	public LuaCharAppearance FetchAppearance() => new(ref_view.Appearance);
+	
+	[LuaMember("RefreshState")]
+	public void RefreshState() => ref_view.RefreshState(ref_view._unitModel);
+	
+	[LuaMember("RefreshEffects")]
+	public void RefreshEffects() => ref_view.RefreshEffects();
 }
 
 [LuaObject]

@@ -47,7 +47,9 @@ public sealed class LuaFunctions
 	  [
 		  new Lua.LuaFunction("GetAliveList", BattleObjectManager_GetAliveList),
 		  new Lua.LuaFunction("GetAliveListByBuf", BattleObjectManager_GetAliveListByBuf),
-		  new Lua.LuaFunction("GetView", BattleObjectManager_GetView)
+		  new Lua.LuaFunction("GetView", BattleObjectManager_GetView),
+		  new Lua.LuaFunction("UpdateViewState", BattleObjectManager_UpdateViewState),
+		  new Lua.LuaFunction("ForceRefreshAllBullshit", BattleObjectManager_ForceRefreshAllBullshit)
 	  ];
 	  F_CoinModel =
 	  [
@@ -242,6 +244,25 @@ public sealed class LuaFunctions
 		LuaUnitView luaView = new(view);
 		buffer.Span[0] = luaView;
 		return new ValueTask<int>(1);
+	}
+	
+	public ValueTask<int> BattleObjectManager_UpdateViewState(
+		LuaFunctionExecutionContext context,
+		Memory<LuaValue> buffer,
+		CancellationToken cancellationToken)
+	{
+		BattleObjectManager objManager = SingletonBehavior<BattleObjectManager>.Instance;
+		objManager.UpdateViewState(false, false);
+		return new ValueTask<int>(0);
+	}
+	
+	public ValueTask<int> BattleObjectManager_ForceRefreshAllBullshit(
+		LuaFunctionExecutionContext context,
+		Memory<LuaValue> buffer,
+		CancellationToken cancellationToken)
+	{
+		UniquePatches.VisualUpdateForSpecial();
+		return new ValueTask<int>(0);
 	}
 	
 	public ValueTask<int> CoinModel_CreateFromCoinModel(

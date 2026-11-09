@@ -436,6 +436,10 @@ function BattleObjectManager.GetAliveListByBuff(bufKeyword, activeRound, include
 ---@nodiscard
 function BattleObjectManager.GetView(unitOrInstID) end
 
+function BattleObjectManager.UpdateViewState() end
+
+function BattleObjectManager.ForceRefreshAllBullshit() end
+
 --- Static Method Interface for BattleActionModelManager.
 ---@class ActionModelManager
 ActionModelManager = {}
@@ -1162,6 +1166,10 @@ function UnitView:FetchTransform() end
 ---@return CharAppearance
 ---@nodiscard
 function UnitView:FetchAppearance() end
+
+function UnitView:RefreshState() end
+
+function UnitView:RefreshEffects() end
 
 --- Internally Stores a vanilla CharacterAppearance.
 ---@class CharAppearance
