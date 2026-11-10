@@ -49,4 +49,8 @@
 			<Private>false</Private>
 		</Reference>
 	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="Resources\ActionWheelDarkCircle.png" />
+	  <EmbeddedResource Include="Resources\ActionWheelDarkCircle.png" />
+	</ItemGroup>
 </Project>

@@ -1,6 +1,8 @@
 using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using Addressable;
 using BattleUI;
 using BattleUI.Abnormality;
@@ -9,6 +11,7 @@ using BattleUI.UIRoot;
 using FMOD;
 using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
+using Lethe.Patches;
 using Lua;
 using ModularSkillScripts;
 using ModularSkillScripts.LuaIntegration;
@@ -79,7 +82,7 @@ public class TheWheel
 		{
 			BattleUIRoot battleUIRoot = SingletonBehavior<BattleUIRoot>.Instance;
 			if (!battleUIRoot) return;
-			Canvas canvas = battleUIRoot.PerspectiveUICanvas;
+			TutorialUIManager canvas = battleUIRoot._tutorialUIManager;
 			if (!canvas) return;
 			AbnormalityUIController uiController = battleUIRoot._abUIController;
 			
@@ -269,8 +272,9 @@ public class TheWheel
 		
 		/*Canvas pivotCanvas = lineObject.AddComponent<Canvas>();
 		pivotCanvas.overrideSorting = true; 
-		pivotCanvas.sortingOrder = 100; 
-		*/
+		pivotCanvas.sortingOrder = 100;
+		pivotCanvas.renderMode = canvas.renderMode;*/
+		
 		RectTransform rect = lineObject.AddComponent<RectTransform>();
 		rect.SetParent(rectParent, false);
 		rect.SetAsLastSibling();
@@ -283,11 +287,11 @@ public class TheWheel
 		rect.pivot = new Vector2(0.5f, 0.5f);
 		rect.anchoredPosition = Vector2.zero;
 		rect.sizeDelta = Vector2.zero;
+
+		line.CreateDarkCircle();
 		
 		return line;
 	}
-	
-	
 	
 	public static WheelOptionText CreateOptionText(RectTransform rectParent, string text, bool is_desc, float fontSize, Vector2 offset)
 	{
@@ -372,6 +376,38 @@ public class TheWheel
 
 			line.SetSelected(false);
 			return line;
+		}
+		
+		public GameObject CreateDarkCircle()
+		{
+			GameObject lineObject = new("WheelDarkCircle");
+
+			RectTransform rect = lineObject.AddComponent<RectTransform>();
+			rect.SetParent(GetComponent<RectTransform>(), false);
+			rect.anchorMin = new Vector2(0.5f, 0.5f);
+			rect.anchorMax = new Vector2(0.5f, 0.5f);
+			rect.pivot = new Vector2(0.5f, 0.5f);
+			rect.anchoredPosition = Vector2.zero;
+			rect.sizeDelta = new Vector2(2000, 2000); // Size of the image
+
+			Image uiImage = lineObject.AddComponent<Image>();
+			uiImage.preserveAspect = true;
+			
+			Assembly assembly = Assembly.GetExecutingAssembly();
+			Stream stream = assembly.GetManifestResourceStream("ModularSkillScripts.Resources.ActionWheelDarkCircle.png");
+			if (stream == null) {
+				foreach (string s in assembly.GetManifestResourceNames()) {
+					MainClass.LogModular(s, true);
+				}
+			} else {
+				byte[] data = new byte[stream.Length];
+				stream.Read(data, 0, (int)stream.Length);
+				Texture2D tex = PngDecoder.Load(data);
+				Sprite sprite =  Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+				uiImage.sprite = sprite;
+			}
+			uiImage.color = new Color(1.0f, 1.0f, 1.0f, 0.3f);
+			return lineObject;
 		}
 	}
 	
