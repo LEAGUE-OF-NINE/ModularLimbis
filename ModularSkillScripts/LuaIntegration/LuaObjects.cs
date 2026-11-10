@@ -1985,6 +1985,18 @@ public partial class LuaActionWheelOption
 		set => ref_obj.icon_scale = value;
 	} 
 	
+	[LuaMember("text_scale")]
+	public double text_scale {
+		get => ref_obj.text_scale;
+		set => ref_obj.text_scale = value;
+	} 
+	
+	[LuaMember("option_name")]
+	public string option_name {
+		get => ref_obj.option_name;
+		set => ref_obj.option_name = value;
+	} 
+	
 	[LuaMember("option_desc")]
 	public string option_desc {
 		get => ref_obj.option_desc;
@@ -2004,5 +2016,7 @@ public class ActionWheelOption : Il2CppSystem.Object
 	public bool can_select = true;
 	public string icon_string = "";
 	public double icon_scale = 1.0;
+	public double text_scale = 1.0;
+	public string option_name = "";
 	public string option_desc = "";
 }

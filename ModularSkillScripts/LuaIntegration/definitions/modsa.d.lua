@@ -198,6 +198,8 @@ PacketActionWheel = {}
 ---@field can_select boolean Default = true
 ---@field icon_string string Set this to override with a custom icon's name.
 ---@field icon_scale boolean Default = 1.0
+---@field text_scale boolean Default = 1.0
+---@field option_name string
 ---@field option_desc string
 ActionWheelOption = {}
 
