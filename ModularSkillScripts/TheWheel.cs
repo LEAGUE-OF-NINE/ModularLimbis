@@ -362,7 +362,7 @@ public class TheWheel
 			if (option_skillIcon == null) option_skillIcon = skill.GetSkillSprite();
 			uiImage.sprite = option_skillIcon;
 
-			string option_name = option.option_desc;
+			string option_name = option.option_name;
 			if (string.IsNullOrEmpty(option_name)) option_name = skill.GetSkillName();
 			//WheelOptionText optionText = CreateOptionText(rect, skillName, 60, new Vector2(0, 60.0f*icon_scale) + pos);
 			WheelOptionText optionText = CreateOptionText(rect, option_name, false, 55 * text_scale, new Vector2(0, -10.0f));
@@ -389,7 +389,7 @@ public class TheWheel
 			rect.anchorMax = new Vector2(0.5f, 0.5f);
 			rect.pivot = new Vector2(0.5f, 0.5f);
 			rect.anchoredPosition = Vector2.zero;
-			rect.sizeDelta = new Vector2(2000, 2000); // Size of the image
+			rect.sizeDelta = new Vector2(1800, 1800); // Size of the image
 
 			Image uiImage = lineObject.AddComponent<Image>();
 			uiImage.preserveAspect = true;
@@ -407,7 +407,7 @@ public class TheWheel
 				Sprite sprite =  Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
 				uiImage.sprite = sprite;
 			}
-			uiImage.color = new Color(1.0f, 1.0f, 1.0f, 0.3f);
+			uiImage.color = new Color(1.0f, 1.0f, 1.0f, 0.5f);
 			return lineObject;
 		}
 	}

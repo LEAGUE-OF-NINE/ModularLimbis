@@ -1102,6 +1102,11 @@ SinActionModel = {}
 ---@return boolean
 function SinActionModel:IsNull() end
 
+--- Compares this and another.
+---@param other SinActionModel
+---@return boolean
+function SinActionModel:IsEqualTo(other) end
+
 ---@return integer
 function SinActionModel:GetSlotIndex() end
 
@@ -1117,6 +1122,11 @@ UnitSinModel = {}
 --- Checks if internal UnitSinModel reference is null.
 ---@return boolean
 function UnitSinModel:IsNull() end
+
+--- Compares this and another.
+---@param other UnitSinModel
+---@return boolean
+function UnitSinModel:IsEqualTo(other) end
 
 ---@param skillID integer
 ---@param unit UnitModel

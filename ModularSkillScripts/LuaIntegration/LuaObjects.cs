@@ -1537,6 +1537,9 @@ public partial class LuaSinActionModel
 	[LuaMember("IsNull")]
 	public bool IsNull() => ref_sinAction == null;
 	
+	[LuaMember("IsEqualTo")]
+	public bool IsEqualTo(LuaSinActionModel other) => ref_sinAction == other.ref_sinAction;
+	
 	[LuaMember("GetSlotIndex")]
 	public int GetSlotIndex() => ref_sinAction.GetSlotIndex();
 	
@@ -1595,6 +1598,9 @@ public partial class LuaUnitSinModel
 
 	[LuaMember("IsNull")]
 	public bool IsNull() => ref_unitSin == null;
+	
+	[LuaMember("IsEqualTo")]
+	public bool IsEqualTo(LuaUnitSinModel other) => ref_unitSin == other.ref_unitSin;
 	
 	public static LuaTable MakeTable(List<UnitSinModel> list) {
   	int count = list.Count;
