@@ -390,6 +390,37 @@ function AtkType:PrintAllEnumValues() end
 ---@return boolean
 function AtkType:IsEqualTo(other) end
 
+--- Can be instanced to store an DEFENSE_TYPE enum.
+---@class DefType
+DefType = {}
+
+--- Creates a new DefType instance that internally stores a DEFENSE_TYPE enum by parsing a string.
+---@param s string
+---@return DefType
+function DefType.CreateFromString(s) end
+
+--- Creates a new DefType instance that internally stores a DEFENSE_TYPE enum by casting an int.
+---@param integ integer
+---@return DefType
+function DefType.CreateFromInt(integ) end
+
+--- Returns a string of the stored DEFENSE_TYPE.
+---@return string
+function DefType:ToString() end
+
+--- Returns an integer of the stored DEFENSE_TYPE enum value.
+---@return integer
+function DefType:ToInt() end
+
+--- Prints all in-game DEFENSE_TYPE enum values to the Console.
+---@return nil
+function DefType:PrintAllEnumValues() end
+
+--- Compares this and another.
+---@param other DefType
+---@return boolean
+function DefType:IsEqualTo(other) end
+
 --- 0 = "Player", 1 = "Enemy", 2 = "None".
 ---@alias UnitFaction
 ---| 0
@@ -999,6 +1030,10 @@ function SkillModel:FetchAttribute() end
 ---@return AtkType
 ---@nodiscard
 function SkillModel:FetchAtkType() end
+
+---@return DefType
+---@nodiscard
+function SkillModel:FetchDefenseType() end
 
 ---@return CoinModel[]
 ---@nodiscard

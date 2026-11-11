@@ -1048,6 +1048,41 @@ public partial class LuaAtkType
 }
 
 [LuaObject]
+public partial class LuaDefType
+{
+	public DEFENSE_TYPE ref_enum;
+	public LuaDefType(DEFENSE_TYPE x = DEFENSE_TYPE.NONE) => ref_enum = x;
+	
+	[LuaMember("CreateFromString")]
+	public static LuaDefType CreateFromString(string s) {
+		LuaDefType new_self = new();
+		if (Enum.TryParse(s, true, out DEFENSE_TYPE result)) {
+			new_self.ref_enum = result;
+		}
+		return new_self;
+	}
+	
+	[LuaMember("CreateFromInt")]
+	public static LuaDefType CreateFromInt(int integ) => new LuaDefType { ref_enum = (DEFENSE_TYPE)integ };
+	
+	[LuaMember("ToString")]
+	public string KeywordToString() => ref_enum.ToString();
+	
+	[LuaMember("ToInt")]
+	public int KeywordToInt() => (int)ref_enum;
+	
+	[LuaMember("PrintAllEnumValues")]
+	public void PrintAllEnumValues() {
+		foreach (string keyname in Il2CppSystem.Enum.GetNames(Il2CppType.Of<DEFENSE_TYPE>())) {
+			MainClass.LogModular("DEFENSE_TYPE: " + keyname, true);
+		}
+	}
+
+	[LuaMember("IsEqualTo")]
+	public bool IsEqualTo(LuaDefType other) => ref_enum == other.ref_enum;
+}
+
+[LuaObject]
 public partial class LuaPassiveModel
 {
 	public PassiveModel ref_passive = null;
@@ -1495,6 +1530,9 @@ public partial class LuaSkillModel
 	
 	[LuaMember("FetchAtkType")]
 	public LuaAtkType FetchAtkType() => new LuaAtkType{ ref_enum = ref_skill.GetAttackType()};
+	
+	[LuaMember("FetchDefenseType")]
+	public LuaDefType FetchDefenseType() => new LuaDefType{ ref_enum = ref_skill.GetDefenseType()};
 	
 	[LuaMember("coinList")]
 	public LuaTable coinList {

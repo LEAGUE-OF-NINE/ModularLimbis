@@ -1401,6 +1401,7 @@ public class ModularSA : Il2CppSystem.Object
 		state.Environment["SkillTargetType"] = new LuaSkillTargetType();
 		state.Environment["AttributeType"] = new LuaAttributeType();
 		state.Environment["AtkType"] = new LuaAtkType();
+		state.Environment["AtkType"] = new LuaAtkType();
 		state.Environment["Vec3"] = new LuaVector3(0,0,0);
 		
 		LuaFunctions.MergeTableToLuaState("ModularUtil", state, LuaFunctions.Instance.F_Util_table);
