@@ -1935,6 +1935,8 @@ public partial class PacketActionWheel
 	public int out_actionType = 0;
 	[LuaMember("out_optionList")]
 	public LuaTable out_optionList = new();
+	[LuaMember("out_wheel_radius_scale")]
+	public double out_wheel_radius_scale = 1.0;
 	[LuaMember("carry_uniqueInfo")]
 	public LuaTable carry_uniqueInfo = new();
 }

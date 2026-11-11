@@ -115,6 +115,8 @@ public class TheWheel
 					BattleUnitModel unit = unitSin._model;
 					BattleActionModel action = unitSin.GetBattleActionModel();
 					SkillModel skill = unitSin.GetSkill();
+
+					float wheel_radius_scale = 1.0f;
 					
 					option_list.Clear();
 					bool foundScript = false;
@@ -136,6 +138,7 @@ public class TheWheel
 						modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 						if (packet.out_optionList.ArrayLength < 1) continue;
 						option_list = LuaActionWheelOption.UnpackTable(packet.out_optionList);
+						wheel_radius_scale = (float)packet.out_wheel_radius_scale;
 						foundScript = true;
 					}
 
@@ -161,24 +164,26 @@ public class TheWheel
 								modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 								if (packet.out_optionList.ArrayLength < 1) continue;
 								option_list = LuaActionWheelOption.UnpackTable(packet.out_optionList);
+								wheel_radius_scale = (float)packet.out_wheel_radius_scale;
 								foundScript = true;
 							}
 						}
 					}
-					
 
+					
 					options = option_list.Count;
+					float wheel_radius = 450.0f * wheel_radius_scale;
 					float rot_per_option = 360.0f / options;
+					float rot_offset = Mathf.Min(180.0f / options, 90.0f);
 					for (int i = 0; i < options; i++)
 					{
 						ActionWheelOption option = option_list[i];
 						SkillModel option_skillModel = unit._unitDataModel.GetSkillModel(option.skillID);
-						Vector2 option_pos = new(450, 0);
-						float option_rot = rot_per_option * i + 45.0f;
+						Vector2 option_pos = new(wheel_radius, 0);
+						float option_rot = rot_per_option * i + rot_offset;
 						option_pos = option_pos.RotateAroundPoint(Vector2.zero, -option_rot);
 						ref_wheelVis.CreateOptionCenter(option_pos, option_skillModel, option);
 					}
-					
 				}
 				else
 				{

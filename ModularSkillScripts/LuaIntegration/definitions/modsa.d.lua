@@ -182,6 +182,7 @@ PacketOverwriteGiveBuf = {}
 ---@field info_selection integer Handled by the Lua script
 ---@field out_actionType ActionWheelType
 ---@field out_optionList ActionWheelOption[] Options for Wheel Request.
+---@field out_wheel_radius_scale number
 ---@field carry_uniqueInfo table Carried over to this same script
 PacketActionWheel = {}
 
@@ -197,8 +198,8 @@ PacketActionWheel = {}
 ---@field skillID integer
 ---@field can_select boolean Default = true
 ---@field icon_string string Set this to override with a custom icon's name.
----@field icon_scale boolean Default = 1.0
----@field text_scale boolean Default = 1.0
+---@field icon_scale number Default = 1.0
+---@field text_scale number Default = 1.0
 ---@field option_name string
 ---@field option_desc string
 ActionWheelOption = {}
