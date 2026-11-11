@@ -1051,7 +1051,6 @@ public partial class LuaAtkType
 public partial class LuaDefType
 {
 	public DEFENSE_TYPE ref_enum;
-	public LuaDefType(DEFENSE_TYPE x = DEFENSE_TYPE.NONE) => ref_enum = x;
 	
 	[LuaMember("CreateFromString")]
 	public static LuaDefType CreateFromString(string s) {
