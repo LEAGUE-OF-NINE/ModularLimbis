@@ -339,8 +339,7 @@ public class TheWheel
 			WheelOptionCenter line = lineObject.AddComponent<WheelOptionCenter>();
 			center_list.Add(line);
 			line.option = option;
-
-
+			
 			float icon_scale = (float)option.icon_scale;
 			float text_scale = (float)option.text_scale;
 
@@ -378,6 +377,22 @@ public class TheWheel
 				//optionText = CreateOptionText(rect, option_desc, 45, new Vector2(0, 120.0f*icon_scale + 10.0f) + pos);
 				optionText = CreateOptionText(rect, option_desc, true, 40 * text_scale, new Vector2(0, -75.0f));
 				line.text2 = optionText;
+			}
+			
+			string option_overlay_icon_s = option.overlay_icon_string;
+			if (!string.IsNullOrEmpty(option_overlay_icon_s)){
+				GameObject go = new("OverlayIcon");
+				RectTransform go_rect = go.AddComponent<RectTransform>();
+				go_rect.SetParent(GetComponent<RectTransform>(), false);
+				go_rect.anchorMin = new Vector2(0.5f, 0.5f);
+				go_rect.anchorMax = new Vector2(0.5f, 0.5f);
+				go_rect.pivot = new Vector2(0.5f, 0.5f);
+				go_rect.anchoredPosition = pos;
+				go_rect.sizeDelta = new Vector2(200, 200) * icon_scale; // Size of the image
+
+				Image go_uiImage = go.AddComponent<Image>();
+				go_uiImage.preserveAspect = true;
+				go_uiImage.sprite = Lethe.Patches.Texture.LoadSpriteFromFile(option_overlay_icon_s);
 			}
 
 			line.SetSelected(false);

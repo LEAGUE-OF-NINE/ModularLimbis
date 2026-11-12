@@ -200,6 +200,7 @@ PacketActionWheel = {}
 ---@field icon_string string Set this to override with a custom icon's name.
 ---@field icon_scale number Default = 1.0
 ---@field text_scale number Default = 1.0
+---@field overlay_icon_string string Set this to place another icon on top of the option's icon.
 ---@field option_name string
 ---@field option_desc string
 ActionWheelOption = {}

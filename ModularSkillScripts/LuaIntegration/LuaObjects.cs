@@ -2036,6 +2036,12 @@ public partial class LuaActionWheelOption
 		set => ref_obj.text_scale = value;
 	} 
 	
+	[LuaMember("overlay_icon_string")]
+	public string overlay_icon_string {
+		get => ref_obj.overlay_icon_string;
+		set => ref_obj.overlay_icon_string = value;
+	} 
+	
 	[LuaMember("option_name")]
 	public string option_name {
 		get => ref_obj.option_name;
@@ -2061,6 +2067,7 @@ public class ActionWheelOption : Il2CppSystem.Object
 	public bool can_select = true;
 	public string icon_string = "";
 	public double icon_scale = 1.0;
+	public string overlay_icon_string = "";
 	public double text_scale = 1.0;
 	public string option_name = "";
 	public string option_desc = "";
