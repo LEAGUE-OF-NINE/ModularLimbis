@@ -1155,6 +1155,10 @@ function SinActionModel:GetSlotIndex() end
 ---@return UnitModel
 function SinActionModel:FetchUnitModel() end
 
+---@param unitSin UnitSinModel
+---@param enable boolean
+function SinActionModel:SetShineOnUnitSin(unitSin, enable) end
+
 ---@return ActionModel[]
 ---@nodiscard
 function SinActionModel:FetchActionListTargetingThisSlot() end

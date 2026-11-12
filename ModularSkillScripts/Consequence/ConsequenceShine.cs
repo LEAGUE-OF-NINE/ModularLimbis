@@ -14,46 +14,44 @@ public class ConsequenceShine : IModularConsequence
 		if (sinAction == null) return;
 		UnitSinModel unitSin = action.Sin;
 		if (unitSin == null) return;
-		
+		bool enable = circledSection == "true";
+		SetShineOnUnitSin(sinAction, unitSin, enable);
+		} // END ExecuteConsequence
+
+	public static void SetShineOnUnitSin(SinActionModel sinAction, UnitSinModel unitSin, bool enable)
+	{
 		BattleUIRoot battleUIRoot = SingletonBehavior<BattleUIRoot>.Instance;
-		if (!battleUIRoot)
-		{
-			MainClass.LogModular("Dude This BattleUIRoot shit is FUCKING NULL");
+		if (!battleUIRoot) {
+			MainClass.LogModular("Dude This BattleUIRoot shit is FUCKING NULL", true);
 			return;
 		}
 		NewOperationController opController = battleUIRoot.NewOperationController;
-		if (!opController)
-		{
-			MainClass.LogModular("Dude This NewOperationController shit is FUCKING NULL");
+		if (!opController) {
+			MainClass.LogModular("Dude This NewOperationController shit is FUCKING NULL", true);
 			return;
 		}
 		
 		//NewOperationParentSlot op_parentSlot = opController.FindSinSlot(sinAction, unitSin);
 		NewOperationSinActionSlot op_sinAction = opController.GetSinActionSlot(sinAction);
 		if (!op_sinAction) return;
-		bool enable = circledSection == "true";
 
 		NewOperationSinSlot opSinSlot = op_sinAction._secondSinSlot;
-		if (opSinSlot)
-		{
+		if (opSinSlot) {
 			OperationSkillEffectManager op_skillEffectManager = opSinSlot._effectManager;
-			if (op_skillEffectManager && opSinSlot.UnitSin == unitSin)
-			{
+			if (op_skillEffectManager && opSinSlot.UnitSin == unitSin) {
 				op_skillEffectManager.SetActiveEffect_OneType(OPERATION_SKILL_EFFECT_TYPE.RING_FAVUISM_TEST, enable);
 				return;
 			}
 		}
 
 		opSinSlot = op_sinAction._firstSinSlot;
-		if (opSinSlot)
-		{
+		if (opSinSlot) {
 			OperationSkillEffectManager op_skillEffectManager = opSinSlot._effectManager;
-			if (op_skillEffectManager && opSinSlot.UnitSin == unitSin)
-			{
+			if (op_skillEffectManager && opSinSlot.UnitSin == unitSin) {
 				op_skillEffectManager.SetActiveEffect_OneType(OPERATION_SKILL_EFFECT_TYPE.RING_FAVUISM_TEST, enable);
 				return;
 			}
 		}
-		
-	} // END ExecuteConsequence
+	}
+
 } // END IModularConsequence

@@ -1605,6 +1605,9 @@ public partial class LuaSinActionModel
 	[LuaMember("FetchUnitModel")]
 	public UnitModel FetchUnitModel() => new UnitModel(ref_sinAction._unitModel);
 	
+	[LuaMember("SetShineOnUnitSin")]
+	public void SetShineOnUnitSin(LuaUnitSinModel unitSin, bool enable) => ConsequenceShine.SetShineOnUnitSin(ref_sinAction, unitSin.ref_unitSin, enable);
+	
 	[LuaMember("currentSinList")]
 	public LuaTable currentSinList {
 		get => LuaUnitSinModel.MakeTable(ref_sinAction.currentSinList);
