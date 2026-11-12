@@ -1154,6 +1154,28 @@ public partial class ActionModel
 	public BattleActionModel ref_action = null;
 	public ActionModel(BattleActionModel x) => ref_action = x;
 	
+	public static LuaTable MakeTable(List<BattleActionModel> list) {
+		int count = list.Count;
+		LuaTable table = new LuaTable(count, 0);
+		for (int i = 0; i < count; i++) {
+			table[i + 1] = new ActionModel(list[i]);
+		}
+		return table;
+	}
+  
+	public static List<BattleActionModel> UnpackTable(LuaTable table) {
+		int count = table.ArrayLength;
+		List<BattleActionModel> list = new(count);
+		for (int i = 0; i < count; i++) {
+			ActionModel luaval = table[i + 1].Read<ActionModel>();
+			list.Add(luaval.ref_action);
+		}
+		return list;
+	}
+	
+	[LuaMember("IsEqualTo")]
+	public bool IsEqualTo(ActionModel other) => ref_action == other.ref_action;
+	
 	[LuaMember("IsNull")]
 	public bool IsNull() => ref_action == null;
 	
@@ -1624,7 +1646,14 @@ public partial class LuaSinActionModel
 		get => new(ref_sinAction._replacedSinByDefenseSkill);
 		set => ref_sinAction._replacedSinByDefenseSkill = value.ref_unitSin;
 	}
-	
+
+	[LuaMember("FetchActionListTargetingThisSlot")]
+	public LuaTable FetchActionListTargetingThisSlot() =>
+		ActionModel.MakeTable(ref_sinAction.GetActionListTargetingThisSlot());
+	[LuaMember("FetchBattleActionListOfTargetingThisAsMain")]
+	public LuaTable FetchBattleActionListOfTargetingThisAsMain() =>
+		ActionModel.MakeTable(ref_sinAction.GetBattleActionListOfTargetingThisAsMain());
+
 }
 
 [LuaObject]

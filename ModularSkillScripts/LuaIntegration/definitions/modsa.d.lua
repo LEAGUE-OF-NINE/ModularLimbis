@@ -891,6 +891,11 @@ function DuelModel:FetchOpponentAction(fromAction) end
 ---@field expectedToEarnMapForInit table
 ActionModel = {}
 
+--- Compares this and another.
+---@param other ActionModel
+---@return boolean
+function ActionModel:IsEqualTo(other) end
+
 --- Checks if internal BattleActionModel reference is null.
 ---@return boolean
 ---@nodiscard
@@ -1149,6 +1154,14 @@ function SinActionModel:GetSlotIndex() end
 
 ---@return UnitModel
 function SinActionModel:FetchUnitModel() end
+
+---@return ActionModel[]
+---@nodiscard
+function SinActionModel:FetchActionListTargetingThisSlot() end
+
+---@return ActionModel[]
+---@nodiscard
+function SinActionModel:FetchBattleActionListOfTargetingThisAsMain() end
 
 --- Internally Stores a vanilla UnitSinModel.
 ---@class UnitSinModel
