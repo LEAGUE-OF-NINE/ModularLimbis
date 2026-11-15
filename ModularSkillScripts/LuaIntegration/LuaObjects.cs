@@ -1210,7 +1210,7 @@ public partial class ActionModel
 	
 	[LuaMember("TryChangeSkillByID")]
 	public void TryChangeSkillByID(int skillID, bool erase_prev_skill) => ConsequenceChangeSkill.ChangeSkillOfAction(ref_action, skillID, erase_prev_skill);
-	[LuaMember("ChangeSkillByModel")]
+	[LuaMember("TryChangeSkillByModel")]
 	public bool TryChangeSkillByModel(LuaSkillModel skill, bool saveOriginSkill) => ref_action.ChangeSkill(skill.ref_skill, saveOriginSkill);
 	
 	[LuaMember("skill")]
