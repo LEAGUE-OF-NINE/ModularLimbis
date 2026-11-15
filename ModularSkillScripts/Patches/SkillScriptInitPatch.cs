@@ -643,6 +643,52 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	{
 		SimpleEnactPassive(__instance._owner, null, null, null, "StartBattle", timing, __instance);
 	}
+	
+	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnBattleStart))]
+	[HarmonyPostfix]
+	private static void Postfix_BattleUnitModel_OnBattleStart(BATTLE_EVENT_TIMING timing, BattleUnitModel __instance)
+	{
+		int actevent = MainClass.timingDict["StartBattleOnDashboard"];
+		BattleUnitModel unit = __instance;
+		
+		foreach (SinActionModel sinAction in unit.GetSinActionList()) {
+			foreach (UnitSinModel sinModel in sinAction.currentSinList) {
+				if (sinModel == null) continue;
+				SkillModel skill = sinModel.GetSkill();
+				if (skill == null) continue;
+				BattleActionModel action = sinModel._currentAction;
+				
+				foreach (BuffModel buf in unit.GetActivatedBuffModels()) {
+					foreach (ModularSA modsa in GetAllModbaFromBuffModel(buf)) {
+						if (modsa.activationTiming != actevent) continue;
+						modsa.modsa_buffModel = buf;
+						modsa.Enact(unit, skill, action, null, actevent, timing);
+					}
+				}
+				
+				foreach (ModularSA modsa in GetAllModsaFromSkillModel(skill)) {
+					if (modsa.activationTiming != actevent) continue;
+					modsa.Enact(unit, skill, action, null, actevent, timing);
+				}
+				
+				foreach (PassiveModel pasmodel in unit._passiveDetail._passivelist.CopyList()) {
+					foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel)) {
+						if (modsa.activationTiming != actevent) continue;
+						modsa.modsa_passiveModel = pasmodel;
+						modsa.Enact(unit, skill, action, null, actevent, timing);
+					}
+				}
+				foreach (EgoPassiveModel pasmodel in unit._passiveDetail._egoPassiveList.CopyList()) {
+					foreach (ModularSA modsa in GetAllModpaFromPasmodel(pasmodel, false)) {
+						if (modsa.activationTiming != actevent) continue;
+						modsa.modsa_passiveModel = pasmodel;
+						modsa.Enact(unit, skill, action, null, actevent, timing);
+					}
+				}
+			}
+		}
+	}
+	
 	[HarmonyPatch(typeof(PassiveDetail), nameof(PassiveDetail.OnStageStart))]
 	[HarmonyPostfix]
 	private static void Postfix_PassiveDetail_OnStageStart(BATTLE_EVENT_TIMING timing, PassiveDetail __instance)

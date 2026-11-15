@@ -125,7 +125,8 @@ public class MainClass : BasePlugin
 			"OverwriteGiveBuf",
 			"IsFreeRedirect",
 			"CanFreeRedirectOther",
-			"ActionWheel"
+			"ActionWheel",
+			"StartBattleOnDashboard"
 		];
 		//timingStringList.Add("ChangeSinBuffDamage");
 
