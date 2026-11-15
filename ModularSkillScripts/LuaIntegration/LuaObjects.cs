@@ -1549,6 +1549,9 @@ public partial class LuaSkillModel
 	[LuaMember("SkillID")]
 	public int SkillID() => ref_skill.GetID();
 	
+	[LuaMember("GetFunnyPointer")]
+	public int GetFunnyPointer() => ref_skill.Pointer.ToInt32();
+	
 	[LuaMember("SkillTier")]
 	public int SkillTier() => ref_skill.GetSkillTier();
 	

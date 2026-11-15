@@ -1031,6 +1031,10 @@ function SkillModel:SkillID() end
 
 ---@return integer
 ---@nodiscard
+function SkillModel:GetFunnyPointer() end
+
+---@return integer
+---@nodiscard
 function SkillModel:SkillTier() end
 
 ---@return AttributeType
