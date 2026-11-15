@@ -209,6 +209,12 @@ public partial class ModsaInterface
 			ref_timing = ref_modsa.battleTiming
 		};
 	}
+	
+	[LuaMember("interactionTimer")]
+	public int interactionTimer {
+		get => ref_modsa.interactionTimer;
+		set => ref_modsa.interactionTimer = value;
+	}
 }
 
 [LuaObject]

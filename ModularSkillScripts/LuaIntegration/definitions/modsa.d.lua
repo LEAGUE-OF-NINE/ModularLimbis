@@ -32,6 +32,7 @@ function ModularUtil.PlayCustomSound(soundName, vol, loop) end
 function ModularUtil.VisualRefreshAllSkillSlot() end
 
 ---@class ModsaInterface
+---@field interactionTimer integer The timer for Modsa expiration. 0 is furthest, 10 is death.
 ModsaInterface = {}
 
 --- Returns the requested modsa VALUE.
