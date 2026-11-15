@@ -2006,6 +2006,10 @@ public partial class PacketActionWheel
 	public int info_wheelTiming = 0;
 	[LuaMember("info_selection")]
 	public int info_selection = -1;
+	[LuaMember("info_selection_0idx")]
+	public int info_selection_0idx = -1;
+	[LuaMember("info_selection_option")]
+	public LuaActionWheelOption info_selection_option = null;
 	[LuaMember("out_actionType")]
 	public int out_actionType = 0;
 	[LuaMember("out_optionList")]

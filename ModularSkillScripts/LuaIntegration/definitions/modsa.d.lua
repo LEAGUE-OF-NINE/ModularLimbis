@@ -180,7 +180,9 @@ PacketOverwriteGiveBuf = {}
 --- Information Packet specific to Modular's ActionWheel activation.
 ---@class PacketActionWheel
 ---@field info_wheelTiming ActionWheelTiming
----@field info_selection integer Handled by the Lua script
+---@field info_selection integer C# Info: option.skillID
+---@field info_selection_0idx integer C# Info: 0index of selected option
+---@field info_selection_option ActionWheelOption C# Info: option object
 ---@field out_actionType ActionWheelType
 ---@field out_optionList ActionWheelOption[] Options for Wheel Request.
 ---@field out_wheel_radius_scale number

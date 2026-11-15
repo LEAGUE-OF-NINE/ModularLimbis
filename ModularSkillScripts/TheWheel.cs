@@ -212,7 +212,10 @@ public class TheWheel
 							}
 							foundScript = true;
 							packet.info_wheelTiming = 1;
-							packet.info_selection = option_list[option_selected_idx].skillID;
+							ActionWheelOption option_selected = option_list[option_selected_idx];
+							packet.info_selection = option_selected.skillID;
+							packet.info_selection_0idx = option_selected_idx;
+							packet.info_selection_option = new LuaActionWheelOption(option_selected);
 							modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 						}
 						
@@ -234,7 +237,10 @@ public class TheWheel
 
 									modsa.modsa_passiveModel = passive;
 									packet.info_wheelTiming = 1;
-									packet.info_selection = option_list[option_selected_idx].skillID;
+									ActionWheelOption option_selected = option_list[option_selected_idx];
+									packet.info_selection = option_selected.skillID;
+									packet.info_selection_0idx = option_selected_idx;
+									packet.info_selection_option = new LuaActionWheelOption(option_selected);
 									modsa.Enact(unit, skill, action, null, actevent, BATTLE_EVENT_TIMING.ALL_TIMING);
 									foundScript = true;
 								}
