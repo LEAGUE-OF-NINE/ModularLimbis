@@ -184,7 +184,7 @@ PacketOverwriteGiveBuf = {}
 ---@field out_actionType ActionWheelType
 ---@field out_optionList ActionWheelOption[] Options for Wheel Request.
 ---@field out_wheel_radius_scale number
----@field out_wheel_rotate_percentage number
+---@field out_wheel_rotate_percentage number 0.0 = 0xTau, 1.0 = 1xTau
 ---@field carry_uniqueInfo table Carried over to this same script
 PacketActionWheel = {}
 

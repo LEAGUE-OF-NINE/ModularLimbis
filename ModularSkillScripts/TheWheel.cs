@@ -141,6 +141,7 @@ public class TheWheel
 						if (packet.out_optionList.ArrayLength < 1) continue;
 						option_list = LuaActionWheelOption.UnpackTable(packet.out_optionList);
 						wheel_radius_scale = (float)packet.out_wheel_radius_scale;
+						rot_offset_percentage = (float)packet.out_wheel_rotate_percentage;
 						foundScript = true;
 					}
 
@@ -173,7 +174,6 @@ public class TheWheel
 						}
 					}
 
-					
 					options = option_list.Count;
 					float wheel_radius = 450.0f * wheel_radius_scale;
 					float rot_per_option = 360.0f / options;
