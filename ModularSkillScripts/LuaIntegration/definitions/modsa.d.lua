@@ -699,6 +699,17 @@ function UnitModel:TakeAbsHpDamage(attackerOrNull, value, timing, dmgSrcType, ac
   ---@diagnostic disable-next-line: missing-return
 end
 
+---@param unitSin UnitSinModel
+---@param timing EventTiming
+---@param actionOrNil ActionModel
+function UnitModel:DiscardSin(unitSin, timing, actionOrNil) end
+
+--- Manually call the Discard Sin effect without actually discarding anything.
+---@param unitSin UnitSinModel
+---@param timing EventTiming
+---@param actionOrNil ActionModel
+function UnitModel:OnDiscardSin(unitSin, timing, actionOrNil) end
+
 ---@param action ActionModel
 ---@param overwrite_skillTargetType SkillTargetType (Use "NONE" for no overwrite)
 ---@param lastOrFirst ModeLastOrFirst
@@ -1073,6 +1084,11 @@ function SkillModel:AddCoin(coin, forcibly) end
 
 ---@param idx integer
 function SkillModel:RemoveCoinModelFromListByIndex(idx) end
+
+--- Manually call the Discard effect without actually discarding anything.
+---@param action ActionModel
+---@param timing EventTiming
+function SkillModel:OnDiscarded(action, timing) end
 
 --- Internally Stores a vanilla CoinModel.
 ---@class CoinModel

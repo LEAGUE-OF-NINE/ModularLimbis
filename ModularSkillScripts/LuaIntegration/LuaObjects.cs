@@ -429,6 +429,16 @@ public partial class UnitModel
 		return table;
 	}
 	
+	[LuaMember("DiscardSin")]
+	public void DiscardSin(LuaUnitSinModel unitSin, EventTiming timing, ActionModel? actionOrNil) {
+		ref_unitModel.DiscardSin(unitSin.ref_unitSin, timing.ref_timing, actionOrNil?.ref_action);
+	}
+	
+	[LuaMember("OnDiscardSin")]
+	public void OnDiscardSin(LuaUnitSinModel unitSin, EventTiming timing, ActionModel? actionOrNil) {
+		ref_unitModel.OnDiscardSin(unitSin.ref_unitSin, timing.ref_timing, actionOrNil?.ref_action);
+	}
+	
 	[LuaMember("CutInAction")]
 	public void CutInAction(ActionModel action, LuaSkillTargetType overwrite_skillTargetType, string lastOrFirst) {
 		BattleActionModelManager.CUT_IN_ACTION_TYPE cutInType = lastOrFirst == "Last" ? BattleActionModelManager.CUT_IN_ACTION_TYPE.LAST_APPEND : BattleActionModelManager
@@ -1594,6 +1604,11 @@ public partial class LuaSkillModel
 	
 	[LuaMember("RemoveCoinModelFromListByIndex")]
 	public void RemoveCoinModelFromListByIndex(int idx) => ref_skill.RemoveCoinModelFromListByIndex(idx);
+	
+	[LuaMember("OnDiscarded")]
+	public void OnDiscarded(ActionModel action, EventTiming timing) {
+		ref_skill.OnDiscarded(action.ref_action, timing.ref_timing);
+	}
 }
 
 [LuaObject]
