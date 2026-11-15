@@ -52,6 +52,8 @@ public class TheWheel
 		private const float pi_fast = 3.1416f;
 		private const float tau_fast = pi_fast*2;
 		
+		
+		public float rot_offset_percentage = 0;
 		public int option_selected_idx = -1;
 		
 		public WheelVis ref_wheelVis = null;
@@ -165,6 +167,7 @@ public class TheWheel
 								if (packet.out_optionList.ArrayLength < 1) continue;
 								option_list = LuaActionWheelOption.UnpackTable(packet.out_optionList);
 								wheel_radius_scale = (float)packet.out_wheel_radius_scale;
+								rot_offset_percentage = (float)packet.out_wheel_rotate_percentage;
 								foundScript = true;
 							}
 						}
@@ -175,8 +178,10 @@ public class TheWheel
 					float wheel_radius = 450.0f * wheel_radius_scale;
 					float rot_per_option = 360.0f / options;
 					float rot_offset = Mathf.Min(180.0f / options, 90.0f);
-					for (int i = 0; i < options; i++)
-					{
+					if (rot_offset_percentage != 0) {
+						rot_offset += tau_fast * rot_offset_percentage;
+					}
+					for (int i = 0; i < options; i++) {
 						ActionWheelOption option = option_list[i];
 						SkillModel option_skillModel = unit._unitDataModel.GetSkillModel(option.skillID);
 						Vector2 option_pos = new(wheel_radius, 0);
@@ -237,6 +242,7 @@ public class TheWheel
 						}
 					}
 
+					rot_offset_percentage = 0;
 					option_selected_idx = -1;
 					options = 0;
 					option_list.Clear();
@@ -246,6 +252,9 @@ public class TheWheel
 
 			if (wantWheel && ref_wheelVis && options > 0)
 			{
+				if (rot_offset_percentage != 0) {
+					wheelPercentage = (wheelPercentage + rot_offset_percentage) % 1.0f;
+				}
 				float selectionVariant = wheelPercentage * options;
 				int selection_idx = -1;
 				if (!in_cancel_range) {

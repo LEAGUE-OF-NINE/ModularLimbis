@@ -2012,6 +2012,8 @@ public partial class PacketActionWheel
 	public LuaTable out_optionList = new();
 	[LuaMember("out_wheel_radius_scale")]
 	public double out_wheel_radius_scale = 1.0;
+	[LuaMember("out_wheel_rotate_percentage")]
+	public double out_wheel_rotate_percentage = 1.0;
 	[LuaMember("carry_uniqueInfo")]
 	public LuaTable carry_uniqueInfo = new();
 }
