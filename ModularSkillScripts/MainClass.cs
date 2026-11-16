@@ -322,6 +322,7 @@ public class MainClass : BasePlugin
 		consequenceDict["othermodsavalue"] = new ConsequenceOtherModsaValue();
 		consequenceDict["worldposition"] = new ConsequenceSetPosition();
 		consequenceDict["gatesp"] = new ConsequenceGateSP();
+		consequenceDict["effectability"] = new ConsequenceEffectAbility();
 		// legacy consequences
 		consequenceDict["mpdmg"] = new ConsequenceMpDmg();
 		consequenceDict["buf"] = new ConsequenceBuf();
