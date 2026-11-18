@@ -1731,13 +1731,28 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 		{
 			return;
 		}
+		if (g.Min > g.Max)
+		{
+			//GateSPDebugPatches.Log($"yo nigga {u.GetUnitID()}#{id} ClampChangeStat got skipped bcuz of invalid gate=[{g.Min},{g.Max}]");
+			return;
+		}
 		int before = newMp;
 		if (newMp > g.Max) newMp = g.Max;
 		if (newMp < g.Min) newMp = g.Min;
+		//GateSPDebugPatches.Log($"{u.GetUnitID()}#{id} ClampChangeStat[{cs.GetType().Name}] curMp={u.Mp} newMp {before} -> {newMp} gate=[{g.Min},{g.Max}]{(before != newMp ? " CLAMPED" : "")}");
 	}
 
+	//[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.ModifyMpChangeValue))]
+	//[HarmonyPostfix]
+	//static void Postfix_GateSP(BattleUnitModel __instance, int oldMp, int newMp, ref int changedNewMp)
+	//{
+	//	if (!gateSPDict.TryGetValue(__instance.InstanceID, out var g)) return;
+	//	if (changedNewMp < oldMp && changedNewMp < g.Min) changedNewMp = Math.Min(oldMp, g.Min); // only stops drops
+	//	if (changedNewMp > oldMp && changedNewMp > g.Max) changedNewMp = Math.Max(oldMp, g.Max); // only stops rises
+	//}
 
-	
+
+
 	[HarmonyPatch(typeof(BattleUnitModel), nameof(BattleUnitModel.OnChangeMp))]
 	[HarmonyPostfix]
 	private static void Postfix_BattleUnitModel_OnChangeMp(
