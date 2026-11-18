@@ -179,7 +179,7 @@ public class TheWheel
 					float rot_per_option = 360.0f / options;
 					float rot_offset = Mathf.Min(180.0f / options, 90.0f);
 					if (rot_offset_percentage != 0) {
-						rot_offset += tau_fast * rot_offset_percentage;
+						rot_offset += 360.0f * rot_offset_percentage;
 					}
 					for (int i = 0; i < options; i++) {
 						ActionWheelOption option = option_list[i];
