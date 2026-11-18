@@ -277,6 +277,12 @@ public partial class UnitModel
 	
 	[LuaMember("Faction")]
 	public int GetFaction() => (int)ref_unitModel.Faction;
+
+	[LuaMember("participateOrder")]
+	public int participateOrder {
+		get => ref_unitModel._participateOrder;
+		set => ref_unitModel._participateOrder = value;
+	}
 	
 	[LuaMember("HP")]
 	public int HPCheck() => ref_unitModel.Hp;

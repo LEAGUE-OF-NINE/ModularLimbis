@@ -588,6 +588,7 @@ function EventTiming.CreateFromInt(integ) end
 function EventTiming:ToString() end
 
 ---@class UnitModel
+---@field participateOrder integer Deployment Order
 UnitModel = {}
 
 --- Checks if internal BattleUnitModel reference is null.
