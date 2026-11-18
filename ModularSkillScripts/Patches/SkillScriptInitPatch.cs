@@ -1705,21 +1705,63 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	}
 
 
-	[HarmonyPatch(typeof(ChangeStatExceptMp), nameof(ChangeStatExceptMp.ChangeMp))]
-	[HarmonyPrefix]
-	static void Prefix_ChangeMp_ExceptMp(ChangeStatExceptMp __instance, ref int newMp) => ClampChangeStat(__instance, ref newMp);
+	public static void PatchGateSPChangeStat(Harmony harmony)
+	{
+		var prefix = new HarmonyMethod(typeof(SkillScriptInitPatch), nameof(Prefix_ChangeStat_ChangeMp));
+		var postfix = new HarmonyMethod(typeof(SkillScriptInitPatch), nameof(Postfix_ChangeStat_ChangeMp));
+		var hooked = new System.Collections.Generic.Dictionary<IntPtr, System.Type>();
+		System.Type[] types = { typeof(ChangeStatIncludeMp), typeof(ChangeStatExceptMp), typeof(ChangeStatPart), typeof(ChangeStatPlayer) };
 
-	[HarmonyPatch(typeof(ChangeStatIncludeMp), nameof(ChangeStatIncludeMp.ChangeMp))]
-	[HarmonyPrefix]
-	static void Prefix_ChangeMp_IncludeMp(ChangeStatIncludeMp __instance, ref int newMp) => ClampChangeStat(__instance, ref newMp);
+		foreach (var t in types)
+		{
+			var method = AccessTools.DeclaredMethod(t, nameof(ChangeStat.ChangeMp));
+			if (method == null) { MainClass.Logg.LogWarning($"[GateSP] {t.Name}.ChangeMp not found, skipping"); continue; }
 
-	[HarmonyPatch(typeof(ChangeStatPart), nameof(ChangeStatPart.ChangeMp))]
-	[HarmonyPrefix]
-	static void Prefix_ChangeMp_Part(ChangeStatPart __instance, ref int newMp) => ClampChangeStat(__instance, ref newMp);
+			IntPtr native = GetNativeMethodPointer(method);
+			if (native == IntPtr.Zero) { MainClass.Logg.LogWarning($"[GateSP] {t.Name}.ChangeMp has no native pointer, skipping"); continue; }
 
-	[HarmonyPatch(typeof(ChangeStatPlayer), nameof(ChangeStatPlayer.ChangeMp))]
-	[HarmonyPrefix]
-	static void Prefix_ChangeMp_Player(ChangeStatPlayer __instance, ref int newMp) => ClampChangeStat(__instance, ref newMp);
+			if (hooked.TryGetValue(native, out var sharedWith))
+			{
+				MainClass.Logg.LogInfo($"[GateSP] {t.Name}.ChangeMp shares native code 0x{native.ToInt64():X} with {sharedWith.Name}.ChangeMp, not hooking it twice");
+				continue;
+			}
+
+			hooked[native] = t;
+			harmony.Patch(method, prefix: prefix, postfix: postfix);
+		}
+	}
+
+	static unsafe IntPtr GetNativeMethodPointer(System.Reflection.MethodBase method)
+	{
+		var field = Il2CppInterop.Common.Il2CppInteropUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(method);
+		if (field == null) return IntPtr.Zero;
+		var info = (IntPtr)field.GetValue(null);
+		if (info == IntPtr.Zero) return IntPtr.Zero;
+		return Il2CppInterop.Runtime.Runtime.UnityVersionHandler
+			.Wrap((Il2CppInterop.Runtime.Runtime.Il2CppMethodInfo*)info).MethodPointer;
+	}
+
+	const int MaxChangeMpDepth = 32;
+	[ThreadStatic] static int changeMpDepth;
+	static bool loggedChangeMpLoop;
+
+	static bool Prefix_ChangeStat_ChangeMp(ChangeStat __instance, ref int newMp)
+	{
+		changeMpDepth++;
+		if (changeMpDepth > MaxChangeMpDepth)
+		{
+			if (!loggedChangeMpLoop)
+			{
+				loggedChangeMpLoop = true;
+				MainClass.Logg.LogError($"[GateSP] ChangeMp recursed past {MaxChangeMpDepth} levels on {__instance.GetType().Name} (newMp={newMp}); skipping to avoid a stack overflow");
+			}
+			return false;
+		}
+		ClampChangeStat(__instance, ref newMp);
+		return true;
+	}
+
+	static void Postfix_ChangeStat_ChangeMp() => changeMpDepth--;
 
 	static void ClampChangeStat(ChangeStat cs, ref int newMp)
 	{
@@ -1747,8 +1789,8 @@ public class CoroutineRunner : UnityEngine.MonoBehaviour
 	//static void Postfix_GateSP(BattleUnitModel __instance, int oldMp, int newMp, ref int changedNewMp)
 	//{
 	//	if (!gateSPDict.TryGetValue(__instance.InstanceID, out var g)) return;
-	//	if (changedNewMp < oldMp && changedNewMp < g.Min) changedNewMp = Math.Min(oldMp, g.Min); // only stops drops
-	//	if (changedNewMp > oldMp && changedNewMp > g.Max) changedNewMp = Math.Max(oldMp, g.Max); // only stops rises
+	//	if (changedNewMp < oldMp && changedNewMp < g.Min) changedNewMp = Math.Min(oldMp, g.Min); 
+	//	if (changedNewMp > oldMp && changedNewMp > g.Max) changedNewMp = Math.Max(oldMp, g.Max);
 	//}
 
 
