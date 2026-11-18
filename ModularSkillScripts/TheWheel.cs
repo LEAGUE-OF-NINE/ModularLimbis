@@ -324,7 +324,7 @@ public class TheWheel
 		rect.anchorMax = new Vector2(0.5f, 0);
 		rect.pivot = new Vector2(0.5f, 1.0f);
 		rect.anchoredPosition = offset;
-		rect.sizeDelta = is_desc ? new Vector2(250, 500) : new Vector2(500, 300);
+		rect.sizeDelta = is_desc ? new Vector2(300, 500) : new Vector2(600, 300);
 		
 		TextMeshProUGUI tmpText = lineObject.AddComponent<TextMeshProUGUI>();
 		line.textMesh = tmpText;
@@ -332,6 +332,10 @@ public class TheWheel
 		tmpText.fontSize = fontSize;
 		tmpText.horizontalAlignment = HorizontalAlignmentOptions.Center;
 		tmpText.enableWordWrapping = true;
+		
+		ContentSizeFitter fitter = lineObject.AddComponent<ContentSizeFitter>();
+		fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+		fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 		
 		return line;
 	}
@@ -384,13 +388,14 @@ public class TheWheel
 			string option_name = option.option_name;
 			if (string.IsNullOrEmpty(option_name)) option_name = skill.GetSkillName();
 			//WheelOptionText optionText = CreateOptionText(rect, skillName, 60, new Vector2(0, 60.0f*icon_scale) + pos);
-			WheelOptionText optionText = CreateOptionText(rect, option_name, false, 55 * text_scale, new Vector2(0, -10.0f));
+			WheelOptionText optionText = CreateOptionText(rect, option_name, false, 50 * text_scale, new Vector2(0, -10.0f));
 			line.text1 = optionText;
 
 			string option_desc = option.option_desc;
-			if (!string.IsNullOrEmpty(option_desc)){
+			if (!string.IsNullOrEmpty(option_desc)) {
+				RectTransform thisParent = optionText.GetComponent<RectTransform>();
 				//optionText = CreateOptionText(rect, option_desc, 45, new Vector2(0, 120.0f*icon_scale + 10.0f) + pos);
-				optionText = CreateOptionText(rect, option_desc, true, 40 * text_scale, new Vector2(0, -75.0f));
+				optionText = CreateOptionText(thisParent, option_desc, true, 40 * text_scale, new Vector2(0, -75.0f));
 				line.text2 = optionText;
 			}
 			
