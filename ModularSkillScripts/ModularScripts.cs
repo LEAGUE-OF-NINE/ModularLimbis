@@ -1411,6 +1411,7 @@ public class ModularSA : Il2CppSystem.Object
 		LuaFunctions.MergeTableToLuaState("ActionModel", state, LuaFunctions.Instance.F_ActionModel_table);
 		LuaFunctions.MergeTableToLuaState("UnitSinModel", state, LuaFunctions.Instance.F_UnitSinModel_table);
 		LuaFunctions.MergeTableToLuaState("TargetSinActionData", state, LuaFunctions.Instance.F_TargetSinActionData_table);
+		LuaFunctions.MergeTableToLuaState("EgoStockManager", state, LuaFunctions.Instance.F_EgoStockManager_table);
 	}
 
 	public static BattleUnitModel_Abnormality AsAbnormalityModel(BattleUnitModel targetModel)

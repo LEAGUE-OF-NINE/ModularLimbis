@@ -27,6 +27,8 @@ public sealed class LuaFunctions
 	public readonly LuaTable F_UnitSinModel_table;
 	public readonly Lua.LuaFunction[] F_TargetSinActionData;
 	public readonly LuaTable F_TargetSinActionData_table;
+	public readonly Lua.LuaFunction[] F_EgoStockManager;
+	public readonly LuaTable F_EgoStockManager_table;
 
   public LuaFunctions()
   {
@@ -71,6 +73,11 @@ public sealed class LuaFunctions
 	  [
 		  new Lua.LuaFunction("CreateNew", TargetSinActionData_CreateNew),
 	  ];
+	  F_EgoStockManager =
+	  [
+		  new Lua.LuaFunction("GetAttributeStockNumberByAttributeType", EgoStockManager_GetAttributeStockNumberByAttributeType),
+		  new Lua.LuaFunction("AddRemoveSinStock", EgoStockManager_AddRemoveSinStock)
+	  ];
 	  
 	  F_Util_table = InstantiateLuaTableForFunctions(F_Util);
 	  F_BufManager_table = InstantiateLuaTableForFunctions(F_BufManager);
@@ -79,6 +86,7 @@ public sealed class LuaFunctions
 	  F_ActionModel_table = InstantiateLuaTableForFunctions(F_ActionModel);
 	  F_UnitSinModel_table = InstantiateLuaTableForFunctions(F_UnitSinModel);
 	  F_TargetSinActionData_table = InstantiateLuaTableForFunctions(F_TargetSinActionData);
+	  F_EgoStockManager_table = InstantiateLuaTableForFunctions(F_EgoStockManager);
 	  
   }
 
@@ -362,6 +370,36 @@ public sealed class LuaFunctions
 		LuaSinActionModel sinAction = context.GetArgument<LuaSinActionModel>(0);
 		buffer.Span[0] = LuaTargetSinActionData.CreateNew(sinAction);
 		return new ValueTask<int>(1);
+	}
+	
+	
+	public ValueTask<int> EgoStockManager_GetAttributeStockNumberByAttributeType(
+		LuaFunctionExecutionContext context,
+		Memory<LuaValue> buffer,
+		CancellationToken cancellationToken)
+	{
+		SinManager sinmanager_inst = Singleton<SinManager>.Instance;
+		SinManager.EgoStockManager stock_manager = sinmanager_inst._egoStockMangaer;
+		int faction = context.GetArgument<int>(0);
+		LuaAttributeType sinType = context.GetArgument<LuaAttributeType>(1);
+		buffer.Span[0] = stock_manager.GetAttributeStockNumberByAttributeType((UNIT_FACTION)faction, sinType.ref_enum);
+		return new ValueTask<int>(1);
+	}
+	
+	public ValueTask<int> EgoStockManager_AddRemoveSinStock(
+		LuaFunctionExecutionContext context,
+		Memory<LuaValue> buffer,
+		CancellationToken cancellationToken)
+	{
+		SinManager sinmanager_inst = Singleton<SinManager>.Instance;
+		SinManager.EgoStockManager stock_manager = sinmanager_inst._egoStockMangaer;
+		int faction = context.GetArgument<int>(0);
+		LuaAttributeType sinType = context.GetArgument<LuaAttributeType>(1);
+		int amount = context.GetArgument<int>(2);
+		
+		if (amount > 0) stock_manager.AddSinStock((UNIT_FACTION)faction, sinType.ref_enum, amount, 0);
+		else if (amount < 0) stock_manager.RemoveSinStock((UNIT_FACTION)faction, sinType.ref_enum, amount * -1);
+		return new ValueTask<int>(0);
 	}
 	
 }

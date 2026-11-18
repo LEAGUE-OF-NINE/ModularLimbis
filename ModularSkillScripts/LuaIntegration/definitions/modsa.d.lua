@@ -569,6 +569,19 @@ function ActionModelManager.AddUniqueCutIn(uniqueCutIn, action) end
 ---@return nil
 function ActionModelManager.ReserveToCutInActionUntilStartRunBattle(reserveType, action, removeDuel) end
 
+--- Static Method Interface for EgoStockManager.
+---@class EgoStockManager
+EgoStockManager = {}
+
+---@param faction UnitFaction
+---@param sinType AttributeType
+function EgoStockManager.GetAttributeStockNumberByAttributeType(faction, sinType) end
+
+---@param faction UnitFaction
+---@param sinType AttributeType
+---@param amount integer Lower than 0 to remove
+function EgoStockManager.AddRemoveSinStock(faction, sinType, amount) end
+
 --- Can be instanced to store a BATTLE_EVENT_TIMING enum.
 ---@class EventTiming
 EventTiming = {}
